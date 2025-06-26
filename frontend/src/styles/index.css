@@ -74,6 +74,24 @@
     border-color: var(--border-default);
     box-shadow: var(--shadow-md);
   }
+
+  /* Midnight-themed Card */
+  .card-midnight {
+    background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-default);
+    backdrop-filter: blur(8px);
+    transition: all var(--duration-normal) ease;
+  }
+  
+  .card-midnight:hover {
+    background: linear-gradient(135deg, var(--surface-3) 0%, var(--surface-4) 100%);
+    border-color: var(--border-default);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
   
   /* Primary Button with Nyx Theme */
   .btn-primary {

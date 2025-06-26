@@ -272,7 +272,7 @@ export const usePerformantAnimation = (config: Partial<AnimationConfig> = {}) =>
     element.style.willChange = 'transform, opacity';
 
     // Use requestAnimationFrame for smooth animations
-    const animate = (timestamp: number) => {
+    const animate = (_timestamp: number) => {
       // Animation logic here
       animationFrameRef.current = requestAnimationFrame(animate);
     };
@@ -319,8 +319,8 @@ export const usePerformantAnimation = (config: Partial<AnimationConfig> = {}) =>
  * Custom hook for hover animations
  */
 export const useHoverAnimation = (
-  hoverConfig: Partial<AnimationConfig> = {},
-  exitConfig: Partial<AnimationConfig> = {}
+  _hoverConfig: Partial<AnimationConfig> = {},
+  _exitConfig: Partial<AnimationConfig> = {}
 ) => {
   const [isHovered, setIsHovered] = useState(false);
   const shouldAnimate = !prefersReducedMotion();

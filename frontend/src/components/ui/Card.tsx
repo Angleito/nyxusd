@@ -83,7 +83,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         )}
         
         {/* Shine effect overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-nyx-600/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         
         {/* Content */}
         <div className="relative z-10">

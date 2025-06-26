@@ -45,10 +45,10 @@
   --surface-4: var(--nyx-purple);
   
   /* Surface Overlays (with opacity) */
-  --surface-overlay-5: rgba(255, 255, 255, 0.05);
-  --surface-overlay-8: rgba(255, 255, 255, 0.08);
-  --surface-overlay-12: rgba(255, 255, 255, 0.12);
-  --surface-overlay-16: rgba(255, 255, 255, 0.16);
+  --surface-overlay-5: rgba(99, 102, 241, 0.05);
+  --surface-overlay-8: rgba(99, 102, 241, 0.08);
+  --surface-overlay-12: rgba(139, 92, 246, 0.12);
+  --surface-overlay-16: rgba(139, 92, 246, 0.16);
   
   /* Interactive Surface States */
   --surface-hover: rgba(255, 255, 255, 0.08);
@@ -82,6 +82,12 @@
   --text-warning: #f59e0b;
   --text-error: #ef4444;
   --text-info: var(--nyx-tertiary);
+
+  /* Function Display Colors */
+  --function-primary: #22d3ee;
+  --function-keyword: #818cf8;
+  --function-string: #10b981;
+  --function-comment: rgba(255, 255, 255, 0.54);
   
   /* =========================
      BORDER COLORS

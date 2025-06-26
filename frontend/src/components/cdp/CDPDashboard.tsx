@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import { fetchCDPs } from '../../services/api'
 // import { CDPCard } from './CDPCard'
 // import { CreateCDPWizard } from './CreateCDPWizard'
@@ -125,7 +125,7 @@ export const CDPDashboard: React.FC = () => {
   const [showCreateWizard, setShowCreateWizard] = useState(false)
   const [expandedActions, setExpandedActions] = useState(false)
   
-  const { data: cdpData, isLoading } = useQuery('cdps', fetchCDPs)
+  const { data: cdpData, isLoading } = useQuery(['cdps'], fetchCDPs)
 
   // Calculate dashboard metrics
   const cdps = (cdpData as any)?.cdps || []
@@ -325,7 +325,22 @@ export const CDPDashboard: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-xl max-w-lg w-full mx-4">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Create New CDP</h2>
-            <p className="text-gray-600 mb-6">CDP creation wizard coming soon...</p>
+            <p className="text-gray-600 mb-6">
+              Create a new Collateralized Debt Position to mint nyxUSD against your collateral. 
+              This allows you to unlock liquidity while maintaining exposure to your assets.
+            </p>
+            
+            <div className="space-y-4 mb-6">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h3 className="font-medium text-blue-900 mb-2">Quick Start Guide:</h3>
+                <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                  <li>Deposit collateral (ETH, BTC, or other supported assets)</li>
+                  <li>Choose your collateralization ratio (minimum 150%)</li>
+                  <li>Mint nyxUSD against your collateral</li>
+                  <li>Manage your position to avoid liquidation</li>
+                </ol>
+              </div>
+            </div>
             <button
               onClick={() => setShowCreateWizard(false)}
               className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-colors"

@@ -1,5 +1,6 @@
 import React from 'react'
-import { useQuery } from 'react-query'
+import { Link } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { fetchSystemStats, fetchOraclePrices } from '../../services/api'
 import { WelcomeCard } from './WelcomeCard'
 import { SystemHealthCard } from './SystemHealthCard'
@@ -7,12 +8,12 @@ import { OraclePricesCard } from './OraclePricesCard'
 import { RecentActivityCard } from './RecentActivityCard'
 
 export const ModernDashboard: React.FC = () => {
-  const { data: systemStats, isLoading: statsLoading, error: statsError } = useQuery('systemStats', fetchSystemStats, {
+  const { data: systemStats, isLoading: statsLoading, error: statsError } = useQuery(['systemStats'], fetchSystemStats, {
     refetchInterval: 30000, // Refetch every 30 seconds
     staleTime: 20000, // Consider data stale after 20 seconds
   })
   
-  const { data: prices, isLoading: pricesLoading, error: pricesError } = useQuery('oraclePrices', fetchOraclePrices, {
+  const { data: prices, isLoading: pricesLoading, error: pricesError } = useQuery(['oraclePrices'], fetchOraclePrices, {
     refetchInterval: 10000, // Refetch every 10 seconds for prices
     staleTime: 5000, // Consider prices stale after 5 seconds
   })
@@ -100,26 +101,40 @@ export const ModernDashboard: React.FC = () => {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
                   <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
-                  <span>Portfolio Analytics</span>
+                  <span>Quick Actions</span>
                 </h3>
-                <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-full font-medium">
-                  Coming Soon
-                </span>
               </div>
               
-              <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-8 text-center">
-                <svg className="w-16 h-16 text-purple-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Advanced Analytics</h4>
-                <p className="text-sm text-gray-600 mb-4">
-                  Track your portfolio performance, yield history, and risk metrics in one place.
-                </p>
-                <div className="text-xs text-gray-500">
-                  Feature in development
-                </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Link to="/cdp" className="group block p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg hover:from-purple-100 hover:to-purple-200 transition-all duration-200">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900">Create CDP</div>
+                      <div className="text-sm text-purple-600">Start earning</div>
+                    </div>
+                  </div>
+                </Link>
+                
+                <Link to="/system" className="group block p-4 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg hover:from-indigo-100 hover:to-indigo-200 transition-all duration-200">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900">View Stats</div>
+                      <div className="text-sm text-indigo-600">System health</div>
+                    </div>
+                  </div>
+                </Link>
               </div>
             </div>
           </div>

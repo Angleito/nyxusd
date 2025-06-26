@@ -108,7 +108,7 @@ const HeroSection: React.FC = () => {
 
               {/* Main headline */}
               <motion.h1 
-                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight"
+                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-6 leading-tight"
                 variants={itemVariants}
               >
                 Privacy-First
@@ -149,7 +149,7 @@ const HeroSection: React.FC = () => {
               >
                 {/* Primary CTA - Launch App */}
                 <motion.button
-                  className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/25 overflow-hidden"
+                  className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-foreground font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/25 overflow-hidden"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -162,7 +162,7 @@ const HeroSection: React.FC = () => {
 
                 {/* Secondary CTA - Learn More */}
                 <motion.button
-                  className="groupe relative px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/20 hover:border-white/30"
+                  className="groupe relative px-8 py-4 bg-background/10 hover:bg-background/20 text-foreground font-semibold rounded-xl transition-all duration-300 backdrop-blur-sm border border-border/20 hover:border-border/30"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -206,7 +206,7 @@ const HeroSection: React.FC = () => {
                     }}
                   >
                     <div className="text-center">
-                      <div className="text-white font-bold text-lg">nyxUSD</div>
+                      <div className="text-foreground font-bold text-lg">nyxUSD</div>
                       <div className="text-purple-200 text-xs">Stablecoin</div>
                     </div>
                   </motion.div>
@@ -219,7 +219,7 @@ const HeroSection: React.FC = () => {
                   ].map((collateral, index) => (
                     <motion.div
                       key={collateral.name}
-                      className={`absolute w-16 h-16 bg-gradient-to-br ${collateral.color} rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg`}
+                      className={`absolute w-16 h-16 bg-gradient-to-br ${collateral.color} rounded-full flex items-center justify-center text-foreground font-bold text-sm shadow-lg`}
                       style={{
                         top: '50%',
                         left: '50%',

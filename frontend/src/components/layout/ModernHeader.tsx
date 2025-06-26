@@ -21,8 +21,8 @@ export const ModernHeader: React.FC = () => {
 
   // Close mobile menu on escape key
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isMobileMenuOpen) {
+    const handleEscape = (e: Event) => {
+      if ((e as KeyboardEvent).key === 'Escape' && isMobileMenuOpen) {
         setIsMobileMenuOpen(false)
       }
     }
@@ -87,14 +87,14 @@ export const ModernHeader: React.FC = () => {
                   {/* Logo Icon */}
                   <div className="relative">
                     <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center shadow-lg shadow-purple-900/30">
-                      <span className="text-white font-bold text-lg">N</span>
+                      <span className="text-foreground font-bold text-lg">N</span>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-200" />
                   </div>
                   
                   {/* Brand Text */}
                   <div className="hidden sm:block">
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
                       NyxUSD
                     </h1>
                     <p className="text-xs text-gray-400 -mt-1 group-hover:text-gray-300 transition-colors duration-200">
@@ -125,7 +125,7 @@ export const ModernHeader: React.FC = () => {
             <motion.button
               className={clsx(
                 'lg:hidden p-2 rounded-lg transition-all duration-200',
-                'text-gray-300 hover:text-white hover:bg-gray-800/50',
+                'text-muted-foreground hover:text-foreground hover:bg-muted/50',
                 'focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-gray-900'
               )}
               onClick={toggleMobileMenu}
@@ -192,16 +192,16 @@ export const ModernHeader: React.FC = () => {
                 <div className="flex items-center justify-between p-4 border-b border-gray-800">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-700 rounded-md flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">N</span>
+                      <span className="text-foreground font-bold text-sm">N</span>
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-white">NyxUSD</h2>
+                      <h2 className="text-lg font-semibold text-foreground">NyxUSD</h2>
                       <p className="text-xs text-gray-400 -mt-1">Navigation</p>
                     </div>
                   </div>
                   <button
                     onClick={closeMobileMenu}
-                    className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-purple-400"
                     aria-label="Close navigation menu"
                   >
                     <XMarkIcon className="w-5 h-5" />

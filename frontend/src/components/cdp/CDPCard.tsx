@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useMutation, useQueryClient } from 'react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { depositCollateral, withdrawCollateral, mintNyxUSD, burnNyxUSD } from '../../services/api'
 
@@ -34,7 +34,7 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
     ({ cdpId, amount }: { cdpId: string; amount: string }) => depositCollateral(cdpId, amount),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('cdps')
+        queryClient.invalidateQueries(['cdps'])
         setShowActionModal(false)
         setActionType(null)
         reset()
@@ -46,7 +46,7 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
     ({ cdpId, amount }: { cdpId: string; amount: string }) => withdrawCollateral(cdpId, amount),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('cdps')
+        queryClient.invalidateQueries(['cdps'])
         setShowActionModal(false)
         setActionType(null)
         reset()
@@ -58,7 +58,7 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
     ({ cdpId, amount }: { cdpId: string; amount: string }) => mintNyxUSD(cdpId, amount),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('cdps')
+        queryClient.invalidateQueries(['cdps'])
         setShowActionModal(false)
         setActionType(null)
         reset()
@@ -70,7 +70,7 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
     ({ cdpId, amount }: { cdpId: string; amount: string }) => burnNyxUSD(cdpId, amount),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('cdps')
+        queryClient.invalidateQueries(['cdps'])
         setShowActionModal(false)
         setActionType(null)
         reset()
@@ -147,18 +147,18 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200">
+      <div className="bg-card rounded-xl shadow-sm border border-border hover:shadow-md transition-all duration-200">
         {/* Header */}
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center text-card-foreground font-bold">
                   {cdp.id.slice(-2)}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">CDP #{cdp.id}</h3>
-                  <p className="text-sm text-gray-500">Created {new Date(cdp.createdAt).toLocaleDateString()}</p>
+                  <h3 className="font-semibold text-card-foreground">CDP #{cdp.id}</h3>
+                  <p className="text-sm text-muted-foreground">Created {new Date(cdp.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
               
@@ -226,25 +226,25 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => openActionModal('deposit')}
-              className="flex-1 min-w-[120px] bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+              className="flex-1 min-w-[120px] bg-blue-600 hover:bg-blue-700 text-foreground px-4 py-2 rounded-lg font-medium transition-colors text-sm"
             >
               Deposit
             </button>
             <button
               onClick={() => openActionModal('withdraw')}
-              className="flex-1 min-w-[120px] bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+              className="flex-1 min-w-[120px] bg-gray-600 hover:bg-gray-700 text-foreground px-4 py-2 rounded-lg font-medium transition-colors text-sm"
             >
               Withdraw
             </button>
             <button
               onClick={() => openActionModal('mint')}
-              className="flex-1 min-w-[120px] bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+              className="flex-1 min-w-[120px] bg-purple-600 hover:bg-purple-700 text-foreground px-4 py-2 rounded-lg font-medium transition-colors text-sm"
             >
               Mint nyxUSD
             </button>
             <button
               onClick={() => openActionModal('burn')}
-              className="flex-1 min-w-[120px] bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+              className="flex-1 min-w-[120px] bg-red-600 hover:bg-red-700 text-foreground px-4 py-2 rounded-lg font-medium transition-colors text-sm"
             >
               Burn nyxUSD
             </button>
@@ -253,32 +253,32 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
 
         {/* Collapsible Details */}
         {expanded && (
-          <div className="border-t border-gray-100 p-6 bg-gray-50">
-            <h4 className="font-semibold text-gray-900 mb-4">Detailed Information</h4>
+          <div className="border-t border-border p-6 bg-muted">
+            <h4 className="font-semibold text-card-foreground mb-4">Detailed Information</h4>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Position Details */}
               <div className="space-y-3">
-                <h5 className="font-medium text-gray-700">Position Details</h5>
+                <h5 className="font-medium text-card-foreground">Position Details</h5>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Owner:</span>
-                    <span className="font-mono text-gray-900">
+                    <span className="text-muted-foreground">Owner:</span>
+                    <span className="font-mono text-card-foreground">
                       {cdp.owner.slice(0, 6)}...{cdp.owner.slice(-4)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Collateral Value:</span>
-                    <span className="font-medium text-gray-900">${collateralUSDValue.toLocaleString()}</span>
+                    <span className="text-muted-foreground">Collateral Value:</span>
+                    <span className="font-medium text-card-foreground">${collateralUSDValue.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Available to Mint:</span>
+                    <span className="text-muted-foreground">Available to Mint:</span>
                     <span className="font-medium text-green-600">
                       {Math.max(0, (collateralUSDValue / 1.5) - debtValue).toFixed(0)} nyxUSD
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Available to Withdraw:</span>
+                    <span className="text-muted-foreground">Available to Withdraw:</span>
                     <span className="font-medium text-blue-600">
                       {Math.max(0, collateralValue - (debtValue * 1.5 / 2000)).toFixed(4)} ETH
                     </span>
@@ -288,10 +288,10 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
 
               {/* Risk Metrics */}
               <div className="space-y-3">
-                <h5 className="font-medium text-gray-700">Risk Metrics</h5>
+                <h5 className="font-medium text-card-foreground">Risk Metrics</h5>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Health Factor:</span>
+                    <span className="text-muted-foreground">Health Factor:</span>
                     <span className={`font-medium ${
                       cdp.healthFactor >= 2 ? 'text-green-600' : 
                       cdp.healthFactor >= 1.5 ? 'text-yellow-600' : 'text-red-600'
@@ -300,15 +300,15 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Liquidation Threshold:</span>
+                    <span className="text-muted-foreground">Liquidation Threshold:</span>
                     <span className="font-medium text-orange-600">150%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Current ETH Price:</span>
-                    <span className="font-medium text-gray-900">$2,000</span>
+                    <span className="text-muted-foreground">Current ETH Price:</span>
+                    <span className="font-medium text-card-foreground">$2,000</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Price Drop to Liquidation:</span>
+                    <span className="text-muted-foreground">Price Drop to Liquidation:</span>
                     <span className={`font-medium ${
                       ((2000 - liquidationPrice) / 2000 * 100) > 25 ? 'text-green-600' :
                       ((2000 - liquidationPrice) / 2000 * 100) > 10 ? 'text-yellow-600' : 'text-red-600'
@@ -339,28 +339,28 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
       {/* Action Modal */}
       {showActionModal && actionType && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-card rounded-xl shadow-2xl max-w-md w-full">
+            <div className="p-6 border-b border-border">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-card-foreground">
                   {actionType.charAt(0).toUpperCase() + actionType.slice(1)} {
                     actionType === 'mint' || actionType === 'burn' ? 'nyxUSD' : 'Collateral'
                   }
                 </h3>
                 <button
                   onClick={closeActionModal}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-muted-foreground hover:text-card-foreground transition-colors"
                 >
                   <span className="text-2xl">×</span>
                 </button>
               </div>
-              <p className="text-sm text-gray-600 mt-1">CDP #{cdp.id}</p>
+              <p className="text-sm text-muted-foreground mt-1">CDP #{cdp.id}</p>
             </div>
 
             <form onSubmit={handleSubmit(handleAction)} className="p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-card-foreground mb-2">
                     Amount ({actionType === 'mint' || actionType === 'burn' ? 'nyxUSD' : cdp.collateralType})
                   </label>
                   <input
@@ -370,8 +370,8 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
                     })}
                     type="number"
                     step="0.01"
-                    className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
-                      errors.amount ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                    className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-background text-foreground ${
+                      errors.amount ? 'border-red-300 bg-red-50' : 'border-border hover:border-muted-foreground'
                     }`}
                     placeholder="Enter amount"
                   />
@@ -400,7 +400,7 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
                 <button
                   type="button"
                   onClick={closeActionModal}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors text-card-foreground"
                 >
                   Cancel
                 </button>

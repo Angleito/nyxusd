@@ -1,20 +1,6 @@
 import React from 'react'
-import { useQuery } from 'react-query'
-import { 
-  PieChart, 
-  Pie, 
-  Cell, 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  Legend,
-  Area,
-  AreaChart
-} from 'recharts'
+import { useQuery } from '@tanstack/react-query'
+// Recharts removed for MVP - using simpler text-based displays
 import { fetchSystemStats, fetchCDPs } from '../../services/api'
 import { MetricsGrid } from './MetricsGrid'
 
@@ -29,8 +15,8 @@ const COLORS = {
 }
 
 export const ModernSystemStats: React.FC = () => {
-  const { data: systemStats, isLoading: statsLoading } = useQuery('systemStats', fetchSystemStats)
-  const { data: cdpData, isLoading: cdpsLoading } = useQuery('cdps', fetchCDPs)
+  const { data: systemStats, isLoading: statsLoading } = useQuery(['systemStats'], fetchSystemStats)
+  const { data: cdpData, isLoading: cdpsLoading } = useQuery(['cdps'], fetchCDPs)
 
   if (statsLoading || cdpsLoading) {
     return (
@@ -108,7 +94,7 @@ export const ModernSystemStats: React.FC = () => {
       />
 
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Risk Distribution Chart */}
+        {/* Risk Distribution */}
         <div className="card">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold">CDP Risk Distribution</h3>
@@ -116,41 +102,24 @@ export const ModernSystemStats: React.FC = () => {
               Total: {riskData.reduce((sum, item) => sum + item.value, 0)} CDPs
             </div>
           </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={riskData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={120}
-                  paddingAngle={2}
-                  dataKey="value"
-                >
-                  {riskData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  formatter={(value: number, name: string) => [value, name]}
-                  contentStyle={{
-                    backgroundColor: 'var(--surface-3)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-lg)',
-                    color: 'var(--text-primary)',
-                    boxShadow: 'var(--shadow-lg)'
-                  }}
-                />
-                <Legend 
-                  verticalAlign="bottom" 
-                  height={36}
-                  formatter={(value) => (
-                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{value}</span>
-                  )}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="space-y-4">
+            {riskData.map((item, index) => (
+              <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div 
+                    className="w-4 h-4 rounded-full" 
+                    style={{ backgroundColor: item.color }}
+                  ></div>
+                  <span className="font-medium">{item.name}</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">{item.value}</div>
+                  <div className="text-sm text-gray-500">
+                    {((item.value / riskData.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(1)}%
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -169,61 +138,26 @@ export const ModernSystemStats: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={tvlTrends}>
-                <defs>
-                  <linearGradient id="tvlGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="supplyGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={COLORS.secondary} stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor={COLORS.secondary} stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
-                <XAxis 
-                  dataKey="period" 
-                  tick={{ fontSize: 12, fill: 'var(--text-tertiary)' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis 
-                  tick={{ fontSize: 12, fill: 'var(--text-tertiary)' }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(value) => `$${(value / 1000000).toFixed(0)}M`}
-                />
-                <Tooltip 
-                  formatter={(value: number, name: string) => [
-                    `$${value.toLocaleString()}`, 
-                    name === 'tvl' ? 'Total Value Locked' : 'nyxUSD Supply'
-                  ]}
-                  contentStyle={{
-                    backgroundColor: 'var(--surface-3)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-lg)',
-                    color: 'var(--text-primary)',
-                    boxShadow: 'var(--shadow-lg)'
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="tvl"
-                  stroke={COLORS.primary}
-                  strokeWidth={2}
-                  fill="url(#tvlGradient)"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="supply"
-                  stroke={COLORS.secondary}
-                  strokeWidth={2}
-                  fill="url(#supplyGradient)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="space-y-2">
+            {tvlTrends.slice(-5).map((trend, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="font-medium">{trend.period}</div>
+                <div className="flex space-x-6">
+                  <div className="text-right">
+                    <div className="text-sm text-gray-500">TVL</div>
+                    <div className="font-semibold text-purple-600">
+                      ${(trend.tvl / 1000000).toFixed(1)}M
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-500">Supply</div>
+                    <div className="font-semibold text-indigo-600">
+                      ${(trend.supply / 1000000).toFixed(1)}M
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -231,42 +165,28 @@ export const ModernSystemStats: React.FC = () => {
       {/* Collateral Breakdown */}
       <div className="card">
         <h3 className="text-xl font-semibold mb-6">Collateral Asset Breakdown</h3>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={collateralData} layout="horizontal">
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
-              <XAxis 
-                type="number" 
-                tick={{ fontSize: 12, fill: 'var(--text-tertiary)' }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(value) => `$${value}M`}
-              />
-              <YAxis 
-                type="category" 
-                dataKey="name"
-                tick={{ fontSize: 12, fill: 'var(--text-tertiary)' }}
-                axisLine={false}
-                tickLine={false}
-                width={80}
-              />
-              <Tooltip 
-                formatter={(value: number, name: string) => {
-                  if (name === 'amount') return [`$${value.toFixed(1)}M`, 'Debt Ceiling']
-                  if (name === 'utilization') return [`${value.toFixed(1)}%`, 'Utilization']
-                  return [value, name]
-                }}
-                contentStyle={{
-                  backgroundColor: 'var(--surface-3)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-lg)',
-                  color: 'var(--text-primary)',
-                  boxShadow: 'var(--shadow-lg)'
-                }}
-              />
-              <Bar dataKey="amount" fill={COLORS.primary} radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="space-y-4">
+          {collateralData.map((item: any, index: number) => (
+            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center">
+                  <span className="text-blue-600 font-semibold text-sm">
+                    {item.name.substring(0, 2).toUpperCase()}
+                  </span>
+                </div>
+                <div>
+                  <div className="font-medium">{item.name}</div>
+                  <div className="text-sm text-gray-500">
+                    {item.utilization?.toFixed(1)}% utilized
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-semibold">${item.amount.toFixed(1)}M</div>
+                <div className="text-sm text-gray-500">Debt Ceiling</div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -318,7 +238,7 @@ export const ModernSystemStats: React.FC = () => {
             </div>
             <h4 className="font-semibold text-lg mb-3">DUST Integration</h4>
             <p className="text-gray-600 leading-relaxed">
-              Powered by Midnight's DUST token for privacy-preserving transaction fees
+              Powered by Midnight&apos;s DUST token for privacy-preserving transaction fees
             </p>
             <div className="mt-4 text-sm">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-purple-800 bg-purple-100">

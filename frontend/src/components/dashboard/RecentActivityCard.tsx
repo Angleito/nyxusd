@@ -226,7 +226,7 @@ export const RecentActivityCard: React.FC<RecentActivityCardProps> = ({
                         className="hover:text-purple-600 transition-colors"
                         onClick={() => {
                           // In a real app, this would open the transaction in a block explorer
-                          console.log('View transaction:', activity.txHash)
+                          // TODO: Integrate with block explorer
                         }}
                       >
                         {activity.txHash}

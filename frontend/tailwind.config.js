@@ -84,6 +84,13 @@ export default {
           800: '#5c5c70',
           900: '#67677c',
         },
+        // Function display colors
+        functionDisplay: {
+          primary: '#6366f1',     // Indigo-500 for primary functions
+          secondary: '#8b5cf6',   // Violet-500 for secondary functions
+          accent: '#06b6d4',      // Cyan-500 for accent/highlight functions
+          utility: '#10b981',     // Emerald-500 for utility functions
+        },
       },
       
       // Custom spacing for midnight theme
@@ -269,14 +276,14 @@ export default {
         },
         // Glass morphism utilities
         '.glass': {
-          background: 'rgba(255, 255, 255, 0.05)',
+          background: 'rgba(99, 102, 241, 0.08)',
           'backdrop-filter': 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: '1px solid rgba(99, 102, 241, 0.15)',
         },
         '.glass-dark': {
-          background: 'rgba(0, 0, 0, 0.2)',
+          background: 'rgba(26, 10, 46, 0.3)',
           'backdrop-filter': 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: '1px solid rgba(119, 93, 206, 0.2)',
         },
         // Custom scrollbar
         '.scrollbar-midnight': {

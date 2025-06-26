@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useMutation, useQueryClient } from 'react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createCDP } from '../../services/api'
 
 interface CreateCDPForm {
@@ -37,7 +37,7 @@ export const CreateCDPWizard: React.FC<CreateCDPWizardProps> = ({ onClose }) => 
 
   const createCDPMutation = useMutation(createCDP, {
     onSuccess: () => {
-      queryClient.invalidateQueries('cdps')
+      queryClient.invalidateQueries(['cdps'])
       onClose()
     }
   })
@@ -331,7 +331,7 @@ export const CreateCDPWizard: React.FC<CreateCDPWizardProps> = ({ onClose }) => 
                   <p className="font-medium mb-1">Important Notes:</p>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Your collateral may be liquidated if the health factor falls below 1.0</li>
-                    <li>You'll need to maintain a minimum collateralization ratio of 150%</li>
+                    <li>You&apos;ll need to maintain a minimum collateralization ratio of 150%</li>
                     <li>Gas fees will apply for this transaction</li>
                   </ul>
                 </div>
