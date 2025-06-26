@@ -1,0 +1,182 @@
+/* Import NYXUSD Theme System */
+@import './theme.css';
+@import './typography.css';
+@import './animations.css';
+
+/* Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global Dark Theme Defaults */
+@layer base {
+  html {
+    color-scheme: dark;
+    background-color: var(--surface-0);
+  }
+  
+  body {
+    background: var(--gradient-bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-primary);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Reset default margins and improve text rendering */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Improved font rendering */
+  html {
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Focus styles for accessibility */
+  *:focus-visible {
+    outline: 2px solid var(--nyx-primary);
+    outline-offset: 2px;
+  }
+
+  /* Selection styles */
+  ::selection {
+    background-color: var(--nyx-primary);
+    color: var(--text-primary);
+  }
+
+  ::-moz-selection {
+    background-color: var(--nyx-primary);
+    color: var(--text-primary);
+  }
+}
+
+@layer components {
+  /* Card Component with Nyx Theme */
+  .card {
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-default);
+    transition: all var(--duration-normal) ease;
+  }
+  
+  .card:hover {
+    background-color: var(--surface-3);
+    border-color: var(--border-default);
+    box-shadow: var(--shadow-md);
+  }
+  
+  /* Primary Button with Nyx Theme */
+  .btn-primary {
+    background: var(--gradient-btn-primary);
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    border: none;
+    cursor: pointer;
+    transition: all var(--duration-normal) ease;
+    box-shadow: var(--shadow-accent-sm);
+  }
+  
+  .btn-primary:hover {
+    background: var(--gradient-btn-primary-hover);
+    box-shadow: var(--shadow-accent-md);
+    transform: translateY(-1px);
+  }
+  
+  .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-accent-sm);
+  }
+  
+  /* Secondary Button with Nyx Theme */
+  .btn-secondary {
+    background-color: var(--surface-overlay-8);
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+    transition: all var(--duration-normal) ease;
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--surface-overlay-12);
+    border-color: var(--border-default);
+    transform: translateY(-1px);
+  }
+  
+  .btn-secondary:active {
+    transform: translateY(0);
+    background-color: var(--surface-overlay-16);
+  }
+  
+  /* Input Field with Nyx Theme */
+  .input-field {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--surface-overlay-8);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: var(--font-primary);
+    font-size: var(--text-base);
+    transition: all var(--duration-normal) ease;
+  }
+  
+  .input-field:focus {
+    outline: none;
+    border-color: var(--nyx-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    background-color: var(--surface-overlay-12);
+  }
+  
+  .input-field::placeholder {
+    color: var(--text-tertiary);
+  }
+  
+  /* Tertiary Button with Nyx Theme */
+  .btn-tertiary {
+    background: var(--gradient-btn-tertiary);
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    border: none;
+    cursor: pointer;
+    transition: all var(--duration-normal) ease;
+  }
+  
+  .btn-tertiary:hover {
+    background: var(--gradient-btn-tertiary-hover);
+    transform: translateY(-1px);
+  }
+  
+  /* Ghost Button */
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-medium);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    border: none;
+    cursor: pointer;
+    transition: all var(--duration-normal) ease;
+  }
+  
+  .btn-ghost:hover {
+    background-color: var(--surface-hover);
+    color: var(--text-primary);
+  }
+}
