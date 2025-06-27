@@ -30,8 +30,7 @@
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f",
-    "vercel-build": "cd frontend && npm install --legacy-peer-deps && npm run build"
+    "docker:logs": "docker-compose logs -f"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",
