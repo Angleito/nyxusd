@@ -9,7 +9,7 @@
  * @version 1.0.0
  */
 
-import { pipe, curry } from "@nyxusd/fp-utils";
+import { pipe, curry } from "../../utils/fp-utils";
 import { ConversationStep } from "../../providers/AIAssistantProvider";
 
 // =====================================================================

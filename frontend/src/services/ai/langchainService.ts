@@ -37,7 +37,7 @@ import {
   OptimizationConfig,
   OptimizationResult,
 } from "./promptOptimizer";
-import { Result, Ok, Err } from "@nyxusd/fp-utils";
+import { Result, Ok, Err } from "../../utils/fp-utils";
 import {
   ConversationStep,
   UserProfile,

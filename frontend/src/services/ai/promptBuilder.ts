@@ -17,8 +17,7 @@
  * @version 1.0.0
  */
 
-import { pipe } from "@nyxusd/fp-utils";
-import { Result, Ok, Err } from "@nyxusd/fp-utils";
+import { pipe, Result, Ok, Err } from "../../utils/fp-utils";
 import {
   ConversationStep,
   UserProfile,

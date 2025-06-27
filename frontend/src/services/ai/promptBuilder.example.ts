@@ -14,7 +14,7 @@ import {
   PRESET_CONFIGS,
   OPTIMIZED_TEMPLATES,
 } from "./promptBuilder";
-import { Err } from "@nyxusd/fp-utils";
+import { Err } from "../../utils/fp-utils";
 import {
   ConversationStep,
   UserProfile,

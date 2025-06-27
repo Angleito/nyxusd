@@ -15,8 +15,7 @@
  * @version 1.0.0
  */
 
-import { pipe } from "@nyxusd/fp-utils";
-import { Option, Result, Either } from "@nyxusd/fp-utils";
+import { pipe, Option, Result, Either } from "../../utils/fp-utils";
 
 // Core interfaces for analogy generation
 export interface AnalogyContext {

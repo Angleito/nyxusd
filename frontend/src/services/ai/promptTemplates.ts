@@ -30,8 +30,7 @@ import {
   OptimizationConfig,
   OptimizationResult,
 } from "./promptOptimizer";
-import { pipe } from "@nyxusd/fp-utils";
-import { Result, Ok, Err } from "@nyxusd/fp-utils";
+import { pipe, Result, Ok, Err } from "../../utils/fp-utils";
 
 export interface PromptContext {
   step: ConversationStep;
