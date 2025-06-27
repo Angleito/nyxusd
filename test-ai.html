@@ -1,24 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
+  <head>
     <title>AI Assistant Test</title>
     <script>
-        // Test if the AI assistant route works
-        fetch('http://localhost:4001/ai-assistant')
-            .then(response => {
-                console.log('AI Assistant route status:', response.status);
-                return response.text();
-            })
-            .then(html => {
-                console.log('HTML contains AI Assistant:', html.includes('AIAssistant'));
-                console.log('Page loaded successfully');
-            })
-            .catch(error => console.error('Error:', error));
+      // Test if the AI assistant route works
+      fetch("http://localhost:4001/ai-assistant")
+        .then((response) => {
+          console.log("AI Assistant route status:", response.status);
+          return response.text();
+        })
+        .then((html) => {
+          console.log(
+            "HTML contains AI Assistant:",
+            html.includes("AIAssistant"),
+          );
+          console.log("Page loaded successfully");
+        })
+        .catch((error) => console.error("Error:", error));
     </script>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Testing AI Assistant</h1>
     <p>Check the console for results</p>
-    <a href="http://localhost:4001/ai-assistant" target="_blank">Open AI Assistant</a>
-</body>
+    <a href="http://localhost:4001/ai-assistant" target="_blank"
+      >Open AI Assistant</a
+    >
+  </body>
 </html>

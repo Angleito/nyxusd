@@ -33,6 +33,7 @@ src/
 ## Type Definitions
 
 ### CDP Types (`src/types/cdp.ts`)
+
 - `CDP`: Core CDP data structure
 - `CDPState`: CDP lifecycle states
 - `CDPConfig`: Configuration parameters
@@ -40,12 +41,14 @@ src/
 - `CDPError`: Error types
 
 ### Collateral Types (`src/types/collateral.ts`)
+
 - `CollateralType`: Collateral type definitions
 - `Collateral`: Individual collateral positions
 - `CollateralPrice`: Price information
 - `CollateralOperation`: Operation types
 
 ### State Types (`src/types/state.ts`)
+
 - `SystemState`: Global system state
 - `AppState`: Complete application state
 - `UserState`: User-specific state
@@ -54,17 +57,12 @@ src/
 ## Usage
 
 ```typescript
-import { 
-  CDP, 
-  CDPState, 
-  CollateralType, 
-  SystemState 
-} from '@nyxusd/core'
+import { CDP, CDPState, CollateralType, SystemState } from "@nyxusd/core";
 
 // Type-safe CDP operations
 const cdp: CDP = {
   // ... CDP properties
-}
+};
 ```
 
 ## Development

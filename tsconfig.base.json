@@ -30,12 +30,16 @@
       "@nyxusd/validators": ["libs/validators/src/index.ts"],
       "@nyxusd/crypto": ["libs/crypto/src/index.ts"],
       "@nyxusd/contracts": ["libs/contracts/src/index.ts"],
-      "@nyxusd/midnight-integration": ["libs/midnight-integration/src/index.ts"],
+      "@nyxusd/midnight-integration": [
+        "libs/midnight-integration/src/index.ts"
+      ],
       "@nyxusd/functional-utils": ["libs/functional-utils/src/index.ts"],
       "@nyxusd/fp-utils": ["libs/fp-utils/src/index.ts"],
       "@nyxusd/cdp-engine": ["packages/cdp-engine/src/index.ts"],
       "@nyxusd/oracle-service": ["packages/oracle-service/src/index.ts"],
-      "@nyxusd/liquidation-engine": ["packages/liquidation-engine/src/index.ts"],
+      "@nyxusd/liquidation-engine": [
+        "packages/liquidation-engine/src/index.ts"
+      ],
       "@nyxusd/governance": ["packages/governance/src/index.ts"],
       "@nyxusd/api": ["packages/api/src/index.ts"],
       "@nyxusd/cli": ["packages/cli/src/index.ts"]

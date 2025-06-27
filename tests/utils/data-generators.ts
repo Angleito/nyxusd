@@ -2,7 +2,7 @@
  * Data generators for testing NYXUSD types
  */
 
-import * as fc from 'fast-check';
+import * as fc from "fast-check";
 import {
   Address,
   Hash,
@@ -16,7 +16,7 @@ import {
   AssetType,
   Network,
   CDPStatus,
-} from '@nyxusd/validators';
+} from "@nyxusd/validators";
 
 /**
  * Basic type generators
@@ -26,15 +26,17 @@ export const BasicGenerators = {
    * Generate valid Ethereum addresses
    */
   address: (): fc.Arbitrary<Address> =>
-    fc.hexaString({ minLength: 40, maxLength: 40 })
-      .map(hex => `0x${hex}` as Address),
+    fc
+      .hexaString({ minLength: 40, maxLength: 40 })
+      .map((hex) => `0x${hex}` as Address),
 
   /**
    * Generate valid transaction hashes
    */
   hash: (): fc.Arbitrary<Hash> =>
-    fc.hexaString({ minLength: 64, maxLength: 64 })
-      .map(hex => `0x${hex}` as Hash),
+    fc
+      .hexaString({ minLength: 64, maxLength: 64 })
+      .map((hex) => `0x${hex}` as Hash),
 
   /**
    * Generate valid timestamps
@@ -58,16 +60,18 @@ export const BasicGenerators = {
    * Generate positive prices
    */
   price: (): fc.Arbitrary<Price> =>
-    fc.float({ min: 0.000001, max: 1000000, noNaN: true })
-      .map(p => Math.round(p * 1000000) / 1000000) as fc.Arbitrary<Price>,
+    fc
+      .float({ min: 0.000001, max: 1000000, noNaN: true })
+      .map((p) => Math.round(p * 1000000) / 1000000) as fc.Arbitrary<Price>,
 
   /**
    * Generate positive amounts as BigInt
    */
   amount: (): fc.Arbitrary<Amount> =>
-    fc.bigUint64Array(1)
-      .map(arr => arr[0])
-      .filter(n => n > 0n) as fc.Arbitrary<Amount>,
+    fc
+      .bigUint64Array(1)
+      .map((arr) => arr[0])
+      .filter((n) => n > 0n) as fc.Arbitrary<Amount>,
 
   /**
    * Generate health factors
@@ -79,31 +83,52 @@ export const BasicGenerators = {
    * Generate risk levels
    */
   riskLevel: (): fc.Arbitrary<RiskLevel> =>
-    fc.constantFrom('low', 'medium', 'high', 'critical') as fc.Arbitrary<RiskLevel>,
+    fc.constantFrom(
+      "low",
+      "medium",
+      "high",
+      "critical",
+    ) as fc.Arbitrary<RiskLevel>,
 
   /**
    * Generate asset types
    */
   assetType: (): fc.Arbitrary<AssetType> =>
-    fc.constantFrom('native', 'erc20', 'wrapped', 'synthetic') as fc.Arbitrary<AssetType>,
+    fc.constantFrom(
+      "native",
+      "erc20",
+      "wrapped",
+      "synthetic",
+    ) as fc.Arbitrary<AssetType>,
 
   /**
    * Generate networks
    */
   network: (): fc.Arbitrary<Network> =>
-    fc.constantFrom('mainnet', 'testnet', 'devnet', 'local') as fc.Arbitrary<Network>,
+    fc.constantFrom(
+      "mainnet",
+      "testnet",
+      "devnet",
+      "local",
+    ) as fc.Arbitrary<Network>,
 
   /**
    * Generate CDP statuses
    */
   cdpStatus: (): fc.Arbitrary<CDPStatus> =>
-    fc.constantFrom('active', 'inactive', 'liquidating', 'liquidated', 'closed', 'frozen') as fc.Arbitrary<CDPStatus>,
+    fc.constantFrom(
+      "active",
+      "inactive",
+      "liquidating",
+      "liquidated",
+      "closed",
+      "frozen",
+    ) as fc.Arbitrary<CDPStatus>,
 
   /**
    * Generate UUID strings
    */
-  uuid: (): fc.Arbitrary<string> =>
-    fc.uuid(),
+  uuid: (): fc.Arbitrary<string> => fc.uuid(),
 
   /**
    * Generate metadata objects
@@ -116,8 +141,8 @@ export const BasicGenerators = {
         fc.integer(),
         fc.float(),
         fc.boolean(),
-        fc.constant(null)
-      )
+        fc.constant(null),
+      ),
     ),
 };
 
@@ -146,17 +171,19 @@ export const FinancialGenerators = {
   /**
    * Generate realistic price movements (-50% to +100%)
    */
-  priceChange: (): fc.Arbitrary<number> =>
-    fc.float({ min: -0.5, max: 1.0 }),
+  priceChange: (): fc.Arbitrary<number> => fc.float({ min: -0.5, max: 1.0 }),
 
   /**
    * Generate correlated prices for stress testing
    */
-  correlatedPrices: (basePrice: number, correlation: number): fc.Arbitrary<number[]> =>
-    fc.array(
-      fc.float({ min: basePrice * 0.5, max: basePrice * 2 }),
-      { minLength: 2, maxLength: 10 }
-    ),
+  correlatedPrices: (
+    basePrice: number,
+    correlation: number,
+  ): fc.Arbitrary<number[]> =>
+    fc.array(fc.float({ min: basePrice * 0.5, max: basePrice * 2 }), {
+      minLength: 2,
+      maxLength: 10,
+    }),
 
   /**
    * Generate realistic debt amounts
@@ -227,7 +254,7 @@ export const CDPGenerators = {
   cdpOperation: () =>
     fc.record({
       cdpId: fc.string({ minLength: 1, maxLength: 32 }),
-      operation: fc.constantFrom('deposit', 'withdraw', 'mint', 'repay'),
+      operation: fc.constantFrom("deposit", "withdraw", "mint", "repay"),
       amount: FinancialGenerators.collateralAmount(),
       initiator: BasicGenerators.address(),
       timestamp: BasicGenerators.timestamp(),
@@ -265,9 +292,9 @@ export const EdgeCaseGenerators = {
      * Extreme price volatility
      */
     volatilePrice: (basePrice: number): fc.Arbitrary<Price> =>
-      fc.float({ 
-        min: basePrice * 0.01, 
-        max: basePrice * 100 
+      fc.float({
+        min: basePrice * 0.01,
+        max: basePrice * 100,
       }) as fc.Arbitrary<Price>,
   },
 
@@ -307,11 +334,11 @@ export const EdgeCaseGenerators = {
      */
     invalidAddress: (): fc.Arbitrary<string> =>
       fc.oneof(
-        fc.constant(''),
-        fc.constant('0x'),
+        fc.constant(""),
+        fc.constant("0x"),
         fc.string({ minLength: 1, maxLength: 39 }),
         fc.string({ minLength: 43, maxLength: 100 }),
-        fc.string().filter(s => !s.startsWith('0x'))
+        fc.string().filter((s) => !s.startsWith("0x")),
       ),
 
     /**
@@ -321,7 +348,7 @@ export const EdgeCaseGenerators = {
       fc.oneof(
         fc.constant(0n),
         fc.constant(-1n),
-        fc.bigInt({ min: -1000n, max: -1n })
+        fc.bigInt({ min: -1000n, max: -1n }),
       ),
 
     /**
@@ -333,7 +360,7 @@ export const EdgeCaseGenerators = {
         fc.float({ min: 100.1, max: 1000 }),
         fc.constant(Infinity),
         fc.constant(-Infinity),
-        fc.constant(NaN)
+        fc.constant(NaN),
       ),
   },
 };
@@ -350,36 +377,41 @@ export const ConstraintGenerators = {
      * Collateral value > debt value for healthy CDPs
      */
     healthyCDP: () =>
-      fc.tuple(
-        fc.float({ min: 1000, max: 1000000 }), // collateral value
-        fc.float({ min: 1.2, max: 5.0 }) // collateralization ratio
-      ).map(([collateralValue, ratio]) => ({
-        collateralValue,
-        debtValue: collateralValue / ratio,
-        healthFactor: ratio,
-      })),
+      fc
+        .tuple(
+          fc.float({ min: 1000, max: 1000000 }), // collateral value
+          fc.float({ min: 1.2, max: 5.0 }), // collateralization ratio
+        )
+        .map(([collateralValue, ratio]) => ({
+          collateralValue,
+          debtValue: collateralValue / ratio,
+          healthFactor: ratio,
+        })),
 
     /**
      * Price movements preserving relative order
      */
     orderedPrices: () =>
-      fc.array(fc.float({ min: 1, max: 1000 }), { minLength: 2, maxLength: 10 })
-        .map(prices => prices.sort((a, b) => a - b)),
+      fc
+        .array(fc.float({ min: 1, max: 1000 }), { minLength: 2, maxLength: 10 })
+        .map((prices) => prices.sort((a, b) => a - b)),
 
     /**
      * Liquidation scenarios
      */
     liquidationScenario: () =>
-      fc.record({
-        initialPrice: fc.float({ min: 100, max: 1000 }),
-        priceDropPercent: fc.float({ min: 0.1, max: 0.8 }),
-        liquidationThreshold: fc.integer({ min: 7500, max: 9000 }),
-      }).map(({ initialPrice, priceDropPercent, liquidationThreshold }) => ({
-        initialPrice,
-        liquidationPrice: initialPrice * (1 - priceDropPercent),
-        liquidationThreshold: liquidationThreshold / 10000,
-        shouldLiquidate: priceDropPercent > (1 - liquidationThreshold / 10000),
-      })),
+      fc
+        .record({
+          initialPrice: fc.float({ min: 100, max: 1000 }),
+          priceDropPercent: fc.float({ min: 0.1, max: 0.8 }),
+          liquidationThreshold: fc.integer({ min: 7500, max: 9000 }),
+        })
+        .map(({ initialPrice, priceDropPercent, liquidationThreshold }) => ({
+          initialPrice,
+          liquidationPrice: initialPrice * (1 - priceDropPercent),
+          liquidationThreshold: liquidationThreshold / 10000,
+          shouldLiquidate: priceDropPercent > 1 - liquidationThreshold / 10000,
+        })),
   },
 };
 
@@ -391,31 +423,39 @@ export const ScenarioGenerators = {
    * Generate multi-asset portfolio
    */
   multiAssetPortfolio: (numAssets: number = 3) =>
-    fc.array(CDPGenerators.collateralAssetConfig(), { 
-      minLength: numAssets, 
-      maxLength: numAssets 
+    fc.array(CDPGenerators.collateralAssetConfig(), {
+      minLength: numAssets,
+      maxLength: numAssets,
     }),
 
   /**
    * Generate time series of price updates
    */
   priceTimeSeries: (length: number = 10) =>
-    fc.array(
-      fc.record({
-        timestamp: BasicGenerators.timestamp(),
-        price: BasicGenerators.price(),
-      }),
-      { minLength: length, maxLength: length }
-    ).map(series => series.sort((a, b) => a.timestamp - b.timestamp)),
+    fc
+      .array(
+        fc.record({
+          timestamp: BasicGenerators.timestamp(),
+          price: BasicGenerators.price(),
+        }),
+        { minLength: length, maxLength: length },
+      )
+      .map((series) => series.sort((a, b) => a.timestamp - b.timestamp)),
 
   /**
    * Generate market stress scenario
    */
   marketStressScenario: () =>
     fc.record({
-      initialPrices: fc.array(BasicGenerators.price(), { minLength: 3, maxLength: 10 }),
-      stressLevel: fc.constantFrom('mild', 'moderate', 'severe'),
-      correlations: fc.array(fc.float({ min: -1, max: 1 }), { minLength: 3, maxLength: 10 }),
+      initialPrices: fc.array(BasicGenerators.price(), {
+        minLength: 3,
+        maxLength: 10,
+      }),
+      stressLevel: fc.constantFrom("mild", "moderate", "severe"),
+      correlations: fc.array(fc.float({ min: -1, max: 1 }), {
+        minLength: 3,
+        maxLength: 10,
+      }),
       duration: fc.integer({ min: 3600, max: 86400 }), // 1 hour to 1 day
     }),
 
@@ -424,7 +464,10 @@ export const ScenarioGenerators = {
    */
   liquidationCascade: () =>
     fc.record({
-      cdps: fc.array(CDPGenerators.cdpConfig(), { minLength: 5, maxLength: 20 }),
+      cdps: fc.array(CDPGenerators.cdpConfig(), {
+        minLength: 5,
+        maxLength: 20,
+      }),
       triggerPriceShock: fc.float({ min: 0.1, max: 0.5 }),
       marketDepth: fc.float({ min: 0.1, max: 1.0 }),
     }),

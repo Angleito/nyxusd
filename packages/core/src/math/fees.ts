@@ -1,20 +1,20 @@
 /**
  * Fee Calculation Functions
- * 
+ *
  * This module provides pure mathematical functions for calculating various fees
  * in the CDP system including stability fees, liquidation penalties, and
  * transaction fees. All calculations use BigInt arithmetic for precision.
- * 
+ *
  * Mathematical formulas:
  * - Stability Fee = Debt Amount × Fee Rate × (Time Elapsed / SECONDS_PER_YEAR)
  * - Liquidation Penalty = Collateral Value × Penalty Rate
  * - Percentage Fee = Amount × (Percentage / 10000)
  * - Progressive Fee = Base Fee + (Amount - Threshold) × Progressive Rate
- * 
+ *
  * @packageDocumentation
  */
 
-import { Result } from './types'
+import { Result } from "./types";
 
 /**
  * Mathematical constants for fee calculations
@@ -31,50 +31,67 @@ export const FEE_CONSTANTS = {
   /** Zero value */
   ZERO: 0n,
   /** Maximum reasonable fee rate (1000% in basis points) */
-  MAX_FEE_RATE: 100000n
-} as const
+  MAX_FEE_RATE: 100000n,
+} as const;
 
 /**
  * Fee type discriminated union for different fee calculations
  */
-export type FeeType = 
-  | { readonly type: 'stability'; readonly annualRate: number }
-  | { readonly type: 'liquidation'; readonly penaltyRate: number }
-  | { readonly type: 'transaction'; readonly flatFee: bigint; readonly percentageFee: number }
-  | { readonly type: 'progressive'; readonly baseRate: number; readonly progressiveRate: number; readonly threshold: bigint }
+export type FeeType =
+  | { readonly type: "stability"; readonly annualRate: number }
+  | { readonly type: "liquidation"; readonly penaltyRate: number }
+  | {
+      readonly type: "transaction";
+      readonly flatFee: bigint;
+      readonly percentageFee: number;
+    }
+  | {
+      readonly type: "progressive";
+      readonly baseRate: number;
+      readonly progressiveRate: number;
+      readonly threshold: bigint;
+    };
 
 /**
  * Fee calculation parameters
  */
 export interface FeeParams {
   /** Amount subject to fee calculation */
-  readonly amount: bigint
+  readonly amount: bigint;
   /** Fee type and parameters */
-  readonly feeType: FeeType
+  readonly feeType: FeeType;
   /** Time elapsed in seconds (for time-based fees) */
-  readonly timeElapsed?: bigint
+  readonly timeElapsed?: bigint;
 }
 
 /**
  * Error types for fee calculations
  */
-export type FeeError = 
-  | { readonly type: 'negative_amount'; readonly amount: bigint; readonly field: string }
-  | { readonly type: 'negative_time'; readonly timeElapsed: bigint }
-  | { readonly type: 'invalid_fee_rate'; readonly rate: number; readonly bounds: [number, number] }
-  | { readonly type: 'missing_time'; readonly feeType: string }
-  | { readonly type: 'overflow'; readonly operation: string }
+export type FeeError =
+  | {
+      readonly type: "negative_amount";
+      readonly amount: bigint;
+      readonly field: string;
+    }
+  | { readonly type: "negative_time"; readonly timeElapsed: bigint }
+  | {
+      readonly type: "invalid_fee_rate";
+      readonly rate: number;
+      readonly bounds: [number, number];
+    }
+  | { readonly type: "missing_time"; readonly feeType: string }
+  | { readonly type: "overflow"; readonly operation: string };
 
 /**
  * Calculates stability fee for a debt position over time.
- * 
+ *
  * Formula: Stability Fee = Debt Amount × (Fee Rate / 10000) × (Time Elapsed / SECONDS_PER_YEAR)
- * 
+ *
  * @param debtAmount - Current debt amount in wei
  * @param feeRate - Annual stability fee rate in basis points (100 = 1%)
  * @param timeElapsed - Time elapsed since last fee calculation in seconds
  * @returns Result containing the stability fee amount in wei
- * 
+ *
  * @example
  * ```typescript
  * // $1000 debt, 2% annual stability fee, 30 days elapsed
@@ -89,56 +106,57 @@ export type FeeError =
 export function calculateStabilityFee(
   debtAmount: bigint,
   feeRate: number,
-  timeElapsed: bigint
+  timeElapsed: bigint,
 ): Result<bigint, FeeError> {
   // Validate inputs
   if (debtAmount < FEE_CONSTANTS.ZERO) {
     return Result.err({
-      type: 'negative_amount' as const,
+      type: "negative_amount" as const,
       amount: debtAmount,
-      field: 'debtAmount'
-    })
+      field: "debtAmount",
+    });
   }
 
   if (feeRate < 0 || feeRate > Number(FEE_CONSTANTS.MAX_FEE_RATE)) {
     return Result.err({
-      type: 'invalid_fee_rate' as const,
+      type: "invalid_fee_rate" as const,
       rate: feeRate,
-      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)]
-    })
+      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)],
+    });
   }
 
   if (timeElapsed < FEE_CONSTANTS.ZERO) {
     return Result.err({
-      type: 'negative_time' as const,
-      timeElapsed
-    })
+      type: "negative_time" as const,
+      timeElapsed,
+    });
   }
 
   try {
     // Calculate stability fee: debtAmount * feeRate * timeElapsed / (BASIS_POINTS * SECONDS_PER_YEAR)
-    const numerator = debtAmount * BigInt(feeRate) * timeElapsed
-    const denominator = FEE_CONSTANTS.BASIS_POINTS * FEE_CONSTANTS.SECONDS_PER_YEAR
-    const stabilityFee = numerator / denominator
+    const numerator = debtAmount * BigInt(feeRate) * timeElapsed;
+    const denominator =
+      FEE_CONSTANTS.BASIS_POINTS * FEE_CONSTANTS.SECONDS_PER_YEAR;
+    const stabilityFee = numerator / denominator;
 
-    return Result.ok(stabilityFee)
+    return Result.ok(stabilityFee);
   } catch (error) {
     return Result.err({
-      type: 'overflow' as const,
-      operation: 'calculateStabilityFee'
-    })
+      type: "overflow" as const,
+      operation: "calculateStabilityFee",
+    });
   }
 }
 
 /**
  * Calculates liquidation penalty fee based on collateral value.
- * 
+ *
  * Formula: Liquidation Penalty = Collateral Value × (Penalty Rate / 10000)
- * 
+ *
  * @param collateralValue - Total collateral value in wei
  * @param penaltyRate - Liquidation penalty rate in basis points (1000 = 10%)
  * @returns Result containing the liquidation penalty amount in wei
- * 
+ *
  * @example
  * ```typescript
  * // $1500 collateral value, 13% liquidation penalty
@@ -151,83 +169,85 @@ export function calculateStabilityFee(
  */
 export function calculateLiquidationPenalty(
   collateralValue: bigint,
-  penaltyRate: number
+  penaltyRate: number,
 ): Result<bigint, FeeError> {
   // Validate inputs
   if (collateralValue < FEE_CONSTANTS.ZERO) {
     return Result.err({
-      type: 'negative_amount' as const,
+      type: "negative_amount" as const,
       amount: collateralValue,
-      field: 'collateralValue'
-    })
+      field: "collateralValue",
+    });
   }
 
   if (penaltyRate < 0 || penaltyRate > Number(FEE_CONSTANTS.MAX_FEE_RATE)) {
     return Result.err({
-      type: 'invalid_fee_rate' as const,
+      type: "invalid_fee_rate" as const,
       rate: penaltyRate,
-      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)]
-    })
+      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)],
+    });
   }
 
   try {
     // Calculate liquidation penalty: collateralValue * penaltyRate / BASIS_POINTS
-    const numerator = collateralValue * BigInt(penaltyRate)
-    const penalty = numerator / FEE_CONSTANTS.BASIS_POINTS
+    const numerator = collateralValue * BigInt(penaltyRate);
+    const penalty = numerator / FEE_CONSTANTS.BASIS_POINTS;
 
-    return Result.ok(penalty)
+    return Result.ok(penalty);
   } catch (error) {
     return Result.err({
-      type: 'overflow' as const,
-      operation: 'calculateLiquidationPenalty'
-    })
+      type: "overflow" as const,
+      operation: "calculateLiquidationPenalty",
+    });
   }
 }
 
 /**
  * Converts basis points to a decimal ratio.
- * 
+ *
  * Formula: Ratio = Basis Points / 10000
- * 
+ *
  * @param basisPoints - Value in basis points (10000 = 100%)
  * @returns Result containing the decimal ratio
- * 
+ *
  * @example
  * ```typescript
  * const result = convertBasisPointsToRatio(250) // 2.5%
  * // Returns Ok(0.025)
  * ```
  */
-export function convertBasisPointsToRatio(basisPoints: number): Result<number, FeeError> {
+export function convertBasisPointsToRatio(
+  basisPoints: number,
+): Result<number, FeeError> {
   if (basisPoints < 0) {
     return Result.err({
-      type: 'invalid_fee_rate' as const,
+      type: "invalid_fee_rate" as const,
       rate: basisPoints,
-      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)]
-    })
+      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)],
+    });
   }
 
   if (basisPoints > Number(FEE_CONSTANTS.MAX_FEE_RATE)) {
     return Result.err({
-      type: 'invalid_fee_rate' as const,
+      type: "invalid_fee_rate" as const,
       rate: basisPoints,
-      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)]
-    })
+      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)],
+    });
   }
 
-  const ratio = basisPoints / Number(FEE_CONSTANTS.BASIS_POINTS)
-  return Result.ok(ratio)
+  const ratio = basisPoints / Number(FEE_CONSTANTS.BASIS_POINTS);
+  return Result.ok(ratio);
 }
 
 /**
  * Applies a percentage fee to an amount.
- * 
+ *
  * Formula: Fee Amount = Amount × (Percentage / 10000)
- * 
+ *
  * @param amount - Base amount in wei
  * @param percentage - Percentage in basis points (100 = 1%)
  * @returns Result containing the fee amount in wei
- * 
+ *
  * @example
  * ```typescript
  * // Apply 0.3% fee to $1000
@@ -237,52 +257,52 @@ export function convertBasisPointsToRatio(basisPoints: number): Result<number, F
  */
 export function applyPercentage(
   amount: bigint,
-  percentage: number
+  percentage: number,
 ): Result<bigint, FeeError> {
   // Validate inputs
   if (amount < FEE_CONSTANTS.ZERO) {
     return Result.err({
-      type: 'negative_amount' as const,
+      type: "negative_amount" as const,
       amount,
-      field: 'amount'
-    })
+      field: "amount",
+    });
   }
 
   if (percentage < 0 || percentage > Number(FEE_CONSTANTS.MAX_FEE_RATE)) {
     return Result.err({
-      type: 'invalid_fee_rate' as const,
+      type: "invalid_fee_rate" as const,
       rate: percentage,
-      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)]
-    })
+      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)],
+    });
   }
 
   try {
     // Calculate percentage: amount * percentage / BASIS_POINTS
-    const numerator = amount * BigInt(percentage)
-    const feeAmount = numerator / FEE_CONSTANTS.BASIS_POINTS
+    const numerator = amount * BigInt(percentage);
+    const feeAmount = numerator / FEE_CONSTANTS.BASIS_POINTS;
 
-    return Result.ok(feeAmount)
+    return Result.ok(feeAmount);
   } catch (error) {
     return Result.err({
-      type: 'overflow' as const,
-      operation: 'applyPercentage'
-    })
+      type: "overflow" as const,
+      operation: "applyPercentage",
+    });
   }
 }
 
 /**
  * Calculates a progressive fee structure where rates increase above thresholds.
- * 
- * Formula: 
+ *
+ * Formula:
  * - If amount <= threshold: Fee = Amount × (Base Rate / 10000)
  * - If amount > threshold: Fee = Threshold × (Base Rate / 10000) + (Amount - Threshold) × (Progressive Rate / 10000)
- * 
+ *
  * @param amount - Amount subject to progressive fee
  * @param baseRate - Base fee rate in basis points
  * @param progressiveRate - Progressive fee rate in basis points (applied above threshold)
  * @param threshold - Threshold amount where progressive rate begins
  * @returns Result containing the total progressive fee amount
- * 
+ *
  * @example
  * ```typescript
  * // $2000 amount, 1% base rate, 2% progressive rate, $1000 threshold
@@ -299,80 +319,83 @@ export function calculateProgressiveFee(
   amount: bigint,
   baseRate: number,
   progressiveRate: number,
-  threshold: bigint
+  threshold: bigint,
 ): Result<bigint, FeeError> {
   // Validate inputs
   if (amount < FEE_CONSTANTS.ZERO) {
     return Result.err({
-      type: 'negative_amount' as const,
+      type: "negative_amount" as const,
       amount,
-      field: 'amount'
-    })
+      field: "amount",
+    });
   }
 
   if (threshold < FEE_CONSTANTS.ZERO) {
     return Result.err({
-      type: 'negative_amount' as const,
+      type: "negative_amount" as const,
       amount: threshold,
-      field: 'threshold'
-    })
+      field: "threshold",
+    });
   }
 
   if (baseRate < 0 || baseRate > Number(FEE_CONSTANTS.MAX_FEE_RATE)) {
     return Result.err({
-      type: 'invalid_fee_rate' as const,
+      type: "invalid_fee_rate" as const,
       rate: baseRate,
-      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)]
-    })
+      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)],
+    });
   }
 
-  if (progressiveRate < 0 || progressiveRate > Number(FEE_CONSTANTS.MAX_FEE_RATE)) {
+  if (
+    progressiveRate < 0 ||
+    progressiveRate > Number(FEE_CONSTANTS.MAX_FEE_RATE)
+  ) {
     return Result.err({
-      type: 'invalid_fee_rate' as const,
+      type: "invalid_fee_rate" as const,
       rate: progressiveRate,
-      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)]
-    })
+      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)],
+    });
   }
 
   try {
     if (amount <= threshold) {
       // Simple percentage calculation for amounts under threshold
-      return applyPercentage(amount, baseRate)
+      return applyPercentage(amount, baseRate);
     }
 
     // Calculate base fee on threshold amount
-    const baseFeeResult = applyPercentage(threshold, baseRate)
+    const baseFeeResult = applyPercentage(threshold, baseRate);
     if (baseFeeResult.isErr()) {
-      return baseFeeResult
+      return baseFeeResult;
     }
 
     // Calculate progressive fee on amount above threshold
-    const excessAmount = amount - threshold
-    const progressiveFeeResult = applyPercentage(excessAmount, progressiveRate)
+    const excessAmount = amount - threshold;
+    const progressiveFeeResult = applyPercentage(excessAmount, progressiveRate);
     if (progressiveFeeResult.isErr()) {
-      return progressiveFeeResult
+      return progressiveFeeResult;
     }
 
-    const totalFee = baseFeeResult.unwrap() + progressiveFeeResult.unwrap()
-    return Result.ok(totalFee)
+    const totalFee = baseFeeResult.unwrap() + progressiveFeeResult.unwrap();
+    return Result.ok(totalFee);
   } catch (error) {
     return Result.err({
-      type: 'overflow' as const,
-      operation: 'calculateProgressiveFee'
-    })
+      type: "overflow" as const,
+      operation: "calculateProgressiveFee",
+    });
   }
 }
 
 /**
  * Calculates a combined transaction fee with both flat and percentage components.
- * 
+ *
  * Formula: Total Fee = Flat Fee + (Amount × Percentage Fee / 10000)
- * 
+ *
  * @param amount - Transaction amount in wei
  * @param flatFee - Fixed fee amount in wei
  * @param percentageFee - Percentage fee in basis points
  * @returns Result containing the total transaction fee
- * 
+ *
  * @example
  * ```typescript
  * // $100 transaction, $2 flat fee, 0.5% percentage fee
@@ -387,59 +410,59 @@ export function calculateProgressiveFee(
 export function calculateTransactionFee(
   amount: bigint,
   flatFee: bigint,
-  percentageFee: number
+  percentageFee: number,
 ): Result<bigint, FeeError> {
   // Validate inputs
   if (amount < FEE_CONSTANTS.ZERO) {
     return Result.err({
-      type: 'negative_amount' as const,
+      type: "negative_amount" as const,
       amount,
-      field: 'amount'
-    })
+      field: "amount",
+    });
   }
 
   if (flatFee < FEE_CONSTANTS.ZERO) {
     return Result.err({
-      type: 'negative_amount' as const,
+      type: "negative_amount" as const,
       amount: flatFee,
-      field: 'flatFee'
-    })
+      field: "flatFee",
+    });
   }
 
   if (percentageFee < 0 || percentageFee > Number(FEE_CONSTANTS.MAX_FEE_RATE)) {
     return Result.err({
-      type: 'invalid_fee_rate' as const,
+      type: "invalid_fee_rate" as const,
       rate: percentageFee,
-      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)]
-    })
+      bounds: [0, Number(FEE_CONSTANTS.MAX_FEE_RATE)],
+    });
   }
 
   try {
     // Calculate percentage component
-    const percentageFeeResult = applyPercentage(amount, percentageFee)
+    const percentageFeeResult = applyPercentage(amount, percentageFee);
     if (percentageFeeResult.isErr()) {
-      return percentageFeeResult
+      return percentageFeeResult;
     }
 
-    const totalFee = flatFee + percentageFeeResult.unwrap()
-    return Result.ok(totalFee)
+    const totalFee = flatFee + percentageFeeResult.unwrap();
+    return Result.ok(totalFee);
   } catch (error) {
     return Result.err({
-      type: 'overflow' as const,
-      operation: 'calculateTransactionFee'
-    })
+      type: "overflow" as const,
+      operation: "calculateTransactionFee",
+    });
   }
 }
 
 /**
  * Calculates fee with a minimum and maximum cap.
- * 
+ *
  * @param amount - Base amount for fee calculation
  * @param feeRate - Fee rate in basis points
  * @param minFee - Minimum fee amount in wei
  * @param maxFee - Maximum fee amount in wei
  * @returns Result containing the capped fee amount
- * 
+ *
  * @example
  * ```typescript
  * // 1% fee on $50, min $2, max $10
@@ -456,87 +479,87 @@ export function calculateCappedFee(
   amount: bigint,
   feeRate: number,
   minFee: bigint,
-  maxFee: bigint
+  maxFee: bigint,
 ): Result<bigint, FeeError> {
   // Validate inputs
   if (amount < FEE_CONSTANTS.ZERO) {
     return Result.err({
-      type: 'negative_amount' as const,
+      type: "negative_amount" as const,
       amount,
-      field: 'amount'
-    })
+      field: "amount",
+    });
   }
 
   if (minFee < FEE_CONSTANTS.ZERO) {
     return Result.err({
-      type: 'negative_amount' as const,
+      type: "negative_amount" as const,
       amount: minFee,
-      field: 'minFee'
-    })
+      field: "minFee",
+    });
   }
 
   if (maxFee < FEE_CONSTANTS.ZERO) {
     return Result.err({
-      type: 'negative_amount' as const,
+      type: "negative_amount" as const,
       amount: maxFee,
-      field: 'maxFee'
-    })
+      field: "maxFee",
+    });
   }
 
   if (minFee > maxFee) {
     return Result.err({
-      type: 'negative_amount' as const,
+      type: "negative_amount" as const,
       amount: minFee - maxFee,
-      field: 'minFee_exceeds_maxFee'
-    })
+      field: "minFee_exceeds_maxFee",
+    });
   }
 
   // Calculate base fee
-  const baseFeeResult = applyPercentage(amount, feeRate)
+  const baseFeeResult = applyPercentage(amount, feeRate);
   if (baseFeeResult.isErr()) {
-    return baseFeeResult
+    return baseFeeResult;
   }
 
-  const baseFee = baseFeeResult.unwrap()
+  const baseFee = baseFeeResult.unwrap();
 
   // Apply caps
   if (baseFee < minFee) {
-    return Result.ok(minFee)
-  }
-  
-  if (baseFee > maxFee) {
-    return Result.ok(maxFee)
+    return Result.ok(minFee);
   }
 
-  return Result.ok(baseFee)
+  if (baseFee > maxFee) {
+    return Result.ok(maxFee);
+  }
+
+  return Result.ok(baseFee);
 }
 
 /**
  * Utility function to calculate multiple fees and return their sum.
- * 
+ *
  * @param feeCalculations - Array of fee calculation functions
  * @returns Result containing the total of all fees
  */
 export function calculateTotalFees(
-  feeCalculations: Array<() => Result<bigint, FeeError>>
+  feeCalculations: Array<() => Result<bigint, FeeError>>,
 ): Result<bigint, FeeError> {
-  let totalFees = FEE_CONSTANTS.ZERO
+  let totalFees = FEE_CONSTANTS.ZERO;
 
   for (const calculation of feeCalculations) {
-    const feeResult = calculation()
+    const feeResult = calculation();
     if (feeResult.isErr()) {
-      return feeResult
+      return feeResult;
     }
-    
+
     try {
-      totalFees += feeResult.unwrap()
+      totalFees += feeResult.unwrap();
     } catch (error) {
       return Result.err({
-        type: 'overflow' as const,
-        operation: 'calculateTotalFees'
-      })
+        type: "overflow" as const,
+        operation: "calculateTotalFees",
+      });
     }
   }
 
-  return Result.ok(totalFees)
+  return Result.ok(totalFees);
 }

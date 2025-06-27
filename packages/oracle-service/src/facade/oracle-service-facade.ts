@@ -1,12 +1,12 @@
 /**
  * Oracle Service Facade
- * 
+ *
  * Main entry point for oracle operations, combining Chainlink integration,
  * circuit breakers, aggregation, and fallback mechanisms in a unified
  * functional programming interface
  */
 
-import { Option } from 'fp-ts/Option';
+import { Option } from "fp-ts/Option";
 
 import {
   IOracleService,
@@ -14,18 +14,18 @@ import {
   OracleFeedConfig,
   PriceValidator,
   HealthCheck,
-  PriceFetch
-} from '../types/oracle-types';
+  PriceFetch,
+} from "../types/oracle-types";
 
 import {
   AggregationStrategy,
-  ConsensusConfig
-} from '../types/aggregation-types';
+  ConsensusConfig,
+} from "../types/aggregation-types";
 
 import {
   ChainlinkOracleService,
-  ChainlinkOracleConfig
-} from '../services/chainlink-oracle-service-simple';
+  ChainlinkOracleConfig,
+} from "../services/chainlink-oracle-service-simple";
 
 // Temporarily commenting out problematic services
 // import {
@@ -47,19 +47,19 @@ import {
 interface OracleServiceFacadeConfig {
   /** Primary oracle configuration */
   primaryOracle: ChainlinkOracleConfig;
-  
+
   /** Fallback oracle configurations */
   fallbackOracles?: ChainlinkOracleConfig[];
-  
+
   /** Aggregation strategy */
   aggregationStrategy?: AggregationStrategy;
-  
+
   /** Consensus configuration */
   consensusConfig?: ConsensusConfig;
-  
+
   /** Enable fallback mechanisms */
   enableFallback?: boolean;
-  
+
   /** Cache configuration */
   cache?: {
     enabled: boolean;
@@ -107,17 +107,18 @@ export class OracleServiceFacade implements IOracleService {
   /**
    * Get feed configuration
    */
-  public readonly getFeedConfig = (feedId: string): Option<OracleFeedConfig> => {
+  public readonly getFeedConfig = (
+    feedId: string,
+  ): Option<OracleFeedConfig> => {
     return this.primaryOracle.getFeedConfig(feedId);
   };
-
 }
 
 /**
  * Factory function for creating oracle service facade
  */
 export const createOracleServiceFacade = (
-  config: OracleServiceFacadeConfig
+  config: OracleServiceFacadeConfig,
 ): OracleServiceFacade => {
   return new OracleServiceFacade(config);
 };
@@ -126,10 +127,10 @@ export const createOracleServiceFacade = (
  * Default configurations for common use cases
  */
 export const DEFAULT_AGGREGATION_STRATEGY: AggregationStrategy = {
-  name: 'default_median',
-  method: 'median',
-  weighting: 'confidence',
-  outlierHandling: 'exclude',
+  name: "default_median",
+  method: "median",
+  weighting: "confidence",
+  outlierHandling: "exclude",
   qualityFactors: {
     confidenceWeight: 0.3,
     freshnessWeight: 0.2,
@@ -143,7 +144,7 @@ export const DEFAULT_CONSENSUS_CONFIG: ConsensusConfig = {
   maxSources: 5,
   consensusThreshold: 0.8,
   maxDeviation: 10.0,
-  outlierDetection: 'zscore',
+  outlierDetection: "zscore",
   outlierThreshold: 2.5,
   minSourceConfidence: 90.0,
   stalenessWindow: 3600,

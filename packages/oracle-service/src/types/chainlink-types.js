@@ -82,7 +82,7 @@ exports.ChainlinkFunctionRequestSchema = zod_1.z.object({
     /** Function arguments */
     args: zod_1.z.array(zod_1.z.string()).optional(),
     /** Encrypted secrets reference */
-    secretsLocation: zod_1.z.enum(['inline', 'remote']).optional(),
+    secretsLocation: zod_1.z.enum(["inline", "remote"]).optional(),
     /** Secrets data */
     secrets: zod_1.z.record(zod_1.z.string(), zod_1.z.string()).optional(),
     /** DON ID for the request */
@@ -130,7 +130,7 @@ exports.AIRiskAssessmentRequestSchema = zod_1.z.object({
     }),
     /** Analysis parameters */
     parameters: zod_1.z.object({
-        timeHorizon: zod_1.z.enum(['1h', '24h', '7d', '30d']).default('24h'),
+        timeHorizon: zod_1.z.enum(["1h", "24h", "7d", "30d"]).default("24h"),
         confidenceLevel: zod_1.z.number().min(0).max(1).default(0.95),
         stressTestScenarios: zod_1.z.array(zod_1.z.string()).optional(),
     }),
@@ -144,27 +144,27 @@ exports.AIRiskAssessmentResponseSchema = zod_1.z.object({
     /** Risk factors identified */
     riskFactors: zod_1.z.array(zod_1.z.object({
         factor: zod_1.z.string(),
-        impact: zod_1.z.enum(['low', 'medium', 'high']),
+        impact: zod_1.z.enum(["low", "medium", "high"]),
         probability: zod_1.z.number().min(0).max(1),
         description: zod_1.z.string(),
     })),
     /** Recommended actions */
     recommendations: zod_1.z.array(zod_1.z.object({
         action: zod_1.z.string(),
-        priority: zod_1.z.enum(['low', 'medium', 'high']),
+        priority: zod_1.z.enum(["low", "medium", "high"]),
         rationale: zod_1.z.string(),
     })),
     /** Market sentiment analysis */
     sentiment: zod_1.z.object({
-        overall: zod_1.z.enum(['bearish', 'neutral', 'bullish']),
+        overall: zod_1.z.enum(["bearish", "neutral", "bullish"]),
         score: zod_1.z.number().min(-1).max(1),
         sources: zod_1.z.array(zod_1.z.string()).optional(),
     }),
     /** Liquidation probability */
     liquidationProbability: zod_1.z.object({
-        '1h': zod_1.z.number().min(0).max(1),
-        '24h': zod_1.z.number().min(0).max(1),
-        '7d': zod_1.z.number().min(0).max(1),
+        "1h": zod_1.z.number().min(0).max(1),
+        "24h": zod_1.z.number().min(0).max(1),
+        "7d": zod_1.z.number().min(0).max(1),
     }),
     /** Response metadata */
     metadata: zod_1.z.object({
@@ -178,13 +178,13 @@ exports.AIRiskAssessmentResponseSchema = zod_1.z.object({
  * Oracle provider types
  */
 exports.OracleProviderSchema = zod_1.z.enum([
-    'chainlink',
-    'band',
-    'dia',
-    'pyth',
-    'tellor',
-    'api3',
-    'switchboard'
+    "chainlink",
+    "band",
+    "dia",
+    "pyth",
+    "tellor",
+    "api3",
+    "switchboard",
 ]);
 /** Multi-provider configuration */
 exports.MultiProviderConfigSchema = zod_1.z.object({
@@ -218,7 +218,7 @@ exports.HistoricalPriceDataSchema = zod_1.z.object({
     timeRange: zod_1.z.object({
         start: zod_1.z.number().int().positive(),
         end: zod_1.z.number().int().positive(),
-        interval: zod_1.z.enum(['1m', '5m', '15m', '1h', '4h', '1d']),
+        interval: zod_1.z.enum(["1m", "5m", "15m", "1h", "4h", "1d"]),
     }),
 });
 /**
@@ -228,7 +228,7 @@ exports.VolatilityAnalysisSchema = zod_1.z.object({
     /** Asset pair */
     feedId: zod_1.z.string(),
     /** Analysis period */
-    period: zod_1.z.enum(['1h', '24h', '7d', '30d']),
+    period: zod_1.z.enum(["1h", "24h", "7d", "30d"]),
     /** Volatility metrics */
     metrics: zod_1.z.object({
         /** Standard deviation */
@@ -237,9 +237,9 @@ exports.VolatilityAnalysisSchema = zod_1.z.object({
         variance: zod_1.z.number().nonnegative(),
         /** Value at Risk (VaR) */
         valueAtRisk: zod_1.z.object({
-            '95%': zod_1.z.number(),
-            '99%': zod_1.z.number(),
-            '99.9%': zod_1.z.number(),
+            "95%": zod_1.z.number(),
+            "99%": zod_1.z.number(),
+            "99.9%": zod_1.z.number(),
         }),
         /** Maximum drawdown */
         maxDrawdown: zod_1.z.number().min(-1).max(0),
@@ -247,7 +247,7 @@ exports.VolatilityAnalysisSchema = zod_1.z.object({
         sharpeRatio: zod_1.z.number().optional(),
     }),
     /** Volatility classification */
-    classification: zod_1.z.enum(['low', 'medium', 'high', 'extreme']),
+    classification: zod_1.z.enum(["low", "medium", "high", "extreme"]),
     /** Analysis timestamp */
     timestamp: zod_1.z.number().int().positive(),
 });
@@ -266,9 +266,9 @@ exports.CorrelationAnalysisSchema = zod_1.z.object({
     /** Sample size */
     sampleSize: zod_1.z.number().int().positive(),
     /** Analysis period */
-    period: zod_1.z.enum(['1h', '24h', '7d', '30d', '90d']),
+    period: zod_1.z.enum(["1h", "24h", "7d", "30d", "90d"]),
     /** Correlation strength classification */
-    strength: zod_1.z.enum(['none', 'weak', 'moderate', 'strong', 'very_strong']),
+    strength: zod_1.z.enum(["none", "weak", "moderate", "strong", "very_strong"]),
     /** Analysis timestamp */
     timestamp: zod_1.z.number().int().positive(),
 });
@@ -290,7 +290,7 @@ exports.LiquidityAnalysisSchema = zod_1.z.object({
         liquidityScore: zod_1.z.number().min(0).max(100),
     }),
     /** Liquidity classification */
-    classification: zod_1.z.enum(['very_low', 'low', 'medium', 'high', 'very_high']),
+    classification: zod_1.z.enum(["very_low", "low", "medium", "high", "very_high"]),
     /** Exchange data */
     exchanges: zod_1.z.array(zod_1.z.object({
         name: zod_1.z.string(),

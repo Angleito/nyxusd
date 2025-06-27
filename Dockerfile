@@ -39,7 +39,7 @@ FROM nginx:alpine AS production
 COPY --from=frontend-builder /app/frontend/dist /usr/share/nginx/html
 
 # Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx-frontend-only.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 

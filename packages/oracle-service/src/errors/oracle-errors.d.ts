@@ -4,7 +4,7 @@
  * Comprehensive error handling for oracle operations following
  * functional programming patterns with detailed error information
  */
-import { z } from 'zod';
+import { z } from "zod";
 /**
  * Base oracle error schema
  */

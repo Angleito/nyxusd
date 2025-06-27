@@ -1,14 +1,14 @@
 /**
  * Oracle Aggregation Types
- * 
+ *
  * Types for multi-oracle aggregation, consensus mechanisms,
  * and data source combination strategies
  */
 
-import { z } from 'zod';
-import { Either } from 'fp-ts/Either';
-import { Option } from 'fp-ts/Option';
-import { OracleProvider } from './chainlink-types';
+import { z } from "zod";
+import { Either } from "fp-ts/Either";
+import { Option } from "fp-ts/Option";
+import { OracleProvider } from "./chainlink-types";
 
 /**
  * Aggregation weight schema
@@ -33,16 +33,24 @@ export const AggregationResultSchema = z.object({
   /** Final aggregated price */
   aggregatedPrice: z.bigint(),
   /** Aggregation method used */
-  method: z.enum(['median', 'mean', 'weighted_average', 'trimmed_mean', 'mode']),
+  method: z.enum([
+    "median",
+    "mean",
+    "weighted_average",
+    "trimmed_mean",
+    "mode",
+  ]),
   /** Source data used in aggregation */
-  sources: z.array(z.object({
-    provider: z.string(),
-    price: z.bigint(),
-    weight: z.number().min(0).max(1),
-    confidence: z.number().min(0).max(100),
-    included: z.boolean(),
-    reason: z.string().optional(),
-  })),
+  sources: z.array(
+    z.object({
+      provider: z.string(),
+      price: z.bigint(),
+      weight: z.number().min(0).max(1),
+      confidence: z.number().min(0).max(100),
+      included: z.boolean(),
+      reason: z.string().optional(),
+    }),
+  ),
   /** Overall confidence in result */
   confidence: z.number().min(0).max(100),
   /** Statistical measures */
@@ -59,12 +67,14 @@ export const AggregationResultSchema = z.object({
     interquartileRange: z.number().nonnegative(),
   }),
   /** Outlier detection results */
-  outliers: z.array(z.object({
-    provider: z.string(),
-    price: z.bigint(),
-    deviationScore: z.number(),
-    reason: z.string(),
-  })),
+  outliers: z.array(
+    z.object({
+      provider: z.string(),
+      price: z.bigint(),
+      deviationScore: z.number(),
+      reason: z.string(),
+    }),
+  ),
   /** Consensus information */
   consensus: z.object({
     /** Agreement level (0-1) */
@@ -100,7 +110,7 @@ export const ConsensusConfigSchema = z.object({
   /** Maximum allowed deviation from median (percentage) */
   maxDeviation: z.number().min(0).max(100),
   /** Outlier detection method */
-  outlierDetection: z.enum(['zscore', 'iqr', 'mad', 'isolation_forest']),
+  outlierDetection: z.enum(["zscore", "iqr", "mad", "isolation_forest"]),
   /** Outlier threshold (standard deviations or similar) */
   outlierThreshold: z.number().positive(),
   /** Minimum confidence required from each source */
@@ -118,23 +128,25 @@ export const MultiOracleDataSchema = z.object({
   /** Feed identifier */
   feedId: z.string(),
   /** Individual oracle responses */
-  responses: z.array(z.object({
-    provider: z.string(),
-    data: z.union([
-      z.object({
-        success: z.literal(true),
-        priceData: z.any(), // OraclePriceData
-        responseTime: z.number().int().nonnegative(),
-      }),
-      z.object({
-        success: z.literal(false),
-        error: z.string(),
-        errorCode: z.string(),
-        responseTime: z.number().int().nonnegative(),
-      }),
-    ]),
-    timestamp: z.number().int().positive(),
-  })),
+  responses: z.array(
+    z.object({
+      provider: z.string(),
+      data: z.union([
+        z.object({
+          success: z.literal(true),
+          priceData: z.any(), // OraclePriceData
+          responseTime: z.number().int().nonnegative(),
+        }),
+        z.object({
+          success: z.literal(false),
+          error: z.string(),
+          errorCode: z.string(),
+          responseTime: z.number().int().nonnegative(),
+        }),
+      ]),
+      timestamp: z.number().int().positive(),
+    }),
+  ),
   /** Collection metadata */
   metadata: z.object({
     /** Total collection time */
@@ -179,15 +191,21 @@ export const AggregationStrategySchema = z.object({
   /** Strategy name */
   name: z.string(),
   /** Aggregation method */
-  method: z.enum(['median', 'mean', 'weighted_average', 'trimmed_mean', 'mode']),
+  method: z.enum([
+    "median",
+    "mean",
+    "weighted_average",
+    "trimmed_mean",
+    "mode",
+  ]),
   /** Weighting scheme */
-  weighting: z.enum(['equal', 'confidence', 'reliability', 'custom']),
+  weighting: z.enum(["equal", "confidence", "reliability", "custom"]),
   /** Custom weights (if using custom weighting) */
   customWeights: z.record(z.string(), z.number().min(0).max(1)).optional(),
   /** Trimming percentage (for trimmed mean) */
   trimPercentage: z.number().min(0).max(0.5).optional(),
   /** Outlier handling */
-  outlierHandling: z.enum(['exclude', 'cap', 'transform', 'include']),
+  outlierHandling: z.enum(["exclude", "cap", "transform", "include"]),
   /** Quality scoring factors */
   qualityFactors: z.object({
     confidenceWeight: z.number().min(0).max(1),
@@ -227,19 +245,19 @@ export const OraclePerformanceSchema = z.object({
   /** Historical statistics */
   historical: z.object({
     /** 24h statistics */
-    '24h': z.object({
+    "24h": z.object({
       successRate: z.number().min(0).max(1),
       avgResponseTime: z.number().nonnegative(),
       requestCount: z.number().int().nonnegative(),
     }),
     /** 7d statistics */
-    '7d': z.object({
+    "7d": z.object({
       successRate: z.number().min(0).max(1),
       avgResponseTime: z.number().nonnegative(),
       requestCount: z.number().int().nonnegative(),
     }),
     /** 30d statistics */
-    '30d': z.object({
+    "30d": z.object({
       successRate: z.number().min(0).max(1),
       avgResponseTime: z.number().nonnegative(),
       requestCount: z.number().int().nonnegative(),
@@ -259,34 +277,37 @@ export type OraclePerformance = z.infer<typeof OraclePerformanceSchema>;
 export type DataCollector = (
   feedId: string,
   providers: OracleProvider[],
-  timeout?: number
+  timeout?: number,
 ) => Promise<Either<string, MultiOracleData>>;
 
 /** Price aggregation operation */
 export type PriceAggregator = (
   data: MultiOracleData,
   strategy: AggregationStrategy,
-  consensus: ConsensusConfig
+  consensus: ConsensusConfig,
 ) => Either<string, AggregationResult>;
 
 /** Outlier detection operation */
 export type OutlierDetector = (
   prices: Array<{ provider: string; price: bigint; confidence: number }>,
-  method: 'zscore' | 'iqr' | 'mad' | 'isolation_forest',
-  threshold: number
+  method: "zscore" | "iqr" | "mad" | "isolation_forest",
+  threshold: number,
 ) => Array<{ provider: string; isOutlier: boolean; score: number }>;
 
 /** Consensus validator */
 export type ConsensusValidator = (
   data: MultiOracleData,
-  config: ConsensusConfig
-) => Either<string, { isValid: boolean; reason?: string; participantCount: number }>;
+  config: ConsensusConfig,
+) => Either<
+  string,
+  { isValid: boolean; reason?: string; participantCount: number }
+>;
 
 /** Quality scorer */
 export type QualityScorer = (
   result: AggregationResult,
   sources: MultiOracleData,
-  strategy: AggregationStrategy
+  strategy: AggregationStrategy,
 ) => number;
 
 /**
@@ -295,19 +316,21 @@ export type QualityScorer = (
 export interface IAggregationService {
   /** Collect data from multiple oracles */
   readonly collectData: DataCollector;
-  
+
   /** Aggregate collected price data */
   readonly aggregatePrices: PriceAggregator;
-  
+
   /** Detect outliers in price data */
   readonly detectOutliers: OutlierDetector;
-  
+
   /** Validate consensus requirements */
   readonly validateConsensus: ConsensusValidator;
-  
+
   /** Calculate quality score */
   readonly calculateQuality: QualityScorer;
-  
+
   /** Get provider performance metrics */
-  readonly getPerformanceMetrics: (provider: string) => Option<OraclePerformance>;
+  readonly getPerformanceMetrics: (
+    provider: string,
+  ) => Option<OraclePerformance>;
 }

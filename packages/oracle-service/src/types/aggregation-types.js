@@ -28,7 +28,13 @@ exports.AggregationResultSchema = zod_1.z.object({
     /** Final aggregated price */
     aggregatedPrice: zod_1.z.bigint(),
     /** Aggregation method used */
-    method: zod_1.z.enum(['median', 'mean', 'weighted_average', 'trimmed_mean', 'mode']),
+    method: zod_1.z.enum([
+        "median",
+        "mean",
+        "weighted_average",
+        "trimmed_mean",
+        "mode",
+    ]),
     /** Source data used in aggregation */
     sources: zod_1.z.array(zod_1.z.object({
         provider: zod_1.z.string(),
@@ -92,7 +98,7 @@ exports.ConsensusConfigSchema = zod_1.z.object({
     /** Maximum allowed deviation from median (percentage) */
     maxDeviation: zod_1.z.number().min(0).max(100),
     /** Outlier detection method */
-    outlierDetection: zod_1.z.enum(['zscore', 'iqr', 'mad', 'isolation_forest']),
+    outlierDetection: zod_1.z.enum(["zscore", "iqr", "mad", "isolation_forest"]),
     /** Outlier threshold (standard deviations or similar) */
     outlierThreshold: zod_1.z.number().positive(),
     /** Minimum confidence required from each source */
@@ -162,15 +168,21 @@ exports.AggregationStrategySchema = zod_1.z.object({
     /** Strategy name */
     name: zod_1.z.string(),
     /** Aggregation method */
-    method: zod_1.z.enum(['median', 'mean', 'weighted_average', 'trimmed_mean', 'mode']),
+    method: zod_1.z.enum([
+        "median",
+        "mean",
+        "weighted_average",
+        "trimmed_mean",
+        "mode",
+    ]),
     /** Weighting scheme */
-    weighting: zod_1.z.enum(['equal', 'confidence', 'reliability', 'custom']),
+    weighting: zod_1.z.enum(["equal", "confidence", "reliability", "custom"]),
     /** Custom weights (if using custom weighting) */
     customWeights: zod_1.z.record(zod_1.z.string(), zod_1.z.number().min(0).max(1)).optional(),
     /** Trimming percentage (for trimmed mean) */
     trimPercentage: zod_1.z.number().min(0).max(0.5).optional(),
     /** Outlier handling */
-    outlierHandling: zod_1.z.enum(['exclude', 'cap', 'transform', 'include']),
+    outlierHandling: zod_1.z.enum(["exclude", "cap", "transform", "include"]),
     /** Quality scoring factors */
     qualityFactors: zod_1.z.object({
         confidenceWeight: zod_1.z.number().min(0).max(1),
@@ -207,19 +219,19 @@ exports.OraclePerformanceSchema = zod_1.z.object({
     /** Historical statistics */
     historical: zod_1.z.object({
         /** 24h statistics */
-        '24h': zod_1.z.object({
+        "24h": zod_1.z.object({
             successRate: zod_1.z.number().min(0).max(1),
             avgResponseTime: zod_1.z.number().nonnegative(),
             requestCount: zod_1.z.number().int().nonnegative(),
         }),
         /** 7d statistics */
-        '7d': zod_1.z.object({
+        "7d": zod_1.z.object({
             successRate: zod_1.z.number().min(0).max(1),
             avgResponseTime: zod_1.z.number().nonnegative(),
             requestCount: zod_1.z.number().int().nonnegative(),
         }),
         /** 30d statistics */
-        '30d': zod_1.z.object({
+        "30d": zod_1.z.object({
             successRate: zod_1.z.number().min(0).max(1),
             avgResponseTime: zod_1.z.number().nonnegative(),
             requestCount: zod_1.z.number().int().nonnegative(),

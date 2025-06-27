@@ -1,17 +1,17 @@
 /**
  * DUST Token Utilities for Midnight Protocol
- * 
+ *
  * DUST is the native utility token of the Midnight blockchain used for:
  * - Transaction fees
  * - Staking rewards
  * - Governance participation
  * - Privacy computation costs
- * 
+ *
  * This module provides utilities for DUST token calculations, conversions,
  * balance validations, and transaction cost estimations.
  */
 
-import { Result } from '@nyxusd/fp-utils';
+import { Result } from "@nyxusd/fp-utils";
 
 /**
  * DUST token precision and constants
@@ -24,7 +24,7 @@ export const DUST_CONSTANTS = {
   /** 1 DUST in minimum units */
   ONE_DUST: BigInt(10) ** BigInt(18),
   /** Maximum safe DUST amount to prevent overflow */
-  MAX_SAFE_AMOUNT: BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'),
+  MAX_SAFE_AMOUNT: BigInt("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"),
   /** Minimum transaction fee in DUST units */
   MIN_TRANSACTION_FEE: BigInt(10) ** BigInt(15), // 0.001 DUST
   /** Base gas price in DUST units */
@@ -35,11 +35,11 @@ export const DUST_CONSTANTS = {
  * Transaction types with different complexity scores
  */
 export enum TransactionType {
-  SIMPLE_TRANSFER = 'simple_transfer',
-  SHIELDED_TRANSFER = 'shielded_transfer',
-  CONTRACT_CALL = 'contract_call',
-  MULTI_PARTY = 'multi_party',
-  PRIVACY_COMPUTATION = 'privacy_computation',
+  SIMPLE_TRANSFER = "simple_transfer",
+  SHIELDED_TRANSFER = "shielded_transfer",
+  CONTRACT_CALL = "contract_call",
+  MULTI_PARTY = "multi_party",
+  PRIVACY_COMPUTATION = "privacy_computation",
 }
 
 /**
@@ -56,13 +56,13 @@ export const TRANSACTION_COMPLEXITY: Record<TransactionType, number> = {
 /**
  * Error types for DUST operations
  */
-export type DustError = 
-  | { type: 'INVALID_AMOUNT'; message: string }
-  | { type: 'INSUFFICIENT_BALANCE'; message: string }
-  | { type: 'OVERFLOW_ERROR'; message: string }
-  | { type: 'INVALID_ADDRESS'; message: string }
-  | { type: 'NEGATIVE_TIME'; message: string }
-  | { type: 'INVALID_TRANSACTION_TYPE'; message: string };
+export type DustError =
+  | { type: "INVALID_AMOUNT"; message: string }
+  | { type: "INSUFFICIENT_BALANCE"; message: string }
+  | { type: "OVERFLOW_ERROR"; message: string }
+  | { type: "INVALID_ADDRESS"; message: string }
+  | { type: "NEGATIVE_TIME"; message: string }
+  | { type: "INVALID_TRANSACTION_TYPE"; message: string };
 
 /**
  * DUST amount representation with validation
@@ -98,27 +98,29 @@ export interface AddressBalance {
  * @param amount - Amount in DUST units (as string, number, or bigint)
  * @returns Result containing DustAmount or error
  */
-export const createDustAmount = (amount: string | number | bigint): Result<DustAmount, DustError> => {
+export const createDustAmount = (
+  amount: string | number | bigint,
+): Result<DustAmount, DustError> => {
   return Result.tryCatch(
     () => {
-      const value = typeof amount === 'bigint' ? amount : BigInt(amount);
-      
+      const value = typeof amount === "bigint" ? amount : BigInt(amount);
+
       if (value < 0n) {
-        throw new Error('Amount cannot be negative');
+        throw new Error("Amount cannot be negative");
       }
-      
+
       if (value > DUST_CONSTANTS.MAX_SAFE_AMOUNT) {
-        throw new Error('Amount exceeds maximum safe value');
+        throw new Error("Amount exceeds maximum safe value");
       }
-      
+
       const formatted = formatDustAmount(value);
-      
+
       return { value, formatted };
     },
     (error): DustError => ({
-      type: 'INVALID_AMOUNT',
-      message: `Invalid DUST amount: ${error instanceof Error ? error.message : 'Unknown error'}`
-    })
+      type: "INVALID_AMOUNT",
+      message: `Invalid DUST amount: ${error instanceof Error ? error.message : "Unknown error"}`,
+    }),
   );
 };
 
@@ -130,12 +132,12 @@ export const createDustAmount = (amount: string | number | bigint): Result<DustA
 export const formatDustAmount = (amount: bigint): string => {
   const dustAmount = amount / DUST_CONSTANTS.ONE_DUST;
   const remainder = amount % DUST_CONSTANTS.ONE_DUST;
-  
+
   if (remainder === 0n) {
     return dustAmount.toString();
   }
-  
-  const fractional = remainder.toString().padStart(18, '0').replace(/0+$/, '');
+
+  const fractional = remainder.toString().padStart(18, "0").replace(/0+$/, "");
   return `${dustAmount}.${fractional}`;
 };
 
@@ -144,40 +146,42 @@ export const formatDustAmount = (amount: bigint): string => {
  * @param dustString - String representation of DUST amount
  * @returns Result containing amount in smallest units or error
  */
-export const parseDustAmount = (dustString: string): Result<bigint, DustError> => {
+export const parseDustAmount = (
+  dustString: string,
+): Result<bigint, DustError> => {
   return Result.tryCatch(
     () => {
       const trimmed = dustString.trim();
-      
+
       if (!trimmed || !/^-?\d+(\.\d+)?$/.test(trimmed)) {
-        throw new Error('Invalid number format');
+        throw new Error("Invalid number format");
       }
-      
-      const [whole, fractional = ''] = trimmed.split('.');
+
+      const [whole, fractional = ""] = trimmed.split(".");
       if (!whole) {
-        throw new Error('Invalid number format - missing whole part');
+        throw new Error("Invalid number format - missing whole part");
       }
       const wholeBig = BigInt(whole);
-      
+
       if (wholeBig < 0n) {
-        throw new Error('Amount cannot be negative');
+        throw new Error("Amount cannot be negative");
       }
-      
-      const fractionalPadded = fractional.padEnd(18, '0').slice(0, 18);
+
+      const fractionalPadded = fractional.padEnd(18, "0").slice(0, 18);
       const fractionalBig = BigInt(fractionalPadded);
-      
+
       const totalAmount = wholeBig * DUST_CONSTANTS.ONE_DUST + fractionalBig;
-      
+
       if (totalAmount > DUST_CONSTANTS.MAX_SAFE_AMOUNT) {
-        throw new Error('Amount exceeds maximum safe value');
+        throw new Error("Amount exceeds maximum safe value");
       }
-      
+
       return totalAmount;
     },
     (error): DustError => ({
-      type: 'INVALID_AMOUNT',
-      message: `Invalid DUST string: ${error instanceof Error ? error.message : 'Unknown error'}`
-    })
+      type: "INVALID_AMOUNT",
+      message: `Invalid DUST string: ${error instanceof Error ? error.message : "Unknown error"}`,
+    }),
   );
 };
 
@@ -190,42 +194,43 @@ export const parseDustAmount = (dustString: string): Result<bigint, DustError> =
  */
 export const calculateDustGeneration = (
   nightAmount: bigint,
-  timeElapsed: number
+  timeElapsed: number,
 ): Result<bigint, DustError> => {
   return Result.tryCatch(
     () => {
       if (nightAmount < 0n) {
-        throw new Error('NIGHT amount cannot be negative');
+        throw new Error("NIGHT amount cannot be negative");
       }
-      
+
       if (timeElapsed < 0) {
-        throw new Error('Time elapsed cannot be negative');
+        throw new Error("Time elapsed cannot be negative");
       }
-      
+
       // Mock reward rate: 5% annual yield
       // Formula: (stakedAmount * annualRate * timeElapsed) / (365 * 24 * 3600)
       const annualRateNumerator = 5n;
       const annualRateDenominator = 100n;
       const secondsPerYear = 365n * 24n * 3600n;
-      
+
       const timeElapsedBig = BigInt(Math.floor(timeElapsed));
-      const dustGenerated = (nightAmount * annualRateNumerator * timeElapsedBig) / 
-                           (annualRateDenominator * secondsPerYear);
-      
+      const dustGenerated =
+        (nightAmount * annualRateNumerator * timeElapsedBig) /
+        (annualRateDenominator * secondsPerYear);
+
       return dustGenerated;
     },
     (error): DustError => {
-      if (error instanceof Error && error.message.includes('negative')) {
+      if (error instanceof Error && error.message.includes("negative")) {
         return {
-          type: 'NEGATIVE_TIME',
-          message: error.message
+          type: "NEGATIVE_TIME",
+          message: error.message,
         };
       }
       return {
-        type: 'INVALID_AMOUNT',
-        message: `DUST generation calculation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        type: "INVALID_AMOUNT",
+        message: `DUST generation calculation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       };
-    }
+    },
   );
 };
 
@@ -234,26 +239,28 @@ export const calculateDustGeneration = (
  * @param dustAmount - Amount of DUST to convert
  * @returns Result containing fee in gas units or error
  */
-export const convertDustToTransactionFee = (dustAmount: bigint): Result<bigint, DustError> => {
+export const convertDustToTransactionFee = (
+  dustAmount: bigint,
+): Result<bigint, DustError> => {
   return Result.tryCatch(
     () => {
       if (dustAmount < 0n) {
-        throw new Error('DUST amount cannot be negative');
+        throw new Error("DUST amount cannot be negative");
       }
-      
+
       if (dustAmount < DUST_CONSTANTS.MIN_TRANSACTION_FEE) {
-        throw new Error('DUST amount below minimum transaction fee');
+        throw new Error("DUST amount below minimum transaction fee");
       }
-      
+
       // Convert DUST to gas units using base gas price
       const gasUnits = dustAmount / DUST_CONSTANTS.BASE_GAS_PRICE;
-      
+
       return gasUnits;
     },
     (error): DustError => ({
-      type: 'INVALID_AMOUNT',
-      message: `DUST to fee conversion failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-    })
+      type: "INVALID_AMOUNT",
+      message: `DUST to fee conversion failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+    }),
   );
 };
 
@@ -265,37 +272,39 @@ export const convertDustToTransactionFee = (dustAmount: bigint): Result<bigint, 
  */
 export const validateDustBalance = (
   address: string,
-  requiredDust: bigint
+  requiredDust: bigint,
 ): Result<boolean, DustError> => {
   return Result.tryCatch(
     () => {
       // Basic address validation (mock)
       if (!address || address.length < 20) {
-        throw new Error('Invalid address format');
+        throw new Error("Invalid address format");
       }
-      
+
       if (requiredDust < 0n) {
-        throw new Error('Required DUST amount cannot be negative');
+        throw new Error("Required DUST amount cannot be negative");
       }
-      
+
       // Mock balance check - in real implementation, this would query the blockchain
       // For now, we'll simulate that addresses starting with 'rich' have sufficient balance
-      const hasBalance = address.toLowerCase().includes('rich') || requiredDust <= DUST_CONSTANTS.ONE_DUST;
-      
+      const hasBalance =
+        address.toLowerCase().includes("rich") ||
+        requiredDust <= DUST_CONSTANTS.ONE_DUST;
+
       return hasBalance;
     },
     (error): DustError => {
-      if (error instanceof Error && error.message.includes('address')) {
+      if (error instanceof Error && error.message.includes("address")) {
         return {
-          type: 'INVALID_ADDRESS',
-          message: error.message
+          type: "INVALID_ADDRESS",
+          message: error.message,
         };
       }
       return {
-        type: 'INVALID_AMOUNT',
-        message: `Balance validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        type: "INVALID_AMOUNT",
+        message: `Balance validation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       };
-    }
+    },
   );
 };
 
@@ -307,52 +316,57 @@ export const validateDustBalance = (
  */
 export const estimateTransactionCost = (
   transactionType: TransactionType,
-  complexityScore: number = 1.0
+  complexityScore: number = 1.0,
 ): Result<TransactionCost, DustError> => {
   return Result.tryCatch(
     () => {
       if (!(transactionType in TRANSACTION_COMPLEXITY)) {
         throw new Error(`Unknown transaction type: ${transactionType}`);
       }
-      
+
       if (complexityScore < 0) {
-        throw new Error('Complexity score cannot be negative');
+        throw new Error("Complexity score cannot be negative");
       }
-      
+
       const baseComplexity = TRANSACTION_COMPLEXITY[transactionType];
       const totalComplexity = baseComplexity * complexityScore;
-      
+
       // Base fee calculation
       const baseFee = DUST_CONSTANTS.MIN_TRANSACTION_FEE;
-      
+
       // Complexity fee calculation
-      const complexityFee = BigInt(Math.floor(Number(baseFee) * totalComplexity));
-      
+      const complexityFee = BigInt(
+        Math.floor(Number(baseFee) * totalComplexity),
+      );
+
       // Total fee
       const totalFee = baseFee + complexityFee;
-      
+
       // Gas estimate
       const gasEstimate = totalFee / DUST_CONSTANTS.BASE_GAS_PRICE;
-      
+
       return {
         baseFee,
         complexityFee,
         totalFee,
-        gasEstimate
+        gasEstimate,
       };
     },
     (error): DustError => {
-      if (error instanceof Error && error.message.includes('transaction type')) {
+      if (
+        error instanceof Error &&
+        error.message.includes("transaction type")
+      ) {
         return {
-          type: 'INVALID_TRANSACTION_TYPE',
-          message: error.message
+          type: "INVALID_TRANSACTION_TYPE",
+          message: error.message,
         };
       }
       return {
-        type: 'INVALID_AMOUNT',
-        message: `Transaction cost estimation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        type: "INVALID_AMOUNT",
+        message: `Transaction cost estimation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       };
-    }
+    },
   );
 };
 
@@ -361,34 +375,38 @@ export const estimateTransactionCost = (
  * @param address - Address to query
  * @returns Result containing balance information or error
  */
-export const getAddressBalance = (address: string): Result<AddressBalance, DustError> => {
+export const getAddressBalance = (
+  address: string,
+): Result<AddressBalance, DustError> => {
   return Result.tryCatch(
     () => {
       if (!address || address.length < 20) {
-        throw new Error('Invalid address format');
+        throw new Error("Invalid address format");
       }
-      
+
       // Mock balance data - in real implementation, this would query the blockchain
-      const isRich = address.toLowerCase().includes('rich');
-      const baseAmount = isRich ? DUST_CONSTANTS.ONE_DUST * 1000n : DUST_CONSTANTS.ONE_DUST;
-      
+      const isRich = address.toLowerCase().includes("rich");
+      const baseAmount = isRich
+        ? DUST_CONSTANTS.ONE_DUST * 1000n
+        : DUST_CONSTANTS.ONE_DUST;
+
       const available = baseAmount;
       const staked = baseAmount / 2n;
       const locked = baseAmount / 10n;
       const total = available + staked + locked;
-      
+
       return {
         address,
         available,
         staked,
         locked,
-        total
+        total,
       };
     },
     (error): DustError => ({
-      type: 'INVALID_ADDRESS',
-      message: `Failed to get balance: ${error instanceof Error ? error.message : 'Unknown error'}`
-    })
+      type: "INVALID_ADDRESS",
+      message: `Failed to get balance: ${error instanceof Error ? error.message : "Unknown error"}`,
+    }),
   );
 };
 
@@ -401,36 +419,36 @@ export const getAddressBalance = (address: string): Result<AddressBalance, DustE
  */
 export const convertDustDenomination = (
   amount: bigint,
-  from: 'dust' | 'mdust' | 'units',
-  to: 'dust' | 'mdust' | 'units'
+  from: "dust" | "mdust" | "units",
+  to: "dust" | "mdust" | "units",
 ): Result<bigint, DustError> => {
   return Result.tryCatch(
     () => {
       if (amount < 0n) {
-        throw new Error('Amount cannot be negative');
+        throw new Error("Amount cannot be negative");
       }
-      
+
       // Define conversion factors
       const conversions = {
-        dust: DUST_CONSTANTS.ONE_DUST,      // 1 DUST = 10^18 units
+        dust: DUST_CONSTANTS.ONE_DUST, // 1 DUST = 10^18 units
         mdust: DUST_CONSTANTS.ONE_DUST / 1000n, // 1 mDUST = 10^15 units
-        units: 1n                            // 1 unit = 1 unit
+        units: 1n, // 1 unit = 1 unit
       };
-      
+
       if (!(from in conversions) || !(to in conversions)) {
-        throw new Error('Invalid denomination');
+        throw new Error("Invalid denomination");
       }
-      
+
       // Convert to base units first, then to target denomination
       const baseUnits = amount * conversions[from];
       const convertedAmount = baseUnits / conversions[to];
-      
+
       return convertedAmount;
     },
     (error): DustError => ({
-      type: 'INVALID_AMOUNT',
-      message: `Denomination conversion failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-    })
+      type: "INVALID_AMOUNT",
+      message: `Denomination conversion failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+    }),
   );
 };
 
@@ -446,11 +464,14 @@ export const DustUtils = {
       () => {
         const result = a + b;
         if (result > DUST_CONSTANTS.MAX_SAFE_AMOUNT) {
-          throw new Error('Addition would cause overflow');
+          throw new Error("Addition would cause overflow");
         }
         return result;
       },
-      (): DustError => ({ type: 'OVERFLOW_ERROR', message: 'DUST addition overflow' })
+      (): DustError => ({
+        type: "OVERFLOW_ERROR",
+        message: "DUST addition overflow",
+      }),
     );
   },
 
@@ -461,11 +482,14 @@ export const DustUtils = {
     return Result.tryCatch(
       () => {
         if (b > a) {
-          throw new Error('Subtraction would result in negative amount');
+          throw new Error("Subtraction would result in negative amount");
         }
         return a - b;
       },
-      (): DustError => ({ type: 'INVALID_AMOUNT', message: 'DUST subtraction would be negative' })
+      (): DustError => ({
+        type: "INVALID_AMOUNT",
+        message: "DUST subtraction would be negative",
+      }),
     );
   },
 
@@ -476,15 +500,18 @@ export const DustUtils = {
     return Result.tryCatch(
       () => {
         if (factor < 0) {
-          throw new Error('Factor cannot be negative');
+          throw new Error("Factor cannot be negative");
         }
-        const result = amount * BigInt(Math.floor(factor * 1000)) / 1000n;
+        const result = (amount * BigInt(Math.floor(factor * 1000))) / 1000n;
         if (result > DUST_CONSTANTS.MAX_SAFE_AMOUNT) {
-          throw new Error('Multiplication would cause overflow');
+          throw new Error("Multiplication would cause overflow");
         }
         return result;
       },
-      (): DustError => ({ type: 'OVERFLOW_ERROR', message: 'DUST multiplication overflow' })
+      (): DustError => ({
+        type: "OVERFLOW_ERROR",
+        message: "DUST multiplication overflow",
+      }),
     );
   },
 
@@ -505,10 +532,10 @@ export const DustUtils = {
   /**
    * Gets the minimum of two amounts
    */
-  min: (a: bigint, b: bigint): bigint => a < b ? a : b,
+  min: (a: bigint, b: bigint): bigint => (a < b ? a : b),
 
   /**
    * Gets the maximum of two amounts
    */
-  max: (a: bigint, b: bigint): bigint => a > b ? a : b,
+  max: (a: bigint, b: bigint): bigint => (a > b ? a : b),
 } as const;

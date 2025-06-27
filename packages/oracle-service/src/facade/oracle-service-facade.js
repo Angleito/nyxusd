@@ -56,10 +56,10 @@ exports.createOracleServiceFacade = createOracleServiceFacade;
  * Default configurations for common use cases
  */
 exports.DEFAULT_AGGREGATION_STRATEGY = {
-    name: 'default_median',
-    method: 'median',
-    weighting: 'confidence',
-    outlierHandling: 'exclude',
+    name: "default_median",
+    method: "median",
+    weighting: "confidence",
+    outlierHandling: "exclude",
     qualityFactors: {
         confidenceWeight: 0.3,
         freshnessWeight: 0.2,
@@ -72,7 +72,7 @@ exports.DEFAULT_CONSENSUS_CONFIG = {
     maxSources: 5,
     consensusThreshold: 0.8,
     maxDeviation: 10.0,
-    outlierDetection: 'zscore',
+    outlierDetection: "zscore",
     outlierThreshold: 2.5,
     minSourceConfidence: 90.0,
     stalenessWindow: 3600,

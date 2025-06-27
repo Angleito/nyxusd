@@ -4,7 +4,7 @@
  * Type definitions for Chainlink oracle integration including
  * AggregatorV3Interface, Chainlink Functions, and feed configurations
  */
-import { z } from 'zod';
+import { z } from "zod";
 /**
  * Chainlink AggregatorV3Interface response
  */
@@ -352,17 +352,17 @@ export declare const AIRiskAssessmentResponseSchema: z.ZodObject<{
     }>;
     /** Liquidation probability */
     liquidationProbability: z.ZodObject<{
-        '1h': z.ZodNumber;
-        '24h': z.ZodNumber;
-        '7d': z.ZodNumber;
+        "1h": z.ZodNumber;
+        "24h": z.ZodNumber;
+        "7d": z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        '1h': number;
-        '24h': number;
-        '7d': number;
+        "1h": number;
+        "24h": number;
+        "7d": number;
     }, {
-        '1h': number;
-        '24h': number;
-        '7d': number;
+        "1h": number;
+        "24h": number;
+        "7d": number;
     }>;
     /** Response metadata */
     metadata: z.ZodObject<{
@@ -407,9 +407,9 @@ export declare const AIRiskAssessmentResponseSchema: z.ZodObject<{
         sources?: string[] | undefined;
     };
     liquidationProbability: {
-        '1h': number;
-        '24h': number;
-        '7d': number;
+        "1h": number;
+        "24h": number;
+        "7d": number;
     };
 }, {
     confidence: number;
@@ -437,9 +437,9 @@ export declare const AIRiskAssessmentResponseSchema: z.ZodObject<{
         sources?: string[] | undefined;
     };
     liquidationProbability: {
-        '1h': number;
-        '24h': number;
-        '7d': number;
+        "1h": number;
+        "24h": number;
+        "7d": number;
     };
 }>;
 export type AIRiskAssessmentResponse = z.infer<typeof AIRiskAssessmentResponseSchema>;
@@ -565,17 +565,17 @@ export declare const VolatilityAnalysisSchema: z.ZodObject<{
         variance: z.ZodNumber;
         /** Value at Risk (VaR) */
         valueAtRisk: z.ZodObject<{
-            '95%': z.ZodNumber;
-            '99%': z.ZodNumber;
-            '99.9%': z.ZodNumber;
+            "95%": z.ZodNumber;
+            "99%": z.ZodNumber;
+            "99.9%": z.ZodNumber;
         }, "strip", z.ZodTypeAny, {
-            '95%': number;
-            '99%': number;
-            '99.9%': number;
+            "95%": number;
+            "99%": number;
+            "99.9%": number;
         }, {
-            '95%': number;
-            '99%': number;
-            '99.9%': number;
+            "95%": number;
+            "99%": number;
+            "99.9%": number;
         }>;
         /** Maximum drawdown */
         maxDrawdown: z.ZodNumber;
@@ -585,9 +585,9 @@ export declare const VolatilityAnalysisSchema: z.ZodObject<{
         standardDeviation: number;
         variance: number;
         valueAtRisk: {
-            '95%': number;
-            '99%': number;
-            '99.9%': number;
+            "95%": number;
+            "99%": number;
+            "99.9%": number;
         };
         maxDrawdown: number;
         sharpeRatio?: number | undefined;
@@ -595,9 +595,9 @@ export declare const VolatilityAnalysisSchema: z.ZodObject<{
         standardDeviation: number;
         variance: number;
         valueAtRisk: {
-            '95%': number;
-            '99%': number;
-            '99.9%': number;
+            "95%": number;
+            "99%": number;
+            "99.9%": number;
         };
         maxDrawdown: number;
         sharpeRatio?: number | undefined;
@@ -613,9 +613,9 @@ export declare const VolatilityAnalysisSchema: z.ZodObject<{
         standardDeviation: number;
         variance: number;
         valueAtRisk: {
-            '95%': number;
-            '99%': number;
-            '99.9%': number;
+            "95%": number;
+            "99%": number;
+            "99.9%": number;
         };
         maxDrawdown: number;
         sharpeRatio?: number | undefined;
@@ -629,9 +629,9 @@ export declare const VolatilityAnalysisSchema: z.ZodObject<{
         standardDeviation: number;
         variance: number;
         valueAtRisk: {
-            '95%': number;
-            '99%': number;
-            '99.9%': number;
+            "95%": number;
+            "99%": number;
+            "99.9%": number;
         };
         maxDrawdown: number;
         sharpeRatio?: number | undefined;

@@ -2,7 +2,7 @@
  * Result type implementation for explicit error handling.
  * Represents a computation that can either succeed (Ok) or fail (Err).
  * Similar to Either but specifically designed for error handling scenarios.
- * 
+ *
  * The Result type satisfies the monad laws:
  * - Left identity: Result.ok(a).flatMap(f) === f(a)
  * - Right identity: m.flatMap(Result.ok) === m
@@ -39,7 +39,7 @@ export abstract class Result<T, E = Error> {
    */
   static tryCatch<T, E = Error>(
     computation: () => T,
-    errorMapper: (error: unknown) => E = (e) => e as E
+    errorMapper: (error: unknown) => E = (e) => e as E,
   ): Result<T, E> {
     try {
       return Result.ok(computation());
@@ -56,7 +56,7 @@ export abstract class Result<T, E = Error> {
    */
   static async tryCatchAsync<T, E = Error>(
     computation: () => Promise<T>,
-    errorMapper: (error: unknown) => E = (e) => e as E
+    errorMapper: (error: unknown) => E = (e) => e as E,
   ): Promise<Result<T, E>> {
     try {
       const value = await computation();
@@ -74,11 +74,11 @@ export abstract class Result<T, E = Error> {
    */
   static fromPromise<T, E = Error>(
     promise: Promise<T>,
-    errorMapper: (error: unknown) => E = (e) => e as E
+    errorMapper: (error: unknown) => E = (e) => e as E,
   ): Promise<Result<T, E>> {
     return promise
-      .then(value => Result.ok<T, E>(value))
-      .catch(error => Result.err<T, E>(errorMapper(error)));
+      .then((value) => Result.ok<T, E>(value))
+      .catch((error) => Result.err<T, E>(errorMapper(error)));
   }
 
   /**
@@ -269,7 +269,7 @@ export class Ok<T, E = Error> extends Result<T, E> {
   }
 
   ap<U>(resultFn: Result<(value: T) => U, E>): Result<U, E> {
-    return resultFn.flatMap(fn => this.map(fn));
+    return resultFn.flatMap((fn) => this.map(fn));
   }
 
   tap(fn: (value: T) => void): Result<T, E> {
@@ -431,10 +431,7 @@ export const ResultUtils = {
    * @param fn - Function that returns Result
    * @returns Result containing array of all success values or first error
    */
-  traverse<A, T, E>(
-    items: A[],
-    fn: (item: A) => Result<T, E>
-  ): Result<T[], E> {
+  traverse<A, T, E>(items: A[], fn: (item: A) => Result<T, E>): Result<T[], E> {
     return this.sequence(items.map(fn));
   },
 
@@ -453,10 +450,10 @@ export const ResultUtils = {
    * @returns Function that works with Result values
    */
   lift2<A, B, C>(
-    fn: (a: A, b: B) => C
+    fn: (a: A, b: B) => C,
   ): <E>(resultA: Result<A, E>, resultB: Result<B, E>) => Result<C, E> {
     return <E>(resultA: Result<A, E>, resultB: Result<B, E>) =>
-      resultA.flatMap(a => resultB.map(b => fn(a, b)));
+      resultA.flatMap((a) => resultB.map((b) => fn(a, b)));
   },
 
   /**
@@ -467,7 +464,7 @@ export const ResultUtils = {
   partition<T, E>(results: Result<T, E>[]): [E[], T[]] {
     const errors: E[] = [];
     const successes: T[] = [];
-    
+
     for (const result of results) {
       if (result.isErr()) {
         errors.push((result as Err<T, E>).value);
@@ -475,7 +472,7 @@ export const ResultUtils = {
         successes.push((result as Ok<T, E>).value);
       }
     }
-    
+
     return [errors, successes];
   },
 
@@ -486,8 +483,8 @@ export const ResultUtils = {
    */
   catOks<T, E>(results: Result<T, E>[]): T[] {
     return results
-      .filter(result => result.isOk())
-      .map(result => (result as Ok<T, E>).value);
+      .filter((result) => result.isOk())
+      .map((result) => (result as Ok<T, E>).value);
   },
 
   /**
@@ -497,8 +494,8 @@ export const ResultUtils = {
    */
   catErrs<T, E>(results: Result<T, E>[]): E[] {
     return results
-      .filter(result => result.isErr())
-      .map(result => (result as Err<T, E>).value);
+      .filter((result) => result.isErr())
+      .map((result) => (result as Err<T, E>).value);
   },
 
   /**
@@ -508,8 +505,10 @@ export const ResultUtils = {
    */
   all<T extends readonly Result<any, any>[]>(
     ...results: T
-  ): Result<{ [K in keyof T]: T[K] extends Result<infer U, any> ? U : never }, 
-           T[number] extends Result<any, infer E> ? E : never> {
+  ): Result<
+    { [K in keyof T]: T[K] extends Result<infer U, any> ? U : never },
+    T[number] extends Result<any, infer E> ? E : never
+  > {
     const values: any[] = [];
     for (const result of results) {
       if (result.isErr()) {
@@ -518,5 +517,5 @@ export const ResultUtils = {
       values.push((result as Ok<any, any>).value);
     }
     return Result.ok(values as any);
-  }
+  },
 };

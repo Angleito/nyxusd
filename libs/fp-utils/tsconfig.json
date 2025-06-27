@@ -12,7 +12,7 @@
     "composite": true,
     "incremental": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
-    
+
     // Strict type checking
     "strict": true,
     "noImplicitAny": true,
@@ -25,45 +25,38 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-    
+
     // Additional checks
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitOverride": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    
+
     // Module resolution
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    
+
     // Emit
     "removeComments": false,
     "preserveConstEnums": true,
     "sourceRoot": "./src",
     "mapRoot": "./dist",
-    
+
     // Experimental features
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    
+
     // Skip lib check for faster compilation
     "skipLibCheck": true,
-    
+
     // Type definitions
     "types": ["node", "jest"]
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts"],
   "references": []
 }

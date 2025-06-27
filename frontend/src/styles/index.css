@@ -1,7 +1,7 @@
 /* Import NYXUSD Theme System */
-@import './theme.css';
-@import './typography.css';
-@import './animations.css';
+@import "./theme.css";
+@import "./typography.css";
+@import "./animations.css";
 
 /* Tailwind CSS */
 @tailwind base;
@@ -14,7 +14,7 @@
     color-scheme: dark;
     background-color: var(--surface-0);
   }
-  
+
   body {
     background: var(--gradient-bg-primary);
     color: var(--text-primary);
@@ -68,7 +68,7 @@
     box-shadow: var(--shadow-default);
     transition: all var(--duration-normal) ease;
   }
-  
+
   .card:hover {
     background-color: var(--surface-3);
     border-color: var(--border-default);
@@ -77,7 +77,11 @@
 
   /* Midnight-themed Card */
   .card-midnight {
-    background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--surface-2) 0%,
+      var(--surface-3) 100%
+    );
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-xl);
     padding: var(--space-6);
@@ -85,14 +89,18 @@
     backdrop-filter: blur(8px);
     transition: all var(--duration-normal) ease;
   }
-  
+
   .card-midnight:hover {
-    background: linear-gradient(135deg, var(--surface-3) 0%, var(--surface-4) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--surface-3) 0%,
+      var(--surface-4) 100%
+    );
     border-color: var(--border-default);
     box-shadow: var(--shadow-md);
     transform: translateY(-1px);
   }
-  
+
   /* Primary Button with Nyx Theme */
   .btn-primary {
     background: var(--gradient-btn-primary);
@@ -105,18 +113,18 @@
     transition: all var(--duration-normal) ease;
     box-shadow: var(--shadow-accent-sm);
   }
-  
+
   .btn-primary:hover {
     background: var(--gradient-btn-primary-hover);
     box-shadow: var(--shadow-accent-md);
     transform: translateY(-1px);
   }
-  
+
   .btn-primary:active {
     transform: translateY(0);
     box-shadow: var(--shadow-accent-sm);
   }
-  
+
   /* Secondary Button with Nyx Theme */
   .btn-secondary {
     background-color: var(--surface-overlay-8);
@@ -128,18 +136,18 @@
     cursor: pointer;
     transition: all var(--duration-normal) ease;
   }
-  
+
   .btn-secondary:hover {
     background-color: var(--surface-overlay-12);
     border-color: var(--border-default);
     transform: translateY(-1px);
   }
-  
+
   .btn-secondary:active {
     transform: translateY(0);
     background-color: var(--surface-overlay-16);
   }
-  
+
   /* Input Field with Nyx Theme */
   .input-field {
     width: 100%;
@@ -152,18 +160,18 @@
     font-size: var(--text-base);
     transition: all var(--duration-normal) ease;
   }
-  
+
   .input-field:focus {
     outline: none;
     border-color: var(--nyx-primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
     background-color: var(--surface-overlay-12);
   }
-  
+
   .input-field::placeholder {
     color: var(--text-tertiary);
   }
-  
+
   /* Tertiary Button with Nyx Theme */
   .btn-tertiary {
     background: var(--gradient-btn-tertiary);
@@ -175,12 +183,12 @@
     cursor: pointer;
     transition: all var(--duration-normal) ease;
   }
-  
+
   .btn-tertiary:hover {
     background: var(--gradient-btn-tertiary-hover);
     transform: translateY(-1px);
   }
-  
+
   /* Ghost Button */
   .btn-ghost {
     background-color: transparent;
@@ -192,7 +200,7 @@
     cursor: pointer;
     transition: all var(--duration-normal) ease;
   }
-  
+
   .btn-ghost:hover {
     background-color: var(--surface-hover);
     color: var(--text-primary);
