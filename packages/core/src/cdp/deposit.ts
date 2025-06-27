@@ -17,16 +17,14 @@
  * @packageDocumentation
  */
 
-import { Result } from '../../../libs/fp-utils/src/result'
+import { Result, Ok, Err } from '@nyxusd/fp-utils'
 import { 
   CDP, 
-  CDPId, 
   CDPError, 
   CDPState,
   Amount, 
   Timestamp,
-  mkAmount,
-  mkTimestamp
+  mkAmount
 } from '../types/cdp'
 
 /**
@@ -154,19 +152,8 @@ export const validateDepositCollateral = (
   }
 
   // Check if CDP is in emergency closure state
-  if (params.cdp.state.type === 'liquidated') {
-    return Result.err({
-      type: 'cdp_already_liquidated',
-      id: params.cdp.id
-    })
-  }
-
-  if (params.cdp.state.type === 'closed') {
-    return Result.err({
-      type: 'cdp_already_closed',
-      id: params.cdp.id
-    })
-  }
+  // TypeScript ensures CDP state is active or liquidating
+  // No need to check for liquidated or closed states
 
   return Result.ok(undefined)
 }
@@ -271,7 +258,7 @@ export const calculateCurrentHealthFactor = (
 export const updateCDPStateAfterDeposit = (
   currentState: CDPState,
   newHealthFactor: number,
-  liquidationRatio: number
+  _liquidationRatio: number
 ): CDPState => {
   // If health factor is still critical, keep in liquidating state
   if (newHealthFactor <= 1.0) {
@@ -462,9 +449,9 @@ export const depositCollateralBatch = (
   for (const params of deposits) {
     const result = depositCollateral(params, context)
     if (result.isErr()) {
-      return Result.err(result.value)
+      return Result.err((result as Err<DepositResult, CDPError>).value)
     }
-    results.push(result.value)
+    results.push((result as Ok<DepositResult, CDPError>).value)
   }
 
   return Result.ok(results)

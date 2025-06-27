@@ -8,7 +8,7 @@
  * @packageDocumentation
  */
 
-import { Result } from '../../../libs/fp-utils/src/result'
+import { Result } from '@nyxusd/fp-utils'
 
 // Re-export all validation functions and types
 export * from './collateral'

@@ -8,7 +8,8 @@
     "libs/*"
   ],
   "scripts": {
-    "build": "tsc --build packages/*/tsconfig.json libs/*/tsconfig.json",
+    "build": "tsc --build",
+    "clean:build": "tsc --build --clean",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:unit": "jest --selectProjects unit-tests",
@@ -22,7 +23,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit --skipLibCheck",
-    "clean": "rm -rf dist node_modules packages/*/node_modules libs/*/node_modules packages/*/dist libs/*/dist coverage",
+    "clean": "npm run clean:build && rm -rf dist node_modules packages/*/node_modules libs/*/node_modules packages/*/dist libs/*/dist coverage",
     "validate": "npm run lint && npm run type-check && npm run test",
     "build:frontend": "cd frontend && npm install && npm run build",
     "build:api": "cd api && npm install && npm run build",

@@ -6,7 +6,10 @@
     "lib": ["es2020", "dom"],
     "outDir": "../../dist/libs/validators",
     "declaration": true,
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "composite": true,
+    "incremental": true,
+    "tsBuildInfoFile": "../../dist/libs/validators/.tsbuildinfo"
   },
   "include": [
     "src/**/*"

@@ -4,6 +4,8 @@ import { ModernDashboard } from './components/dashboard/ModernDashboard'
 import { CDPDashboard } from './components/cdp/CDPDashboard'
 import { ModernSystemStats } from './components/stats/ModernSystemStats'
 import HeroSection from './components/dashboard/HeroSection'
+import { AIAssistantProvider } from './providers/AIAssistantProvider'
+import { AIAssistant } from './components/ai-assistant'
 import './styles/App.css'
 
 function App() {
@@ -37,6 +39,16 @@ function App() {
               <div className="container mx-auto px-4 py-8 pt-24">
                 <ModernSystemStats />
               </div>
+            } 
+          />
+          <Route 
+            path="/ai-assistant" 
+            element={
+              <AIAssistantProvider>
+                <div className="container mx-auto px-4 py-8 pt-24">
+                  <AIAssistant />
+                </div>
+              </AIAssistantProvider>
             } 
           />
         </Routes>

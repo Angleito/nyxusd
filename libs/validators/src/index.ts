@@ -9,6 +9,7 @@
 export * from './schemas/common.js';
 export * from './schemas/collateral.js';
 export * from './schemas/cdp.js';
+export * from './schemas/oracle.js';
 
 // Re-export all utilities
 export * from './utils/validate.js';
@@ -34,6 +35,13 @@ import {
 } from './schemas/common.js';
 import { CollateralDepositSchema, CollateralWithdrawalSchema } from './schemas/collateral.js';
 import { CreateCDPSchema, CDPCollateralUpdateSchema, CDPDebtUpdateSchema } from './schemas/cdp.js';
+import { 
+  OraclePriceDataSchema, 
+  OracleQuerySchema, 
+  OracleFeedConfigSchema,
+  ChainlinkRoundDataSchema,
+  PriceValidationResultSchema
+} from './schemas/oracle.js';
 import { validate, createValidator } from './utils/validate.js';
 import { sanitizeAddress, sanitizeAmount, sanitizePrice } from './utils/sanitize.js';
 
@@ -53,6 +61,13 @@ export const CommonValidators = {
   createCDP: createValidator(CreateCDPSchema),
   cdpCollateralUpdate: createValidator(CDPCollateralUpdateSchema),
   cdpDebtUpdate: createValidator(CDPDebtUpdateSchema),
+  
+  // Oracle validators
+  oraclePriceData: createValidator(OraclePriceDataSchema),
+  oracleQuery: createValidator(OracleQuerySchema),
+  oracleFeedConfig: createValidator(OracleFeedConfigSchema),
+  chainlinkRoundData: createValidator(ChainlinkRoundDataSchema),
+  priceValidationResult: createValidator(PriceValidationResultSchema),
 };
 
 // Sanitization presets

@@ -407,14 +407,14 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
                 <button
                   type="submit"
                   disabled={
-                    depositMutation.isLoading || 
-                    withdrawMutation.isLoading || 
-                    mintMutation.isLoading || 
-                    burnMutation.isLoading
+                    depositMutation.isPending || 
+                    withdrawMutation.isPending || 
+                    mintMutation.isPending || 
+                    burnMutation.isPending
                   }
                   className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
-                  {(depositMutation.isLoading || withdrawMutation.isLoading || mintMutation.isLoading || burnMutation.isLoading)
+                  {(depositMutation.isPending || withdrawMutation.isPending || mintMutation.isPending || burnMutation.isPending)
                     ? 'Processing...' 
                     : `Confirm ${actionType.charAt(0).toUpperCase() + actionType.slice(1)}`
                   }

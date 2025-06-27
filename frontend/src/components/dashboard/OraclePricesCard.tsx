@@ -1,16 +1,51 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { fetchOraclePrices } from '../../services/api'
 
 export interface OraclePricesCardProps {
-  prices?: any
-  isLoading?: boolean
   className?: string
 }
 
+interface PriceData {
+  [key: string]: string | number
+}
+
+interface OraclePricesData {
+  prices: PriceData
+  timestamp: number
+}
+
 export const OraclePricesCard: React.FC<OraclePricesCardProps> = ({
-  prices,
-  isLoading = false,
   className = ''
 }) => {
+  const [prices, setPrices] = useState<OraclePricesData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
+
+  const loadPrices = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const response = await fetchOraclePrices()
+      // Handle axios response vs direct data
+      const data = response?.data ? response.data : response
+      setPrices(data)
+      setLastRefresh(new Date())
+    } catch (err) {
+      console.error('Failed to load oracle prices:', err)
+      setError('Failed to load price data')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadPrices()
+    
+    // Refresh prices every 30 seconds
+    const interval = setInterval(loadPrices, 30000)
+    return () => clearInterval(interval)
+  }, [])
   const formatPrice = (price: any) => {
     if (typeof price === 'string') {
       return parseFloat(price).toLocaleString(undefined, {
@@ -107,61 +142,77 @@ export const OraclePricesCard: React.FC<OraclePricesCardProps> = ({
         </h3>
         
         <div className="flex items-center space-x-2">
-          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-          <span className="text-xs text-gray-500">Live</span>
+          <div className={`w-2 h-2 rounded-full ${error ? 'bg-red-400' : 'bg-green-400 animate-pulse'}`}></div>
+          <span className="text-xs text-gray-500">{error ? 'Error' : 'Live'}</span>
         </div>
       </div>
 
-      <div className="space-y-3">
-        {prices?.prices && Object.entries(prices.prices).map(([pair, price]) => {
-          const trend = generateTrendData(pair)
-          return (
-            <div 
-              key={pair} 
-              className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-150 border border-gray-100 hover:border-purple-200"
-            >
-              <div className="flex items-center space-x-3">
-                {getPairIcon(pair)}
-                <div>
-                  <div className="font-medium text-gray-900">{pair}</div>
-                  <div className={`text-xs flex items-center space-x-1 ${
-                    trend.isPositive ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    <svg 
-                      className={`w-3 h-3 ${trend.isPositive ? '' : 'rotate-180'}`}
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17l9.2-9.2M17 17V7H7" />
-                    </svg>
-                    <span>{trend.change}%</span>
+      {error ? (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+          <p className="text-red-600 text-sm">{error}</p>
+          <button 
+            onClick={loadPrices}
+            className="mt-2 text-red-700 hover:text-red-800 text-sm font-medium"
+          >
+            Try Again
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {prices?.prices && Object.entries(prices.prices).map(([pair, price]) => {
+            const trend = generateTrendData(pair)
+            return (
+              <div 
+                key={pair} 
+                className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-150 border border-gray-100 hover:border-purple-200"
+              >
+                <div className="flex items-center space-x-3">
+                  {getPairIcon(pair)}
+                  <div>
+                    <div className="font-medium text-gray-900">{pair}</div>
+                    <div className={`text-xs flex items-center space-x-1 ${
+                      trend.isPositive ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      <svg 
+                        className={`w-3 h-3 ${trend.isPositive ? '' : 'rotate-180'}`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17l9.2-9.2M17 17V7H7" />
+                      </svg>
+                      <span>{trend.change}%</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="text-right">
-                <div className="text-lg font-semibold text-gray-900">
-                  ${formatPrice(price)}
+                
+                <div className="text-right">
+                  <div className="text-lg font-semibold text-gray-900">
+                    ${formatPrice(price)}
+                  </div>
+                  <div className="text-xs text-gray-500">USD</div>
                 </div>
-                <div className="text-xs text-gray-500">USD</div>
               </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      )}
 
       <div className="mt-6 pt-4 border-t border-gray-100">
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-500">
-            Last updated: {prices?.timestamp ? new Date(prices.timestamp).toLocaleString() : 'Loading...'}
+            Last updated: {lastRefresh.toLocaleString()}
           </span>
           
-          <button className="text-purple-600 hover:text-purple-700 font-medium flex items-center space-x-1 text-xs">
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button 
+            onClick={loadPrices}
+            disabled={isLoading}
+            className="text-purple-600 hover:text-purple-700 font-medium flex items-center space-x-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            <span>Refresh</span>
+            <span>{isLoading ? 'Refreshing...' : 'Refresh'}</span>
           </button>
         </div>
       </div>

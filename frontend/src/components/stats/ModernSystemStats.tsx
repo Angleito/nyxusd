@@ -15,8 +15,8 @@ const COLORS = {
 }
 
 export const ModernSystemStats: React.FC = () => {
-  const { data: systemStats, isLoading: statsLoading } = useQuery(['systemStats'], fetchSystemStats)
-  const { data: cdpData, isLoading: cdpsLoading } = useQuery(['cdps'], fetchCDPs)
+  const { data: systemStats, isLoading: statsLoading } = useQuery({ queryKey: ['systemStats'], queryFn: fetchSystemStats })
+  const { data: cdpData, isLoading: cdpsLoading } = useQuery({ queryKey: ['cdps'], queryFn: fetchCDPs })
 
   if (statsLoading || cdpsLoading) {
     return (

@@ -3,8 +3,8 @@
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
-    "outDir": "./dist",
     "rootDir": "./src",
+    "outDir": "./dist",
     "composite": true,
     "incremental": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
@@ -40,5 +40,7 @@
     "**/*.test.ts",
     "**/*.spec.ts"
   ],
-  "references": []
+  "references": [
+    { "path": "../../libs/fp-utils" }
+  ]
 }

@@ -125,7 +125,7 @@ export const CDPDashboard: React.FC = () => {
   const [showCreateWizard, setShowCreateWizard] = useState(false)
   const [expandedActions, setExpandedActions] = useState(false)
   
-  const { data: cdpData, isLoading } = useQuery(['cdps'], fetchCDPs)
+  const { data: cdpData, isLoading } = useQuery({ queryKey: ['cdps'], queryFn: fetchCDPs })
 
   // Calculate dashboard metrics
   const cdps = (cdpData as any)?.cdps || []

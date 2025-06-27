@@ -20,16 +20,14 @@
  * @packageDocumentation
  */
 
-import { Result } from '../../../libs/fp-utils/src/result'
+import { Result, Ok, Err } from '@nyxusd/fp-utils'
 import { 
   CDP, 
-  CDPId, 
   CDPError, 
   CDPState,
   Amount, 
   Timestamp,
-  mkAmount,
-  mkTimestamp
+  mkAmount
 } from '../types/cdp'
 
 /**
@@ -297,7 +295,7 @@ export const validateBurnNYXUSD = (
   if (params.burnAmount > totalDebt) {
     return Result.err({
       type: 'burn_amount_exceeds_debt',
-      debt: totalDebt,
+      debt: mkAmount(totalDebt),
       requested: params.burnAmount
     })
   }
@@ -655,9 +653,9 @@ export const burnNYXUSDBatch = (
   for (const params of burns) {
     const result = burnNYXUSD(params, context)
     if (result.isErr()) {
-      return Result.err(result.value)
+      return Result.err((result as Err<BurnResult, CDPError>).value)
     }
-    results.push(result.value)
+    results.push((result as Ok<BurnResult, CDPError>).value)
   }
 
   return Result.ok(results)

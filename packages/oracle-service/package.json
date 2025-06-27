@@ -1,0 +1,56 @@
+{
+  "name": "@nyxusd/oracle-service",
+  "version": "0.1.0",
+  "description": "Oracle service for NYXUSD CDP system with Chainlink integration",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@chainlink/contracts": "^0.8.0",
+    "@nyxusd/fp-utils": "*",
+    "@nyxusd/validators": "*",
+    "@nyxusd/midnight-utils": "*",
+    "fp-ts": "^2.16.1",
+    "io-ts": "^2.2.20",
+    "zod": "^3.22.4",
+    "ethers": "^6.8.1",
+    "axios": "^1.6.2",
+    "rxjs": "^7.8.1",
+    "ramda": "^0.29.1"
+  },
+  "devDependencies": {
+    "@types/ramda": "^0.29.6",
+    "@types/jest": "^29.5.8",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2",
+    "eslint": "^8.54.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nyxusd/nyxusd.git",
+    "directory": "packages/oracle-service"
+  },
+  "keywords": [
+    "oracle",
+    "chainlink",
+    "cdp",
+    "defi",
+    "functional-programming",
+    "midnight-protocol"
+  ],
+  "license": "MIT"
+}

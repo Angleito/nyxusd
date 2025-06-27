@@ -8,12 +8,16 @@ import { OraclePricesCard } from './OraclePricesCard'
 import { RecentActivityCard } from './RecentActivityCard'
 
 export const ModernDashboard: React.FC = () => {
-  const { data: systemStats, isLoading: statsLoading, error: statsError } = useQuery(['systemStats'], fetchSystemStats, {
+  const { data: systemStats, isLoading: statsLoading, error: statsError } = useQuery({
+    queryKey: ['systemStats'],
+    queryFn: fetchSystemStats,
     refetchInterval: 30000, // Refetch every 30 seconds
     staleTime: 20000, // Consider data stale after 20 seconds
   })
   
-  const { data: prices, isLoading: pricesLoading, error: pricesError } = useQuery(['oraclePrices'], fetchOraclePrices, {
+  const { data: prices, isLoading: pricesLoading, error: pricesError } = useQuery({
+    queryKey: ['oraclePrices'],
+    queryFn: fetchOraclePrices,
     refetchInterval: 10000, // Refetch every 10 seconds for prices
     staleTime: 5000, // Consider prices stale after 5 seconds
   })
@@ -73,10 +77,67 @@ export const ModernDashboard: React.FC = () => {
           {/* Oracle Prices Card - Spans 4 columns on lg */}
           <div className="lg:col-span-4">
             <OraclePricesCard 
-              prices={prices} 
-              isLoading={pricesLoading}
               className="h-full"
             />
+          </div>
+
+          {/* AI Portfolio Assistant Card - Full width, prominent placement */}
+          <div className="lg:col-span-12">
+            <div className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-xl shadow-lg border border-purple-500/20 p-8 hover:shadow-xl transition-all duration-300">
+              {/* Background pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute -top-4 -right-4 w-24 h-24 bg-white rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-300 rounded-full blur-3xl"></div>
+              </div>
+              
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex-1 text-center md:text-left">
+                  <div className="flex items-center justify-center md:justify-start space-x-3 mb-3">
+                    {/* Robot/AI Icon */}
+                    <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    {/* Sparkles */}
+                    <svg className="w-5 h-5 text-purple-300 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <h2 className="text-2xl md:text-3xl font-bold text-white">AI Portfolio Assistant</h2>
+                    <svg className="w-5 h-5 text-purple-300 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  </div>
+                  <p className="text-purple-100 text-lg mb-2">
+                    Get personalized investment recommendations based on your profile
+                  </p>
+                  <div className="flex flex-wrap gap-2 justify-center md:justify-start text-sm">
+                    <span className="px-3 py-1 bg-white/10 backdrop-blur rounded-full text-purple-100">AI-Powered</span>
+                    <span className="px-3 py-1 bg-white/10 backdrop-blur rounded-full text-purple-100">Risk Analysis</span>
+                    <span className="px-3 py-1 bg-white/10 backdrop-blur rounded-full text-purple-100">Portfolio Optimization</span>
+                  </div>
+                </div>
+                
+                <div className="flex-shrink-0">
+                  <Link 
+                    to="/ai-assistant" 
+                    className="group inline-flex items-center space-x-2 bg-white text-purple-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-purple-50 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                  >
+                    <span>Start AI Consultation</span>
+                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+              
+              {/* Floating decoration elements */}
+              <div className="absolute top-4 right-4 w-20 h-20 opacity-20">
+                <svg className="w-full h-full text-purple-300 animate-spin-slow" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" />
+                </svg>
+              </div>
+            </div>
           </div>
 
           {/* System Health Card - Spans 8 columns on lg */}

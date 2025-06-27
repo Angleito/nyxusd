@@ -25,6 +25,7 @@ const mainNavItems: NavItem[] = [
   { label: 'Dashboard', href: '/', description: 'Overview of your CDPs and system status' },
   { label: 'My CDPs', href: '/cdp', description: 'Manage your Collateralized Debt Positions' },
   { label: 'System Stats', href: '/system', description: 'System-wide statistics and health metrics' },
+  { label: 'AI Portfolio Assistant', href: '/ai-assistant', description: 'Get personalized investment recommendations' },
 ]
 
 // Removed unimplemented navigation sections for MVP focus

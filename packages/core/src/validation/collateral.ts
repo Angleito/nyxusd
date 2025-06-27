@@ -8,9 +8,8 @@
  * @packageDocumentation
  */
 
-import { Result } from '../../../libs/fp-utils/src/result'
+import { Result } from '@nyxusd/fp-utils'
 import { Amount, mkAmount } from '../types/cdp'
-import { CollateralTypeId } from '../types/collateral'
 
 /**
  * Validation error types for collateral operations

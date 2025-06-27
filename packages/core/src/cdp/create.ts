@@ -15,7 +15,7 @@
  * @packageDocumentation
  */
 
-import { Result } from '../../../libs/fp-utils/src/result'
+import { Result, Ok, Err } from '@nyxusd/fp-utils'
 import { 
   CDP, 
   CDPId, 
@@ -25,8 +25,8 @@ import {
   Amount, 
   Timestamp,
   mkCDPId,
-  mkTimestamp,
-  mkAmount
+  mkAmount,
+  mkCollateralizationRatio
 } from '../types/cdp'
 
 /**
@@ -160,8 +160,8 @@ export const validateCDPCreation = (
   if (collateralizationRatio < context.config.minCollateralizationRatio) {
     return Result.err({
       type: 'below_min_collateral_ratio',
-      current: collateralizationRatio,
-      minimum: context.config.minCollateralizationRatio
+      current: mkCollateralizationRatio(collateralizationRatio),
+      minimum: mkCollateralizationRatio(context.config.minCollateralizationRatio)
     })
   }
 
@@ -169,7 +169,7 @@ export const validateCDPCreation = (
   if (collateralizationRatio < params.config.minCollateralizationRatio) {
     return Result.err({
       type: 'below_min_collateral_ratio',
-      current: collateralizationRatio,
+      current: mkCollateralizationRatio(collateralizationRatio),
       minimum: params.config.minCollateralizationRatio
     })
   }
@@ -277,7 +277,7 @@ export const generateCDPId = (
  */
 export const createInitialCDPState = (
   healthFactor: number,
-  liquidationRatio: number
+  _liquidationRatio: number
 ): CDPState => {
   // If health factor is too low, CDP should be flagged for liquidation
   if (healthFactor <= 1.0) {
@@ -419,9 +419,9 @@ export const createCDPBatch = (
   for (const params of requests) {
     const result = createCDP(params, context)
     if (result.isErr()) {
-      return Result.err(result.value)
+      return Result.err((result as Err<CDP, CDPError>).value)
     }
-    cdps.push(result.value)
+    cdps.push((result as Ok<CDP, CDPError>).value)
   }
 
   return Result.ok(cdps)

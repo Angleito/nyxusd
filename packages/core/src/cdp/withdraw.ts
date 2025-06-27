@@ -18,16 +18,15 @@
  * @packageDocumentation
  */
 
-import { Result } from '../../../libs/fp-utils/src/result'
+import { Result, Ok, Err } from '@nyxusd/fp-utils'
 import { 
   CDP, 
-  CDPId, 
   CDPError, 
   CDPState,
   Amount, 
   Timestamp,
   mkAmount,
-  mkTimestamp
+  mkCollateralizationRatio
 } from '../types/cdp'
 
 /**
@@ -183,8 +182,8 @@ export const validateWithdrawCollateral = (
   if (newCollateralizationRatio < requiredRatio) {
     return Result.err({
       type: 'below_min_collateral_ratio',
-      current: newCollateralizationRatio,
-      minimum: requiredRatio
+      current: mkCollateralizationRatio(newCollateralizationRatio),
+      minimum: mkCollateralizationRatio(requiredRatio)
     })
   }
 
@@ -332,9 +331,9 @@ export const calculateCurrentHealthFactor = (
  * ```
  */
 export const updateCDPStateAfterWithdraw = (
-  currentState: CDPState,
+  _currentState: CDPState,
   newHealthFactor: number,
-  liquidationRatio: number
+  _liquidationRatio: number
 ): CDPState => {
   // If health factor drops to critical levels, flag for liquidation
   if (newHealthFactor <= 1.0) {
@@ -528,9 +527,9 @@ export const withdrawCollateralBatch = (
   for (const params of withdrawals) {
     const result = withdrawCollateral(params, context)
     if (result.isErr()) {
-      return Result.err(result.value)
+      return Result.err((result as Err<WithdrawResult, CDPError>).value)
     }
-    results.push(result.value)
+    results.push((result as Ok<WithdrawResult, CDPError>).value)
   }
 
   return Result.ok(results)

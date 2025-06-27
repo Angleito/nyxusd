@@ -5,6 +5,9 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import { createClient } from 'redis';
 
+// Import oracle routes
+import oracleRoutes from './routes/oracle.js';
+
 // Import CDP operations (mock for now since we need to resolve import paths)
 // import * as CDPOperations from '@nyxusd/core';
 
@@ -169,6 +172,9 @@ app.post('/api/cdp/:id/burn', (req, res) => {
   });
 });
 
+// Oracle routes
+app.use('/api/oracle', oracleRoutes);
+
 // System information endpoints
 app.get('/api/system', (req, res) => {
   res.json({
@@ -199,18 +205,113 @@ app.get('/api/system', (req, res) => {
   });
 });
 
-// Oracle price feeds (mock)
-app.get('/api/oracle/prices', (req, res) => {
-  res.json({
-    timestamp: new Date().toISOString(),
-    prices: {
-      'ETH/USD': '2450.50',
-      'BTC/USD': '42150.75',
-      'MATIC/USD': '0.85',
-      'USDC/USD': '1.00',
-      'DAI/USD': '0.999'
+// Oracle price feeds (real Chainlink integration)
+app.get('/api/oracle/prices', async (req, res) => {
+  try {
+    // Import oracle service (dynamic import to handle potential build issues)
+    const { createOracleServiceFacade, DEFAULT_AGGREGATION_STRATEGY, DEFAULT_CONSENSUS_CONFIG } = 
+      await import('@nyxusd/oracle-service');
+    
+    // Create oracle service configuration
+    const oracleConfig = {
+      primaryOracle: {
+        network: process.env.NODE_ENV === 'production' ? 'ethereum' : 'sepolia',
+        provider: process.env.ORACLE_RPC_URL || 'https://sepolia.infura.io/v3/demo',
+        defaultTimeout: 5000,
+        defaultMaxStaleness: 3600,
+        defaultMinConfidence: 95,
+        cacheTtl: 60,
+        retry: {
+          maxAttempts: 3,
+          delayMs: 1000,
+          backoffMultiplier: 2,
+        },
+      },
+      enableFallback: true,
+      aggregationStrategy: DEFAULT_AGGREGATION_STRATEGY,
+      consensusConfig: DEFAULT_CONSENSUS_CONFIG,
+      cache: {
+        enabled: true,
+        ttl: 60,
+      },
+    };
+
+    // Create oracle service
+    const oracleService = createOracleServiceFacade(oracleConfig);
+    
+    // Fetch prices for supported feeds
+    const supportedFeeds = ['ETH-USD', 'BTC-USD', 'LINK-USD', 'USDC-USD', 'DAI-USD'];
+    const pricePromises = supportedFeeds.map(async (feedId) => {
+      try {
+        const query = { feedId, allowCached: true, timeout: 5000 };
+        const result = await oracleService.fetchPrice(query)();
+        
+        if (result._tag === 'Right') {
+          const priceData = result.right.data;
+          // Convert price to human-readable format
+          const price = Number(priceData.price) / Math.pow(10, priceData.decimals);
+          return {
+            feedId,
+            price: price.toFixed(2),
+            confidence: priceData.confidence,
+            timestamp: priceData.timestamp,
+            source: priceData.source,
+          };
+        } else {
+          console.warn(`Failed to fetch price for ${feedId}:`, result.left);
+          return null;
+        }
+      } catch (error) {
+        console.warn(`Error fetching price for ${feedId}:`, error);
+        return null;
+      }
+    });
+
+    const priceResults = await Promise.all(pricePromises);
+    const validPrices = priceResults.filter(p => p !== null);
+    
+    // Format response to match existing API structure
+    const prices: Record<string, string> = {};
+    validPrices.forEach(price => {
+      if (price) {
+        const displayPair = price.feedId.replace('-', '/');
+        prices[displayPair] = price.price;
+      }
+    });
+    
+    // Add fallback prices if oracle fails
+    if (Object.keys(prices).length === 0) {
+      console.warn('All oracle requests failed, using fallback prices');
+      prices['ETH/USD'] = '2450.50';
+      prices['BTC/USD'] = '42150.75';
+      prices['LINK/USD'] = '14.50';
+      prices['USDC/USD'] = '1.00';
+      prices['DAI/USD'] = '0.999';
     }
-  });
+
+    res.json({
+      timestamp: new Date().toISOString(),
+      prices,
+      source: validPrices.length > 0 ? 'chainlink' : 'fallback',
+      oracleHealth: validPrices.length / supportedFeeds.length,
+    });
+  } catch (error) {
+    console.error('Oracle service error:', error);
+    
+    // Fallback to mock data on error
+    res.json({
+      timestamp: new Date().toISOString(),
+      prices: {
+        'ETH/USD': '2450.50',
+        'BTC/USD': '42150.75',
+        'LINK/USD': '14.50',
+        'USDC/USD': '1.00',
+        'DAI/USD': '0.999'
+      },
+      source: 'fallback',
+      error: 'Oracle service unavailable',
+    });
+  }
 });
 
 // Error handling middleware

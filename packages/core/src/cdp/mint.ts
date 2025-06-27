@@ -19,16 +19,15 @@
  * @packageDocumentation
  */
 
-import { Result } from '../../../libs/fp-utils/src/result'
+import { Result, Ok, Err } from '@nyxusd/fp-utils'
 import { 
   CDP, 
-  CDPId, 
   CDPError, 
   CDPState,
   Amount, 
   Timestamp,
   mkAmount,
-  mkTimestamp
+  mkCollateralizationRatio
 } from '../types/cdp'
 
 /**
@@ -228,7 +227,7 @@ export const validateMintNYXUSD = (
     return Result.err({
       type: 'debt_ceiling_exceeded',
       ceiling: params.cdp.config.debtCeiling,
-      requested: newTotalDebt
+      requested: mkAmount(newTotalDebt)
     })
   }
 
@@ -238,7 +237,7 @@ export const validateMintNYXUSD = (
     return Result.err({
       type: 'debt_ceiling_exceeded',
       ceiling: context.globalDebtCeiling,
-      requested: newGlobalDebt
+      requested: mkAmount(newGlobalDebt)
     })
   }
 
@@ -250,7 +249,7 @@ export const validateMintNYXUSD = (
   if (newCollateralizationRatio < params.cdp.config.minCollateralizationRatio) {
     return Result.err({
       type: 'below_min_collateral_ratio',
-      current: newCollateralizationRatio,
+      current: mkCollateralizationRatio(newCollateralizationRatio),
       minimum: params.cdp.config.minCollateralizationRatio
     })
   }
@@ -413,9 +412,9 @@ export const calculateCurrentHealthFactor = (
  * ```
  */
 export const updateCDPStateAfterMint = (
-  currentState: CDPState,
+  _currentState: CDPState,
   newHealthFactor: number,
-  liquidationRatio: number
+  _liquidationRatio: number
 ): CDPState => {
   // If health factor drops to critical levels, flag for liquidation
   if (newHealthFactor <= 1.0) {
@@ -579,7 +578,7 @@ export const mintNYXUSD = (
     newHealthFactor,
     previousHealthFactor,
     accruedFees,
-    newTotalDebt
+    newTotalDebt: mkAmount(newTotalDebt)
   }
 
   return Result.ok(mintResult)
@@ -627,14 +626,14 @@ export const mintNYXUSDBatch = (
 
     const result = mintNYXUSD(params, updatedContext)
     if (result.isErr()) {
-      return Result.err(result.value)
+      return Result.err((result as Err<MintResult, CDPError>).value)
     }
 
-    const mintResult = result.value
+    const mintResult = (result as Ok<MintResult, CDPError>).value
     results.push(mintResult)
     
     // Update running total for next iteration
-    runningTotalDebt += mintResult.mintedAmount + mintResult.accruedFees
+    runningTotalDebt = mkAmount(runningTotalDebt + mintResult.mintedAmount + mintResult.accruedFees)
   }
 
   return Result.ok(results)

@@ -5,8 +5,8 @@ import { fetchSystemStats, fetchOraclePrices } from '../../services/api';
 import HeroSection from './HeroSection';
 
 export const DashboardWithHero: React.FC = () => {
-  const { data: systemStats, isLoading: statsLoading } = useQuery(['systemStats'], fetchSystemStats);
-  const { data: prices, isLoading: pricesLoading } = useQuery(['oraclePrices'], fetchOraclePrices);
+  const { data: systemStats, isLoading: statsLoading } = useQuery({ queryKey: ['systemStats'], queryFn: fetchSystemStats });
+  const { data: prices, isLoading: pricesLoading } = useQuery({ queryKey: ['oraclePrices'], queryFn: fetchOraclePrices });
 
   return (
     <div className="bg-slate-900 min-h-screen">

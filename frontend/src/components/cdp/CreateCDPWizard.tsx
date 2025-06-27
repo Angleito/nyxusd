@@ -428,10 +428,10 @@ export const CreateCDPWizard: React.FC<CreateCDPWizardProps> = ({ onClose }) => 
               ) : (
                 <button
                   type="submit"
-                  disabled={createCDPMutation.isLoading}
+                  disabled={createCDPMutation.isPending}
                   className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50"
                 >
-                  {createCDPMutation.isLoading ? 'Creating...' : 'Create CDP'}
+                  {createCDPMutation.isPending ? 'Creating...' : 'Create CDP'}
                 </button>
               )}
             </div>

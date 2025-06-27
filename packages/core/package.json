@@ -28,6 +28,7 @@
   "author": "NyxUSD Team",
   "license": "MIT",
   "dependencies": {
+    "@nyxusd/fp-utils": "*",
     "fp-ts": "^2.16.0",
     "immutable": "^4.3.0",
     "io-ts": "^2.2.20"
