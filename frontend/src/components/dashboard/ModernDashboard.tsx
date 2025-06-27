@@ -5,7 +5,6 @@ import { fetchSystemStats, fetchOraclePrices } from "../../services/api";
 import { WelcomeCard } from "./WelcomeCard";
 import { SystemHealthCard } from "./SystemHealthCard";
 import { OraclePricesCard } from "./OraclePricesCard";
-import { RecentActivityCard } from "./RecentActivityCard";
 
 export const ModernDashboard: React.FC = () => {
   const {
@@ -208,9 +207,66 @@ export const ModernDashboard: React.FC = () => {
             />
           </div>
 
-          {/* Recent Activity Card - Spans 4 columns on lg */}
+          {/* Privacy Protection Card - Spans 4 columns on lg */}
           <div className="lg:col-span-4">
-            <RecentActivityCard isLoading={false} className="h-full" />
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200 h-full">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                  <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span>Privacy Protection</span>
+                </h3>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-gray-500">Active</span>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="bg-purple-50 rounded-lg p-4">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                      <span className="text-purple-600 text-sm">🔐</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-purple-900">Zero-Knowledge Proofs</h4>
+                      <p className="text-xs text-purple-700">Transactions verified without revealing data</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-indigo-50 rounded-lg p-4">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                      <span className="text-indigo-600 text-sm">🌙</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-indigo-900">Midnight Protocol</h4>
+                      <p className="text-xs text-indigo-700">Built for privacy-first DeFi</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-green-50 rounded-lg p-4">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 text-sm">🛡️</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-green-900">No Transaction History</h4>
+                      <p className="text-xs text-green-700">Your activity remains completely private</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <button className="w-full text-purple-600 hover:text-purple-700 text-sm font-medium py-2 hover:bg-purple-50 rounded-lg transition-colors">
+                  Learn More About Privacy
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Additional Cards Row */}
