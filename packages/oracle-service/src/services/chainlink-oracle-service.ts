@@ -1,14 +1,14 @@
 /**
  * Chainlink Oracle Service
- * 
+ *
  * Functional programming-based service for interacting with Chainlink
  * price feeds following NYXUSD's established patterns
  */
 
-import { Either, left, right, fold } from 'fp-ts/Either';
-import { Option, some, none, isSome } from 'fp-ts/Option';
-import * as IO from 'fp-ts/IO';
-import { TaskEither as TaskEitherType, tryCatch } from 'fp-ts/TaskEither';
+import { Either, left, right, fold } from "fp-ts/Either";
+import { Option, some, none, isSome } from "fp-ts/Option";
+import * as IO from "fp-ts/IO";
+import { TaskEither as TaskEitherType, tryCatch } from "fp-ts/TaskEither";
 // Mock ethers types since package not properly installed in workspace
 interface Contract {
   latestRoundData(): Promise<{
@@ -23,45 +23,42 @@ interface Contract {
 interface Provider {
   getBlockNumber(): Promise<number>;
 }
-import { z } from 'zod';
+import { z } from "zod";
 
-import { 
-  OraclePriceData, 
-  OracleQueryData, 
-  OracleResponse, 
+import {
+  OraclePriceData,
+  OracleQueryData,
+  OracleResponse,
   OracleFeedConfig,
   IOracleService,
   PriceFetch,
   HealthCheck,
-  PriceValidator
-} from '../types/oracle-types';
+  PriceValidator,
+} from "../types/oracle-types";
 
 import {
   ChainlinkRoundData,
   ChainlinkFeedMetadata,
-  ChainlinkRoundDataSchema
-} from '../types/chainlink-types';
+  ChainlinkRoundDataSchema,
+} from "../types/chainlink-types";
 
 import {
   OracleError,
   createNetworkError,
   createDataValidationError,
-  createStaleDataError
-} from '../errors/oracle-errors';
+  createStaleDataError,
+} from "../errors/oracle-errors";
 
-import { 
-  getFeedAddress, 
-  getFeedMetadata
-} from '../config/chainlink-feeds';
+import { getFeedAddress, getFeedMetadata } from "../config/chainlink-feeds";
 
 /**
  * Chainlink AggregatorV3Interface ABI (minimal)
  */
 const AGGREGATOR_V3_ABI = [
-  'function latestRoundData() view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)',
-  'function decimals() view returns (uint8)',
-  'function description() view returns (string)',
-  'function version() view returns (uint256)',
+  "function latestRoundData() view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)",
+  "function decimals() view returns (uint8)",
+  "function description() view returns (string)",
+  "function version() view returns (uint256)",
 ] as const;
 
 /**
@@ -81,11 +78,13 @@ export const ChainlinkOracleConfigSchema = z.object({
   /** Cache TTL (seconds) */
   cacheTtl: z.number().int().positive().default(60),
   /** Retry configuration */
-  retry: z.object({
-    maxAttempts: z.number().int().min(1).default(3),
-    delayMs: z.number().int().positive().default(1000),
-    backoffMultiplier: z.number().positive().default(2),
-  }).default({}),
+  retry: z
+    .object({
+      maxAttempts: z.number().int().min(1).default(3),
+      delayMs: z.number().int().positive().default(1000),
+      backoffMultiplier: z.number().positive().default(2),
+    })
+    .default({}),
 });
 
 export type ChainlinkOracleConfig = z.infer<typeof ChainlinkOracleConfigSchema>;
@@ -110,17 +109,19 @@ export class ChainlinkOracleService implements IOracleService {
 
   constructor(config: ChainlinkOracleConfig) {
     this.config = ChainlinkOracleConfigSchema.parse(config);
-    
+
     // Initialize provider (mock implementation)
     this.provider = {
-      getBlockNumber: async () => 12345678
+      getBlockNumber: async () => 12345678,
     };
   }
 
   /**
    * Get or create contract instance for a feed - UNUSED IN MOCK
    */
-  private getContract = (feedAddress: string): Either<OracleError, Contract> => {
+  private getContract = (
+    feedAddress: string,
+  ): Either<OracleError, Contract> => {
     try {
       const cached = this.contracts.get(feedAddress);
       if (cached) {
@@ -129,27 +130,34 @@ export class ChainlinkOracleService implements IOracleService {
 
       const contract = this.createContract(feedAddress);
       this.contracts.set(feedAddress, contract);
-      
+
       return right(contract);
     } catch (error) {
-      return left(createNetworkError(
-        `Failed to create contract for feed ${feedAddress}`,
-        { endpoint: feedAddress }
-      ));
+      return left(
+        createNetworkError(
+          `Failed to create contract for feed ${feedAddress}`,
+          { endpoint: feedAddress },
+        ),
+      );
     }
   };
 
   /**
    * Fetch raw round data from Chainlink aggregator
    */
-  private fetchRoundData = (contract: Contract): TaskEitherType<OracleError, ChainlinkRoundData> =>
+  private fetchRoundData = (
+    contract: Contract,
+  ): TaskEitherType<OracleError, ChainlinkRoundData> =>
     tryCatch(
       async () => {
         const result = await Promise.race([
           contract.latestRoundData(),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), this.config.defaultTimeout)
-          )
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Timeout")),
+              this.config.defaultTimeout,
+            ),
+          ),
         ]);
 
         return ChainlinkRoundDataSchema.parse({
@@ -161,19 +169,21 @@ export class ChainlinkOracleService implements IOracleService {
         });
       },
       (error) => {
-        if (error instanceof Error && error.message === 'Timeout') {
-          return createNetworkError('Request timeout', { timeout: true });
+        if (error instanceof Error && error.message === "Timeout") {
+          return createNetworkError("Request timeout", { timeout: true });
         }
-        return createNetworkError(`Failed to fetch round data: ${error}`, { 
-          endpoint: 'chainlink-aggregator'
+        return createNetworkError(`Failed to fetch round data: ${error}`, {
+          endpoint: "chainlink-aggregator",
         });
-      }
+      },
     );
 
   /**
    * Fetch feed metadata (decimals, description, etc.)
    */
-  private fetchFeedMetadata = (contract: Contract): TaskEither<OracleError, ChainlinkFeedMetadata> =>
+  private fetchFeedMetadata = (
+    contract: Contract,
+  ): TaskEither<OracleError, ChainlinkFeedMetadata> =>
     tryCatch(
       async () => {
         const [decimals, description, version] = await Promise.all([
@@ -188,12 +198,13 @@ export class ChainlinkOracleService implements IOracleService {
           description,
           version: Number(version),
           heartbeat: 3600, // Default, should be configured per feed
-          deviation: 0.5,  // Default, should be configured per feed
+          deviation: 0.5, // Default, should be configured per feed
         };
       },
-      (error) => createNetworkError(`Failed to fetch feed metadata: ${error}`, { 
-        endpoint: 'chainlink-metadata'
-      })
+      (error) =>
+        createNetworkError(`Failed to fetch feed metadata: ${error}`, {
+          endpoint: "chainlink-metadata",
+        }),
     );
 
   /**
@@ -202,29 +213,33 @@ export class ChainlinkOracleService implements IOracleService {
   private convertToOracleData = (
     roundData: ChainlinkRoundData,
     metadata: ChainlinkFeedMetadata,
-    feedId: string
+    feedId: string,
   ): Either<OracleError, OraclePriceData> => {
     try {
       // Validate price data
       if (roundData.answer <= 0) {
-        return left(createDataValidationError(
-          'Invalid price data: answer must be positive',
-          { feedId, receivedData: roundData }
-        ));
+        return left(
+          createDataValidationError(
+            "Invalid price data: answer must be positive",
+            { feedId, receivedData: roundData },
+          ),
+        );
       }
 
       if (roundData.updatedAt <= 0) {
-        return left(createDataValidationError(
-          'Invalid price data: updatedAt must be positive',
-          { feedId, receivedData: roundData }
-        ));
+        return left(
+          createDataValidationError(
+            "Invalid price data: updatedAt must be positive",
+            { feedId, receivedData: roundData },
+          ),
+        );
       }
 
       // Calculate confidence based on data freshness and other factors
       const now = Math.floor(Date.now() / 1000);
       const staleness = now - Number(roundData.updatedAt);
       const maxStaleness = metadata.heartbeat * 2; // Allow 2x heartbeat
-      
+
       let confidence = 100;
       if (staleness > metadata.heartbeat) {
         confidence = Math.max(50, 100 - (staleness / maxStaleness) * 50);
@@ -237,15 +252,17 @@ export class ChainlinkOracleService implements IOracleService {
         timestamp: Number(roundData.updatedAt),
         roundId: BigInt(roundData.roundId.toString()),
         confidence: Math.round(confidence),
-        source: 'chainlink',
+        source: "chainlink",
       };
 
       return right(oracleData);
     } catch (error) {
-      return left(createDataValidationError(
-        `Failed to convert oracle data: ${error}`,
-        { feedId, receivedData: roundData }
-      ));
+      return left(
+        createDataValidationError(`Failed to convert oracle data: ${error}`, {
+          feedId,
+          receivedData: roundData,
+        }),
+      );
     }
   };
 
@@ -254,35 +271,40 @@ export class ChainlinkOracleService implements IOracleService {
    */
   private validatePriceData = (
     data: OraclePriceData,
-    query: OracleQueryData
+    query: OracleQueryData,
   ): Either<OracleError, OraclePriceData> => {
     const now = Math.floor(Date.now() / 1000);
     const staleness = now - data.timestamp;
     const maxStaleness = query.maxStaleness || this.config.defaultMaxStaleness;
-    const minConfidence = query.minConfidence || this.config.defaultMinConfidence;
+    const minConfidence =
+      query.minConfidence || this.config.defaultMinConfidence;
 
     // Check staleness
     if (staleness > maxStaleness) {
-      return left(createStaleDataError(
-        `Price data is too stale: ${staleness}s > ${maxStaleness}s`,
-        {
-          feedId: data.feedId,
-          lastUpdate: data.timestamp,
-          maxAge: maxStaleness,
-          staleness,
-        }
-      ));
+      return left(
+        createStaleDataError(
+          `Price data is too stale: ${staleness}s > ${maxStaleness}s`,
+          {
+            feedId: data.feedId,
+            lastUpdate: data.timestamp,
+            maxAge: maxStaleness,
+            staleness,
+          },
+        ),
+      );
     }
 
     // Check confidence
     if (data.confidence < minConfidence) {
-      return left(createDataValidationError(
-        `Price confidence too low: ${data.confidence}% < ${minConfidence}%`,
-        {
-          feedId: data.feedId,
-          receivedData: { confidence: data.confidence },
-        }
-      ));
+      return left(
+        createDataValidationError(
+          `Price confidence too low: ${data.confidence}% < ${minConfidence}%`,
+          {
+            feedId: data.feedId,
+            receivedData: { confidence: data.confidence },
+          },
+        ),
+      );
     }
 
     return right(data);
@@ -322,17 +344,21 @@ export class ChainlinkOracleService implements IOracleService {
   /**
    * Fetch price with retry logic
    */
-  private fetchPriceWithRetry = (query: OracleQueryData): TaskEitherType<OracleError, OraclePriceData> => {
+  private fetchPriceWithRetry = (
+    query: OracleQueryData,
+  ): TaskEitherType<OracleError, OraclePriceData> => {
     return tryCatch(
       async () => {
         const feedAddress = getFeedAddress(this.config.network, query.feedId);
         if (!feedAddress) {
-          throw new Error(`Feed not supported: ${query.feedId} on ${this.config.network}`);
+          throw new Error(
+            `Feed not supported: ${query.feedId} on ${this.config.network}`,
+          );
         }
 
         const contract = this.createContract(feedAddress);
         const roundData = await contract.latestRoundData();
-        
+
         const priceData: OraclePriceData = {
           feedId: query.feedId,
           price: BigInt(roundData.answer.toString()),
@@ -340,15 +366,16 @@ export class ChainlinkOracleService implements IOracleService {
           timestamp: Number(roundData.updatedAt),
           roundId: BigInt(roundData.roundId.toString()),
           confidence: 100, // Chainlink feeds are considered high confidence
-          source: 'chainlink',
+          source: "chainlink",
         };
 
         return priceData;
       },
-      (error) => createNetworkError(
-        `Failed to fetch price for ${query.feedId}: ${error}`,
-        { endpoint: 'chainlink-feed' }
-      )
+      (error) =>
+        createNetworkError(
+          `Failed to fetch price for ${query.feedId}: ${error}`,
+          { endpoint: "chainlink-feed" },
+        ),
     );
   };
 
@@ -359,19 +386,21 @@ export class ChainlinkOracleService implements IOracleService {
     // Mock implementation for testing
     return {
       latestRoundData: async () => ({
-        roundId: { toString: () => '12345' },
-        answer: { toString: () => '200000000000' }, // $2000 with 8 decimals
-        startedAt: { toString: () => Math.floor(Date.now() / 1000 - 100).toString() },
+        roundId: { toString: () => "12345" },
+        answer: { toString: () => "200000000000" }, // $2000 with 8 decimals
+        startedAt: {
+          toString: () => Math.floor(Date.now() / 1000 - 100).toString(),
+        },
         updatedAt: { toString: () => Math.floor(Date.now() / 1000).toString() },
-        answeredInRound: { toString: () => '12345' },
-      })
+        answeredInRound: { toString: () => "12345" },
+      }),
     };
   };
 
   /**
    * Main price fetch implementation
    */
-  public readonly fetchPrice: PriceFetch = (query: OracleQueryData) => 
+  public readonly fetchPrice: PriceFetch = (query: OracleQueryData) =>
     IO.of(async () => {
       // Check cache first if allowed
       if (query.allowCached) {
@@ -382,7 +411,7 @@ export class ChainlinkOracleService implements IOracleService {
             metadata: {
               responseTime: 0,
               fromCache: true,
-              source: 'chainlink',
+              source: "chainlink",
             },
           };
           return right(response);
@@ -392,7 +421,7 @@ export class ChainlinkOracleService implements IOracleService {
       // Fetch fresh data
       const startTime = Date.now();
       const result = await this.fetchPriceWithRetry(query)();
-      
+
       return fold(
         (error: OracleError) => left(error),
         (data: OraclePriceData) => {
@@ -401,12 +430,12 @@ export class ChainlinkOracleService implements IOracleService {
             metadata: {
               responseTime: Date.now() - startTime,
               fromCache: false,
-              source: 'chainlink',
-              aggregationMethod: 'single',
+              source: "chainlink",
+              aggregationMethod: "single",
             },
           };
           return right(response);
-        }
+        },
       )(result);
     });
 
@@ -418,9 +447,9 @@ export class ChainlinkOracleService implements IOracleService {
       try {
         // Test connection with a simple call
         await this.provider.getBlockNumber();
-        
+
         const health = {
-          status: 'healthy' as const,
+          status: "healthy" as const,
           feeds: {},
           metrics: {
             totalFeeds: 0,
@@ -434,10 +463,11 @@ export class ChainlinkOracleService implements IOracleService {
 
         return right(health);
       } catch (error) {
-        return left(createNetworkError(
-          `Health check failed: ${error}`,
-          { endpoint: 'chainlink-health' }
-        ));
+        return left(
+          createNetworkError(`Health check failed: ${error}`, {
+            endpoint: "chainlink-health",
+          }),
+        );
       }
     });
 
@@ -448,7 +478,7 @@ export class ChainlinkOracleService implements IOracleService {
     // Basic validation - can be extended with more sophisticated rules
     const issues: Array<{
       code: string;
-      severity: 'info' | 'warning' | 'error';
+      severity: "info" | "warning" | "error";
       message: string;
     }> = [];
 
@@ -457,9 +487,9 @@ export class ChainlinkOracleService implements IOracleService {
     // Check price value
     if (data.price <= 0) {
       issues.push({
-        code: 'INVALID_PRICE',
-        severity: 'error',
-        message: 'Price must be positive',
+        code: "INVALID_PRICE",
+        severity: "error",
+        message: "Price must be positive",
       });
       score = 0;
     }
@@ -467,10 +497,11 @@ export class ChainlinkOracleService implements IOracleService {
     // Check staleness
     const now = Math.floor(Date.now() / 1000);
     const staleness = now - data.timestamp;
-    if (staleness > 3600) { // 1 hour
+    if (staleness > 3600) {
+      // 1 hour
       issues.push({
-        code: 'STALE_DATA',
-        severity: 'warning',
+        code: "STALE_DATA",
+        severity: "warning",
         message: `Data is ${staleness} seconds old`,
       });
       score -= Math.min(30, staleness / 120); // Reduce score based on staleness
@@ -479,15 +510,16 @@ export class ChainlinkOracleService implements IOracleService {
     // Check confidence
     if (data.confidence < 95) {
       issues.push({
-        code: 'LOW_CONFIDENCE',
-        severity: 'warning',
+        code: "LOW_CONFIDENCE",
+        severity: "warning",
         message: `Low confidence: ${data.confidence}%`,
       });
       score -= (95 - data.confidence) * 2;
     }
 
     const result = {
-      isValid: score > 50 && issues.filter(i => i.severity === 'error').length === 0,
+      isValid:
+        score > 50 && issues.filter((i) => i.severity === "error").length === 0,
       score: Math.max(0, Math.round(score)),
       issues,
       validatedData: score > 50 ? data : undefined,
@@ -500,17 +532,19 @@ export class ChainlinkOracleService implements IOracleService {
    * Get supported feed IDs
    */
   public readonly getSupportedFeeds = (): readonly string[] => {
-    const feedAddresses = getFeedAddress(this.config.network, '');
+    const feedAddresses = getFeedAddress(this.config.network, "");
     return Object.keys(feedAddresses || {});
   };
 
   /**
    * Get feed configuration
    */
-  public readonly getFeedConfig = (feedId: string): Option<OracleFeedConfig> => {
+  public readonly getFeedConfig = (
+    feedId: string,
+  ): Option<OracleFeedConfig> => {
     const address = getFeedAddress(this.config.network, feedId);
     const metadata = getFeedMetadata(feedId);
-    
+
     if (!address || !metadata) {
       return none;
     }

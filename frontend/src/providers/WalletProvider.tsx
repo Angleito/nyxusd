@@ -1,8 +1,8 @@
-import React from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import React from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 interface WalletProviderProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 const queryClient = new QueryClient({
@@ -12,14 +12,12 @@ const queryClient = new QueryClient({
       retry: 2,
     },
   },
-})
+});
 
 export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  )
-}
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+};
 
-export default WalletProvider
+export default WalletProvider;

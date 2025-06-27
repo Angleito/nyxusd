@@ -1,19 +1,20 @@
-import React from 'react';
-import * as Dialog from '@radix-ui/react-dialog';
-import { motion, AnimatePresence } from 'framer-motion';
-import { clsx } from 'clsx';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import React from "react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { motion, AnimatePresence } from "framer-motion";
+import { clsx } from "clsx";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 export interface ModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  size?: "sm" | "md" | "lg" | "xl" | "full";
   closeOnOverlayClick?: boolean;
   showCloseButton?: boolean;
 }
 
-export interface ModalContentProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ModalContentProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
@@ -25,30 +26,32 @@ export interface ModalFooterProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-export interface ModalTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+export interface ModalTitleProps
+  extends React.HTMLAttributes<HTMLHeadingElement> {
   children: React.ReactNode;
 }
 
-export interface ModalDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
+export interface ModalDescriptionProps
+  extends React.HTMLAttributes<HTMLParagraphElement> {
   children: React.ReactNode;
 }
 
 const modalSizes = {
-  sm: 'max-w-md',
-  md: 'max-w-lg',
-  lg: 'max-w-2xl',
-  xl: 'max-w-4xl',
-  full: 'max-w-[95vw] max-h-[95vh]',
+  sm: "max-w-md",
+  md: "max-w-lg",
+  lg: "max-w-2xl",
+  xl: "max-w-4xl",
+  full: "max-w-[95vw] max-h-[95vh]",
 };
 
 const overlayVariants = {
   closed: {
     opacity: 0,
-    backdropFilter: 'blur(0px)',
+    backdropFilter: "blur(0px)",
   },
   open: {
     opacity: 1,
-    backdropFilter: 'blur(8px)',
+    backdropFilter: "blur(8px)",
   },
 };
 
@@ -69,7 +72,7 @@ export const Modal: React.FC<ModalProps> = ({
   open,
   onOpenChange,
   children,
-  size = 'md',
+  size = "md",
   closeOnOverlayClick = true,
   showCloseButton = true,
 }) => {
@@ -86,8 +89,10 @@ export const Modal: React.FC<ModalProps> = ({
                 initial="closed"
                 animate="open"
                 exit="closed"
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                onClick={closeOnOverlayClick ? () => onOpenChange(false) : undefined}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                onClick={
+                  closeOnOverlayClick ? () => onOpenChange(false) : undefined
+                }
               />
             </Dialog.Overlay>
 
@@ -95,15 +100,15 @@ export const Modal: React.FC<ModalProps> = ({
             <Dialog.Content asChild forceMount>
               <motion.div
                 className={clsx(
-                  'fixed left-1/2 top-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 rounded-xl border border-gray-700 bg-gray-900/95 backdrop-blur-xl shadow-2xl',
-                  modalSizes[size]
+                  "fixed left-1/2 top-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 rounded-xl border border-gray-700 bg-gray-900/95 backdrop-blur-xl shadow-2xl",
+                  modalSizes[size],
                 )}
                 variants={contentVariants}
                 initial="closed"
                 animate="open"
                 exit="closed"
                 transition={{
-                  type: 'spring',
+                  type: "spring",
                   stiffness: 400,
                   damping: 30,
                 }}
@@ -129,9 +134,7 @@ export const Modal: React.FC<ModalProps> = ({
                 )}
 
                 {/* Content wrapper */}
-                <div className="relative z-10 p-6">
-                  {children}
-                </div>
+                <div className="relative z-10 p-6">{children}</div>
               </motion.div>
             </Dialog.Content>
           </Dialog.Portal>
@@ -143,74 +146,70 @@ export const Modal: React.FC<ModalProps> = ({
 
 export const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
   ({ className, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={clsx('space-y-4', className)}
-      {...props}
-    >
+    <div ref={ref} className={clsx("space-y-4", className)} {...props}>
       {children}
     </div>
-  )
+  ),
 );
 
-ModalContent.displayName = 'ModalContent';
+ModalContent.displayName = "ModalContent";
 
 export const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={clsx('space-y-2 pb-4 border-b border-gray-800', className)}
+      className={clsx("space-y-2 pb-4 border-b border-gray-800", className)}
       {...props}
     >
       {children}
     </div>
-  )
+  ),
 );
 
-ModalHeader.displayName = 'ModalHeader';
+ModalHeader.displayName = "ModalHeader";
 
 export const ModalFooter = React.forwardRef<HTMLDivElement, ModalFooterProps>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={clsx('flex items-center justify-end space-x-3 pt-4 border-t border-gray-800', className)}
+      className={clsx(
+        "flex items-center justify-end space-x-3 pt-4 border-t border-gray-800",
+        className,
+      )}
       {...props}
     >
       {children}
     </div>
-  )
+  ),
 );
 
-ModalFooter.displayName = 'ModalFooter';
+ModalFooter.displayName = "ModalFooter";
 
 export const ModalTitle = React.forwardRef<HTMLHeadingElement, ModalTitleProps>(
   ({ className, children, ...props }, ref) => (
     <Dialog.Title asChild>
       <h2
         ref={ref}
-        className={clsx('text-xl font-semibold text-white', className)}
+        className={clsx("text-xl font-semibold text-white", className)}
         {...props}
       >
         {children}
       </h2>
     </Dialog.Title>
-  )
+  ),
 );
 
-ModalTitle.displayName = 'ModalTitle';
+ModalTitle.displayName = "ModalTitle";
 
-export const ModalDescription = React.forwardRef<HTMLParagraphElement, ModalDescriptionProps>(
-  ({ className, children, ...props }, ref) => (
-    <Dialog.Description asChild>
-      <p
-        ref={ref}
-        className={clsx('text-gray-400', className)}
-        {...props}
-      >
-        {children}
-      </p>
-    </Dialog.Description>
-  )
-);
+export const ModalDescription = React.forwardRef<
+  HTMLParagraphElement,
+  ModalDescriptionProps
+>(({ className, children, ...props }, ref) => (
+  <Dialog.Description asChild>
+    <p ref={ref} className={clsx("text-gray-400", className)} {...props}>
+      {children}
+    </p>
+  </Dialog.Description>
+));
 
-ModalDescription.displayName = 'ModalDescription';
+ModalDescription.displayName = "ModalDescription";

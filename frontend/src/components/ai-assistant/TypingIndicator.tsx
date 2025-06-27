@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 
 export const TypingIndicator: React.FC = () => {
   const dotVariants = {
@@ -11,39 +11,39 @@ export const TypingIndicator: React.FC = () => {
       transition: {
         duration: 0.8,
         repeat: Infinity,
-        ease: 'easeInOut'
-      }
-    }
+        ease: "easeInOut",
+      },
+    },
   };
 
   const containerVariants = {
     initial: { opacity: 0, scale: 0.9 },
-    animate: { 
-      opacity: 1, 
+    animate: {
+      opacity: 1,
       scale: 1,
       transition: {
         duration: 0.3,
-        ease: 'easeOut'
-      }
+        ease: "easeOut",
+      },
     },
     exit: {
       opacity: 0,
       scale: 0.9,
       transition: {
-        duration: 0.2
-      }
-    }
+        duration: 0.2,
+      },
+    },
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="flex items-center gap-3 p-4 bg-gray-800/30 rounded-lg"
       variants={containerVariants}
       initial="initial"
       animate="animate"
       exit="exit"
     >
-      <motion.div 
+      <motion.div
         className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 shadow-lg shadow-purple-900/30 flex items-center justify-center"
         animate={{ rotate: 360 }}
         transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
@@ -63,7 +63,7 @@ export const TypingIndicator: React.FC = () => {
             />
           ))}
         </div>
-        <motion.div 
+        <motion.div
           className="text-sm text-gray-400"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

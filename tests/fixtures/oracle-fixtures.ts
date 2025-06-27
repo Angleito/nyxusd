@@ -7,10 +7,10 @@
  */
 export const sampleOracleFeeds = {
   ETH_USD: {
-    feedId: 'ETH-USD',
-    address: '0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419',
+    feedId: "ETH-USD",
+    address: "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
     decimals: 8,
-    description: 'ETH / USD',
+    description: "ETH / USD",
     version: 4,
     heartbeat: 3600, // 1 hour
     deviation: 0.5, // 0.5%
@@ -24,10 +24,10 @@ export const sampleOracleFeeds = {
   },
 
   BTC_USD: {
-    feedId: 'BTC-USD',
-    address: '0xf4030086522a5beea4988f8ca5b36dbc97bee88c',
+    feedId: "BTC-USD",
+    address: "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
     decimals: 8,
-    description: 'BTC / USD',
+    description: "BTC / USD",
     version: 4,
     heartbeat: 3600,
     deviation: 0.5,
@@ -41,10 +41,10 @@ export const sampleOracleFeeds = {
   },
 
   LINK_USD: {
-    feedId: 'LINK-USD',
-    address: '0x2c1d072e956affc0d435cb7ac38ef18d24d9127c',
+    feedId: "LINK-USD",
+    address: "0x2c1d072e956affc0d435cb7ac38ef18d24d9127c",
     decimals: 8,
-    description: 'LINK / USD',
+    description: "LINK / USD",
     version: 4,
     heartbeat: 3600,
     deviation: 1.0,
@@ -58,10 +58,10 @@ export const sampleOracleFeeds = {
   },
 
   UNI_USD: {
-    feedId: 'UNI-USD',
-    address: '0x553303d460ee0afb37edff9be42922d8ff63220e',
+    feedId: "UNI-USD",
+    address: "0x553303d460ee0afb37edff9be42922d8ff63220e",
     decimals: 8,
-    description: 'UNI / USD',
+    description: "UNI / USD",
     version: 4,
     heartbeat: 3600,
     deviation: 1.5,
@@ -83,30 +83,30 @@ export const stressScenarios = {
    * Black Swan event - 50% crash across all assets
    */
   blackSwan: {
-    name: 'Black Swan Event',
-    description: '50% price crash across all major assets',
+    name: "Black Swan Event",
+    description: "50% price crash across all major assets",
     duration: 3600, // 1 hour
     priceShocks: [
       {
-        feedId: 'ETH-USD',
+        feedId: "ETH-USD",
         shockPercent: -50,
         newPrice: 80000000000, // $800.00
         confidence: 95.0,
       },
       {
-        feedId: 'BTC-USD',
+        feedId: "BTC-USD",
         shockPercent: -50,
         newPrice: 2100000000000, // $21000.00
         confidence: 95.0,
       },
       {
-        feedId: 'LINK-USD',
+        feedId: "LINK-USD",
         shockPercent: -50,
         newPrice: 725000000, // $7.25
         confidence: 92.0,
       },
       {
-        feedId: 'UNI-USD',
+        feedId: "UNI-USD",
         shockPercent: -50,
         newPrice: 292500000, // $2.925
         confidence: 90.0,
@@ -118,28 +118,28 @@ export const stressScenarios = {
    * Flash crash - rapid 30% drop followed by recovery
    */
   flashCrash: {
-    name: 'Flash Crash',
-    description: '30% flash crash with partial recovery',
+    name: "Flash Crash",
+    description: "30% flash crash with partial recovery",
     duration: 900, // 15 minutes
     phases: [
       {
-        name: 'crash',
+        name: "crash",
         duration: 300, // 5 minutes
         priceShocks: [
-          { feedId: 'ETH-USD', shockPercent: -30, confidence: 95.0 },
-          { feedId: 'BTC-USD', shockPercent: -30, confidence: 95.0 },
-          { feedId: 'LINK-USD', shockPercent: -35, confidence: 90.0 },
-          { feedId: 'UNI-USD', shockPercent: -40, confidence: 85.0 },
+          { feedId: "ETH-USD", shockPercent: -30, confidence: 95.0 },
+          { feedId: "BTC-USD", shockPercent: -30, confidence: 95.0 },
+          { feedId: "LINK-USD", shockPercent: -35, confidence: 90.0 },
+          { feedId: "UNI-USD", shockPercent: -40, confidence: 85.0 },
         ],
       },
       {
-        name: 'recovery',
+        name: "recovery",
         duration: 600, // 10 minutes
         priceShocks: [
-          { feedId: 'ETH-USD', shockPercent: 15, confidence: 98.0 },
-          { feedId: 'BTC-USD', shockPercent: 15, confidence: 98.0 },
-          { feedId: 'LINK-USD', shockPercent: 20, confidence: 95.0 },
-          { feedId: 'UNI-USD', shockPercent: 25, confidence: 92.0 },
+          { feedId: "ETH-USD", shockPercent: 15, confidence: 98.0 },
+          { feedId: "BTC-USD", shockPercent: 15, confidence: 98.0 },
+          { feedId: "LINK-USD", shockPercent: 20, confidence: 95.0 },
+          { feedId: "UNI-USD", shockPercent: 25, confidence: 92.0 },
         ],
       },
     ],
@@ -149,8 +149,8 @@ export const stressScenarios = {
    * Gradual bear market - slow decline over days
    */
   bearMarket: {
-    name: 'Bear Market',
-    description: 'Gradual 40% decline over 7 days',
+    name: "Bear Market",
+    description: "Gradual 40% decline over 7 days",
     duration: 604800, // 7 days
     dailyDeclines: [
       { day: 1, declinePercent: -8, volatility: 15 },
@@ -167,19 +167,19 @@ export const stressScenarios = {
    * Oracle manipulation attack
    */
   oracleAttack: {
-    name: 'Oracle Manipulation',
-    description: 'Artificial price manipulation through oracle compromise',
+    name: "Oracle Manipulation",
+    description: "Artificial price manipulation through oracle compromise",
     duration: 1800, // 30 minutes
     manipulations: [
       {
-        feedId: 'ETH-USD',
+        feedId: "ETH-USD",
         originalPrice: 160000000000,
         manipulatedPrice: 200000000000, // +25%
         confidence: 45.0, // Low confidence indicates potential issue
         detectionDelay: 600, // 10 minutes to detect
       },
       {
-        feedId: 'LINK-USD',
+        feedId: "LINK-USD",
         originalPrice: 1450000000,
         manipulatedPrice: 2900000000, // +100%
         confidence: 30.0,
@@ -197,11 +197,11 @@ export const oracleFailures = {
    * Complete oracle outage
    */
   completeOutage: {
-    name: 'Complete Oracle Outage',
-    description: 'All oracle feeds go offline',
+    name: "Complete Oracle Outage",
+    description: "All oracle feeds go offline",
     duration: 7200, // 2 hours
-    affectedFeeds: ['ETH-USD', 'BTC-USD', 'LINK-USD', 'UNI-USD'],
-    fallbackBehavior: 'use_last_known_price',
+    affectedFeeds: ["ETH-USD", "BTC-USD", "LINK-USD", "UNI-USD"],
+    fallbackBehavior: "use_last_known_price",
     maxStaleness: 3600, // 1 hour
   },
 
@@ -209,34 +209,34 @@ export const oracleFailures = {
    * Partial oracle outage
    */
   partialOutage: {
-    name: 'Partial Oracle Outage',
-    description: 'Some oracle feeds go offline',
+    name: "Partial Oracle Outage",
+    description: "Some oracle feeds go offline",
     duration: 3600, // 1 hour
-    affectedFeeds: ['LINK-USD', 'UNI-USD'],
-    workingFeeds: ['ETH-USD', 'BTC-USD'],
-    fallbackBehavior: 'use_alternative_feeds',
+    affectedFeeds: ["LINK-USD", "UNI-USD"],
+    workingFeeds: ["ETH-USD", "BTC-USD"],
+    fallbackBehavior: "use_alternative_feeds",
   },
 
   /**
    * Stale price data
    */
   staleData: {
-    name: 'Stale Oracle Data',
-    description: 'Oracle prices become stale but feeds remain online',
+    name: "Stale Oracle Data",
+    description: "Oracle prices become stale but feeds remain online",
     scenarios: [
       {
-        feedId: 'ETH-USD',
+        feedId: "ETH-USD",
         lastUpdate: 1703030400,
         currentTime: 1703037600, // 2 hours stale
         stalenessThreshold: 3600, // 1 hour max
-        action: 'reject_price',
+        action: "reject_price",
       },
       {
-        feedId: 'LINK-USD',
+        feedId: "LINK-USD",
         lastUpdate: 1703033000,
         currentTime: 1703037600, // 1.27 hours stale
         stalenessThreshold: 3600,
-        action: 'reject_price',
+        action: "reject_price",
       },
     ],
   },
@@ -245,22 +245,22 @@ export const oracleFailures = {
    * Price deviation anomalies
    */
   priceDeviations: {
-    name: 'Price Deviation Anomalies',
-    description: 'Prices deviate significantly from expected ranges',
+    name: "Price Deviation Anomalies",
+    description: "Prices deviate significantly from expected ranges",
     anomalies: [
       {
-        feedId: 'ETH-USD',
+        feedId: "ETH-USD",
         expectedPrice: 160000000000,
         reportedPrice: 32000000000, // -80% deviation
         maxDeviation: 10, // 10% max allowed
-        action: 'circuit_breaker',
+        action: "circuit_breaker",
       },
       {
-        feedId: 'BTC-USD',
+        feedId: "BTC-USD",
         expectedPrice: 4200000000000,
         reportedPrice: 8400000000000, // +100% deviation
         maxDeviation: 15, // 15% max allowed
-        action: 'circuit_breaker',
+        action: "circuit_breaker",
       },
     ],
   },
@@ -274,35 +274,35 @@ export const correlationData = {
    * Historical price correlations
    */
   historical: {
-    timeframe: '30_days',
+    timeframe: "30_days",
     pairs: [
       {
-        asset1: 'ETH-USD',
-        asset2: 'BTC-USD',
+        asset1: "ETH-USD",
+        asset2: "BTC-USD",
         correlation: 0.85,
         pValue: 0.001,
-        significance: 'high',
+        significance: "high",
       },
       {
-        asset1: 'ETH-USD',
-        asset2: 'LINK-USD',
+        asset1: "ETH-USD",
+        asset2: "LINK-USD",
         correlation: 0.72,
         pValue: 0.01,
-        significance: 'medium',
+        significance: "medium",
       },
       {
-        asset1: 'BTC-USD',
-        asset2: 'LINK-USD',
+        asset1: "BTC-USD",
+        asset2: "LINK-USD",
         correlation: 0.68,
         pValue: 0.02,
-        significance: 'medium',
+        significance: "medium",
       },
       {
-        asset1: 'LINK-USD',
-        asset2: 'UNI-USD',
+        asset1: "LINK-USD",
+        asset2: "UNI-USD",
         correlation: 0.65,
         pValue: 0.03,
-        significance: 'medium',
+        significance: "medium",
       },
     ],
   },
@@ -311,19 +311,19 @@ export const correlationData = {
    * Stress period correlations
    */
   stress: {
-    timeframe: 'crash_period',
-    description: 'Correlations during market stress',
+    timeframe: "crash_period",
+    description: "Correlations during market stress",
     pairs: [
       {
-        asset1: 'ETH-USD',
-        asset2: 'BTC-USD',
+        asset1: "ETH-USD",
+        asset2: "BTC-USD",
         normalCorrelation: 0.85,
         stressCorrelation: 0.95, // Higher correlation during stress
-        increase: 0.10,
+        increase: 0.1,
       },
       {
-        asset1: 'ETH-USD',
-        asset2: 'LINK-USD',
+        asset1: "ETH-USD",
+        asset2: "LINK-USD",
         normalCorrelation: 0.72,
         stressCorrelation: 0.88,
         increase: 0.16,
@@ -350,25 +350,25 @@ export const validationRules = {
    * Asset-specific validation rules
    */
   assetSpecific: {
-    'ETH-USD': {
+    "ETH-USD": {
       minPrice: 50000000000, // $500.00
       maxPrice: 1000000000000, // $10,000.00
       maxVolatility: 20.0, // 20% per hour
       requiredConfidence: 99.0,
     },
-    'BTC-USD': {
+    "BTC-USD": {
       minPrice: 1000000000000, // $10,000.00
       maxPrice: 20000000000000, // $200,000.00
       maxVolatility: 15.0, // 15% per hour
       requiredConfidence: 99.5,
     },
-    'LINK-USD': {
+    "LINK-USD": {
       minPrice: 100000000, // $1.00
       maxPrice: 10000000000, // $100.00
       maxVolatility: 30.0, // 30% per hour
       requiredConfidence: 98.0,
     },
-    'UNI-USD': {
+    "UNI-USD": {
       minPrice: 50000000, // $0.50
       maxPrice: 5000000000, // $50.00
       maxVolatility: 35.0, // 35% per hour
@@ -381,14 +381,14 @@ export const validationRules = {
    */
   circuitBreakers: {
     priceShockThresholds: [
-      { threshold: 20, action: 'warn', duration: 300 },
-      { threshold: 30, action: 'pause_operations', duration: 900 },
-      { threshold: 50, action: 'emergency_shutdown', duration: 3600 },
+      { threshold: 20, action: "warn", duration: 300 },
+      { threshold: 30, action: "pause_operations", duration: 900 },
+      { threshold: 50, action: "emergency_shutdown", duration: 3600 },
     ],
     volatilityThresholds: [
-      { threshold: 25, action: 'increase_monitoring', duration: 1800 },
-      { threshold: 40, action: 'reduce_leverage', duration: 3600 },
-      { threshold: 60, action: 'halt_new_positions', duration: 7200 },
+      { threshold: 25, action: "increase_monitoring", duration: 1800 },
+      { threshold: 40, action: "reduce_leverage", duration: 3600 },
+      { threshold: 60, action: "halt_new_positions", duration: 7200 },
     ],
   },
 };
@@ -409,7 +409,7 @@ export const mockOracleResponses = {
       answeredInRound: 18446744073709562345,
     },
     decimals: 8,
-    description: 'ETH / USD',
+    description: "ETH / USD",
     version: 4,
   },
 
@@ -446,7 +446,7 @@ export const mockOracleResponses = {
   timeouts: {
     slow: {
       delay: 5000, // 5 second delay
-      response: 'normal',
+      response: "normal",
     },
     timeout: {
       delay: 30000, // 30 second timeout

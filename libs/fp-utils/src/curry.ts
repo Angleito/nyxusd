@@ -10,7 +10,9 @@ export type Curry1<A, R> = (a: A) => R;
 export type Curry2<A, B, R> = (a: A) => (b: B) => R;
 export type Curry3<A, B, C, R> = (a: A) => (b: B) => (c: C) => R;
 export type Curry4<A, B, C, D, R> = (a: A) => (b: B) => (c: C) => (d: D) => R;
-export type Curry5<A, B, C, D, E, R> = (a: A) => (b: B) => (c: C) => (d: D) => (e: E) => R;
+export type Curry5<A, B, C, D, E, R> = (
+  a: A,
+) => (b: B) => (c: C) => (d: D) => (e: E) => R;
 
 /**
  * Curries a function of arity 2
@@ -26,7 +28,9 @@ export function curry2<A, B, R>(fn: (a: A, b: B) => R): Curry2<A, B, R> {
  * @param fn - Function to curry
  * @returns Curried function
  */
-export function curry3<A, B, C, R>(fn: (a: A, b: B, c: C) => R): Curry3<A, B, C, R> {
+export function curry3<A, B, C, R>(
+  fn: (a: A, b: B, c: C) => R,
+): Curry3<A, B, C, R> {
   return (a: A) => (b: B) => (c: C) => fn(a, b, c);
 }
 
@@ -36,7 +40,7 @@ export function curry3<A, B, C, R>(fn: (a: A, b: B, c: C) => R): Curry3<A, B, C,
  * @returns Curried function
  */
 export function curry4<A, B, C, D, R>(
-  fn: (a: A, b: B, c: C, d: D) => R
+  fn: (a: A, b: B, c: C, d: D) => R,
 ): Curry4<A, B, C, D, R> {
   return (a: A) => (b: B) => (c: C) => (d: D) => fn(a, b, c, d);
 }
@@ -47,7 +51,7 @@ export function curry4<A, B, C, D, R>(
  * @returns Curried function
  */
 export function curry5<A, B, C, D, E, R>(
-  fn: (a: A, b: B, c: C, d: D, e: E) => R
+  fn: (a: A, b: B, c: C, d: D, e: E) => R,
 ): Curry5<A, B, C, D, E, R> {
   return (a: A) => (b: B) => (c: C) => (d: D) => (e: E) => fn(a, b, c, d, e);
 }
@@ -60,7 +64,7 @@ export function curry5<A, B, C, D, E, R>(
 export function curry<T extends any[], R>(fn: (...args: T) => R): any {
   return function curried(...args: any[]): any {
     if (args.length >= fn.length) {
-      return fn(...args as T);
+      return fn(...(args as T));
     }
     return (...nextArgs: any[]) => curried(...args, ...nextArgs);
   };
@@ -74,7 +78,7 @@ export function curry<T extends any[], R>(fn: (...args: T) => R): any {
  */
 export function uncurry<T extends any[], R>(
   fn: (...args: any[]) => any,
-  arity: number
+  arity: number,
 ): (...args: T) => R {
   return (...args: T): R => {
     let result: any = fn;
@@ -117,7 +121,7 @@ export function partialRight<T extends any[], U extends any[], R>(
  * @returns Function with flipped arguments
  */
 export function flip<A, B, Rest extends any[], R>(
-  fn: (a: A, b: B, ...rest: Rest) => R
+  fn: (a: A, b: B, ...rest: Rest) => R,
 ): (b: B, a: A, ...rest: Rest) => R {
   return (b: B, a: A, ...rest: Rest) => fn(a, b, ...rest);
 }
@@ -130,7 +134,7 @@ export function flip<A, B, Rest extends any[], R>(
  */
 export function arity<T extends any[], R>(
   n: number,
-  fn: (...args: T) => R
+  fn: (...args: T) => R,
 ): (...args: any[]) => R {
   return (...args: any[]) => fn(...(args.slice(0, n) as T));
 }
@@ -150,7 +154,7 @@ export function unary<T, R>(fn: (arg: T, ...rest: any[]) => R): (arg: T) => R {
  * @returns Binary function
  */
 export function binary<A, B, R>(
-  fn: (a: A, b: B, ...rest: any[]) => R
+  fn: (a: A, b: B, ...rest: any[]) => R,
 ): (a: A, b: B) => R {
   return (a: A, b: B) => fn(a, b);
 }
@@ -161,7 +165,7 @@ export function binary<A, B, R>(
  * @returns Function that accepts an array argument
  */
 export function spread<T extends any[], R>(
-  fn: (...args: T) => R
+  fn: (...args: T) => R,
 ): (args: T) => R {
   return (args: T) => fn(...args);
 }
@@ -172,7 +176,7 @@ export function spread<T extends any[], R>(
  * @returns Function that accepts individual arguments
  */
 export function unspread<T extends any[], R>(
-  fn: (args: T) => R
+  fn: (args: T) => R,
 ): (...args: T) => R {
   return (...args: T) => fn(args);
 }
@@ -183,7 +187,7 @@ export function unspread<T extends any[], R>(
  * @returns Function with reversed arguments
  */
 export function reverseArgs<T extends any[], R>(
-  fn: (...args: T) => R
+  fn: (...args: T) => R,
 ): (...args: T) => R {
   return (...args: T) => fn(...(args.reverse() as T));
 }
@@ -220,7 +224,9 @@ export const CurryUtils = {
   /**
    * Creates a curried power function
    */
-  power: curry2((base: number, exponent: number): number => Math.pow(base, exponent)),
+  power: curry2((base: number, exponent: number): number =>
+    Math.pow(base, exponent),
+  ),
 
   /**
    * Creates a curried greater than function
@@ -255,22 +261,22 @@ export const CurryUtils = {
   /**
    * Creates a curried string contains function
    */
-  contains: curry2((substring: string, string: string): boolean => 
-    string.includes(substring)
+  contains: curry2((substring: string, string: string): boolean =>
+    string.includes(substring),
   ),
 
   /**
    * Creates a curried string starts with function
    */
   startsWith: curry2((prefix: string, string: string): boolean =>
-    string.startsWith(prefix)
+    string.startsWith(prefix),
   ),
 
   /**
    * Creates a curried string ends with function
    */
   endsWith: curry2((suffix: string, string: string): boolean =>
-    string.endsWith(suffix)
+    string.endsWith(suffix),
   ),
 
   /**
@@ -291,11 +297,12 @@ export const CurryUtils = {
   /**
    * Creates a curried object property setter
    */
-  setProp: curry3(<T, K extends keyof T>(
-    key: K,
-    value: T[K],
-    obj: T
-  ): T => ({ ...obj, [key]: value })),
+  setProp: curry3(
+    <T, K extends keyof T>(key: K, value: T[K], obj: T): T => ({
+      ...obj,
+      [key]: value,
+    }),
+  ),
 
   /**
    * Creates a curried map function
@@ -306,37 +313,37 @@ export const CurryUtils = {
    * Creates a curried filter function
    */
   filter: curry2(<T>(predicate: (item: T) => boolean, array: T[]): T[] =>
-    array.filter(predicate)
+    array.filter(predicate),
   ),
 
   /**
    * Creates a curried reduce function
    */
-  reduce: curry3(<T, U>(
-    reducer: (acc: U, item: T) => U,
-    initial: U,
-    array: T[]
-  ): U => array.reduce(reducer, initial)),
+  reduce: curry3(
+    <T, U>(reducer: (acc: U, item: T) => U, initial: U, array: T[]): U =>
+      array.reduce(reducer, initial),
+  ),
 
   /**
    * Creates a curried find function
    */
-  find: curry2(<T>(predicate: (item: T) => boolean, array: T[]): T | undefined =>
-    array.find(predicate)
+  find: curry2(
+    <T>(predicate: (item: T) => boolean, array: T[]): T | undefined =>
+      array.find(predicate),
   ),
 
   /**
    * Creates a curried some function
    */
   some: curry2(<T>(predicate: (item: T) => boolean, array: T[]): boolean =>
-    array.some(predicate)
+    array.some(predicate),
   ),
 
   /**
    * Creates a curried every function
    */
   every: curry2(<T>(predicate: (item: T) => boolean, array: T[]): boolean =>
-    array.every(predicate)
+    array.every(predicate),
   ),
 
   /**
@@ -348,41 +355,40 @@ export const CurryUtils = {
    * Creates a curried slice function
    */
   slice: curry3(<T>(start: number, end: number, array: T[]): T[] =>
-    array.slice(start, end)
+    array.slice(start, end),
   ),
 
   /**
    * Creates a curried join function
    */
   join: curry2((separator: string, array: string[]): string =>
-    array.join(separator)
+    array.join(separator),
   ),
 
   /**
    * Creates a curried split function
    */
   split: curry2((separator: string, string: string): string[] =>
-    string.split(separator)
+    string.split(separator),
   ),
 
   /**
    * Creates a curried replace function
    */
-  replace: curry3((
-    search: string | RegExp,
-    replacement: string,
-    string: string
-  ): string => string.replace(search, replacement)),
+  replace: curry3(
+    (search: string | RegExp, replacement: string, string: string): string =>
+      string.replace(search, replacement),
+  ),
 
   /**
    * Creates a curried match function
    */
   match: curry2((regex: RegExp, string: string): RegExpMatchArray | null =>
-    string.match(regex)
+    string.match(regex),
   ),
 
   /**
    * Creates a curried test function for regex
    */
-  test: curry2((regex: RegExp, string: string): boolean => regex.test(string))
+  test: curry2((regex: RegExp, string: string): boolean => regex.test(string)),
 };

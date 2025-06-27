@@ -2,7 +2,7 @@
  * Test utilities for working with Result types
  */
 
-import { Result } from '@nyxusd/functional-utils';
+import { Result } from "@nyxusd/functional-utils";
 
 /**
  * Assertion helpers for Result types
@@ -52,7 +52,9 @@ export const ResultAssertions = {
     for (let i = 0; i < results.length; i++) {
       const result = results[i];
       if (result.isErr()) {
-        throw new Error(`Expected all Results to be Ok, but index ${i} was Err: ${(result as any).value}`);
+        throw new Error(
+          `Expected all Results to be Ok, but index ${i} was Err: ${(result as any).value}`,
+        );
       }
       values.push((result as any).value);
     }
@@ -63,7 +65,7 @@ export const ResultAssertions = {
    * Assert that at least one Result in array is Err
    */
   expectSomeErr<T, E>(results: Result<T, E>[]): boolean {
-    return results.some(result => result.isErr());
+    return results.some((result) => result.isErr());
   },
 
   /**
@@ -72,11 +74,13 @@ export const ResultAssertions = {
   expectResultSatisfies<T, E>(
     result: Result<T, E>,
     predicate: (value: T) => boolean,
-    message?: string
+    message?: string,
   ): void {
     const value = this.expectOk(result);
     if (!predicate(value)) {
-      throw new Error(message || `Result value does not satisfy predicate: ${value}`);
+      throw new Error(
+        message || `Result value does not satisfy predicate: ${value}`,
+      );
     }
   },
 };
@@ -91,21 +95,21 @@ export const ResultTestUtils = {
   createResultSequence<T, E>(
     values: T[],
     errors: E[],
-    pattern: ('ok' | 'err')[]
+    pattern: ("ok" | "err")[],
   ): Result<T, E>[] {
     const results: Result<T, E>[] = [];
     let valueIndex = 0;
     let errorIndex = 0;
 
     for (const type of pattern) {
-      if (type === 'ok') {
+      if (type === "ok") {
         if (valueIndex >= values.length) {
-          throw new Error('Not enough values for ok pattern');
+          throw new Error("Not enough values for ok pattern");
         }
         results.push(Result.ok(values[valueIndex++]));
       } else {
         if (errorIndex >= errors.length) {
-          throw new Error('Not enough errors for err pattern');
+          throw new Error("Not enough errors for err pattern");
         }
         results.push(Result.err(errors[errorIndex++]));
       }
@@ -121,10 +125,7 @@ export const ResultTestUtils = {
     /**
      * Left identity: Result.ok(a).flatMap(f) === f(a)
      */
-    leftIdentity<T, U, E>(
-      value: T,
-      f: (value: T) => Result<U, E>
-    ): boolean {
+    leftIdentity<T, U, E>(value: T, f: (value: T) => Result<U, E>): boolean {
       const left = Result.ok(value).flatMap(f);
       const right = f(value);
       return left.toString() === right.toString();
@@ -144,10 +145,10 @@ export const ResultTestUtils = {
     associativity<T, U, V, E>(
       m: Result<T, E>,
       f: (value: T) => Result<U, E>,
-      g: (value: U) => Result<V, E>
+      g: (value: U) => Result<V, E>,
     ): boolean {
       const left = m.flatMap(f).flatMap(g);
-      const right = m.flatMap(x => f(x).flatMap(g));
+      const right = m.flatMap((x) => f(x).flatMap(g));
       return left.toString() === right.toString();
     },
   },
@@ -159,13 +160,15 @@ export const ResultTestUtils = {
     result: Result<T, E>,
     transform: (result: Result<T, E>) => Result<U, E>,
     property: (value: U) => boolean,
-    description: string
+    description: string,
   ): void {
     const transformed = transform(result);
     if (transformed.isOk()) {
       const value = (transformed as any).value;
       if (!property(value)) {
-        throw new Error(`Property "${description}" not preserved after transformation. Value: ${value}`);
+        throw new Error(
+          `Property "${description}" not preserved after transformation. Value: ${value}`,
+        );
       }
     }
   },
@@ -203,13 +206,13 @@ export const ResultPerformanceUtils = {
    */
   async measureTime<T>(
     operation: () => Promise<T> | T,
-    description: string
+    description: string,
   ): Promise<{ result: T; timeMs: number }> {
     const start = performance.now();
     const result = await operation();
     const end = performance.now();
     const timeMs = end - start;
-    
+
     console.log(`${description}: ${timeMs.toFixed(2)}ms`);
     return { result, timeMs };
   },
@@ -221,15 +224,17 @@ export const ResultPerformanceUtils = {
     results: Result<T, E>[],
     operation: (results: Result<T, E>[]) => Result<T[], E>,
     maxTimeMs: number,
-    description: string
+    description: string,
   ): Promise<void> {
     const { timeMs } = await this.measureTime(
       () => operation(results),
-      description
+      description,
     );
 
     if (timeMs > maxTimeMs) {
-      throw new Error(`Performance test failed: ${description} took ${timeMs}ms, expected < ${maxTimeMs}ms`);
+      throw new Error(
+        `Performance test failed: ${description} took ${timeMs}ms, expected < ${maxTimeMs}ms`,
+      );
     }
   },
 
@@ -239,13 +244,13 @@ export const ResultPerformanceUtils = {
   async benchmarkResultOperations<T, E>(
     results: Result<T, E>[],
     operations: Record<string, (results: Result<T, E>[]) => any>,
-    iterations: number = 100
+    iterations: number = 100,
   ): Promise<Record<string, number>> {
     const benchmarks: Record<string, number> = {};
 
     for (const [name, operation] of Object.entries(operations)) {
       const times: number[] = [];
-      
+
       for (let i = 0; i < iterations; i++) {
         const start = performance.now();
         operation(results);
@@ -253,7 +258,8 @@ export const ResultPerformanceUtils = {
         times.push(end - start);
       }
 
-      benchmarks[name] = times.reduce((sum, time) => sum + time, 0) / times.length;
+      benchmarks[name] =
+        times.reduce((sum, time) => sum + time, 0) / times.length;
     }
 
     return benchmarks;

@@ -30,7 +30,7 @@ tslib_1.__exportStar(require("./services/chainlink-oracle-service-simple"), expo
 // export * from './validation/oracle-validation';
 tslib_1.__exportStar(require("./errors/oracle-errors"), exports);
 // Configuration exports - temporarily excluded due to compilation issues
-// export { 
+// export {
 //   OracleEnvironmentConfig,
 //   DEFAULT_ORACLE_CONFIGS as ORACLE_ENV_CONFIGS,
 //   getOracleConfig as getOracleEnvironmentConfig,

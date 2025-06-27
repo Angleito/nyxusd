@@ -1,11 +1,11 @@
 /**
  * CDP Business Logic Module
- * 
+ *
  * This module contains the core CDP business logic implementations
  * including CDP operations, validation, and state management functions.
  * All functions follow functional programming principles with immutable
  * data structures and explicit error handling using Result types.
- * 
+ *
  * @packageDocumentation
  */
 
@@ -18,13 +18,10 @@ export {
   createCDP,
   createCDPBatch,
   estimateMaxDebt,
-  estimateMinCollateral
-} from './create'
+  estimateMinCollateral,
+} from "./create";
 
-export type {
-  CDPCreationConfig,
-  CDPCreationContext
-} from './create'
+export type { CDPCreationConfig, CDPCreationContext } from "./create";
 
 // Collateral Deposit Functions
 export {
@@ -36,14 +33,14 @@ export {
   depositCollateral,
   depositCollateralBatch,
   calculateHealthFactorImprovement as calculateDepositHealthFactorImprovement,
-  estimateMinDepositForHealthFactor
-} from './deposit'
+  estimateMinDepositForHealthFactor,
+} from "./deposit";
 
 export type {
   DepositCollateralParams,
   DepositContext,
-  DepositResult
-} from './deposit'
+  DepositResult,
+} from "./deposit";
 
 // Collateral Withdrawal Functions
 export {
@@ -56,14 +53,14 @@ export {
   withdrawCollateral,
   withdrawCollateralBatch,
   calculateHealthFactorImpact as calculateWithdrawHealthFactorImpact,
-  estimateFreedCollateralValue
-} from './withdraw'
+  estimateFreedCollateralValue,
+} from "./withdraw";
 
 export type {
   WithdrawCollateralParams,
   WithdrawContext,
-  WithdrawResult
-} from './withdraw'
+  WithdrawResult,
+} from "./withdraw";
 
 // NYXUSD Minting Functions
 export {
@@ -77,14 +74,10 @@ export {
   mintNYXUSD,
   mintNYXUSDBatch,
   estimateAnnualBorrowingCost,
-  calculateCollateralizationRatioAfterMint
-} from './mint'
+  calculateCollateralizationRatioAfterMint,
+} from "./mint";
 
-export type {
-  MintNYXUSDParams,
-  MintContext,
-  MintResult
-} from './mint'
+export type { MintNYXUSDParams, MintContext, MintResult } from "./mint";
 
 // NYXUSD Burning Functions
 export {
@@ -99,15 +92,15 @@ export {
   burnNYXUSDBatch,
   estimateMinBurnForHealthFactor,
   calculateHealthFactorImprovement as calculateBurnHealthFactorImprovement,
-  calculateFullClosureAmount
-} from './burn'
+  calculateFullClosureAmount,
+} from "./burn";
 
 export type {
   BurnNYXUSDParams,
   BurnContext,
   BurnResult,
-  BurnAllocation
-} from './burn'
+  BurnAllocation,
+} from "./burn";
 
 // Module version
-export const CDP_MODULE_VERSION = '1.0.0'
+export const CDP_MODULE_VERSION = "1.0.0";

@@ -1,9 +1,9 @@
 /**
  * Local type definitions for mathematical operations
- * 
+ *
  * This module provides local type definitions to ensure the math module
  * can be compiled independently without cross-project dependencies.
- * 
+ *
  * @packageDocumentation
  */
 

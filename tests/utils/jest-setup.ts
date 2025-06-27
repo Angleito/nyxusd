@@ -3,7 +3,7 @@
  * This file is executed before all tests run
  */
 
-import { Result } from '@nyxusd/functional-utils';
+import { Result } from "@nyxusd/functional-utils";
 
 // Extend Jest matchers for Result types
 declare global {
@@ -28,8 +28,8 @@ expect.extend({
     return {
       message: () =>
         pass
-          ? `Expected Result not to be Ok, but it was Ok(${received.isOk() ? (received as any).value : 'unknown'})`
-          : `Expected Result to be Ok, but it was Err(${received.isErr() ? (received as any).value : 'unknown'})`,
+          ? `Expected Result not to be Ok, but it was Ok(${received.isOk() ? (received as any).value : "unknown"})`
+          : `Expected Result to be Ok, but it was Err(${received.isErr() ? (received as any).value : "unknown"})`,
       pass,
     };
   },
@@ -42,8 +42,8 @@ expect.extend({
     return {
       message: () =>
         pass
-          ? `Expected Result not to be Err, but it was Err(${received.isErr() ? (received as any).value : 'unknown'})`
-          : `Expected Result to be Err, but it was Ok(${received.isOk() ? (received as any).value : 'unknown'})`,
+          ? `Expected Result not to be Err, but it was Err(${received.isErr() ? (received as any).value : "unknown"})`
+          : `Expected Result to be Err, but it was Ok(${received.isOk() ? (received as any).value : "unknown"})`,
       pass,
     };
   },
@@ -54,14 +54,15 @@ expect.extend({
   toBeOkWith(received: Result<any, any>, expected: any) {
     if (!received.isOk()) {
       return {
-        message: () => `Expected Result to be Ok with ${expected}, but it was Err(${(received as any).value})`,
+        message: () =>
+          `Expected Result to be Ok with ${expected}, but it was Err(${(received as any).value})`,
         pass: false,
       };
     }
-    
+
     const actualValue = (received as any).value;
     const pass = this.equals(actualValue, expected);
-    
+
     return {
       message: () =>
         pass
@@ -77,14 +78,15 @@ expect.extend({
   toBeErrWith(received: Result<any, any>, expected: any) {
     if (!received.isErr()) {
       return {
-        message: () => `Expected Result to be Err with ${expected}, but it was Ok(${(received as any).value})`,
+        message: () =>
+          `Expected Result to be Err with ${expected}, but it was Ok(${(received as any).value})`,
         pass: false,
       };
     }
-    
+
     const actualError = (received as any).value;
     const pass = this.equals(actualError, expected);
-    
+
     return {
       message: () =>
         pass
@@ -99,32 +101,37 @@ expect.extend({
    */
   toSatisfyProperty(received: any, property: string) {
     let pass = false;
-    let message = '';
+    let message = "";
 
     try {
       switch (property) {
-        case 'positive':
-          pass = typeof received === 'number' && received > 0;
+        case "positive":
+          pass = typeof received === "number" && received > 0;
           message = `Expected ${received} to be positive`;
           break;
-        case 'non-negative':
-          pass = typeof received === 'number' && received >= 0;
+        case "non-negative":
+          pass = typeof received === "number" && received >= 0;
           message = `Expected ${received} to be non-negative`;
           break;
-        case 'integer':
-          pass = typeof received === 'number' && Number.isInteger(received);
+        case "integer":
+          pass = typeof received === "number" && Number.isInteger(received);
           message = `Expected ${received} to be an integer`;
           break;
-        case 'finite':
-          pass = typeof received === 'number' && Number.isFinite(received);
+        case "finite":
+          pass = typeof received === "number" && Number.isFinite(received);
           message = `Expected ${received} to be finite`;
           break;
-        case 'valid-percentage':
-          pass = typeof received === 'number' && received >= 0 && received <= 100;
+        case "valid-percentage":
+          pass =
+            typeof received === "number" && received >= 0 && received <= 100;
           message = `Expected ${received} to be a valid percentage (0-100)`;
           break;
-        case 'valid-basis-points':
-          pass = typeof received === 'number' && Number.isInteger(received) && received >= 0 && received <= 10000;
+        case "valid-basis-points":
+          pass =
+            typeof received === "number" &&
+            Number.isInteger(received) &&
+            received >= 0 &&
+            received <= 10000;
           message = `Expected ${received} to be valid basis points (0-10000)`;
           break;
         default:
@@ -176,13 +183,15 @@ afterAll(() => {
 export const PROPERTY_TEST_CONFIG = {
   // Number of test cases to generate for property tests
   numRuns: process.env.CI ? 1000 : 100,
-  
+
   // Timeout for individual property test runs
   timeout: 5000,
-  
+
   // Seed for reproducible test runs
-  seed: process.env.FAST_CHECK_SEED ? parseInt(process.env.FAST_CHECK_SEED, 10) : Date.now(),
-  
+  seed: process.env.FAST_CHECK_SEED
+    ? parseInt(process.env.FAST_CHECK_SEED, 10)
+    : Date.now(),
+
   // Verbose output in CI
   verbose: Boolean(process.env.CI),
 };

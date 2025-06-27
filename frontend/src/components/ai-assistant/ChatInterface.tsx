@@ -1,40 +1,40 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Send, X, Sparkles } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { ChatMessage } from './ChatMessage';
-import { TypingIndicator } from './TypingIndicator';
-import { useAIAssistant } from '../../providers/AIAssistantProvider';
+import React, { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Send, X, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ChatMessage } from "./ChatMessage";
+import { TypingIndicator } from "./TypingIndicator";
+import { useAIAssistant } from "../../providers/AIAssistantProvider";
 
 export const ChatInterface: React.FC = () => {
   const { state, sendMessage } = useAIAssistant();
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [state.messages, state.isTyping]);
 
   const handleSendMessage = () => {
     if (inputValue.trim() && !state.isTyping) {
       sendMessage(inputValue.trim());
-      setInputValue('');
+      setInputValue("");
       inputRef.current?.focus();
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="flex flex-col h-full bg-gray-900 rounded-lg border border-gray-800 shadow-2xl relative overflow-hidden"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -43,7 +43,7 @@ export const ChatInterface: React.FC = () => {
       {/* Background gradient effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/5 via-transparent to-blue-900/5 pointer-events-none" />
       {/* Header */}
-      <motion.div 
+      <motion.div
         className="px-6 py-4 border-b border-gray-800 bg-gradient-to-r from-gray-900 to-gray-800"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -59,12 +59,16 @@ export const ChatInterface: React.FC = () => {
               <Sparkles className="w-5 h-5 text-white" />
             </motion.div>
             <div>
-              <h2 className="text-xl font-bold text-white">AI Portfolio Assistant</h2>
-              <p className="text-sm text-gray-400">Your personalized investment advisor</p>
+              <h2 className="text-xl font-bold text-white">
+                AI Portfolio Assistant
+              </h2>
+              <p className="text-sm text-gray-400">
+                Your personalized investment advisor
+              </p>
             </div>
           </div>
           <motion.button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate("/dashboard")}
             className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all duration-200"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -118,7 +122,7 @@ export const ChatInterface: React.FC = () => {
         transition={{ delay: 0.3, duration: 0.3 }}
       >
         <div className="flex items-center space-x-2">
-          <motion.div 
+          <motion.div
             className="flex-1 relative"
             whileHover={{ scale: 1.01 }}
             transition={{ type: "spring", stiffness: 400 }}
@@ -139,14 +143,15 @@ export const ChatInterface: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.1 }}
                 style={{
-                  background: 'radial-gradient(ellipse at center, #a855f7 0%, transparent 70%)',
-                  filter: 'blur(20px)',
+                  background:
+                    "radial-gradient(ellipse at center, #a855f7 0%, transparent 70%)",
+                  filter: "blur(20px)",
                 }}
               />
             )}
           </motion.div>
           <motion.button
-            whileHover={{ scale: 1.05, backgroundColor: '#7c3aed' }}
+            whileHover={{ scale: 1.05, backgroundColor: "#7c3aed" }}
             whileTap={{ scale: 0.95 }}
             onClick={handleSendMessage}
             disabled={!inputValue.trim() || state.isTyping}
@@ -154,7 +159,11 @@ export const ChatInterface: React.FC = () => {
           >
             <motion.div
               animate={state.isTyping ? { rotate: 360 } : { rotate: 0 }}
-              transition={{ duration: 1, repeat: state.isTyping ? Infinity : 0, ease: "linear" }}
+              transition={{
+                duration: 1,
+                repeat: state.isTyping ? Infinity : 0,
+                ease: "linear",
+              }}
             >
               <Send className="w-5 h-5" />
             </motion.div>
