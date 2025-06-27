@@ -9,7 +9,9 @@
  * @version 1.0.0
  */
 
-import { pipe, curry } from "../../utils/fp-utils";
+// Simple local implementations to avoid build issues
+const pipe = <T, U>(value: T, fn: (val: T) => U): U => fn(value);
+const curry = <A, B, C>(fn: (a: A, b: B) => C) => (a: A) => (b: B) => fn(a, b);
 import { ConversationStep } from "../../providers/AIAssistantProvider";
 
 // =====================================================================

@@ -15,7 +15,43 @@
  * @version 1.0.0
  */
 
-import { pipe, Option, Result, Either } from "../../utils/fp-utils";
+// Simple local implementations to avoid build issues
+const pipe = <T, U>(value: T, fn: (val: T) => U): U => fn(value);
+
+class Some<T> {
+  constructor(public readonly value: T) {}
+  isSome(): this is Some<T> { return true; }
+  isNone(): this is None { return false; }
+}
+class None {
+  isSome(): this is Some<any> { return false; }
+  isNone(): this is None { return true; }
+}
+type Option<T> = Some<T> | None;
+
+class Ok<T, E> {
+  constructor(public readonly value: T) {}
+  isOk(): this is Ok<T, E> { return true; }
+  isErr(): this is Err<T, E> { return false; }
+}
+class Err<T, E> {
+  constructor(public readonly value: E) {}
+  isOk(): this is Ok<T, E> { return false; }
+  isErr(): this is Err<T, E> { return true; }
+}
+type Result<T, E> = Ok<T, E> | Err<T, E>;
+
+class Left<L, R> {
+  constructor(public readonly value: L) {}
+  isLeft(): this is Left<L, R> { return true; }
+  isRight(): this is Right<L, R> { return false; }
+}
+class Right<L, R> {
+  constructor(public readonly value: R) {}
+  isLeft(): this is Left<L, R> { return false; }
+  isRight(): this is Right<L, R> { return true; }
+}
+type Either<L, R> = Left<L, R> | Right<L, R>;
 
 // Core interfaces for analogy generation
 export interface AnalogyContext {

@@ -30,7 +30,22 @@ import {
   OptimizationConfig,
   OptimizationResult,
 } from "./promptOptimizer";
-import { pipe, Result, Ok, Err } from "../../utils/fp-utils";
+// Simple local implementations to avoid build issues
+const pipe = <T, U>(value: T, fn: (val: T) => U): U => fn(value);
+
+class Ok<T, E> {
+  constructor(public readonly value: T) {}
+  isOk(): this is Ok<T, E> { return true; }
+  isErr(): this is Err<T, E> { return false; }
+}
+
+class Err<T, E> {
+  constructor(public readonly value: E) {}
+  isOk(): this is Ok<T, E> { return false; }
+  isErr(): this is Err<T, E> { return true; }
+}
+
+type Result<T, E> = Ok<T, E> | Err<T, E>;
 
 export interface PromptContext {
   step: ConversationStep;

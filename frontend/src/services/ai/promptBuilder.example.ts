@@ -14,7 +14,17 @@ import {
   PRESET_CONFIGS,
   OPTIMIZED_TEMPLATES,
 } from "./promptBuilder";
-import { Err } from "../../utils/fp-utils";
+// Simple local implementation to avoid build issues
+class Err<T, E> {
+  constructor(public readonly value: E) {}
+  isOk(): this is Ok<T, E> { return false; }
+  isErr(): this is Err<T, E> { return true; }
+}
+class Ok<T, E> {
+  constructor(public readonly value: T) {}
+  isOk(): this is Ok<T, E> { return true; }
+  isErr(): this is Err<T, E> { return false; }
+}
 import {
   ConversationStep,
   UserProfile,
