@@ -59,15 +59,13 @@ export const OraclePricesCard: React.FC<OraclePricesCardProps> = ({
   const generateTrendData = (pair: string) => {
     // Mock trend data - in a real app, this would come from historical data
     const trends = {
-      "BTC/USD": { change: 2.34, isPositive: true },
-      "ETH/USD": { change: -1.23, isPositive: false },
-      "ADA/USD": { change: 5.67, isPositive: true },
-      "DUST/USD": { change: 0.89, isPositive: true },
-    };
-    return (
-      trends[pair as keyof typeof trends] || { change: 0, isPositive: true }
-    );
-  };
+      'NIGHT/USD': { change: 3.42, isPositive: true },
+      'DUST/USD': { change: 0.89, isPositive: true },
+      'ADA/USD': { change: 5.67, isPositive: true },
+      'BTC/USD': { change: 2.34, isPositive: true },
+    }
+    return trends[pair as keyof typeof trends] || { change: 0, isPositive: true }
+  }
 
   const getPairIcon = (pair: string) => {
     const baseAsset = pair.split("/")[0];
@@ -77,11 +75,11 @@ export const OraclePricesCard: React.FC<OraclePricesCardProps> = ({
           <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
             <span className="text-orange-600 font-bold text-xs">₿</span>
           </div>
-        );
-      case "ETH":
+        )
+      case 'NIGHT':
         return (
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-            <span className="text-blue-600 font-bold text-xs">Ξ</span>
+          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+            <span className="text-purple-600 font-bold text-xs">◑</span>
           </div>
         );
       case "ADA":

@@ -52,8 +52,8 @@ export interface OracleHealthDashboardProps {
 export const OracleHealthDashboard: React.FC<OracleHealthDashboardProps> = ({
   className = "",
 }) => {
-  const [selectedFeed, setSelectedFeed] = useState<string>("ETH/USD");
-  const [refreshInterval, setRefreshInterval] = useState(5000); // 5 seconds
+  const [selectedFeed, setSelectedFeed] = useState<string>('NIGHT/USD')
+  const [refreshInterval, setRefreshInterval] = useState(5000) // 5 seconds
 
   // Mock data - in production would fetch from API
   const { data: metrics, isLoading: metricsLoading } = useQuery({
@@ -73,18 +73,28 @@ export const OracleHealthDashboard: React.FC<OracleHealthDashboardProps> = ({
     queryKey: ["oracleFeedsHealth"],
     queryFn: async (): Promise<OracleFeedHealth[]> => [
       {
-        feedId: "ETH/USD",
-        status: "healthy",
+        feedId: 'NIGHT/USD',
+        status: 'healthy',
         confidence: 98,
         staleness: 12,
-        lastPrice: "3,420.50",
-        priceChange24h: 2.4,
+        lastPrice: '150.75',
+        priceChange24h: 3.2,
         responseTime: 120,
         errorRate: 0.2,
       },
       {
-        feedId: "BTC/USD",
-        status: "healthy",
+        feedId: 'DUST/USD',
+        status: 'healthy',
+        confidence: 95,
+        staleness: 15,
+        lastPrice: '0.025',
+        priceChange24h: 0.8,
+        responseTime: 110,
+        errorRate: 0.3,
+      },
+      {
+        feedId: 'BTC/USD',
+        status: 'healthy',
         confidence: 97,
         staleness: 8,
         lastPrice: "98,150.00",
@@ -101,16 +111,6 @@ export const OracleHealthDashboard: React.FC<OracleHealthDashboardProps> = ({
         priceChange24h: 5.6,
         responseTime: 250,
         errorRate: 2.1,
-      },
-      {
-        feedId: "DUST/USD",
-        status: "healthy",
-        confidence: 95,
-        staleness: 20,
-        lastPrice: "0.15",
-        priceChange24h: 0.8,
-        responseTime: 110,
-        errorRate: 0.5,
       },
     ],
     refetchInterval: refreshInterval,
