@@ -2,9 +2,9 @@
  * Centralized export for all test fixtures
  */
 
-export { CDPFixtures } from './cdp-fixtures';
-export { CollateralFixtures } from './collateral-fixtures';
-export { OracleFixtures } from './oracle-fixtures';
+export { CDPFixtures } from "./cdp-fixtures";
+export { CollateralFixtures } from "./collateral-fixtures";
+export { OracleFixtures } from "./oracle-fixtures";
 
 /**
  * Combined fixtures for comprehensive testing scenarios
@@ -13,7 +13,7 @@ export const TestFixtures = {
   cdp: CDPFixtures,
   collateral: CollateralFixtures,
   oracle: OracleFixtures,
-  
+
   /**
    * Cross-cutting test scenarios that use multiple fixture types
    */
@@ -24,7 +24,8 @@ export const TestFixtures = {
     completeLiquidation: {
       cdp: CDPFixtures.samples.cdps[2], // Critical CDP
       collateral: CollateralFixtures.samples.balances[2], // Critical balance
-      priceUpdate: CollateralFixtures.edgeCases.extremeVolatility.priceUpdates[0], // Price crash
+      priceUpdate:
+        CollateralFixtures.edgeCases.extremeVolatility.priceUpdates[0], // Price crash
       liquidation: CDPFixtures.samples.liquidations[0],
     },
 
@@ -45,8 +46,8 @@ export const TestFixtures = {
       failure: OracleFixtures.failures.partialOutage,
       affectedCDPs: [CDPFixtures.samples.cdps[0], CDPFixtures.samples.cdps[1]],
       fallbackPrices: [
-        { asset: 'ETH-USD', price: 1600 },
-        { asset: 'BTC-USD', price: 42000 },
+        { asset: "ETH-USD", price: 1600 },
+        { asset: "BTC-USD", price: 42000 },
       ],
       recoveryTime: 3600,
     },
@@ -61,7 +62,7 @@ export const TestFixtures = {
       },
       crashPhase: OracleFixtures.stress.flashCrash.phases[0],
       recoveryPhase: OracleFixtures.stress.flashCrash.phases[1],
-      expectedOutcome: 'no_liquidations',
+      expectedOutcome: "no_liquidations",
     },
 
     /**
@@ -82,7 +83,7 @@ export const TestFixtures = {
     /**
      * Create a CDP with specific risk level
      */
-    createCDPWithRisk: (riskLevel: 'low' | 'medium' | 'high' | 'critical') => {
+    createCDPWithRisk: (riskLevel: "low" | "medium" | "high" | "critical") => {
       const baseCDP = CDPFixtures.samples.cdps[0];
       const riskMultipliers = {
         low: { healthFactor: 2.0, collateralizationRatio: 200 },
@@ -107,17 +108,17 @@ export const TestFixtures = {
     createCorrelatedPrices: (
       basePrice: number,
       correlation: number,
-      numPrices: number = 10
+      numPrices: number = 10,
     ) => {
       const prices: number[] = [basePrice];
-      
+
       for (let i = 1; i < numPrices; i++) {
         const randomFactor = (Math.random() - 0.5) * 0.1; // ±5% random
         const correlatedFactor = (prices[i - 1] / basePrice - 1) * correlation;
         const change = randomFactor + correlatedFactor;
         prices.push(basePrice * (1 + change));
       }
-      
+
       return prices;
     },
 
@@ -126,15 +127,17 @@ export const TestFixtures = {
      */
     createPortfolioWithAllocation: (
       totalValue: number,
-      allocations: Record<string, number> // asset -> percentage
+      allocations: Record<string, number>, // asset -> percentage
     ) => {
-      const assets = Object.entries(allocations).map(([assetAddress, percentage]) => ({
-        assetAddress,
-        amount: BigInt(Math.floor(totalValue * percentage / 100)),
-        value: totalValue * percentage / 100,
-        weight: percentage,
-        allocationTarget: percentage,
-      }));
+      const assets = Object.entries(allocations).map(
+        ([assetAddress, percentage]) => ({
+          assetAddress,
+          amount: BigInt(Math.floor((totalValue * percentage) / 100)),
+          value: (totalValue * percentage) / 100,
+          weight: percentage,
+          allocationTarget: percentage,
+        }),
+      );
 
       return {
         ...CollateralFixtures.samples.portfolios[0],
@@ -149,14 +152,16 @@ export const TestFixtures = {
      */
     createStressScenario: (
       priceShocks: Record<string, number>, // asset -> shock percentage
-      duration: number = 3600
+      duration: number = 3600,
     ) => {
-      const shocks = Object.entries(priceShocks).map(([feedId, shockPercent]) => ({
-        feedId,
-        shockPercent,
-        newPrice: 0, // Will be calculated based on current price
-        confidence: Math.max(95 - Math.abs(shockPercent), 80),
-      }));
+      const shocks = Object.entries(priceShocks).map(
+        ([feedId, shockPercent]) => ({
+          feedId,
+          shockPercent,
+          newPrice: 0, // Will be calculated based on current price
+          confidence: Math.max(95 - Math.abs(shockPercent), 80),
+        }),
+      );
 
       return {
         name: `Custom Stress Test ${Date.now()}`,

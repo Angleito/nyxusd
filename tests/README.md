@@ -21,11 +21,12 @@ tests/
 Unit tests focus on testing individual functions and components in isolation. They use mocks and stubs to isolate the system under test.
 
 **Example:**
-```typescript
-import { Result } from '@nyxusd/functional-utils';
-import { ResultTestHelpers } from '../utils/result-helpers';
 
-test('should validate CDP successfully', () => {
+```typescript
+import { Result } from "@nyxusd/functional-utils";
+import { ResultTestHelpers } from "../utils/result-helpers";
+
+test("should validate CDP successfully", () => {
   const result = validateCDP(validCDPData);
   expect(result).toBeOk();
   expect(ResultTestHelpers.expectOk(result)).toEqual(expectedCDP);
@@ -37,11 +38,12 @@ test('should validate CDP successfully', () => {
 Integration tests verify that different components work together correctly. They test complete workflows and data flows between components.
 
 **Example:**
+
 ```typescript
-test('should complete CDP liquidation process', async () => {
+test("should complete CDP liquidation process", async () => {
   const result = await liquidateCDP(unhealthyCDP);
   expect(result.success).toBe(true);
-  expect(result.liquidation.finalStatus).toBe('liquidated');
+  expect(result.liquidation.finalStatus).toBe("liquidated");
 });
 ```
 
@@ -50,21 +52,16 @@ test('should complete CDP liquidation process', async () => {
 Property-based tests use fast-check to generate random test data and verify mathematical properties and invariants hold across a wide range of inputs.
 
 **Example:**
-```typescript
-import * as fc from 'fast-check';
-import { PropertyTesting } from '../utils/property-testing';
 
-PropertyTesting.run(
-  'Health factor is always non-negative',
-  () => {
-    fc.assert(
-      fc.property(
-        DataGenerators.cdp.cdpConfig(),
-        (cdp) => cdp.healthFactor >= 0
-      )
-    );
-  }
-);
+```typescript
+import * as fc from "fast-check";
+import { PropertyTesting } from "../utils/property-testing";
+
+PropertyTesting.run("Health factor is always non-negative", () => {
+  fc.assert(
+    fc.property(DataGenerators.cdp.cdpConfig(), (cdp) => cdp.healthFactor >= 0),
+  );
+});
 ```
 
 ## Test Utilities
@@ -74,11 +71,11 @@ PropertyTesting.run(
 Utilities for testing Result types with custom matchers and assertion helpers:
 
 ```typescript
-import { ResultTestHelpers } from './utils/result-helpers';
+import { ResultTestHelpers } from "./utils/result-helpers";
 
 // Custom matchers
 expect(result).toBeOk();
-expect(result).toBeErrWith('error message');
+expect(result).toBeErrWith("error message");
 
 // Assertion helpers
 const value = ResultTestHelpers.expectOk(result);
@@ -90,7 +87,7 @@ const error = ResultTestHelpers.expectErr(result);
 Fast-check generators for creating test data:
 
 ```typescript
-import { DataGenerators } from './utils/data-generators';
+import { DataGenerators } from "./utils/data-generators";
 
 // Generate valid CDP configuration
 const cdpGen = DataGenerators.cdp.cdpConfig();
@@ -105,7 +102,7 @@ const amountGen = DataGenerators.financial.collateralAmount();
 Utilities for property-based testing with pre-defined mathematical properties:
 
 ```typescript
-import { PropertyTesting } from './utils/property-testing';
+import { PropertyTesting } from "./utils/property-testing";
 
 // Test mathematical properties
 PropertyTesting.math.associativity(gen, operation)();
@@ -119,11 +116,11 @@ PropertyTesting.financial.healthFactorConsistency(gen, ...functions)();
 Comprehensive test data including:
 
 - **CDP Fixtures**: Sample CDPs, operations, liquidations
-- **Collateral Fixtures**: Asset configurations, balances, operations  
+- **Collateral Fixtures**: Asset configurations, balances, operations
 - **Oracle Fixtures**: Price feeds, stress scenarios, failure modes
 
 ```typescript
-import { CDPFixtures, CollateralFixtures } from './fixtures';
+import { CDPFixtures, CollateralFixtures } from "./fixtures";
 
 const sampleCDP = CDPFixtures.samples.cdps[0];
 const ethAsset = CollateralFixtures.samples.assets[0];
@@ -132,11 +129,13 @@ const ethAsset = CollateralFixtures.samples.assets[0];
 ## Running Tests
 
 ### All Tests
+
 ```bash
 npm test
 ```
 
 ### Specific Test Types
+
 ```bash
 npm run test:unit           # Unit tests only
 npm run test:integration    # Integration tests only
@@ -144,12 +143,14 @@ npm run test:property       # Property-based tests only
 ```
 
 ### With Coverage
+
 ```bash
 npm run test:coverage       # All tests with coverage
 npm run test:coverage:unit  # Unit tests with coverage
 ```
 
 ### Watch Mode
+
 ```bash
 npm run test:watch          # Watch mode for development
 ```
@@ -170,10 +171,10 @@ Property-based tests are configured in `./utils/jest-setup.ts`:
 
 ```typescript
 export const PROPERTY_TEST_CONFIG = {
-  numRuns: process.env.CI ? 1000 : 100,  // More runs in CI
-  timeout: 5000,                         // 5 second timeout
-  seed: process.env.FAST_CHECK_SEED,     // Reproducible tests
-  verbose: Boolean(process.env.CI),      // Verbose in CI
+  numRuns: process.env.CI ? 1000 : 100, // More runs in CI
+  timeout: 5000, // 5 second timeout
+  seed: process.env.FAST_CHECK_SEED, // Reproducible tests
+  verbose: Boolean(process.env.CI), // Verbose in CI
 };
 ```
 
@@ -182,11 +183,11 @@ export const PROPERTY_TEST_CONFIG = {
 The test infrastructure provides custom Jest matchers for Result types:
 
 ```typescript
-expect(result).toBeOk();                    // Check if Result is Ok
-expect(result).toBeErr();                   // Check if Result is Err
-expect(result).toBeOkWith(expectedValue);   // Check Ok with specific value
-expect(result).toBeErrWith(expectedError);  // Check Err with specific error
-expect(value).toSatisfyProperty('positive'); // Check mathematical properties
+expect(result).toBeOk(); // Check if Result is Ok
+expect(result).toBeErr(); // Check if Result is Err
+expect(result).toBeOkWith(expectedValue); // Check Ok with specific value
+expect(result).toBeErrWith(expectedError); // Check Err with specific error
+expect(value).toSatisfyProperty("positive"); // Check mathematical properties
 ```
 
 ## Mathematical Properties Tested
@@ -194,18 +195,21 @@ expect(value).toSatisfyProperty('positive'); // Check mathematical properties
 The property-based tests verify mathematical invariants including:
 
 ### CDP Properties
+
 - Health factor non-negativity
 - Collateralization ratio monotonicity
 - Fee accrual over time
 - Liquidation thresholds
 
 ### Financial Mathematics
+
 - Interest rate calculations
 - Present/future value relationships
 - Risk metric calculations
 - Portfolio value properties
 
 ### Result Type Properties
+
 - Monad laws (left identity, right identity, associativity)
 - Type safety preservation
 - Error propagation
@@ -215,20 +219,21 @@ The property-based tests verify mathematical invariants including:
 Performance utilities are included for benchmarking:
 
 ```typescript
-import { ResultTestHelpers } from './utils/result-helpers';
+import { ResultTestHelpers } from "./utils/result-helpers";
 
 // Measure operation time
 const { result, timeMs } = await ResultTestHelpers.performance.measureTime(
   () => expensiveOperation(),
-  'Operation description'
+  "Operation description",
 );
 
 // Benchmark multiple operations
-const benchmarks = await ResultTestHelpers.performance.benchmarkResultOperations(
-  testData,
-  operations,
-  iterations
-);
+const benchmarks =
+  await ResultTestHelpers.performance.benchmarkResultOperations(
+    testData,
+    operations,
+    iterations,
+  );
 ```
 
 ## Best Practices
@@ -267,22 +272,27 @@ The test infrastructure is designed for CI/CD:
 ## Debugging Tests
 
 ### Verbose Output
+
 ```bash
 npm test -- --verbose
 ```
 
 ### Run Single Test File
+
 ```bash
 npm test -- tests/unit/result-validation.test.ts
 ```
 
 ### Debug Property Tests
+
 ```bash
 FAST_CHECK_SEED=42 npm run test:property
 ```
 
 ### Coverage Reports
+
 Coverage reports are generated in the `coverage/` directory with:
+
 - HTML reports for browser viewing
 - LCOV reports for CI integration
 - JSON reports for programmatic access
