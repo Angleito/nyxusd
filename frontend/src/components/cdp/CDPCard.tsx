@@ -158,7 +158,7 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
   // Calculate derived values
   const collateralValue = parseInt(cdp.collateralAmount) / 1e18;
   const debtValue = parseInt(cdp.debtAmount) / 1e18;
-  const collateralUSDValue = collateralValue * 2000; // Assuming ETH price
+  const collateralUSDValue = collateralValue * 150; // Assuming NIGHT price
   const liquidationPrice = (debtValue * 1.5) / collateralValue;
 
   return (
@@ -263,7 +263,7 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
               <div className="text-lg font-bold text-orange-900">
                 ${liquidationPrice.toFixed(0)}
               </div>
-              <div className="text-xs text-orange-600">ETH Price</div>
+              <div className="text-xs text-orange-600">NIGHT Price</div>
             </div>
           </div>
         </div>
@@ -345,9 +345,9 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
                     <span className="font-medium text-blue-600">
                       {Math.max(
                         0,
-                        collateralValue - (debtValue * 1.5) / 2000,
+                        collateralValue - (debtValue * 1.5) / 150,
                       ).toFixed(4)}{" "}
-                      ETH
+                      NIGHT
                     </span>
                   </div>
                 </div>
@@ -383,10 +383,10 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      Current ETH Price:
+                      Current NIGHT Price:
                     </span>
                     <span className="font-medium text-card-foreground">
-                      $2,000
+                      $150
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -395,14 +395,14 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
                     </span>
                     <span
                       className={`font-medium ${
-                        ((2000 - liquidationPrice) / 2000) * 100 > 25
+                        ((150 - liquidationPrice) / 150) * 100 > 25
                           ? "text-green-600"
-                          : ((2000 - liquidationPrice) / 2000) * 100 > 10
+                          : ((150 - liquidationPrice) / 150) * 100 > 10
                             ? "text-yellow-600"
                             : "text-red-600"
                       }`}
                     >
-                      {(((2000 - liquidationPrice) / 2000) * 100).toFixed(1)}%
+                      {(((150 - liquidationPrice) / 150) * 100).toFixed(1)}%
                     </span>
                   </div>
                 </div>

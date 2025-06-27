@@ -27,7 +27,7 @@ export const RecentActivityCard: React.FC<RecentActivityCardProps> = ({
       id: "1",
       type: "deposit",
       amount: "1.5",
-      asset: "ETH",
+      asset: "NIGHT",
       timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(), // 5 minutes ago
       txHash: "0x1234...5678",
       status: "confirmed",

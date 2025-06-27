@@ -196,7 +196,7 @@ export const CDPDashboard: React.FC = () => {
         />
         <QuickStatsCard
           title="Total Collateral"
-          value={`${totalCollateralValue.toFixed(2)} ETH`}
+          value={`${totalCollateralValue.toFixed(2)} NIGHT`}
           subtitle="Locked value"
           color="blue"
         />
@@ -236,9 +236,9 @@ export const CDPDashboard: React.FC = () => {
       {/* Overview Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PortfolioSummaryCard
-          totalValue={totalCollateralValue * 2000} // Assuming ETH price
+          totalValue={totalCollateralValue * 150} // Assuming NIGHT price
           totalDebt={totalDebt}
-          netWorth={totalCollateralValue * 2000 - totalDebt}
+          netWorth={totalCollateralValue * 150 - totalDebt}
         />
         <RiskIndicatorCard
           averageHealthFactor={averageHealthFactor}
@@ -349,7 +349,7 @@ export const CDPDashboard: React.FC = () => {
                     </h3>
                     <p className="text-sm text-gray-500">
                       Collateral:{" "}
-                      {(parseInt(cdp.collateralAmount) / 1e18).toFixed(4)} ETH
+                      {(parseInt(cdp.collateralAmount) / 1e18).toFixed(4)} NIGHT
                     </p>
                   </div>
                   <div className="text-right">
@@ -400,7 +400,7 @@ export const CDPDashboard: React.FC = () => {
                 </h3>
                 <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
                   <li>
-                    Deposit collateral (ETH, BTC, or other supported assets)
+                    Deposit collateral (NIGHT, DUST, or other supported assets)
                   </li>
                   <li>Choose your collateralization ratio (minimum 150%)</li>
                   <li>Mint nyxUSD against your collateral</li>

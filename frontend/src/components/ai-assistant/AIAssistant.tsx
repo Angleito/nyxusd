@@ -111,11 +111,12 @@ export const AIAssistant: React.FC = () => {
           const mockWalletData = {
             address: "0x742d...8963",
             assets: [
-              { symbol: "ETH", balance: "2.5", valueUSD: 4875 },
+              { symbol: "NIGHT", balance: "25.0", valueUSD: 3750 },
+              { symbol: "DUST", balance: "10000", valueUSD: 250 },
               { symbol: "USDC", balance: "5000", valueUSD: 5000 },
               { symbol: "WBTC", balance: "0.15", valueUSD: 6450 },
             ],
-            totalValueUSD: 16325,
+            totalValueUSD: 15450,
           };
 
           setWalletData(mockWalletData);

@@ -25,7 +25,7 @@ export const CDPLeverageOptimizer: React.FC<CDPLeverageOptimizerProps> = ({
   const [simulations, setSimulations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCollateral, setSelectedCollateral] = useState<Asset>({
-    symbol: "ETH",
+    symbol: "NIGHT",
     address: "0x...",
     decimals: 18,
     chainId: 1,
