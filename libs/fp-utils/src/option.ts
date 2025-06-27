@@ -1,7 +1,7 @@
 /**
  * Option monad implementation for handling nullable/undefined values.
  * Represents a value that may or may not be present (Some or None).
- * 
+ *
  * The Option type satisfies the monad laws:
  * - Left identity: Option.of(a).flatMap(f) === f(a)
  * - Right identity: m.flatMap(Option.of) === m
@@ -243,7 +243,7 @@ export class Some<T> extends Option<T> {
   }
 
   ap<U>(optionFn: Option<(value: T) => U>): Option<U> {
-    return optionFn.flatMap(fn => this.map(fn));
+    return optionFn.flatMap((fn) => this.map(fn));
   }
 
   toArray(): T[] {
@@ -336,7 +336,7 @@ export class None<T> extends Option<T> {
   }
 
   toString(): string {
-    return 'None';
+    return "None";
   }
 
   tap(_fn: (value: T) => void): Option<T> {
@@ -378,10 +378,7 @@ export const OptionUtils = {
    * @param fn - Function that returns Option
    * @returns Option containing array of all success values or None if any fails
    */
-  traverse<A, B>(
-    items: A[],
-    fn: (item: A) => Option<B>
-  ): Option<B[]> {
+  traverse<A, B>(items: A[], fn: (item: A) => Option<B>): Option<B[]> {
     return this.sequence(items.map(fn));
   },
 
@@ -400,10 +397,10 @@ export const OptionUtils = {
    * @returns Function that works with Option values
    */
   lift2<A, B, C>(
-    fn: (a: A, b: B) => C
+    fn: (a: A, b: B) => C,
   ): (optionA: Option<A>, optionB: Option<B>) => Option<C> {
     return (optionA: Option<A>, optionB: Option<B>) =>
-      optionA.flatMap(a => optionB.map(b => fn(a, b)));
+      optionA.flatMap((a) => optionB.map((b) => fn(a, b)));
   },
 
   /**
@@ -412,13 +409,11 @@ export const OptionUtils = {
    * @returns Function that works with Option values
    */
   lift3<A, B, C, D>(
-    fn: (a: A, b: B, c: C) => D
+    fn: (a: A, b: B, c: C) => D,
   ): (optionA: Option<A>, optionB: Option<B>, optionC: Option<C>) => Option<D> {
     return (optionA: Option<A>, optionB: Option<B>, optionC: Option<C>) =>
-      optionA.flatMap(a => 
-        optionB.flatMap(b => 
-          optionC.map(c => fn(a, b, c))
-        )
+      optionA.flatMap((a) =>
+        optionB.flatMap((b) => optionC.map((c) => fn(a, b, c))),
       );
   },
 
@@ -429,8 +424,8 @@ export const OptionUtils = {
    */
   catOptions<T>(options: Option<T>[]): T[] {
     return options
-      .filter(option => option.isSome())
-      .map(option => (option as Some<T>).value);
+      .filter((option) => option.isSome())
+      .map((option) => (option as Some<T>).value);
   },
 
   /**
@@ -455,5 +450,5 @@ export const OptionUtils = {
       }
     }
     return Option.none<T>();
-  }
+  },
 };

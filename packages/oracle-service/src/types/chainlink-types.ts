@@ -1,11 +1,11 @@
 /**
  * Chainlink-specific Types
- * 
+ *
  * Type definitions for Chainlink oracle integration including
  * AggregatorV3Interface, Chainlink Functions, and feed configurations
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Chainlink AggregatorV3Interface response
@@ -61,7 +61,9 @@ export const ChainlinkNetworkConfigSchema = z.object({
   isTestnet: z.boolean(),
 });
 
-export type ChainlinkNetworkConfig = z.infer<typeof ChainlinkNetworkConfigSchema>;
+export type ChainlinkNetworkConfig = z.infer<
+  typeof ChainlinkNetworkConfigSchema
+>;
 
 /**
  * Supported Chainlink networks with their feed addresses
@@ -81,7 +83,9 @@ export const ChainlinkFeedAddressesSchema = z.object({
   avalanche: z.record(z.string(), z.string()),
 });
 
-export type ChainlinkFeedAddresses = z.infer<typeof ChainlinkFeedAddressesSchema>;
+export type ChainlinkFeedAddresses = z.infer<
+  typeof ChainlinkFeedAddressesSchema
+>;
 
 /**
  * Chainlink Functions types
@@ -94,7 +98,7 @@ export const ChainlinkFunctionRequestSchema = z.object({
   /** Function arguments */
   args: z.array(z.string()).optional(),
   /** Encrypted secrets reference */
-  secretsLocation: z.enum(['inline', 'remote']).optional(),
+  secretsLocation: z.enum(["inline", "remote"]).optional(),
   /** Secrets data */
   secrets: z.record(z.string(), z.string()).optional(),
   /** DON ID for the request */
@@ -103,7 +107,9 @@ export const ChainlinkFunctionRequestSchema = z.object({
   gasLimit: z.number().int().positive().optional(),
 });
 
-export type ChainlinkFunctionRequest = z.infer<typeof ChainlinkFunctionRequestSchema>;
+export type ChainlinkFunctionRequest = z.infer<
+  typeof ChainlinkFunctionRequestSchema
+>;
 
 /** Chainlink Functions response */
 export const ChainlinkFunctionResponseSchema = z.object({
@@ -119,7 +125,9 @@ export const ChainlinkFunctionResponseSchema = z.object({
   timestamp: z.number().int().positive(),
 });
 
-export type ChainlinkFunctionResponse = z.infer<typeof ChainlinkFunctionResponseSchema>;
+export type ChainlinkFunctionResponse = z.infer<
+  typeof ChainlinkFunctionResponseSchema
+>;
 
 /**
  * AI Oracle types for LLM integration
@@ -149,13 +157,15 @@ export const AIRiskAssessmentRequestSchema = z.object({
   }),
   /** Analysis parameters */
   parameters: z.object({
-    timeHorizon: z.enum(['1h', '24h', '7d', '30d']).default('24h'),
+    timeHorizon: z.enum(["1h", "24h", "7d", "30d"]).default("24h"),
     confidenceLevel: z.number().min(0).max(1).default(0.95),
     stressTestScenarios: z.array(z.string()).optional(),
   }),
 });
 
-export type AIRiskAssessmentRequest = z.infer<typeof AIRiskAssessmentRequestSchema>;
+export type AIRiskAssessmentRequest = z.infer<
+  typeof AIRiskAssessmentRequestSchema
+>;
 
 /** AI risk assessment response */
 export const AIRiskAssessmentResponseSchema = z.object({
@@ -164,29 +174,33 @@ export const AIRiskAssessmentResponseSchema = z.object({
   /** Confidence in the assessment */
   confidence: z.number().min(0).max(1),
   /** Risk factors identified */
-  riskFactors: z.array(z.object({
-    factor: z.string(),
-    impact: z.enum(['low', 'medium', 'high']),
-    probability: z.number().min(0).max(1),
-    description: z.string(),
-  })),
+  riskFactors: z.array(
+    z.object({
+      factor: z.string(),
+      impact: z.enum(["low", "medium", "high"]),
+      probability: z.number().min(0).max(1),
+      description: z.string(),
+    }),
+  ),
   /** Recommended actions */
-  recommendations: z.array(z.object({
-    action: z.string(),
-    priority: z.enum(['low', 'medium', 'high']),
-    rationale: z.string(),
-  })),
+  recommendations: z.array(
+    z.object({
+      action: z.string(),
+      priority: z.enum(["low", "medium", "high"]),
+      rationale: z.string(),
+    }),
+  ),
   /** Market sentiment analysis */
   sentiment: z.object({
-    overall: z.enum(['bearish', 'neutral', 'bullish']),
+    overall: z.enum(["bearish", "neutral", "bullish"]),
     score: z.number().min(-1).max(1),
     sources: z.array(z.string()).optional(),
   }),
   /** Liquidation probability */
   liquidationProbability: z.object({
-    '1h': z.number().min(0).max(1),
-    '24h': z.number().min(0).max(1),
-    '7d': z.number().min(0).max(1),
+    "1h": z.number().min(0).max(1),
+    "24h": z.number().min(0).max(1),
+    "7d": z.number().min(0).max(1),
   }),
   /** Response metadata */
   metadata: z.object({
@@ -197,19 +211,21 @@ export const AIRiskAssessmentResponseSchema = z.object({
   }),
 });
 
-export type AIRiskAssessmentResponse = z.infer<typeof AIRiskAssessmentResponseSchema>;
+export type AIRiskAssessmentResponse = z.infer<
+  typeof AIRiskAssessmentResponseSchema
+>;
 
 /**
  * Oracle provider types
  */
 export const OracleProviderSchema = z.enum([
-  'chainlink',
-  'band',
-  'dia',
-  'pyth',
-  'tellor',
-  'api3',
-  'switchboard'
+  "chainlink",
+  "band",
+  "dia",
+  "pyth",
+  "tellor",
+  "api3",
+  "switchboard",
 ]);
 
 export type OracleProvider = z.infer<typeof OracleProviderSchema>;
@@ -221,14 +237,17 @@ export const MultiProviderConfigSchema = z.object({
   /** Fallback providers in order of preference */
   fallbacks: z.array(OracleProviderSchema),
   /** Provider-specific configurations */
-  configs: z.record(z.string(), z.object({
-    /** Provider API key or authentication */
-    apiKey: z.string().optional(),
-    /** Provider endpoint URL */
-    endpoint: z.string().url().optional(),
-    /** Provider-specific settings */
-    settings: z.record(z.string(), z.unknown()).optional(),
-  })),
+  configs: z.record(
+    z.string(),
+    z.object({
+      /** Provider API key or authentication */
+      apiKey: z.string().optional(),
+      /** Provider endpoint URL */
+      endpoint: z.string().url().optional(),
+      /** Provider-specific settings */
+      settings: z.record(z.string(), z.unknown()).optional(),
+    }),
+  ),
 });
 
 export type MultiProviderConfig = z.infer<typeof MultiProviderConfigSchema>;
@@ -240,16 +259,18 @@ export const HistoricalPriceDataSchema = z.object({
   /** Asset pair */
   feedId: z.string(),
   /** Price data points */
-  prices: z.array(z.object({
-    timestamp: z.number().int().positive(),
-    price: z.string(),
-    volume: z.string().optional(),
-  })),
+  prices: z.array(
+    z.object({
+      timestamp: z.number().int().positive(),
+      price: z.string(),
+      volume: z.string().optional(),
+    }),
+  ),
   /** Time range */
   timeRange: z.object({
     start: z.number().int().positive(),
     end: z.number().int().positive(),
-    interval: z.enum(['1m', '5m', '15m', '1h', '4h', '1d']),
+    interval: z.enum(["1m", "5m", "15m", "1h", "4h", "1d"]),
   }),
 });
 
@@ -262,7 +283,7 @@ export const VolatilityAnalysisSchema = z.object({
   /** Asset pair */
   feedId: z.string(),
   /** Analysis period */
-  period: z.enum(['1h', '24h', '7d', '30d']),
+  period: z.enum(["1h", "24h", "7d", "30d"]),
   /** Volatility metrics */
   metrics: z.object({
     /** Standard deviation */
@@ -271,9 +292,9 @@ export const VolatilityAnalysisSchema = z.object({
     variance: z.number().nonnegative(),
     /** Value at Risk (VaR) */
     valueAtRisk: z.object({
-      '95%': z.number(),
-      '99%': z.number(),
-      '99.9%': z.number(),
+      "95%": z.number(),
+      "99%": z.number(),
+      "99.9%": z.number(),
     }),
     /** Maximum drawdown */
     maxDrawdown: z.number().min(-1).max(0),
@@ -281,7 +302,7 @@ export const VolatilityAnalysisSchema = z.object({
     sharpeRatio: z.number().optional(),
   }),
   /** Volatility classification */
-  classification: z.enum(['low', 'medium', 'high', 'extreme']),
+  classification: z.enum(["low", "medium", "high", "extreme"]),
   /** Analysis timestamp */
   timestamp: z.number().int().positive(),
 });
@@ -303,9 +324,9 @@ export const CorrelationAnalysisSchema = z.object({
   /** Sample size */
   sampleSize: z.number().int().positive(),
   /** Analysis period */
-  period: z.enum(['1h', '24h', '7d', '30d', '90d']),
+  period: z.enum(["1h", "24h", "7d", "30d", "90d"]),
   /** Correlation strength classification */
-  strength: z.enum(['none', 'weak', 'moderate', 'strong', 'very_strong']),
+  strength: z.enum(["none", "weak", "moderate", "strong", "very_strong"]),
   /** Analysis timestamp */
   timestamp: z.number().int().positive(),
 });
@@ -330,13 +351,15 @@ export const LiquidityAnalysisSchema = z.object({
     liquidityScore: z.number().min(0).max(100),
   }),
   /** Liquidity classification */
-  classification: z.enum(['very_low', 'low', 'medium', 'high', 'very_high']),
+  classification: z.enum(["very_low", "low", "medium", "high", "very_high"]),
   /** Exchange data */
-  exchanges: z.array(z.object({
-    name: z.string(),
-    volume: z.string(),
-    liquidity: z.number().min(0).max(100),
-  })),
+  exchanges: z.array(
+    z.object({
+      name: z.string(),
+      volume: z.string(),
+      liquidity: z.number().min(0).max(100),
+    }),
+  ),
   /** Analysis timestamp */
   timestamp: z.number().int().positive(),
 });

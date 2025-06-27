@@ -1,14 +1,14 @@
 /**
  * IO monad implementation for managing side effects in a pure functional way.
  * Represents a computation that performs side effects when executed.
- * 
+ *
  * The IO type satisfies the monad laws:
  * - Left identity: IO.of(a).flatMap(f) === f(a)
  * - Right identity: m.flatMap(IO.of) === m
  * - Associativity: m.flatMap(f).flatMap(g) === m.flatMap(x => f(x).flatMap(g))
  */
 
-import { Result } from './result';
+import { Result } from "./result";
 
 /**
  * IO monad for encapsulating side effects
@@ -88,7 +88,7 @@ export class IO<T> {
    * @returns IO with function applied
    */
   ap<U>(ioFn: IO<(value: T) => U>): IO<U> {
-    return ioFn.flatMap(fn => this.map(fn));
+    return ioFn.flatMap((fn) => this.map(fn));
   }
 
   /**
@@ -106,7 +106,7 @@ export class IO<T> {
    * @returns Result of this IO
    */
   before<U>(next: IO<U>): IO<T> {
-    return this.flatMap(value => next.map(() => value));
+    return this.flatMap((value) => next.map(() => value));
   }
 
   /**
@@ -115,7 +115,7 @@ export class IO<T> {
    * @returns This IO unchanged
    */
   tap(fn: (value: T) => void): IO<T> {
-    return this.map(value => {
+    return this.map((value) => {
       fn(value);
       return value;
     });
@@ -127,7 +127,7 @@ export class IO<T> {
    * @returns This IO with side effects applied
    */
   tapIO(fn: (value: T) => IO<any>): IO<T> {
-    return this.flatMap(value => fn(value).map(() => value));
+    return this.flatMap((value) => fn(value).map(() => value));
   }
 
   /**
@@ -166,7 +166,9 @@ export class IO<T> {
       try {
         return Result.ok(this.computation());
       } catch (error) {
-        return Result.err(error instanceof Error ? error : new Error(String(error)));
+        return Result.err(
+          error instanceof Error ? error : new Error(String(error)),
+        );
       }
     });
   }
@@ -195,13 +197,13 @@ export class IO<T> {
   retry(maxAttempts: number, delay?: number): IO<T> {
     return new IO(() => {
       let lastError: Error | undefined;
-      
+
       for (let attempt = 0; attempt <= maxAttempts; attempt++) {
         try {
           return this.computation();
         } catch (error) {
           lastError = error instanceof Error ? error : new Error(String(error));
-          
+
           if (attempt < maxAttempts && delay && delay > 0) {
             // Synchronous delay (not recommended for production, but keeps IO pure)
             const start = Date.now();
@@ -211,8 +213,8 @@ export class IO<T> {
           }
         }
       }
-      
-      throw lastError ?? new Error('Maximum retry attempts exceeded');
+
+      throw lastError ?? new Error("Maximum retry attempts exceeded");
     });
   }
 
@@ -227,11 +229,13 @@ export class IO<T> {
       const startTime = Date.now();
       const result = this.computation();
       const elapsed = Date.now() - startTime;
-      
+
       if (elapsed > timeoutMs) {
-        throw timeoutError || new Error(`Operation timed out after ${timeoutMs}ms`);
+        throw (
+          timeoutError || new Error(`Operation timed out after ${timeoutMs}ms`)
+        );
       }
-      
+
       return result;
     });
   }
@@ -256,7 +260,7 @@ export class IO<T> {
    * @returns IO that validates the result
    */
   filter(predicate: (value: T) => boolean, error: Error): IO<T> {
-    return this.map(value => {
+    return this.map((value) => {
       if (!predicate(value)) {
         throw error;
       }
@@ -298,7 +302,7 @@ export class IO<T> {
    * Converts the IO to a string representation
    */
   toString(): string {
-    return 'IO(<computation>)';
+    return "IO(<computation>)";
   }
 }
 
@@ -312,7 +316,7 @@ export const IOUtils = {
    * @returns IO containing array of all results
    */
   sequence<T>(ios: IO<T>[]): IO<T[]> {
-    return new IO(() => ios.map(io => io.run()));
+    return new IO(() => ios.map((io) => io.run()));
   },
 
   /**
@@ -343,7 +347,7 @@ export const IOUtils = {
   race<T>(ios: IO<T>[]): IO<T> {
     return new IO(() => {
       if (ios.length === 0) {
-        throw new Error('Cannot race empty array of IOs');
+        throw new Error("Cannot race empty array of IOs");
       }
       return ios[0]!.run();
     });
@@ -363,11 +367,9 @@ export const IOUtils = {
    * @param fn - Binary function to lift
    * @returns Function that works with IO values
    */
-  lift2<A, B, C>(
-    fn: (a: A, b: B) => C
-  ): (ioA: IO<A>, ioB: IO<B>) => IO<C> {
+  lift2<A, B, C>(fn: (a: A, b: B) => C): (ioA: IO<A>, ioB: IO<B>) => IO<C> {
     return (ioA: IO<A>, ioB: IO<B>) =>
-      ioA.flatMap(a => ioB.map(b => fn(a, b)));
+      ioA.flatMap((a) => ioB.map((b) => fn(a, b)));
   },
 
   /**
@@ -395,10 +397,10 @@ export const IOUtils = {
    */
   readStorage(key: string): IO<string | null> {
     return new IO(() => {
-      if (typeof localStorage !== 'undefined') {
+      if (typeof localStorage !== "undefined") {
         return localStorage.getItem(key);
       }
-      throw new Error('localStorage is not available');
+      throw new Error("localStorage is not available");
     });
   },
 
@@ -410,10 +412,10 @@ export const IOUtils = {
    */
   writeStorage(key: string, value: string): IO<void> {
     return new IO(() => {
-      if (typeof localStorage !== 'undefined') {
+      if (typeof localStorage !== "undefined") {
         localStorage.setItem(key, value);
       } else {
-        throw new Error('localStorage is not available');
+        throw new Error("localStorage is not available");
       }
     });
   },
@@ -467,5 +469,5 @@ export const IOUtils = {
    */
   unless(condition: boolean, io: IO<void>): IO<void> {
     return condition ? IO.unit() : io;
-  }
+  },
 };

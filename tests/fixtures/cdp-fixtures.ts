@@ -11,23 +11,23 @@ import {
   CDPPortfolio,
   CDPAnalytics,
   EnhancedCDP,
-} from '@nyxusd/validators';
+} from "@nyxusd/validators";
 
 /**
  * Sample CDP configurations for testing
  */
 export const sampleCDPs: CDP[] = [
   {
-    id: 'cdp_001',
-    owner: '0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c',
-    status: 'active',
+    id: "cdp_001",
+    owner: "0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c",
+    status: "active",
     collateralValue: 10000,
     debtAmount: 6000n,
     availableCredit: 1000n,
     collateralizationRatio: 166.67,
     healthFactor: 1.67,
     liquidationPrice: 900,
-    riskLevel: 'low',
+    riskLevel: "low",
     stabilityFee: 300, // 3%
     accruedFees: 50n,
     lastFeeUpdate: 1703030400, // 2023-12-20
@@ -35,16 +35,16 @@ export const sampleCDPs: CDP[] = [
     lastUpdated: 1703116800, // 2023-12-21
   },
   {
-    id: 'cdp_002',
-    owner: '0x8ba1f109551bd432803012645hac136c0c8d2d57',
-    status: 'active',
+    id: "cdp_002",
+    owner: "0x8ba1f109551bd432803012645hac136c0c8d2d57",
+    status: "active",
     collateralValue: 5000,
     debtAmount: 4000n,
     availableCredit: 0n,
     collateralizationRatio: 125,
     healthFactor: 1.25,
     liquidationPrice: 1000,
-    riskLevel: 'medium',
+    riskLevel: "medium",
     stabilityFee: 400, // 4%
     accruedFees: 100n,
     lastFeeUpdate: 1703030400,
@@ -52,16 +52,16 @@ export const sampleCDPs: CDP[] = [
     lastUpdated: 1703116800,
   },
   {
-    id: 'cdp_003',
-    owner: '0x5aae7ac79bf69b4e7c3d90b6f7c7f7c7c7c7c7c7',
-    status: 'liquidating',
+    id: "cdp_003",
+    owner: "0x5aae7ac79bf69b4e7c3d90b6f7c7f7c7c7c7c7c7",
+    status: "liquidating",
     collateralValue: 3000,
     debtAmount: 2800n,
     availableCredit: 0n,
     collateralizationRatio: 107.14,
     healthFactor: 0.95,
     liquidationPrice: 1050,
-    riskLevel: 'critical',
+    riskLevel: "critical",
     stabilityFee: 500, // 5%
     accruedFees: 200n,
     lastFeeUpdate: 1703030400,
@@ -69,16 +69,16 @@ export const sampleCDPs: CDP[] = [
     lastUpdated: 1703116800,
   },
   {
-    id: 'cdp_004',
-    owner: '0x1234567890abcdef1234567890abcdef12345678',
-    status: 'closed',
+    id: "cdp_004",
+    owner: "0x1234567890abcdef1234567890abcdef12345678",
+    status: "closed",
     collateralValue: 0,
     debtAmount: 0n,
     availableCredit: 0n,
     collateralizationRatio: 0,
     healthFactor: 0,
     liquidationPrice: 0,
-    riskLevel: 'low',
+    riskLevel: "low",
     stabilityFee: 250,
     accruedFees: 0n,
     lastFeeUpdate: 1703203200, // 2023-12-22
@@ -92,9 +92,9 @@ export const sampleCDPs: CDP[] = [
  */
 export const sampleCreateCDPs: CreateCDP[] = [
   {
-    owner: '0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c',
+    owner: "0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c",
     initialCollateral: {
-      assetAddress: '0xa0b86a33e6e4fa1e4ca98cc37ae6c9e7fab80743',
+      assetAddress: "0xa0b86a33e6e4fa1e4ca98cc37ae6c9e7fab80743",
       amount: 1000000000000000000n, // 1 ETH
     },
     initialDebt: 800000000000000000000n, // 800 USD
@@ -102,14 +102,14 @@ export const sampleCreateCDPs: CreateCDP[] = [
     maxLeverageRatio: 3,
     slippageTolerance: 100, // 1%
     metadata: {
-      purpose: 'liquidity_provision',
-      referrer: '0x1234567890abcdef1234567890abcdef12345678',
+      purpose: "liquidity_provision",
+      referrer: "0x1234567890abcdef1234567890abcdef12345678",
     },
   },
   {
-    owner: '0x8ba1f109551bd432803012645hac136c0c8d2d57',
+    owner: "0x8ba1f109551bd432803012645hac136c0c8d2d57",
     initialCollateral: {
-      assetAddress: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', // WBTC
+      assetAddress: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599", // WBTC
       amount: 50000000n, // 0.5 BTC
     },
     initialDebt: 8000000000000000000000n, // 8000 USD
@@ -124,27 +124,29 @@ export const sampleCreateCDPs: CreateCDP[] = [
  */
 export const sampleCollateralUpdates: CDPCollateralUpdate[] = [
   {
-    cdpId: 'cdp_001',
-    operation: 'deposit',
-    assetAddress: '0xa0b86a33e6e4fa1e4ca98cc37ae6c9e7fab80743',
+    cdpId: "cdp_001",
+    operation: "deposit",
+    assetAddress: "0xa0b86a33e6e4fa1e4ca98cc37ae6c9e7fab80743",
     amount: 500000000000000000n, // 0.5 ETH
     enforceHealthFactor: true,
     minHealthFactorAfter: 1.2,
-    initiator: '0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c',
-    transactionHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+    initiator: "0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c",
+    transactionHash:
+      "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
     blockNumber: 18500000,
     gasUsed: 150000,
     timestamp: 1703116800,
   },
   {
-    cdpId: 'cdp_002',
-    operation: 'withdraw',
-    assetAddress: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+    cdpId: "cdp_002",
+    operation: "withdraw",
+    assetAddress: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
     amount: 10000000n, // 0.1 BTC
     enforceHealthFactor: true,
     minHealthFactorAfter: 1.3,
-    initiator: '0x8ba1f109551bd432803012645hac136c0c8d2d57',
-    transactionHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+    initiator: "0x8ba1f109551bd432803012645hac136c0c8d2d57",
+    transactionHash:
+      "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
     blockNumber: 18500001,
     gasUsed: 180000,
     timestamp: 1703117100,
@@ -156,27 +158,29 @@ export const sampleCollateralUpdates: CDPCollateralUpdate[] = [
  */
 export const sampleDebtUpdates: CDPDebtUpdate[] = [
   {
-    cdpId: 'cdp_001',
-    operation: 'mint',
+    cdpId: "cdp_001",
+    operation: "mint",
     amount: 1000000000000000000000n, // 1000 USD
     enforceCollateralizationRatio: true,
     minCollateralizationRatioAfter: 15000,
     includeAccruedFees: true,
     maxFeeAmount: 50000000000000000000n, // 50 USD max fees
-    initiator: '0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c',
-    transactionHash: '0x9876543210fedcba9876543210fedcba9876543210fedcba9876543210fedcba',
+    initiator: "0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c",
+    transactionHash:
+      "0x9876543210fedcba9876543210fedcba9876543210fedcba9876543210fedcba",
     blockNumber: 18500002,
     gasUsed: 200000,
     timestamp: 1703117400,
   },
   {
-    cdpId: 'cdp_002',
-    operation: 'repay',
+    cdpId: "cdp_002",
+    operation: "repay",
     amount: 500000000000000000000n, // 500 USD
     enforceCollateralizationRatio: false,
     includeAccruedFees: true,
-    initiator: '0x8ba1f109551bd432803012645hac136c0c8d2d57',
-    transactionHash: '0xfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210',
+    initiator: "0x8ba1f109551bd432803012645hac136c0c8d2d57",
+    transactionHash:
+      "0xfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
     blockNumber: 18500003,
     gasUsed: 120000,
     timestamp: 1703117700,
@@ -188,10 +192,10 @@ export const sampleDebtUpdates: CDPDebtUpdate[] = [
  */
 export const sampleLiquidations: CDPLiquidation[] = [
   {
-    cdpId: 'cdp_003',
-    liquidator: '0x9999999999999999999999999999999999999999',
-    cdpOwner: '0x5aae7ac79bf69b4e7c3d90b6f7c7f7c7c7c7c7c7',
-    triggerReason: 'health_factor_below_threshold',
+    cdpId: "cdp_003",
+    liquidator: "0x9999999999999999999999999999999999999999",
+    cdpOwner: "0x5aae7ac79bf69b4e7c3d90b6f7c7f7c7c7c7c7c7",
+    triggerReason: "health_factor_below_threshold",
     healthFactorAtLiquidation: 0.95,
     totalCollateralValue: 3000,
     totalDebtAmount: 2800n,
@@ -199,7 +203,7 @@ export const sampleLiquidations: CDPLiquidation[] = [
     liquidatorReward: 140n, // 5%
     collateralLiquidated: [
       {
-        assetAddress: '0xa0b86a33e6e4fa1e4ca98cc37ae6c9e7fab80743',
+        assetAddress: "0xa0b86a33e6e4fa1e4ca98cc37ae6c9e7fab80743",
         amount: 2000000000000000000n, // 2 ETH
         price: 1500,
         value: 3000,
@@ -207,8 +211,9 @@ export const sampleLiquidations: CDPLiquidation[] = [
     ],
     remainingCollateral: 0n,
     remainingDebt: 0n,
-    finalStatus: 'liquidated',
-    transactionHash: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    finalStatus: "liquidated",
+    transactionHash:
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     blockNumber: 18500004,
     gasUsed: 350000,
     timestamp: 1703118000,
@@ -222,21 +227,21 @@ export const sampleLiquidations: CDPLiquidation[] = [
  */
 export const samplePortfolios: CDPPortfolio[] = [
   {
-    owner: '0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c',
-    cdpIds: ['cdp_001', 'cdp_005', 'cdp_006'],
+    owner: "0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c",
+    cdpIds: ["cdp_001", "cdp_005", "cdp_006"],
     totalCollateralValue: 25000,
     totalDebtAmount: 15000n,
     totalAvailableCredit: 3000n,
     averageHealthFactor: 1.67,
-    portfolioRiskLevel: 'low',
+    portfolioRiskLevel: "low",
     collateralAssetDistribution: [
       {
-        assetAddress: '0xa0b86a33e6e4fa1e4ca98cc37ae6c9e7fab80743',
+        assetAddress: "0xa0b86a33e6e4fa1e4ca98cc37ae6c9e7fab80743",
         value: 15000,
         percentage: 60,
       },
       {
-        assetAddress: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+        assetAddress: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
         value: 10000,
         percentage: 40,
       },
@@ -259,11 +264,11 @@ export const samplePortfolios: CDPPortfolio[] = [
  */
 export const sampleAnalytics: CDPAnalytics[] = [
   {
-    cdpId: 'cdp_001',
+    cdpId: "cdp_001",
     analysisDate: 1703116800,
     profitAndLoss: {
       realizedPnL: 250.75,
-      unrealizedPnL: 125.50,
+      unrealizedPnL: 125.5,
       totalReturn: 376.25,
       totalReturnPercent: 3.76,
     },
@@ -288,9 +293,10 @@ export const sampleAnalytics: CDPAnalytics[] = [
     },
     recommendations: [
       {
-        type: 'increase_collateral',
-        priority: 'low',
-        description: 'Consider adding collateral to improve health factor buffer',
+        type: "increase_collateral",
+        priority: "low",
+        description:
+          "Consider adding collateral to improve health factor buffer",
         estimatedImpact: {
           healthFactorChange: 0.2,
           riskReduction: 10,
@@ -308,8 +314,8 @@ export const sampleEnhancedCDPs: Partial<EnhancedCDP>[] = [
     ...sampleCDPs[0],
     collateralAssets: [
       {
-        assetAddress: '0xa0b86a33e6e4fa1e4ca98cc37ae6c9e7fab80743',
-        owner: '0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c',
+        assetAddress: "0xa0b86a33e6e4fa1e4ca98cc37ae6c9e7fab80743",
+        owner: "0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c",
         lockedAmount: 5000000000000000000n, // 5 ETH
         availableAmount: 1000000000000000000n, // 1 ETH
         totalAmount: 6000000000000000000n, // 6 ETH
@@ -317,7 +323,7 @@ export const sampleEnhancedCDPs: Partial<EnhancedCDP>[] = [
         totalValue: 9600,
         utilizationRatio: 83.33,
         healthFactor: 1.67,
-        riskLevel: 'low',
+        riskLevel: "low",
         lastUpdated: 1703116800,
         priceLastUpdated: 1703116700,
       },
@@ -350,15 +356,15 @@ export const sampleEnhancedCDPs: Partial<EnhancedCDP>[] = [
     },
     optimizationSuggestions: [
       {
-        suggestion: 'Diversify collateral across multiple assets',
-        expectedBenefit: 'Reduce concentration risk by 30%',
-        risk: 'low',
+        suggestion: "Diversify collateral across multiple assets",
+        expectedBenefit: "Reduce concentration risk by 30%",
+        risk: "low",
         implementationCost: 50000000000000000000n, // 50 USD gas costs
       },
       {
-        suggestion: 'Increase collateral buffer during high volatility',
-        expectedBenefit: 'Reduce liquidation risk by 50%',
-        risk: 'low',
+        suggestion: "Increase collateral buffer during high volatility",
+        expectedBenefit: "Reduce liquidation risk by 50%",
+        risk: "low",
       },
     ],
   },
@@ -372,16 +378,16 @@ export const edgeCaseScenarios = {
    * Minimal viable CDP
    */
   minimalCDP: {
-    id: 'cdp_minimal',
-    owner: '0x0000000000000000000000000000000000000001',
-    status: 'active' as const,
+    id: "cdp_minimal",
+    owner: "0x0000000000000000000000000000000000000001",
+    status: "active" as const,
     collateralValue: 150, // Just above minimum
     debtAmount: 100n,
     availableCredit: 0n,
     collateralizationRatio: 150,
     healthFactor: 1.0,
     liquidationPrice: 100,
-    riskLevel: 'critical' as const,
+    riskLevel: "critical" as const,
     stabilityFee: 0,
     accruedFees: 0n,
     lastFeeUpdate: 1703030400,
@@ -393,16 +399,16 @@ export const edgeCaseScenarios = {
    * Maximum scale CDP
    */
   maximalCDP: {
-    id: 'cdp_maximal',
-    owner: '0xffffffffffffffffffffffffffffffffffffffff',
-    status: 'active' as const,
+    id: "cdp_maximal",
+    owner: "0xffffffffffffffffffffffffffffffffffffffff",
+    status: "active" as const,
     collateralValue: 100000000, // 100M USD
     debtAmount: 50000000000000000000000000n, // 50M USD
     availableCredit: 10000000000000000000000000n, // 10M USD
     collateralizationRatio: 200,
     healthFactor: 2.0,
     liquidationPrice: 25000,
-    riskLevel: 'low' as const,
+    riskLevel: "low" as const,
     stabilityFee: 100, // 1%
     accruedFees: 1000000000000000000000n, // 1000 USD
     lastFeeUpdate: 1703030400,
@@ -414,16 +420,16 @@ export const edgeCaseScenarios = {
    * Zero debt CDP (collateral only)
    */
   zeroDebtCDP: {
-    id: 'cdp_zero_debt',
-    owner: '0x1111111111111111111111111111111111111111',
-    status: 'active' as const,
+    id: "cdp_zero_debt",
+    owner: "0x1111111111111111111111111111111111111111",
+    status: "active" as const,
     collateralValue: 5000,
     debtAmount: 0n,
     availableCredit: 0n,
     collateralizationRatio: Infinity,
     healthFactor: Infinity,
     liquidationPrice: 0,
-    riskLevel: 'low' as const,
+    riskLevel: "low" as const,
     stabilityFee: 0,
     accruedFees: 0n,
     lastFeeUpdate: 1703030400,
@@ -435,23 +441,23 @@ export const edgeCaseScenarios = {
    * Multi-asset collateral CDP
    */
   multiAssetCDP: {
-    id: 'cdp_multi_asset',
-    owner: '0x2222222222222222222222222222222222222222',
-    status: 'active' as const,
+    id: "cdp_multi_asset",
+    owner: "0x2222222222222222222222222222222222222222",
+    status: "active" as const,
     collateralValue: 20000,
     debtAmount: 12000n,
     availableCredit: 2000n,
     collateralizationRatio: 166.67,
     healthFactor: 1.67,
     liquidationPrice: 900,
-    riskLevel: 'medium' as const,
+    riskLevel: "medium" as const,
     stabilityFee: 250,
     accruedFees: 75n,
     lastFeeUpdate: 1703030400,
     createdAt: 1703030400,
     lastUpdated: 1703116800,
     metadata: {
-      collateralTypes: ['ETH', 'BTC', 'LINK', 'UNI'],
+      collateralTypes: ["ETH", "BTC", "LINK", "UNI"],
       diversificationScore: 85,
     },
   },
@@ -466,23 +472,23 @@ export const errorScenarios = {
    */
   invalidCDPs: [
     {
-      id: '', // Empty ID
-      owner: '0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c',
-      status: 'active',
+      id: "", // Empty ID
+      owner: "0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c",
+      status: "active",
       collateralValue: 10000,
       debtAmount: 6000n,
     },
     {
-      id: 'cdp_invalid',
-      owner: 'invalid_address', // Invalid address
-      status: 'active',
+      id: "cdp_invalid",
+      owner: "invalid_address", // Invalid address
+      status: "active",
       collateralValue: 10000,
       debtAmount: 6000n,
     },
     {
-      id: 'cdp_negative',
-      owner: '0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c',
-      status: 'active',
+      id: "cdp_negative",
+      owner: "0x742d35cc6601c7a0dc85b9f6d3a6c157aa3b2f5c",
+      status: "active",
       collateralValue: -1000, // Negative collateral
       debtAmount: 6000n,
     },
@@ -493,16 +499,16 @@ export const errorScenarios = {
    */
   liquidationErrors: [
     {
-      cdpId: 'nonexistent_cdp',
-      reason: 'CDP not found',
+      cdpId: "nonexistent_cdp",
+      reason: "CDP not found",
     },
     {
-      cdpId: 'cdp_001',
-      reason: 'CDP not liquidatable (health factor > 1)',
+      cdpId: "cdp_001",
+      reason: "CDP not liquidatable (health factor > 1)",
     },
     {
-      cdpId: 'cdp_closed',
-      reason: 'CDP already closed',
+      cdpId: "cdp_closed",
+      reason: "CDP already closed",
     },
   ],
 };

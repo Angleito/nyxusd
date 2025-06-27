@@ -54,10 +54,10 @@ exports.OracleFeedConfigSchema = zod_1.z.object({
  * Oracle service status
  */
 exports.OracleStatusSchema = zod_1.z.enum([
-    'healthy',
-    'degraded',
-    'critical',
-    'offline'
+    "healthy",
+    "degraded",
+    "critical",
+    "offline",
 ]);
 /**
  * Oracle health information
@@ -114,7 +114,9 @@ exports.OracleResponseSchema = zod_1.z.object({
         /** Data source used */
         source: zod_1.z.string(),
         /** Aggregation method if multiple sources used */
-        aggregationMethod: zod_1.z.enum(['single', 'median', 'weighted_average']).optional(),
+        aggregationMethod: zod_1.z
+            .enum(["single", "median", "weighted_average"])
+            .optional(),
     }),
 });
 /**
@@ -128,7 +130,7 @@ exports.PriceValidationResultSchema = zod_1.z.object({
     /** List of validation issues */
     issues: zod_1.z.array(zod_1.z.object({
         code: zod_1.z.string(),
-        severity: zod_1.z.enum(['info', 'warning', 'error']),
+        severity: zod_1.z.enum(["info", "warning", "error"]),
         message: zod_1.z.string(),
         metadata: zod_1.z.record(zod_1.z.unknown()).optional(),
     })),
@@ -139,11 +141,11 @@ exports.PriceValidationResultSchema = zod_1.z.object({
  * Oracle aggregation types
  */
 exports.AggregationMethodSchema = zod_1.z.enum([
-    'median',
-    'mean',
-    'weighted_average',
-    'trimmed_mean',
-    'mode'
+    "median",
+    "mean",
+    "weighted_average",
+    "trimmed_mean",
+    "mode",
 ]);
 exports.AggregationConfigSchema = zod_1.z.object({
     /** Aggregation method to use */
@@ -163,9 +165,9 @@ exports.AggregationConfigSchema = zod_1.z.object({
  * Circuit breaker types
  */
 exports.CircuitBreakerStateSchema = zod_1.z.enum([
-    'closed', // Normal operation
-    'open', // Circuit breaker triggered
-    'half_open' // Testing if service has recovered
+    "closed", // Normal operation
+    "open", // Circuit breaker triggered
+    "half_open", // Testing if service has recovered
 ]);
 exports.CircuitBreakerConfigSchema = zod_1.z.object({
     /** Failure threshold to open circuit */

@@ -4,10 +4,10 @@
  * Types for multi-oracle aggregation, consensus mechanisms,
  * and data source combination strategies
  */
-import { z } from 'zod';
-import { Either } from 'fp-ts/Either';
-import { Option } from 'fp-ts/Option';
-import { OracleProvider } from './chainlink-types';
+import { z } from "zod";
+import { Either } from "fp-ts/Either";
+import { Option } from "fp-ts/Option";
+import { OracleProvider } from "./chainlink-types";
 /**
  * Aggregation weight schema
  */
@@ -528,7 +528,7 @@ export declare const OraclePerformanceSchema: z.ZodObject<{
     /** Historical statistics */
     historical: z.ZodObject<{
         /** 24h statistics */
-        '24h': z.ZodObject<{
+        "24h": z.ZodObject<{
             successRate: z.ZodNumber;
             avgResponseTime: z.ZodNumber;
             requestCount: z.ZodNumber;
@@ -542,7 +542,7 @@ export declare const OraclePerformanceSchema: z.ZodObject<{
             requestCount: number;
         }>;
         /** 7d statistics */
-        '7d': z.ZodObject<{
+        "7d": z.ZodObject<{
             successRate: z.ZodNumber;
             avgResponseTime: z.ZodNumber;
             requestCount: z.ZodNumber;
@@ -556,7 +556,7 @@ export declare const OraclePerformanceSchema: z.ZodObject<{
             requestCount: number;
         }>;
         /** 30d statistics */
-        '30d': z.ZodObject<{
+        "30d": z.ZodObject<{
             successRate: z.ZodNumber;
             avgResponseTime: z.ZodNumber;
             requestCount: z.ZodNumber;
@@ -570,33 +570,33 @@ export declare const OraclePerformanceSchema: z.ZodObject<{
             requestCount: number;
         }>;
     }, "strip", z.ZodTypeAny, {
-        '24h': {
+        "24h": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
         };
-        '7d': {
+        "7d": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
         };
-        '30d': {
+        "30d": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
         };
     }, {
-        '24h': {
+        "24h": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
         };
-        '7d': {
+        "7d": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
         };
-        '30d': {
+        "30d": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
@@ -617,17 +617,17 @@ export declare const OraclePerformanceSchema: z.ZodObject<{
         avgConfidence: number;
     };
     historical: {
-        '24h': {
+        "24h": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
         };
-        '7d': {
+        "7d": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
         };
-        '30d': {
+        "30d": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
@@ -647,17 +647,17 @@ export declare const OraclePerformanceSchema: z.ZodObject<{
         avgConfidence: number;
     };
     historical: {
-        '24h': {
+        "24h": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
         };
-        '7d': {
+        "7d": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
         };
-        '30d': {
+        "30d": {
             successRate: number;
             avgResponseTime: number;
             requestCount: number;
@@ -678,7 +678,7 @@ export type OutlierDetector = (prices: Array<{
     provider: string;
     price: bigint;
     confidence: number;
-}>, method: 'zscore' | 'iqr' | 'mad' | 'isolation_forest', threshold: number) => Array<{
+}>, method: "zscore" | "iqr" | "mad" | "isolation_forest", threshold: number) => Array<{
     provider: string;
     isOutlier: boolean;
     score: number;

@@ -1,19 +1,19 @@
 /**
  * Midnight Protocol Utilities Library
- * 
+ *
  * A comprehensive utility library for interacting with the Midnight blockchain protocol.
  * Provides utilities for DUST token operations, Compact smart contract interactions,
  * and zero-knowledge proof generation and verification.
- * 
+ *
  * @version 1.0.0
  * @author Midnight Protocol Team
  * @license MIT
  */
 
 // Import modules for the combined utility object
-import * as DustModule from './dust';
-import * as CompactModule from './compact';
-import * as ProofModule from './proof';
+import * as DustModule from "./dust";
+import * as CompactModule from "./compact";
+import * as ProofModule from "./proof";
 
 // DUST Token Utilities
 export {
@@ -39,7 +39,7 @@ export {
 
   // DUST utilities
   DustUtils,
-} from './dust';
+} from "./dust";
 
 // Compact Language Helpers
 export {
@@ -67,11 +67,11 @@ export {
 
   // Compact utilities
   CompactUtils,
-} from './compact';
+} from "./compact";
 
 // Zero-Knowledge Proof Utilities
 export {
-  // Types and enums  
+  // Types and enums
   ProofSystem,
   CircuitType,
   type ProofError,
@@ -94,15 +94,15 @@ export {
 
   // Proof utilities
   ProofUtils,
-} from './proof';
+} from "./proof";
 
 // Re-export Result type from fp-utils for convenience
-export { Result } from '@nyxusd/fp-utils';
+export { Result } from "@nyxusd/fp-utils";
 
 /**
  * Library version and metadata
  */
-export const MIDNIGHT_UTILS_VERSION = '1.0.0';
+export const MIDNIGHT_UTILS_VERSION = "1.0.0";
 
 /**
  * Supported Midnight protocol features
@@ -133,7 +133,7 @@ export const MidnightUtils = {
     convert: DustModule.convertDustDenomination,
     utils: DustModule.DustUtils,
   },
-  
+
   compact: {
     types: CompactModule.CompactType,
     validateAddress: CompactModule.validateCompactAddress,
@@ -144,7 +144,7 @@ export const MidnightUtils = {
     createMockABI: CompactModule.createMockCompactABI,
     utils: CompactModule.CompactUtils,
   },
-  
+
   proof: {
     systems: ProofModule.ProofSystem,
     circuits: ProofModule.CircuitType,
@@ -154,7 +154,7 @@ export const MidnightUtils = {
     validateParameters: ProofModule.validateProofParameters,
     utils: ProofModule.ProofUtils,
   },
-  
+
   version: MIDNIGHT_UTILS_VERSION,
   features: SUPPORTED_FEATURES,
 } as const;

@@ -1,12 +1,12 @@
 /**
  * Performance Optimization and Caching Layers
- * 
+ *
  * Provides performance optimizations for oracle operations including
  * intelligent caching, request batching, and response compression
  */
 
-import { Either, left, right } from 'fp-ts/Either';
-import { Option, some, none, isSome } from 'fp-ts/Option';
+import { Either, left, right } from "fp-ts/Either";
+import { Option, some, none, isSome } from "fp-ts/Option";
 
 /**
  * Cache Configuration
@@ -16,7 +16,7 @@ export interface CacheConfig {
   readonly defaultTtl: number;
   readonly compressionEnabled: boolean;
   readonly persistToDisk: boolean;
-  readonly evictionStrategy: 'lru' | 'lfu' | 'ttl' | 'fifo';
+  readonly evictionStrategy: "lru" | "lfu" | "ttl" | "fifo";
 }
 
 /**
@@ -80,12 +80,12 @@ export class HighPerformanceCache<T> {
    */
   get(key: string): Option<T> {
     const startTime = Date.now();
-    this.updateMetrics('totalRequests', this.metrics.totalRequests + 1);
+    this.updateMetrics("totalRequests", this.metrics.totalRequests + 1);
 
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
-      this.updateMetrics('cacheMisses', this.metrics.cacheMisses + 1);
+      this.updateMetrics("cacheMisses", this.metrics.cacheMisses + 1);
       this.updateResponseTime(Date.now() - startTime);
       return none;
     }
@@ -94,7 +94,7 @@ export class HighPerformanceCache<T> {
     const now = Date.now();
     if (now - entry.timestamp > entry.ttl * 1000) {
       this.cache.delete(key);
-      this.updateMetrics('cacheMisses', this.metrics.cacheMisses + 1);
+      this.updateMetrics("cacheMisses", this.metrics.cacheMisses + 1);
       this.updateResponseTime(Date.now() - startTime);
       return none;
     }
@@ -107,7 +107,7 @@ export class HighPerformanceCache<T> {
     };
     this.cache.set(key, updatedEntry);
 
-    this.updateMetrics('cacheHits', this.metrics.cacheHits + 1);
+    this.updateMetrics("cacheHits", this.metrics.cacheHits + 1);
     this.updateResponseTime(Date.now() - startTime);
 
     return some(this.decompressIfNeeded(entry.data, entry.compressed));
@@ -119,7 +119,7 @@ export class HighPerformanceCache<T> {
   set(key: string, value: T, ttl?: number): void {
     const now = Date.now();
     const effectiveTtl = ttl || this.config.defaultTtl;
-    
+
     // Compress data if enabled
     const { data, compressed, size } = this.compressIfNeeded(value);
 
@@ -147,8 +147,8 @@ export class HighPerformanceCache<T> {
    */
   getBatch(keys: readonly string[]): Map<string, T> {
     const results = new Map<string, T>();
-    
-    keys.forEach(key => {
+
+    keys.forEach((key) => {
       const result = this.get(key);
       if (isSome(result)) {
         results.set(key, result.value);
@@ -194,25 +194,25 @@ export class HighPerformanceCache<T> {
 
   private evictEntries(count: number): void {
     const entries = Array.from(this.cache.entries());
-    
+
     let toEvict: string[] = [];
 
     switch (this.config.evictionStrategy) {
-      case 'lru':
+      case "lru":
         toEvict = entries
           .sort(([, a], [, b]) => a.lastAccessed - b.lastAccessed)
           .slice(0, count)
           .map(([key]) => key);
         break;
 
-      case 'lfu':
+      case "lfu":
         toEvict = entries
           .sort(([, a], [, b]) => a.accessCount - b.accessCount)
           .slice(0, count)
           .map(([key]) => key);
         break;
 
-      case 'ttl':
+      case "ttl":
         const now = Date.now();
         toEvict = entries
           .sort(([, a], [, b]) => {
@@ -224,7 +224,7 @@ export class HighPerformanceCache<T> {
           .map(([key]) => key);
         break;
 
-      case 'fifo':
+      case "fifo":
         toEvict = entries
           .sort(([, a], [, b]) => a.timestamp - b.timestamp)
           .slice(0, count)
@@ -232,12 +232,16 @@ export class HighPerformanceCache<T> {
         break;
     }
 
-    toEvict.forEach(key => this.cache.delete(key));
-    this.updateMetrics('evictions', this.metrics.evictions + toEvict.length);
+    toEvict.forEach((key) => this.cache.delete(key));
+    this.updateMetrics("evictions", this.metrics.evictions + toEvict.length);
     this.updateMemoryUsage();
   }
 
-  private compressIfNeeded(data: T): { data: T; compressed: boolean; size: number } {
+  private compressIfNeeded(data: T): {
+    data: T;
+    compressed: boolean;
+    size: number;
+  } {
     if (!this.config.compressionEnabled) {
       return {
         data,
@@ -249,14 +253,15 @@ export class HighPerformanceCache<T> {
     // Simple compression simulation - in production would use actual compression
     const serialized = JSON.stringify(data);
     const originalSize = serialized.length;
-    
-    if (originalSize > 1000) { // Only compress larger objects
+
+    if (originalSize > 1000) {
+      // Only compress larger objects
       // Simulate compression (in reality would use gzip, lz4, etc.)
       const compressedData = data; // Mock - would be actual compressed data
       const compressedSize = Math.floor(originalSize * 0.7); // Assume 30% compression
-      
+
       this.updateCompressionRatio(originalSize, compressedSize);
-      
+
       return {
         data: compressedData,
         compressed: true,
@@ -292,23 +297,25 @@ export class HighPerformanceCache<T> {
   private updateResponseTime(responseTime: number): void {
     const total = this.metrics.totalRequests;
     this.updateMetrics(
-      'averageResponseTime',
-      (this.metrics.averageResponseTime * (total - 1) + responseTime) / total
+      "averageResponseTime",
+      (this.metrics.averageResponseTime * (total - 1) + responseTime) / total,
     );
   }
 
   private updateCompressionRatio(original: number, compressed: number): void {
     const ratio = compressed / original;
     this.updateMetrics(
-      'compressionRatio',
-      (this.metrics.compressionRatio + ratio) / 2
+      "compressionRatio",
+      (this.metrics.compressionRatio + ratio) / 2,
     );
   }
 
   private updateMemoryUsage(): void {
-    const totalSize = Array.from(this.cache.values())
-      .reduce((sum, entry) => sum + entry.size, 0);
-    this.updateMetrics('memoryUsage', totalSize);
+    const totalSize = Array.from(this.cache.values()).reduce(
+      (sum, entry) => sum + entry.size,
+      0,
+    );
+    this.updateMetrics("memoryUsage", totalSize);
   }
 }
 
@@ -316,20 +323,25 @@ export class HighPerformanceCache<T> {
  * Request Batcher for optimizing multiple oracle requests
  */
 export class RequestBatcher<TRequest, TResponse> {
-  private readonly pendingRequests = new Map<string, {
-    request: TRequest;
-    resolve: (value: TResponse) => void;
-    reject: (error: any) => void;
-    timestamp: number;
-    priority: number;
-  }>();
+  private readonly pendingRequests = new Map<
+    string,
+    {
+      request: TRequest;
+      resolve: (value: TResponse) => void;
+      reject: (error: any) => void;
+      timestamp: number;
+      priority: number;
+    }
+  >();
 
   private readonly config: BatchConfig;
   private batchTimer: NodeJS.Timeout | null = null;
 
   constructor(
     config: BatchConfig,
-    private readonly batchHandler: (requests: TRequest[]) => Promise<TResponse[]>
+    private readonly batchHandler: (
+      requests: TRequest[],
+    ) => Promise<TResponse[]>,
   ) {
     this.config = config;
   }
@@ -340,7 +352,7 @@ export class RequestBatcher<TRequest, TResponse> {
   async addRequest(
     key: string,
     request: TRequest,
-    priority: number = 0
+    priority: number = 0,
   ): Promise<TResponse> {
     return new Promise<TResponse>((resolve, reject) => {
       this.pendingRequests.set(key, {
@@ -352,8 +364,10 @@ export class RequestBatcher<TRequest, TResponse> {
       });
 
       // Auto-flush if high priority or batch is full
-      if (priority >= this.config.priorityThreshold || 
-          this.pendingRequests.size >= this.config.maxBatchSize) {
+      if (
+        priority >= this.config.priorityThreshold ||
+        this.pendingRequests.size >= this.config.maxBatchSize
+      ) {
         this.flush();
       } else if (this.config.enableAutoFlush && !this.batchTimer) {
         // Set timer for auto-flush
@@ -378,24 +392,24 @@ export class RequestBatcher<TRequest, TResponse> {
     }
 
     const requests = Array.from(this.pendingRequests.values());
-    const requestData = requests.map(r => r.request);
+    const requestData = requests.map((r) => r.request);
 
     this.pendingRequests.clear();
 
     try {
       const responses = await this.batchHandler(requestData);
-      
+
       // Resolve individual promises
       requests.forEach((req, index) => {
         if (index < responses.length) {
           req.resolve(responses[index]);
         } else {
-          req.reject(new Error('Response not found for request'));
+          req.reject(new Error("Response not found for request"));
         }
       });
     } catch (error) {
       // Reject all pending requests
-      requests.forEach(req => req.reject(error));
+      requests.forEach((req) => req.reject(error));
     }
   }
 
@@ -415,7 +429,7 @@ export const DEFAULT_CACHE_CONFIG: CacheConfig = {
   defaultTtl: 300, // 5 minutes
   compressionEnabled: true,
   persistToDisk: false,
-  evictionStrategy: 'lru',
+  evictionStrategy: "lru",
 };
 
 export const HIGH_PERFORMANCE_CACHE_CONFIG: CacheConfig = {
@@ -423,7 +437,7 @@ export const HIGH_PERFORMANCE_CACHE_CONFIG: CacheConfig = {
   defaultTtl: 60, // 1 minute
   compressionEnabled: true,
   persistToDisk: true,
-  evictionStrategy: 'lfu',
+  evictionStrategy: "lfu",
 };
 
 export const DEFAULT_BATCH_CONFIG: BatchConfig = {
@@ -445,12 +459,12 @@ export class PerformanceMonitor {
   record(metric: string, value: number): void {
     const values = this.metrics.get(metric) || [];
     values.push(value);
-    
+
     // Keep only last 100 measurements
     if (values.length > 100) {
       values.shift();
     }
-    
+
     this.metrics.set(metric, values);
   }
 
@@ -459,7 +473,9 @@ export class PerformanceMonitor {
    */
   getAverage(metric: string): number {
     const values = this.metrics.get(metric) || [];
-    return values.length > 0 ? values.reduce((sum, v) => sum + v, 0) / values.length : 0;
+    return values.length > 0
+      ? values.reduce((sum, v) => sum + v, 0) / values.length
+      : 0;
   }
 
   /**
@@ -478,8 +494,9 @@ export class PerformanceMonitor {
    * Get all metrics summary
    */
   getSummary(): Record<string, { avg: number; p95: number; p99: number }> {
-    const summary: Record<string, { avg: number; p95: number; p99: number }> = {};
-    
+    const summary: Record<string, { avg: number; p95: number; p99: number }> =
+      {};
+
     this.metrics.forEach((values, metric) => {
       summary[metric] = {
         avg: this.getAverage(metric),

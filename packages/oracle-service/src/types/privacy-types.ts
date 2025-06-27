@@ -1,21 +1,21 @@
 /**
  * Privacy-Preserving Oracle Types
- * 
+ *
  * Type definitions for zero-knowledge oracle proofs and privacy-preserving
  * price data consumption using Midnight Protocol integration
  */
 
-import { Either } from 'fp-ts/Either';
-import { z } from 'zod';
+import { Either } from "fp-ts/Either";
+import { z } from "zod";
 
 /**
  * Zero-Knowledge Proof Schema for Oracle Data
  */
 export const ZKProofSchema = z.object({
-  proof: z.string().min(1, 'Proof cannot be empty'),
+  proof: z.string().min(1, "Proof cannot be empty"),
   publicInputs: z.array(z.string()),
-  verificationKey: z.string().min(1, 'Verification key required'),
-  circuit: z.string().min(1, 'Circuit identifier required'),
+  verificationKey: z.string().min(1, "Verification key required"),
+  circuit: z.string().min(1, "Circuit identifier required"),
   timestamp: z.number().int().positive(),
 });
 
@@ -26,7 +26,7 @@ export type ZKProof = z.infer<typeof ZKProofSchema>;
  */
 export const PrivatePriceDataSchema = z.object({
   feedId: z.string().min(1),
-  encryptedPrice: z.string().min(1, 'Encrypted price required'),
+  encryptedPrice: z.string().min(1, "Encrypted price required"),
   zkProof: ZKProofSchema,
   priceRange: z.object({
     min: z.bigint(),
@@ -34,8 +34,8 @@ export const PrivatePriceDataSchema = z.object({
   }),
   confidence: z.number().min(0).max(100),
   timestamp: z.number().int().positive(),
-  nonce: z.string().min(1, 'Nonce required for encryption'),
-  commitment: z.string().min(1, 'Price commitment required'),
+  nonce: z.string().min(1, "Nonce required for encryption"),
+  commitment: z.string().min(1, "Price commitment required"),
 });
 
 export type PrivatePriceData = z.infer<typeof PrivatePriceDataSchema>;
@@ -45,12 +45,16 @@ export type PrivatePriceData = z.infer<typeof PrivatePriceDataSchema>;
  */
 export const PrivacyConfigSchema = z.object({
   enableZKProofs: z.boolean().default(true),
-  encryptionAlgorithm: z.enum(['aes-256-gcm', 'chacha20-poly1305']).default('aes-256-gcm'),
-  zkCircuit: z.enum(['groth16', 'plonk', 'stark']).default('groth16'),
-  commitmentScheme: z.enum(['pedersen', 'blake2s', 'poseidon']).default('pedersen'),
-  privacyLevel: z.enum(['standard', 'high', 'maximum']).default('standard'),
+  encryptionAlgorithm: z
+    .enum(["aes-256-gcm", "chacha20-poly1305"])
+    .default("aes-256-gcm"),
+  zkCircuit: z.enum(["groth16", "plonk", "stark"]).default("groth16"),
+  commitmentScheme: z
+    .enum(["pedersen", "blake2s", "poseidon"])
+    .default("pedersen"),
+  privacyLevel: z.enum(["standard", "high", "maximum"]).default("standard"),
   keyDerivation: z.object({
-    algorithm: z.enum(['pbkdf2', 'scrypt', 'argon2']).default('pbkdf2'),
+    algorithm: z.enum(["pbkdf2", "scrypt", "argon2"]).default("pbkdf2"),
     iterations: z.number().int().positive().default(100000),
     keyLength: z.number().int().positive().default(32),
   }),
@@ -63,7 +67,7 @@ export type PrivacyConfig = z.infer<typeof PrivacyConfigSchema>;
  */
 export const PrivateOracleQuerySchema = z.object({
   feedId: z.string().min(1),
-  requesterPublicKey: z.string().min(1, 'Requester public key required'),
+  requesterPublicKey: z.string().min(1, "Requester public key required"),
   priceConstraints: z.object({
     minPrice: z.bigint().optional(),
     maxPrice: z.bigint().optional(),
@@ -74,7 +78,7 @@ export const PrivateOracleQuerySchema = z.object({
     encryptResponse: z.boolean().default(true),
     anonymizeSource: z.boolean().default(false),
   }),
-  nonce: z.string().min(1, 'Query nonce required'),
+  nonce: z.string().min(1, "Query nonce required"),
 });
 
 export type PrivateOracleQuery = z.infer<typeof PrivateOracleQuerySchema>;
@@ -85,11 +89,11 @@ export type PrivateOracleQuery = z.infer<typeof PrivateOracleQuerySchema>;
 export interface PrivateOracleResponse {
   readonly data: PrivatePriceData;
   readonly metadata: {
-    readonly source: 'midnight' | 'chainlink-private' | 'aggregated-private';
+    readonly source: "midnight" | "chainlink-private" | "aggregated-private";
     readonly responseTime: number;
-    readonly privacyLevel: 'standard' | 'high' | 'maximum';
+    readonly privacyLevel: "standard" | "high" | "maximum";
     readonly proofVerified: boolean;
-    readonly encryptionStatus: 'encrypted' | 'plaintext';
+    readonly encryptionStatus: "encrypted" | "plaintext";
   };
 }
 
@@ -112,7 +116,7 @@ export interface IPrivacyOracleService {
    * Fetch price data with privacy preservation
    */
   readonly fetchPrivatePrice: (
-    query: PrivateOracleQuery
+    query: PrivateOracleQuery,
   ) => Promise<Either<PrivacyOracleError, PrivateOracleResponse>>;
 
   /**
@@ -120,7 +124,7 @@ export interface IPrivacyOracleService {
    */
   readonly verifyZKProof: (
     proof: ZKProof,
-    publicInputs: readonly string[]
+    publicInputs: readonly string[],
   ) => Promise<Either<PrivacyOracleError, boolean>>;
 
   /**
@@ -128,7 +132,7 @@ export interface IPrivacyOracleService {
    */
   readonly generatePriceCommitment: (
     price: bigint,
-    nonce: string
+    nonce: string,
   ) => Promise<Either<PrivacyOracleError, string>>;
 
   /**
@@ -137,7 +141,7 @@ export interface IPrivacyOracleService {
   readonly decryptPriceData: (
     encryptedData: string,
     privateKey: string,
-    nonce: string
+    nonce: string,
   ) => Promise<Either<PrivacyOracleError, bigint>>;
 
   /**
@@ -151,16 +155,16 @@ export interface IPrivacyOracleService {
  */
 export const PrivacyOracleErrorSchema = z.object({
   code: z.enum([
-    'ZK_PROOF_GENERATION_FAILED',
-    'ZK_PROOF_VERIFICATION_FAILED',
-    'ENCRYPTION_FAILED',
-    'DECRYPTION_FAILED',
-    'COMMITMENT_GENERATION_FAILED',
-    'INVALID_PRIVACY_CONFIG',
-    'CIRCUIT_NOT_FOUND',
-    'KEY_DERIVATION_FAILED',
-    'PRIVACY_VIOLATION',
-    'INSUFFICIENT_ANONYMITY',
+    "ZK_PROOF_GENERATION_FAILED",
+    "ZK_PROOF_VERIFICATION_FAILED",
+    "ENCRYPTION_FAILED",
+    "DECRYPTION_FAILED",
+    "COMMITMENT_GENERATION_FAILED",
+    "INVALID_PRIVACY_CONFIG",
+    "CIRCUIT_NOT_FOUND",
+    "KEY_DERIVATION_FAILED",
+    "PRIVACY_VIOLATION",
+    "INSUFFICIENT_ANONYMITY",
   ]),
   message: z.string().min(1),
   details: z.record(z.unknown()).optional(),
@@ -213,16 +217,16 @@ export interface PrivacyMetrics {
 export const PrivacyAuditLogSchema = z.object({
   timestamp: z.number().int().positive(),
   operation: z.enum([
-    'PRIVATE_QUERY',
-    'ZK_PROOF_GENERATION',
-    'ZK_PROOF_VERIFICATION', 
-    'ENCRYPTION',
-    'DECRYPTION',
-    'COMMITMENT_GENERATION',
+    "PRIVATE_QUERY",
+    "ZK_PROOF_GENERATION",
+    "ZK_PROOF_VERIFICATION",
+    "ENCRYPTION",
+    "DECRYPTION",
+    "COMMITMENT_GENERATION",
   ]),
   feedId: z.string(),
   requesterHash: z.string().min(1), // Hashed requester identity
-  privacyLevel: z.enum(['standard', 'high', 'maximum']),
+  privacyLevel: z.enum(["standard", "high", "maximum"]),
   success: z.boolean(),
   errorCode: z.string().optional(),
   proofVerificationTime: z.number().optional(),

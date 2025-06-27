@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Wallet, CheckCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Wallet, CheckCircle } from "lucide-react";
 
 interface WalletConnectionStepProps {
   onComplete: (data?: any) => void;
@@ -13,8 +13,8 @@ export const WalletConnectionStep: React.FC<WalletConnectionStepProps> = ({
   const [isConnected, setIsConnected] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const mockWalletAddress = '0x742d...8963';
-  
+  const mockWalletAddress = "0x742d...8963";
+
   const mockWalletData = {
     address: mockWalletAddress,
     balances: {
@@ -26,14 +26,14 @@ export const WalletConnectionStep: React.FC<WalletConnectionStepProps> = ({
 
   const handleConnect = async () => {
     setIsConnecting(true);
-    
+
     // Simulate connection delay
-    await new Promise(resolve => setTimeout(resolve, 2500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 2500));
+
     setIsConnecting(false);
     setIsConnected(true);
     setShowSuccess(true);
-    
+
     // Auto-advance after showing success with wallet data
     setTimeout(() => {
       onComplete({ connected: true, walletData: mockWalletData });
@@ -63,6 +63,7 @@ export const WalletConnectionStep: React.FC<WalletConnectionStepProps> = ({
             key="connect-button"
             onClick={handleConnect}
             disabled={isConnecting}
+            data-action="connect-wallet"
             whileHover={{ scale: isConnecting ? 1 : 1.02 }}
             whileTap={{ scale: isConnecting ? 1 : 0.98 }}
             className={`
@@ -70,7 +71,7 @@ export const WalletConnectionStep: React.FC<WalletConnectionStepProps> = ({
               bg-gradient-to-r from-purple-600 to-purple-700
               hover:from-purple-700 hover:to-purple-800
               transition-all duration-200
-              ${isConnecting ? 'opacity-75 cursor-not-allowed' : ''}
+              ${isConnecting ? "opacity-75 cursor-not-allowed" : ""}
               flex items-center justify-center gap-3
             `}
           >
@@ -103,11 +104,11 @@ export const WalletConnectionStep: React.FC<WalletConnectionStepProps> = ({
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ 
+                  transition={{
                     type: "spring",
                     stiffness: 500,
                     damping: 15,
-                    delay: 0.1
+                    delay: 0.1,
                   }}
                 >
                   <CheckCircle className="w-6 h-6 text-green-500" />

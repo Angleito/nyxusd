@@ -1,15 +1,15 @@
 /**
  * Core Oracle Types
- * 
+ *
  * Functional programming-based type definitions for oracle operations
  * following the established NYXUSD patterns with immutable data structures
  */
 
-import { z } from 'zod';
-import { Either } from 'fp-ts/Either';
-import { Option } from 'fp-ts/Option';
-import { IO } from 'fp-ts/IO';
-import type { OracleError, ValidationError } from '../errors/oracle-errors';
+import { z } from "zod";
+import { Either } from "fp-ts/Either";
+import { Option } from "fp-ts/Option";
+import { IO } from "fp-ts/IO";
+import type { OracleError, ValidationError } from "../errors/oracle-errors";
 
 /**
  * Base oracle data structure
@@ -63,10 +63,10 @@ export type OracleFeedConfig = z.infer<typeof OracleFeedConfigSchema>;
  * Oracle service status
  */
 export const OracleStatusSchema = z.enum([
-  'healthy',
-  'degraded',
-  'critical',
-  'offline'
+  "healthy",
+  "degraded",
+  "critical",
+  "offline",
 ]);
 
 export type OracleStatus = z.infer<typeof OracleStatusSchema>;
@@ -78,13 +78,16 @@ export const OracleHealthSchema = z.object({
   /** Overall oracle service status */
   status: OracleStatusSchema,
   /** Individual feed statuses */
-  feeds: z.record(z.string(), z.object({
-    status: OracleStatusSchema,
-    lastUpdate: z.number().int().positive(),
-    staleness: z.number().int().nonnegative(),
-    confidence: z.number().min(0).max(100),
-    errorCount: z.number().int().nonnegative(),
-  })),
+  feeds: z.record(
+    z.string(),
+    z.object({
+      status: OracleStatusSchema,
+      lastUpdate: z.number().int().positive(),
+      staleness: z.number().int().nonnegative(),
+      confidence: z.number().min(0).max(100),
+      errorCount: z.number().int().nonnegative(),
+    }),
+  ),
   /** System-wide metrics */
   metrics: z.object({
     totalFeeds: z.number().int().nonnegative(),
@@ -132,7 +135,9 @@ export const OracleResponseSchema = z.object({
     /** Data source used */
     source: z.string(),
     /** Aggregation method if multiple sources used */
-    aggregationMethod: z.enum(['single', 'median', 'weighted_average']).optional(),
+    aggregationMethod: z
+      .enum(["single", "median", "weighted_average"])
+      .optional(),
   }),
 });
 
@@ -147,12 +152,14 @@ export const PriceValidationResultSchema = z.object({
   /** Validation score (0-100) */
   score: z.number().min(0).max(100),
   /** List of validation issues */
-  issues: z.array(z.object({
-    code: z.string(),
-    severity: z.enum(['info', 'warning', 'error']),
-    message: z.string(),
-    metadata: z.record(z.unknown()).optional(),
-  })),
+  issues: z.array(
+    z.object({
+      code: z.string(),
+      severity: z.enum(["info", "warning", "error"]),
+      message: z.string(),
+      metadata: z.record(z.unknown()).optional(),
+    }),
+  ),
   /** Validated price data (if valid) */
   validatedData: OraclePriceDataSchema.optional(),
 });
@@ -170,13 +177,17 @@ export type OracleOperation<A> = IO<Either<OracleError, A>>;
 export type OracleQuery<A> = IO<Option<A>>;
 
 /** Oracle price fetch operation */
-export type PriceFetch = (query: OracleQueryData) => OracleOperation<OracleResponse>;
+export type PriceFetch = (
+  query: OracleQueryData,
+) => OracleOperation<OracleResponse>;
 
 /** Oracle health check operation */
 export type HealthCheck = () => OracleOperation<OracleHealth>;
 
 /** Price validation operation */
-export type PriceValidator = (data: OraclePriceData) => Either<ValidationError, PriceValidationResult>;
+export type PriceValidator = (
+  data: OraclePriceData,
+) => Either<ValidationError, PriceValidationResult>;
 
 /**
  * Oracle service interface
@@ -184,16 +195,16 @@ export type PriceValidator = (data: OraclePriceData) => Either<ValidationError, 
 export interface IOracleService {
   /** Fetch current price data */
   readonly fetchPrice: PriceFetch;
-  
+
   /** Check oracle service health */
   readonly checkHealth: HealthCheck;
-  
+
   /** Validate price data */
   readonly validatePrice: PriceValidator;
-  
+
   /** Get supported feed IDs */
   readonly getSupportedFeeds: () => readonly string[];
-  
+
   /** Get feed configuration */
   readonly getFeedConfig: (feedId: string) => Option<OracleFeedConfig>;
 }
@@ -202,11 +213,11 @@ export interface IOracleService {
  * Oracle aggregation types
  */
 export const AggregationMethodSchema = z.enum([
-  'median',
-  'mean',
-  'weighted_average',
-  'trimmed_mean',
-  'mode'
+  "median",
+  "mean",
+  "weighted_average",
+  "trimmed_mean",
+  "mode",
 ]);
 
 export type AggregationMethod = z.infer<typeof AggregationMethodSchema>;
@@ -232,9 +243,9 @@ export type AggregationConfig = z.infer<typeof AggregationConfigSchema>;
  * Circuit breaker types
  */
 export const CircuitBreakerStateSchema = z.enum([
-  'closed',    // Normal operation
-  'open',      // Circuit breaker triggered
-  'half_open'  // Testing if service has recovered
+  "closed", // Normal operation
+  "open", // Circuit breaker triggered
+  "half_open", // Testing if service has recovered
 ]);
 
 export type CircuitBreakerState = z.infer<typeof CircuitBreakerStateSchema>;
@@ -255,4 +266,4 @@ export const CircuitBreakerConfigSchema = z.object({
 export type CircuitBreakerConfig = z.infer<typeof CircuitBreakerConfigSchema>;
 
 // Re-export common error types
-export type { OracleError, ValidationError } from '../errors/oracle-errors';
+export type { OracleError, ValidationError } from "../errors/oracle-errors";

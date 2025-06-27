@@ -1,0 +1,149 @@
+version: "3.8"
+
+services:
+  # Test Database
+  test-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: nyxusd_test
+    volumes:
+      - test-db-data:/var/lib/postgresql/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Test Redis
+  test-redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - test-redis-data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # API Test Container
+  api-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    environment:
+      NODE_ENV: test
+      PORT: 8080
+      REDIS_URL: redis://test-redis:6379
+      DATABASE_URL: postgresql://test:test@test-db:5432/nyxusd_test
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-mock}
+      USE_MOCK_AI: ${USE_MOCK_AI:-true}
+      LOG_LEVEL: debug
+    volumes:
+      - ./api:/app/api
+      - ./tests:/app/tests
+      - test-logs:/app/logs
+    depends_on:
+      - test-db
+      - test-redis
+    command: |
+      sh -c "
+        echo '🚀 Starting API tests with enhanced logging...'
+        npm run test:integration -- --verbose
+        npm run test:property -- --verbose
+      "
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        labels: "service=api-test"
+
+  # Frontend Test Container
+  frontend-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: test
+      REACT_APP_API_URL: http://api-test:8080
+      REACT_APP_USE_MOCK_AI: ${USE_MOCK_AI:-true}
+    volumes:
+      - ./frontend:/app/frontend
+      - ./tests:/app/tests
+      - test-logs:/app/logs
+    command: |
+      sh -c "
+        echo '🎨 Starting frontend tests...'
+        cd frontend && npm test -- --watchAll=false
+      "
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        labels: "service=frontend-test"
+
+  # Log Aggregator
+  log-aggregator:
+    image: datalust/seq:latest
+    environment:
+      ACCEPT_EULA: Y
+    ports:
+      - "5341:80"
+    volumes:
+      - seq-data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Test Runner with Property Tests
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: test
+      LOG_LEVEL: debug
+    volumes:
+      - ./:/app
+      - test-logs:/app/logs
+      - /app/node_modules
+    command: |
+      sh -c "
+        echo '🧪 Running comprehensive test suite...'
+        echo '📊 Property-based tests for AI service...'
+        npm run test tests/property/ai-service-properties.test.ts -- --verbose
+        
+        echo '🔗 Integration tests for AI endpoints...'
+        npm run test tests/integration/ai-endpoints.test.ts -- --verbose
+        
+        echo '📈 Generating test coverage report...'
+        npm run test:coverage
+        
+        echo '✅ All tests completed!'
+      "
+    depends_on:
+      - api-test
+      - test-redis
+      - test-db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        labels: "service=test-runner"
+
+volumes:
+  test-db-data:
+  test-redis-data:
+  test-logs:
+  seq-data:
+
+networks:
+  default:
+    name: nyxusd-test-network
