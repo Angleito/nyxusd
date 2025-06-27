@@ -14,7 +14,7 @@ export const AIAssistant: React.FC = () => {
   useEffect(() => {
     if (messages.length === 0) {
       // Add initial welcome message
-      const messageId = addMessage('Welcome to NyxUSD AI Assistant! I\'m here to help you optimize your CDP positions and understand the Midnight Protocol ecosystem. Would you like to connect your wallet to get personalized recommendations?', 'ai');
+      addMessage('Welcome to NyxUSD AI Assistant! I\'m here to help you optimize your CDP positions and understand the Midnight Protocol ecosystem. Would you like to connect your wallet to get personalized recommendations?', 'ai');
       
       // After a short delay, move to wallet prompt step
       setTimeout(() => {

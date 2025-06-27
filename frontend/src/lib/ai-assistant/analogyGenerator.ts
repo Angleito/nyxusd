@@ -1,4 +1,4 @@
-import { pipe } from '@nyxusd/fp-utils';
+// import { pipe } from '@nyxusd/fp-utils';
 
 export interface Analogy {
   concept: string;
@@ -182,13 +182,12 @@ export const explainWithAnalogy = (
 ): string => {
   const analogy = generateAnalogy(concept, occupation);
   
-  return pipe(
-    analogy.explanation,
-    explanation => analogy.example 
-      ? `${explanation}\n\n${analogy.example}`
-      : explanation,
-    fullExplanation => contextualInfo
-      ? `${fullExplanation}\n\nIn your case: ${contextualInfo}`
-      : fullExplanation
-  );
+  let result = analogy.explanation;
+  if (analogy.example) {
+    result = `${result}\n\n${analogy.example}`;
+  }
+  if (contextualInfo) {
+    result = `${result}\n\nIn your case: ${contextualInfo}`;
+  }
+  return result;
 };
