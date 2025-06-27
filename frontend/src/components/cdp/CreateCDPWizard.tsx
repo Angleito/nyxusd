@@ -31,10 +31,10 @@ export const CreateCDPWizard: React.FC<CreateCDPWizardProps> = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [formData] = useState<Partial<CreateCDPForm>>({
     owner: "0x742d35Cc6634C0532925a3b8D",
-    collateralType: "WETH",
-    collateralAmount: "2.5",
-    debtAmount: "3000",
-  });
+    collateralType: "NIGHT",
+    collateralAmount: "25.0",
+    debtAmount: "3000"
+  })
 
   const queryClient = useQueryClient();
   const {
@@ -78,13 +78,11 @@ export const CreateCDPWizard: React.FC<CreateCDPWizardProps> = ({
   const getStepProgress = () => (currentStep / steps.length) * 100;
 
   // Watch form values for real-time calculations
-  const watchedValues = watch();
-  const collateralValue =
-    parseFloat(watchedValues.collateralAmount || "0") * 2000; // Assume ETH price
-  const debtAmount = parseFloat(watchedValues.debtAmount || "0");
-  const collateralizationRatio =
-    debtAmount > 0 ? (collateralValue / debtAmount) * 100 : 0;
-  const healthFactor = collateralizationRatio / 150; // Assuming 150% liquidation ratio
+  const watchedValues = watch()
+  const collateralValue = parseFloat(watchedValues.collateralAmount || '0') * 150 // Assume NIGHT price
+  const debtAmount = parseFloat(watchedValues.debtAmount || '0')
+  const collateralizationRatio = debtAmount > 0 ? (collateralValue / debtAmount) * 100 : 0
+  const healthFactor = collateralizationRatio / 150 // Assuming 150% liquidation ratio
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -114,8 +112,8 @@ export const CreateCDPWizard: React.FC<CreateCDPWizardProps> = ({
                       required: "Wallet address is required",
                       pattern: {
                         value: /^0x[a-fA-F0-9]{40}$/,
-                        message: "Please enter a valid Ethereum address",
-                      },
+                        message: 'Please enter a valid Midnight Protocol address'
+                      }
                     })}
                     className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
                       errors.owner
@@ -169,8 +167,8 @@ export const CreateCDPWizard: React.FC<CreateCDPWizardProps> = ({
                   })}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                 >
-                  <option value="WETH">WETH - Wrapped Ethereum</option>
-                  <option value="WBTC">WBTC - Wrapped Bitcoin</option>
+                  <option value="NIGHT">NIGHT - Midnight Protocol</option>
+                  <option value="DUST">DUST - Transaction Token</option>
                 </select>
               </div>
 
@@ -180,12 +178,9 @@ export const CreateCDPWizard: React.FC<CreateCDPWizardProps> = ({
                 </label>
                 <div className="relative">
                   <input
-                    {...register("collateralAmount", {
-                      required: "Collateral amount is required",
-                      min: {
-                        value: 0.1,
-                        message: "Minimum collateral is 0.1 ETH",
-                      },
+                    {...register('collateralAmount', { 
+                      required: 'Collateral amount is required',
+                      min: { value: 0.1, message: 'Minimum collateral is 0.1 NIGHT' }
                     })}
                     type="number"
                     step="0.01"
@@ -198,7 +193,7 @@ export const CreateCDPWizard: React.FC<CreateCDPWizardProps> = ({
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                     <span className="text-gray-500 text-sm">
-                      {watchedValues.collateralType || "ETH"}
+                      {watchedValues.collateralType || 'NIGHT'}
                     </span>
                   </div>
                 </div>
@@ -221,7 +216,7 @@ export const CreateCDPWizard: React.FC<CreateCDPWizardProps> = ({
                 <div className="text-sm text-blue-700 space-y-1">
                   <div className="flex justify-between">
                     <span>Current Price:</span>
-                    <span>$2,000 USD</span>
+                    <span>$150 USD</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Liquidation Threshold:</span>

@@ -222,21 +222,9 @@ const HeroSection: React.FC = () => {
 
                   {/* Orbiting Collateral Types */}
                   {[
-                    {
-                      name: "ETH",
-                      angle: 0,
-                      color: "from-blue-500 to-blue-600",
-                    },
-                    {
-                      name: "BTC",
-                      angle: 120,
-                      color: "from-orange-500 to-orange-600",
-                    },
-                    {
-                      name: "AVAX",
-                      angle: 240,
-                      color: "from-red-500 to-red-600",
-                    },
+                    { name: 'NIGHT', angle: 0, color: 'from-purple-500 to-purple-600' },
+                    { name: 'BTC', angle: 120, color: 'from-orange-500 to-orange-600' },
+                    { name: 'DUST', angle: 240, color: 'from-violet-500 to-violet-600' }
                   ].map((collateral, index) => (
                     <motion.div
                       key={collateral.name}
