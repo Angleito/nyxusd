@@ -18,10 +18,11 @@ export const WalletConnectionStep: React.FC<WalletConnectionStepProps> = ({
   const mockWalletData = {
     address: mockWalletAddress,
     balances: {
-      ETH: { amount: 2.5, value: 4875 },
+      NIGHT: { amount: 25.0, value: 3750 },
+      DUST: { amount: 10000, value: 250 },
       USDC: { amount: 5000, value: 5000 },
     },
-    totalValue: 9875,
+    totalValue: 9000,
   };
 
   const handleConnect = async () => {
