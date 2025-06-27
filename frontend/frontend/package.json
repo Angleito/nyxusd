@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "@types/uuid": "^10.0.0",
-    "lucide-react": "^0.523.0",
-    "uuid": "^11.1.0"
-  }
-}
