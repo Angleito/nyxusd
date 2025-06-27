@@ -1,11 +1,11 @@
 /**
  * NYXUSD Minting Functions
- * 
+ *
  * This module implements pure functions for minting additional NYXUSD tokens
  * against existing Collateralized Debt Positions (CDPs) in the NyxUSD system.
  * All functions follow functional programming principles with immutable data
  * structures and explicit error handling using Result types.
- * 
+ *
  * Key Features:
  * - Pure functional approach with no side effects
  * - BigInt arithmetic for precise financial calculations
@@ -15,33 +15,33 @@
  * - Stability fee calculations
  * - Type-safe operations with branded types
  * - Immutable CDP state transitions
- * 
+ *
  * @packageDocumentation
  */
 
-import { Result, Ok, Err } from '@nyxusd/fp-utils'
-import { 
-  CDP, 
-  CDPError, 
+import { Result, Ok, Err } from "@nyxusd/fp-utils";
+import {
+  CDP,
+  CDPError,
   CDPState,
-  Amount, 
+  Amount,
   Timestamp,
   mkAmount,
-  mkCollateralizationRatio
-} from '../types/cdp'
+  mkCollateralizationRatio,
+} from "../types/cdp";
 
 /**
  * Parameters for minting NYXUSD from a CDP
  */
 export interface MintNYXUSDParams {
   /** The CDP to mint NYXUSD from */
-  readonly cdp: CDP
+  readonly cdp: CDP;
   /** Amount of NYXUSD to mint */
-  readonly mintAmount: Amount
+  readonly mintAmount: Amount;
   /** Address initiating the mint */
-  readonly minter: string
+  readonly minter: string;
   /** Current timestamp */
-  readonly timestamp: Timestamp
+  readonly timestamp: Timestamp;
 }
 
 /**
@@ -49,21 +49,21 @@ export interface MintNYXUSDParams {
  */
 export interface MintContext {
   /** Current collateral price in USD (scaled) */
-  readonly collateralPrice: bigint
+  readonly collateralPrice: bigint;
   /** Maximum single mint amount allowed */
-  readonly maxMintAmount: Amount
+  readonly maxMintAmount: Amount;
   /** Global debt ceiling */
-  readonly globalDebtCeiling: Amount
+  readonly globalDebtCeiling: Amount;
   /** Current total debt in system */
-  readonly currentTotalDebt: Amount
+  readonly currentTotalDebt: Amount;
   /** Annual stability fee rate (as decimal, e.g., 0.05 for 5%) */
-  readonly stabilityFeeRate: number
+  readonly stabilityFeeRate: number;
   /** Time elapsed since last fee accrual (in seconds) */
-  readonly timeElapsed: number
+  readonly timeElapsed: number;
   /** Whether emergency shutdown is active */
-  readonly emergencyShutdown: boolean
+  readonly emergencyShutdown: boolean;
   /** Current system timestamp */
-  readonly currentTime: Timestamp
+  readonly currentTime: Timestamp;
 }
 
 /**
@@ -71,30 +71,30 @@ export interface MintContext {
  */
 export interface MintResult {
   /** Updated CDP after minting */
-  readonly updatedCDP: CDP
+  readonly updatedCDP: CDP;
   /** Amount actually minted */
-  readonly mintedAmount: Amount
+  readonly mintedAmount: Amount;
   /** New health factor after minting */
-  readonly newHealthFactor: number
+  readonly newHealthFactor: number;
   /** Previous health factor before minting */
-  readonly previousHealthFactor: number
+  readonly previousHealthFactor: number;
   /** Stability fees accrued during operation */
-  readonly accruedFees: Amount
+  readonly accruedFees: Amount;
   /** New total debt in CDP */
-  readonly newTotalDebt: Amount
+  readonly newTotalDebt: Amount;
 }
 
 /**
  * Calculates accrued stability fees for a CDP
- * 
+ *
  * Computes the stability fees that have accumulated on the CDP's debt
  * based on the time elapsed and the stability fee rate.
- * 
+ *
  * @param currentDebt - Current debt amount in the CDP
  * @param stabilityFeeRate - Annual stability fee rate (as decimal)
  * @param timeElapsed - Time elapsed since last accrual (in seconds)
  * @returns Amount of fees accrued
- * 
+ *
  * @example
  * ```typescript
  * const fees = calculateAccruedFees(
@@ -108,34 +108,37 @@ export interface MintResult {
 export const calculateAccruedFees = (
   currentDebt: Amount,
   stabilityFeeRate: number,
-  timeElapsed: number
+  timeElapsed: number,
 ): Amount => {
   if (currentDebt === 0n || stabilityFeeRate === 0 || timeElapsed === 0) {
-    return mkAmount(0n)
+    return mkAmount(0n);
   }
 
   // Calculate fees using compound interest formula: A = P * (1 + r)^t
   // For small time periods, we can use simple interest approximation: A = P * r * t
-  const secondsPerYear = 365.25 * 24 * 60 * 60 // Account for leap years
-  const timeInYears = timeElapsed / secondsPerYear
-  
+  const secondsPerYear = 365.25 * 24 * 60 * 60; // Account for leap years
+  const timeInYears = timeElapsed / secondsPerYear;
+
   // Use simple interest for small time periods to avoid precision issues
-  const fees = currentDebt * BigInt(Math.floor(stabilityFeeRate * timeInYears * 1000000)) / BigInt(1000000)
-  
-  return mkAmount(fees)
-}
+  const fees =
+    (currentDebt *
+      BigInt(Math.floor(stabilityFeeRate * timeInYears * 1000000))) /
+    BigInt(1000000);
+
+  return mkAmount(fees);
+};
 
 /**
  * Validates NYXUSD minting parameters and system state
- * 
+ *
  * Performs comprehensive validation of minting request including
  * authorization, amounts, CDP state, collateralization requirements,
  * debt ceilings, and system conditions.
- * 
+ *
  * @param params - Minting parameters to validate
  * @param context - Current system context
  * @returns Result indicating validation success or specific error
- * 
+ *
  * @example
  * ```typescript
  * const params: MintNYXUSDParams = {
@@ -144,7 +147,7 @@ export const calculateAccruedFees = (
  *   minter: "0x742d35Cc6634C0532925a3b8D0c4E5B8e4c7D4F6",
  *   timestamp: mkTimestamp(Date.now())
  * }
- * 
+ *
  * const context: MintContext = {
  *   collateralPrice: 2000000000000000000000n,
  *   maxMintAmount: mkAmount(50000000000000000000000n), // 50,000 NYXUSD
@@ -155,7 +158,7 @@ export const calculateAccruedFees = (
  *   emergencyShutdown: false,
  *   currentTime: mkTimestamp(Date.now())
  * }
- * 
+ *
  * const validation = validateMintNYXUSD(params, context)
  * if (validation.isOk()) {
  *   console.log("Minting parameters are valid")
@@ -166,109 +169,113 @@ export const calculateAccruedFees = (
  */
 export const validateMintNYXUSD = (
   params: MintNYXUSDParams,
-  context: MintContext
+  context: MintContext,
 ): Result<void, CDPError> => {
   // Check if system is in emergency shutdown
   if (context.emergencyShutdown) {
     return Result.err({
-      type: 'invalid_operation',
-      operation: 'mint',
-      state: 'emergency_shutdown'
-    })
+      type: "invalid_operation",
+      operation: "mint",
+      state: "emergency_shutdown",
+    });
   }
 
   // Validate minter authorization
   if (params.minter !== params.cdp.owner) {
     return Result.err({
-      type: 'unauthorized',
+      type: "unauthorized",
       owner: params.cdp.owner,
-      caller: params.minter
-    })
+      caller: params.minter,
+    });
   }
 
   // Validate mint amount
   if (params.mintAmount <= 0n) {
     return Result.err({
-      type: 'invalid_amount',
-      amount: params.mintAmount
-    })
+      type: "invalid_amount",
+      amount: params.mintAmount,
+    });
   }
 
   // Check maximum mint limit
   if (params.mintAmount > context.maxMintAmount) {
     return Result.err({
-      type: 'mint_limit_exceeded',
+      type: "mint_limit_exceeded",
       limit: context.maxMintAmount,
-      requested: params.mintAmount
-    })
+      requested: params.mintAmount,
+    });
   }
 
   // Validate CDP state - can only mint from active CDPs
-  if (params.cdp.state.type !== 'active') {
+  if (params.cdp.state.type !== "active") {
     return Result.err({
-      type: 'invalid_operation',
-      operation: 'mint',
-      state: params.cdp.state.type
-    })
+      type: "invalid_operation",
+      operation: "mint",
+      state: params.cdp.state.type,
+    });
   }
 
   // Calculate accrued fees
   const accruedFees = calculateAccruedFees(
     params.cdp.debtAmount,
     context.stabilityFeeRate,
-    context.timeElapsed
-  )
+    context.timeElapsed,
+  );
 
   // Calculate new total debt (existing + new mint + accrued fees)
-  const newTotalDebt = params.cdp.debtAmount + params.mintAmount + accruedFees
+  const newTotalDebt = params.cdp.debtAmount + params.mintAmount + accruedFees;
 
   // Check CDP debt ceiling
   if (newTotalDebt > params.cdp.config.debtCeiling) {
     return Result.err({
-      type: 'debt_ceiling_exceeded',
+      type: "debt_ceiling_exceeded",
       ceiling: params.cdp.config.debtCeiling,
-      requested: mkAmount(newTotalDebt)
-    })
+      requested: mkAmount(newTotalDebt),
+    });
   }
 
   // Check global debt ceiling
-  const newGlobalDebt = context.currentTotalDebt + params.mintAmount + accruedFees
+  const newGlobalDebt =
+    context.currentTotalDebt + params.mintAmount + accruedFees;
   if (newGlobalDebt > context.globalDebtCeiling) {
     return Result.err({
-      type: 'debt_ceiling_exceeded',
+      type: "debt_ceiling_exceeded",
       ceiling: context.globalDebtCeiling,
-      requested: mkAmount(newGlobalDebt)
-    })
+      requested: mkAmount(newGlobalDebt),
+    });
   }
 
   // Calculate collateralization ratio after minting
-  const collateralValue = params.cdp.collateralAmount * context.collateralPrice / BigInt(10**18)
-  const newCollateralizationRatio = Number(collateralValue * BigInt(10000) / newTotalDebt)
+  const collateralValue =
+    (params.cdp.collateralAmount * context.collateralPrice) / BigInt(10 ** 18);
+  const newCollateralizationRatio = Number(
+    (collateralValue * BigInt(10000)) / newTotalDebt,
+  );
 
   // Check if minting would violate minimum collateralization ratio
   if (newCollateralizationRatio < params.cdp.config.minCollateralizationRatio) {
     return Result.err({
-      type: 'below_min_collateral_ratio',
+      type: "below_min_collateral_ratio",
       current: mkCollateralizationRatio(newCollateralizationRatio),
-      minimum: params.cdp.config.minCollateralizationRatio
-    })
+      minimum: params.cdp.config.minCollateralizationRatio,
+    });
   }
 
-  return Result.ok(undefined)
-}
+  return Result.ok(undefined);
+};
 
 /**
  * Calculates the maximum amount of NYXUSD that can be minted from a CDP
- * 
+ *
  * Determines the maximum minting amount while maintaining the required
  * collateralization ratio and considering accrued fees.
- * 
+ *
  * @param cdp - CDP to evaluate for maximum minting
  * @param collateralPrice - Current price of collateral
  * @param stabilityFeeRate - Annual stability fee rate
  * @param timeElapsed - Time elapsed since last fee accrual
  * @returns Maximum amount that can be minted
- * 
+ *
  * @example
  * ```typescript
  * const maxMint = calculateMaxMintableAmount(
@@ -284,38 +291,46 @@ export const calculateMaxMintableAmount = (
   cdp: CDP,
   collateralPrice: bigint,
   stabilityFeeRate: number,
-  timeElapsed: number
+  timeElapsed: number,
 ): Amount => {
   // Calculate accrued fees
-  const accruedFees = calculateAccruedFees(cdp.debtAmount, stabilityFeeRate, timeElapsed)
-  
+  const accruedFees = calculateAccruedFees(
+    cdp.debtAmount,
+    stabilityFeeRate,
+    timeElapsed,
+  );
+
   // Calculate current debt including accrued fees
-  const currentDebtWithFees = cdp.debtAmount + accruedFees
+  const currentDebtWithFees = cdp.debtAmount + accruedFees;
 
   // Calculate maximum debt based on collateral value and minimum ratio
-  const collateralValue = cdp.collateralAmount * collateralPrice / BigInt(10**18)
-  const maxTotalDebt = collateralValue * BigInt(10000) / BigInt(cdp.config.minCollateralizationRatio)
+  const collateralValue =
+    (cdp.collateralAmount * collateralPrice) / BigInt(10 ** 18);
+  const maxTotalDebt =
+    (collateralValue * BigInt(10000)) /
+    BigInt(cdp.config.minCollateralizationRatio);
 
   // Check debt ceiling constraint
-  const debtCeilingLimit = cdp.config.debtCeiling
+  const debtCeilingLimit = cdp.config.debtCeiling;
 
   // Use the most restrictive limit
-  const effectiveMaxDebt = maxTotalDebt < debtCeilingLimit ? maxTotalDebt : debtCeilingLimit
+  const effectiveMaxDebt =
+    maxTotalDebt < debtCeilingLimit ? maxTotalDebt : debtCeilingLimit;
 
   if (effectiveMaxDebt <= currentDebtWithFees) {
-    return mkAmount(0n) // Cannot mint anything
+    return mkAmount(0n); // Cannot mint anything
   }
 
-  const maxMintable = effectiveMaxDebt - currentDebtWithFees
-  return mkAmount(maxMintable)
-}
+  const maxMintable = effectiveMaxDebt - currentDebtWithFees;
+  return mkAmount(maxMintable);
+};
 
 /**
  * Calculates the health factor after minting NYXUSD
- * 
+ *
  * Computes the new health factor that would result from minting
  * the specified amount of NYXUSD from the CDP.
- * 
+ *
  * @param collateralAmount - Current collateral amount in CDP
  * @param currentDebt - Current debt amount in CDP
  * @param mintAmount - Amount of NYXUSD being minted
@@ -323,7 +338,7 @@ export const calculateMaxMintableAmount = (
  * @param collateralPrice - Current price of collateral
  * @param liquidationRatio - Liquidation threshold ratio
  * @returns New health factor after minting
- * 
+ *
  * @example
  * ```typescript
  * const newHealthFactor = calculateHealthFactorAfterMint(
@@ -343,30 +358,32 @@ export const calculateHealthFactorAfterMint = (
   mintAmount: Amount,
   accruedFees: Amount,
   collateralPrice: bigint,
-  liquidationRatio: number
+  liquidationRatio: number,
 ): number => {
-  const newTotalDebt = currentDebt + mintAmount + accruedFees
+  const newTotalDebt = currentDebt + mintAmount + accruedFees;
 
   if (newTotalDebt === 0n) {
-    return Number.MAX_SAFE_INTEGER
+    return Number.MAX_SAFE_INTEGER;
   }
 
-  const collateralValue = collateralAmount * collateralPrice / BigInt(10**18)
-  const liquidationThreshold = collateralValue * BigInt(10000) / BigInt(liquidationRatio)
-  
-  return Number(liquidationThreshold) / Number(newTotalDebt)
-}
+  const collateralValue =
+    (collateralAmount * collateralPrice) / BigInt(10 ** 18);
+  const liquidationThreshold =
+    (collateralValue * BigInt(10000)) / BigInt(liquidationRatio);
+
+  return Number(liquidationThreshold) / Number(newTotalDebt);
+};
 
 /**
  * Calculates the current health factor from CDP state
- * 
+ *
  * Determines the health factor before the minting operation
  * based on current collateral and debt amounts.
- * 
+ *
  * @param cdp - The CDP to calculate health factor for
  * @param collateralPrice - Current price of collateral
  * @returns Current health factor
- * 
+ *
  * @example
  * ```typescript
  * const currentHealth = calculateCurrentHealthFactor(
@@ -378,29 +395,31 @@ export const calculateHealthFactorAfterMint = (
  */
 export const calculateCurrentHealthFactor = (
   cdp: CDP,
-  collateralPrice: bigint
+  collateralPrice: bigint,
 ): number => {
   if (cdp.debtAmount === 0n) {
-    return Number.MAX_SAFE_INTEGER
+    return Number.MAX_SAFE_INTEGER;
   }
 
-  const collateralValue = cdp.collateralAmount * collateralPrice / BigInt(10**18)
-  const liquidationThreshold = collateralValue * BigInt(10000) / BigInt(cdp.config.liquidationRatio)
-  
-  return Number(liquidationThreshold) / Number(cdp.debtAmount)
-}
+  const collateralValue =
+    (cdp.collateralAmount * collateralPrice) / BigInt(10 ** 18);
+  const liquidationThreshold =
+    (collateralValue * BigInt(10000)) / BigInt(cdp.config.liquidationRatio);
+
+  return Number(liquidationThreshold) / Number(cdp.debtAmount);
+};
 
 /**
  * Updates CDP state after NYXUSD minting
- * 
+ *
  * Determines the new CDP state based on the updated health factor
  * and system conditions after the NYXUSD minting.
- * 
+ *
  * @param currentState - Current CDP state
  * @param newHealthFactor - Health factor after minting
  * @param liquidationRatio - Liquidation threshold ratio
  * @returns Updated CDP state
- * 
+ *
  * @example
  * ```typescript
  * const newState = updateCDPStateAfterMint(
@@ -414,44 +433,45 @@ export const calculateCurrentHealthFactor = (
 export const updateCDPStateAfterMint = (
   _currentState: CDPState,
   newHealthFactor: number,
-  _liquidationRatio: number
+  _liquidationRatio: number,
 ): CDPState => {
   // If health factor drops to critical levels, flag for liquidation
   if (newHealthFactor <= 1.0) {
     return {
-      type: 'liquidating',
-      liquidationPrice: mkAmount(0n) // Will be calculated by liquidation system
-    }
+      type: "liquidating",
+      liquidationPrice: mkAmount(0n), // Will be calculated by liquidation system
+    };
   }
 
   // If health factor is still reasonable, keep active
-  if (newHealthFactor > 1.1) { // 10% buffer above liquidation threshold
+  if (newHealthFactor > 1.1) {
+    // 10% buffer above liquidation threshold
     return {
-      type: 'active',
-      healthFactor: newHealthFactor
-    }
+      type: "active",
+      healthFactor: newHealthFactor,
+    };
   }
 
   // For borderline cases, maintain active state but with updated health factor
   return {
-    type: 'active',
-    healthFactor: newHealthFactor
-  }
-}
+    type: "active",
+    healthFactor: newHealthFactor,
+  };
+};
 
 /**
  * Creates an updated CDP with increased debt
- * 
+ *
  * Produces a new CDP object with the minted NYXUSD amount and accrued fees
  * added to the existing debt, along with updated timestamps and state.
- * 
+ *
  * @param cdp - Original CDP to update
  * @param mintAmount - Amount of NYXUSD being minted
  * @param accruedFees - Fees accrued during the operation
  * @param newState - Updated CDP state after minting
  * @param timestamp - Timestamp of the mint operation
  * @returns New CDP object with increased debt
- * 
+ *
  * @example
  * ```typescript
  * const updatedCDP = createUpdatedCDP(
@@ -469,28 +489,28 @@ export const createUpdatedCDP = (
   mintAmount: Amount,
   accruedFees: Amount,
   newState: CDPState,
-  timestamp: Timestamp
+  timestamp: Timestamp,
 ): CDP => {
   return {
     ...cdp,
     debtAmount: mkAmount(cdp.debtAmount + mintAmount),
     accruedFees: mkAmount(cdp.accruedFees + accruedFees),
     state: newState,
-    updatedAt: timestamp
-  }
-}
+    updatedAt: timestamp,
+  };
+};
 
 /**
  * Mints NYXUSD from a CDP
- * 
+ *
  * This is the main NYXUSD minting function that orchestrates validation,
  * fee calculation, and CDP state updates. It performs all necessary checks
  * including collateralization ratio maintenance and debt ceiling compliance.
- * 
+ *
  * @param params - NYXUSD minting parameters
  * @param context - Current system context
  * @returns Result containing minting details or error
- * 
+ *
  * @example
  * ```typescript
  * const params: MintNYXUSDParams = {
@@ -499,7 +519,7 @@ export const createUpdatedCDP = (
  *   minter: "0x742d35Cc6634C0532925a3b8D0c4E5B8e4c7D4F6",
  *   timestamp: mkTimestamp(Date.now())
  * }
- * 
+ *
  * const context: MintContext = {
  *   collateralPrice: 2100000000000000000000n, // $2100 per ETH
  *   maxMintAmount: mkAmount(10000000000000000000000n), // 10,000 NYXUSD max
@@ -510,7 +530,7 @@ export const createUpdatedCDP = (
  *   emergencyShutdown: false,
  *   currentTime: mkTimestamp(Date.now())
  * }
- * 
+ *
  * const result = mintNYXUSD(params, context)
  * if (result.isOk()) {
  *   const mintResult = result.value
@@ -524,23 +544,26 @@ export const createUpdatedCDP = (
  */
 export const mintNYXUSD = (
   params: MintNYXUSDParams,
-  context: MintContext
+  context: MintContext,
 ): Result<MintResult, CDPError> => {
   // Validate minting parameters and system state
-  const validationResult = validateMintNYXUSD(params, context)
+  const validationResult = validateMintNYXUSD(params, context);
   if (validationResult.isErr()) {
-    return Result.err(validationResult.value)
+    return Result.err(validationResult.value);
   }
 
   // Calculate accrued fees
   const accruedFees = calculateAccruedFees(
     params.cdp.debtAmount,
     context.stabilityFeeRate,
-    context.timeElapsed
-  )
+    context.timeElapsed,
+  );
 
   // Calculate current health factor
-  const previousHealthFactor = calculateCurrentHealthFactor(params.cdp, context.collateralPrice)
+  const previousHealthFactor = calculateCurrentHealthFactor(
+    params.cdp,
+    context.collateralPrice,
+  );
 
   // Calculate new health factor after minting
   const newHealthFactor = calculateHealthFactorAfterMint(
@@ -549,15 +572,15 @@ export const mintNYXUSD = (
     params.mintAmount,
     accruedFees,
     context.collateralPrice,
-    params.cdp.config.liquidationRatio
-  )
+    params.cdp.config.liquidationRatio,
+  );
 
   // Update CDP state based on new health factor
   const newState = updateCDPStateAfterMint(
     params.cdp.state,
     newHealthFactor,
-    params.cdp.config.liquidationRatio
-  )
+    params.cdp.config.liquidationRatio,
+  );
 
   // Create updated CDP with increased debt
   const updatedCDP = createUpdatedCDP(
@@ -565,11 +588,11 @@ export const mintNYXUSD = (
     params.mintAmount,
     accruedFees,
     newState,
-    params.timestamp
-  )
+    params.timestamp,
+  );
 
   // Calculate new total debt
-  const newTotalDebt = params.cdp.debtAmount + params.mintAmount + accruedFees
+  const newTotalDebt = params.cdp.debtAmount + params.mintAmount + accruedFees;
 
   // Return successful minting result
   const mintResult: MintResult = {
@@ -578,30 +601,30 @@ export const mintNYXUSD = (
     newHealthFactor,
     previousHealthFactor,
     accruedFees,
-    newTotalDebt: mkAmount(newTotalDebt)
-  }
+    newTotalDebt: mkAmount(newTotalDebt),
+  };
 
-  return Result.ok(mintResult)
-}
+  return Result.ok(mintResult);
+};
 
 /**
  * Mints NYXUSD from multiple CDPs in batch
- * 
+ *
  * Processes an array of NYXUSD minting requests, validating each one
  * and returning results for all operations. This function maintains
  * transaction-like semantics - if any mint fails, the entire batch fails.
- * 
+ *
  * @param mints - Array of minting parameter sets
  * @param context - Shared system context for all operations
  * @returns Result containing array of minting results or first error encountered
- * 
+ *
  * @example
  * ```typescript
  * const mints = [
  *   { cdp: cdp1, mintAmount: mkAmount(1000000000000000000000n), ... },
  *   { cdp: cdp2, mintAmount: mkAmount(500000000000000000000n), ... }
  * ]
- * 
+ *
  * const result = mintNYXUSDBatch(mints, context)
  * if (result.isOk()) {
  *   console.log(`Processed ${result.value.length} mints`)
@@ -612,43 +635,45 @@ export const mintNYXUSD = (
  */
 export const mintNYXUSDBatch = (
   mints: readonly MintNYXUSDParams[],
-  context: MintContext
+  context: MintContext,
 ): Result<readonly MintResult[], CDPError> => {
-  const results: MintResult[] = []
-  let runningTotalDebt = context.currentTotalDebt
+  const results: MintResult[] = [];
+  let runningTotalDebt = context.currentTotalDebt;
 
   for (const params of mints) {
     // Update context with running total for debt ceiling checks
     const updatedContext = {
       ...context,
-      currentTotalDebt: runningTotalDebt
-    }
+      currentTotalDebt: runningTotalDebt,
+    };
 
-    const result = mintNYXUSD(params, updatedContext)
+    const result = mintNYXUSD(params, updatedContext);
     if (result.isErr()) {
-      return Result.err((result as Err<MintResult, CDPError>).value)
+      return Result.err((result as Err<MintResult, CDPError>).value);
     }
 
-    const mintResult = (result as Ok<MintResult, CDPError>).value
-    results.push(mintResult)
-    
+    const mintResult = (result as Ok<MintResult, CDPError>).value;
+    results.push(mintResult);
+
     // Update running total for next iteration
-    runningTotalDebt = mkAmount(runningTotalDebt + mintResult.mintedAmount + mintResult.accruedFees)
+    runningTotalDebt = mkAmount(
+      runningTotalDebt + mintResult.mintedAmount + mintResult.accruedFees,
+    );
   }
 
-  return Result.ok(results)
-}
+  return Result.ok(results);
+};
 
 /**
  * Estimates the annual cost of borrowing for a given amount
- * 
+ *
  * Calculates the annual stability fees that would be charged
  * on a specific debt amount at the current stability fee rate.
- * 
+ *
  * @param debtAmount - Amount of debt to calculate fees for
  * @param stabilityFeeRate - Annual stability fee rate (as decimal)
  * @returns Annual fee amount
- * 
+ *
  * @example
  * ```typescript
  * const annualCost = estimateAnnualBorrowingCost(
@@ -660,25 +685,27 @@ export const mintNYXUSDBatch = (
  */
 export const estimateAnnualBorrowingCost = (
   debtAmount: Amount,
-  stabilityFeeRate: number
+  stabilityFeeRate: number,
 ): Amount => {
-  const annualFees = debtAmount * BigInt(Math.floor(stabilityFeeRate * 1000000)) / BigInt(1000000)
-  return mkAmount(annualFees)
-}
+  const annualFees =
+    (debtAmount * BigInt(Math.floor(stabilityFeeRate * 1000000))) /
+    BigInt(1000000);
+  return mkAmount(annualFees);
+};
 
 /**
  * Calculates the collateralization ratio after minting
- * 
+ *
  * Computes the new collateralization ratio that would result from
  * minting additional NYXUSD, including accrued fees.
- * 
+ *
  * @param cdp - CDP to evaluate
  * @param mintAmount - Amount of NYXUSD to mint
  * @param collateralPrice - Current collateral price
  * @param stabilityFeeRate - Annual stability fee rate
  * @param timeElapsed - Time elapsed since last fee accrual
  * @returns New collateralization ratio (in basis points)
- * 
+ *
  * @example
  * ```typescript
  * const newRatio = calculateCollateralizationRatioAfterMint(
@@ -696,15 +723,20 @@ export const calculateCollateralizationRatioAfterMint = (
   mintAmount: Amount,
   collateralPrice: bigint,
   stabilityFeeRate: number,
-  timeElapsed: number
+  timeElapsed: number,
 ): number => {
-  const accruedFees = calculateAccruedFees(cdp.debtAmount, stabilityFeeRate, timeElapsed)
-  const newTotalDebt = cdp.debtAmount + mintAmount + accruedFees
-  
+  const accruedFees = calculateAccruedFees(
+    cdp.debtAmount,
+    stabilityFeeRate,
+    timeElapsed,
+  );
+  const newTotalDebt = cdp.debtAmount + mintAmount + accruedFees;
+
   if (newTotalDebt === 0n) {
-    return Number.MAX_SAFE_INTEGER
+    return Number.MAX_SAFE_INTEGER;
   }
 
-  const collateralValue = cdp.collateralAmount * collateralPrice / BigInt(10**18)
-  return Number(collateralValue * BigInt(10000) / newTotalDebt)
-}
+  const collateralValue =
+    (cdp.collateralAmount * collateralPrice) / BigInt(10 ** 18);
+  return Number((collateralValue * BigInt(10000)) / newTotalDebt);
+};

@@ -1,6 +1,6 @@
 /**
  * Oracle Service Package
- * 
+ *
  * Provides Oracle integration for the NYXUSD CDP system with support for:
  * - Chainlink price feeds
  * - AI-enhanced risk assessment via Chainlink Functions
@@ -10,13 +10,13 @@
  */
 
 // Core oracle types and interfaces
-export * from './types/oracle-types';
-export * from './types/chainlink-types';
-export * from './types/aggregation-types';
+export * from "./types/oracle-types";
+export * from "./types/chainlink-types";
+export * from "./types/aggregation-types";
 // export * from './types/privacy-types';
 
 // Oracle service implementations
-export * from './services/chainlink-oracle-service-simple';
+export * from "./services/chainlink-oracle-service-simple";
 // Temporarily excluding other services due to compilation issues
 // export * from './services/oracle-aggregator-service';
 // export * from './services/circuit-breaker-service';
@@ -28,10 +28,10 @@ export * from './services/chainlink-oracle-service-simple';
 // Validation and error handling
 // Temporarily excluding oracle-validation due to compilation issues
 // export * from './validation/oracle-validation';
-export * from './errors/oracle-errors';
+export * from "./errors/oracle-errors";
 
 // Configuration exports - temporarily excluded due to compilation issues
-// export { 
+// export {
 //   OracleEnvironmentConfig,
 //   DEFAULT_ORACLE_CONFIGS as ORACLE_ENV_CONFIGS,
 //   getOracleConfig as getOracleEnvironmentConfig,
@@ -52,9 +52,9 @@ export * from './errors/oracle-errors';
 // } from './config/chainlink-feeds';
 
 // Main oracle service facade
-export { 
+export {
   OracleServiceFacade,
   createOracleServiceFacade,
   DEFAULT_AGGREGATION_STRATEGY,
-  DEFAULT_CONSENSUS_CONFIG
-} from './facade/oracle-service-facade';
+  DEFAULT_CONSENSUS_CONFIG,
+} from "./facade/oracle-service-facade";

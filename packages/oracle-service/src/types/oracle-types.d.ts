@@ -4,11 +4,11 @@
  * Functional programming-based type definitions for oracle operations
  * following the established NYXUSD patterns with immutable data structures
  */
-import { z } from 'zod';
-import { Either } from 'fp-ts/Either';
-import { Option } from 'fp-ts/Option';
-import { IO } from 'fp-ts/IO';
-import type { OracleError, ValidationError } from '../errors/oracle-errors';
+import { z } from "zod";
+import { Either } from "fp-ts/Either";
+import { Option } from "fp-ts/Option";
+import { IO } from "fp-ts/IO";
+import type { OracleError, ValidationError } from "../errors/oracle-errors";
 /**
  * Base oracle data structure
  */
@@ -486,5 +486,5 @@ export declare const CircuitBreakerConfigSchema: z.ZodObject<{
     monitoringWindow: number;
 }>;
 export type CircuitBreakerConfig = z.infer<typeof CircuitBreakerConfigSchema>;
-export type { OracleError, ValidationError } from '../errors/oracle-errors';
+export type { OracleError, ValidationError } from "../errors/oracle-errors";
 //# sourceMappingURL=oracle-types.d.ts.map

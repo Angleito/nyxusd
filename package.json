@@ -13,7 +13,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:unit": "jest --selectProjects unit-tests",
-    "test:integration": "jest --selectProjects integration-tests", 
+    "test:integration": "jest --selectProjects integration-tests",
     "test:property": "jest --selectProjects property-tests",
     "test:coverage": "jest --coverage",
     "test:coverage:unit": "jest --selectProjects unit-tests --coverage",

@@ -1,25 +1,25 @@
 /**
  * Simplified Chainlink Oracle Service
- * 
+ *
  * Mock implementation for testing package structure
  */
 
-import { right } from 'fp-ts/Either';
-import { Option, some, none, isSome } from 'fp-ts/Option';
-import * as IO from 'fp-ts/IO';
-import { z } from 'zod';
+import { right } from "fp-ts/Either";
+import { Option, some, none, isSome } from "fp-ts/Option";
+import * as IO from "fp-ts/IO";
+import { z } from "zod";
 
-import { 
-  OraclePriceData, 
-  OracleQueryData, 
-  OracleResponse, 
+import {
+  OraclePriceData,
+  OracleQueryData,
+  OracleResponse,
   OracleFeedConfig,
   IOracleService,
   PriceFetch,
   HealthCheck,
   PriceValidator,
-  OracleHealth
-} from '../types/oracle-types';
+  OracleHealth,
+} from "../types/oracle-types";
 
 /**
  * Simplified configuration
@@ -31,11 +31,13 @@ export const ChainlinkOracleConfigSchema = z.object({
   defaultMaxStaleness: z.number().int().positive().default(3600),
   defaultMinConfidence: z.number().min(0).max(100).default(95),
   cacheTtl: z.number().int().positive().default(60),
-  retry: z.object({
-    maxAttempts: z.number().int().min(1).default(3),
-    delayMs: z.number().int().positive().default(1000),
-    backoffMultiplier: z.number().positive().default(2),
-  }).default({}),
+  retry: z
+    .object({
+      maxAttempts: z.number().int().min(1).default(3),
+      delayMs: z.number().int().positive().default(1000),
+      backoffMultiplier: z.number().positive().default(2),
+    })
+    .default({}),
 });
 
 export type ChainlinkOracleConfig = z.infer<typeof ChainlinkOracleConfigSchema>;
@@ -44,7 +46,10 @@ export type ChainlinkOracleConfig = z.infer<typeof ChainlinkOracleConfigSchema>;
  * Simplified Chainlink Oracle Service
  */
 export class ChainlinkOracleService implements IOracleService {
-  private readonly cache: Map<string, { data: OraclePriceData; timestamp: number; ttl: number }> = new Map();
+  private readonly cache: Map<
+    string,
+    { data: OraclePriceData; timestamp: number; ttl: number }
+  > = new Map();
 
   constructor(config: ChainlinkOracleConfig) {
     ChainlinkOracleConfigSchema.parse(config);
@@ -63,7 +68,7 @@ export class ChainlinkOracleService implements IOracleService {
           metadata: {
             responseTime: 0,
             fromCache: true,
-            source: 'chainlink',
+            source: "chainlink",
           },
         };
         return IO.of(right(response));
@@ -72,14 +77,14 @@ export class ChainlinkOracleService implements IOracleService {
 
     // Real price mapping for supported assets
     const realPrices: Record<string, bigint> = {
-      'ETH/USD': BigInt('340000000000'), // $3400 with 8 decimals
-      'BTC/USD': BigInt('9800000000000'), // $98000 with 8 decimals  
-      'ADA/USD': BigInt('108000000'), // $1.08 with 8 decimals
-      'DUST/USD': BigInt('15000000'), // $0.15 with 8 decimals
+      "ETH/USD": BigInt("340000000000"), // $3400 with 8 decimals
+      "BTC/USD": BigInt("9800000000000"), // $98000 with 8 decimals
+      "ADA/USD": BigInt("108000000"), // $1.08 with 8 decimals
+      "DUST/USD": BigInt("15000000"), // $0.15 with 8 decimals
     };
 
-    const basePrice = realPrices[query.feedId] || BigInt('100000000000'); // Default $1000
-    
+    const basePrice = realPrices[query.feedId] || BigInt("100000000000"); // Default $1000
+
     // Add small random variation to simulate real price movement
     const variation = Math.floor(Math.random() * 200) - 100; // ±1% variation
     const variationAmount = (basePrice * BigInt(variation)) / BigInt(10000);
@@ -92,7 +97,7 @@ export class ChainlinkOracleService implements IOracleService {
       timestamp: Math.floor(Date.now() / 1000),
       roundId: BigInt(Math.floor(Math.random() * 1000000) + 100000),
       confidence: 95 + Math.floor(Math.random() * 5), // 95-99% confidence
-      source: 'chainlink',
+      source: "chainlink",
     };
 
     const response: OracleResponse = {
@@ -100,8 +105,8 @@ export class ChainlinkOracleService implements IOracleService {
       metadata: {
         responseTime: 120 + Math.floor(Math.random() * 80), // 120-200ms
         fromCache: false,
-        source: 'chainlink',
-        aggregationMethod: 'single',
+        source: "chainlink",
+        aggregationMethod: "single",
       },
     };
 
@@ -113,7 +118,7 @@ export class ChainlinkOracleService implements IOracleService {
    */
   public readonly checkHealth: HealthCheck = () => {
     const health: OracleHealth = {
-      status: 'healthy',
+      status: "healthy",
       feeds: {},
       metrics: {
         totalFeeds: 1,
@@ -144,18 +149,20 @@ export class ChainlinkOracleService implements IOracleService {
    * Get supported feed IDs
    */
   public readonly getSupportedFeeds = (): readonly string[] => {
-    return ['ETH/USD', 'BTC/USD', 'ADA/USD', 'DUST/USD'];
+    return ["ETH/USD", "BTC/USD", "ADA/USD", "DUST/USD"];
   };
 
   /**
    * Get feed configuration
    */
-  public readonly getFeedConfig = (feedId: string): Option<OracleFeedConfig> => {
+  public readonly getFeedConfig = (
+    feedId: string,
+  ): Option<OracleFeedConfig> => {
     // Mock feed config
     const config: OracleFeedConfig = {
       feedId,
       description: `Mock ${feedId} feed`,
-      address: '0x0000000000000000000000000000000000000000',
+      address: "0x0000000000000000000000000000000000000000",
       decimals: 8,
       heartbeat: 3600,
       deviationThreshold: 0.5,

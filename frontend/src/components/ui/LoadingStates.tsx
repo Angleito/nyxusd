@@ -1,40 +1,40 @@
-import React from 'react';
-import { cn } from '../../utils/cn';
+import React from "react";
+import { cn } from "../../utils/cn";
 
 /**
  * Loading spinner component - essential for loading states
  */
 interface SpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
-  variant?: 'primary' | 'white';
+  size?: "sm" | "md" | "lg";
+  variant?: "primary" | "white";
   className?: string;
   label?: string;
 }
 
 export const Spinner: React.FC<SpinnerProps> = ({
-  size = 'md',
-  variant = 'primary',
+  size = "md",
+  variant = "primary",
   className,
-  label = 'Loading...'
+  label = "Loading...",
 }) => {
   const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-6 h-6',
-    lg: 'w-8 h-8'
+    sm: "w-4 h-4",
+    md: "w-6 h-6",
+    lg: "w-8 h-8",
   };
 
   const variantClasses = {
-    primary: 'border-purple-600 border-t-transparent',
-    white: 'border-white border-t-transparent'
+    primary: "border-purple-600 border-t-transparent",
+    white: "border-white border-t-transparent",
   };
 
   return (
     <div
       className={cn(
-        'animate-spin rounded-full border-2',
+        "animate-spin rounded-full border-2",
         sizeClasses[size],
         variantClasses[variant],
-        className
+        className,
       )}
       role="status"
       aria-label={label}
@@ -56,18 +56,16 @@ interface SkeletonProps {
 export const Skeleton: React.FC<SkeletonProps> = ({
   className,
   width,
-  height
+  height,
 }) => {
   const style: React.CSSProperties = {};
-  if (width) style.width = typeof width === 'number' ? `${width}px` : width;
-  if (height) style.height = typeof height === 'number' ? `${height}px` : height;
+  if (width) style.width = typeof width === "number" ? `${width}px` : width;
+  if (height)
+    style.height = typeof height === "number" ? `${height}px` : height;
 
   return (
     <div
-      className={cn(
-        'animate-pulse bg-gray-200 rounded',
-        className
-      )}
+      className={cn("animate-pulse bg-gray-200 rounded", className)}
       style={style}
     />
   );
@@ -76,35 +74,39 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 /**
  * Loading button component - essential for form submissions
  */
-interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface LoadingButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "primary" | "secondary";
+  size?: "sm" | "md" | "lg";
 }
 
 export const LoadingButton: React.FC<LoadingButtonProps> = ({
   loading = false,
   children,
-  variant = 'primary',
-  size = 'md',
+  variant = "primary",
+  size = "md",
   className,
   disabled,
   ...props
 }) => {
   const isDisabled = disabled || loading;
 
-  const baseClasses = 'relative inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
-  
+  const baseClasses =
+    "relative inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
+
   const variantClasses = {
-    primary: 'bg-purple-600 hover:bg-purple-700 text-white focus:ring-purple-500 disabled:bg-purple-300',
-    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-900 focus:ring-gray-500 disabled:bg-gray-100'
+    primary:
+      "bg-purple-600 hover:bg-purple-700 text-white focus:ring-purple-500 disabled:bg-purple-300",
+    secondary:
+      "bg-gray-200 hover:bg-gray-300 text-gray-900 focus:ring-gray-500 disabled:bg-gray-100",
   };
 
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base'
+    sm: "px-3 py-1.5 text-sm",
+    md: "px-4 py-2 text-sm",
+    lg: "px-6 py-3 text-base",
   };
 
   return (
@@ -113,8 +115,8 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
         baseClasses,
         variantClasses[variant],
         sizeClasses[size],
-        isDisabled && 'cursor-not-allowed opacity-60',
-        className
+        isDisabled && "cursor-not-allowed opacity-60",
+        className,
       )}
       disabled={isDisabled}
       {...props}
@@ -122,7 +124,7 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
       {loading && (
         <Spinner
           size="sm"
-          variant={variant === 'primary' ? 'white' : 'primary'}
+          variant={variant === "primary" ? "white" : "primary"}
           className="mr-2"
         />
       )}
@@ -135,5 +137,5 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
 export default {
   Spinner,
   Skeleton,
-  LoadingButton
+  LoadingButton,
 };

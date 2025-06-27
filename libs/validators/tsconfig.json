@@ -11,13 +11,7 @@
     "incremental": true,
     "tsBuildInfoFile": "../../dist/libs/validators/.tsbuildinfo"
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"],
   "references": []
 }

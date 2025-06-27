@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 interface Recommendation {
   id: string;
@@ -7,51 +7,55 @@ interface Recommendation {
   description: string;
   allocation: number;
   expectedReturn: string;
-  riskLevel: 'low' | 'medium' | 'high';
+  riskLevel: "low" | "medium" | "high";
   explanation: string;
   color: string;
 }
 
 const mockRecommendations: Recommendation[] = [
   {
-    id: '1',
-    title: 'CLMM Liquidity Pools',
-    description: 'Concentrated liquidity market making on DEXs',
+    id: "1",
+    title: "CLMM Liquidity Pools",
+    description: "Concentrated liquidity market making on DEXs",
     allocation: 30,
-    expectedReturn: '15-25% APY',
-    riskLevel: 'high',
-    explanation: 'Based on your risk tolerance and DeFi experience, CLMM pools offer higher yields through concentrated liquidity positions.',
-    color: '#8B5CF6',
+    expectedReturn: "15-25% APY",
+    riskLevel: "high",
+    explanation:
+      "Based on your risk tolerance and DeFi experience, CLMM pools offer higher yields through concentrated liquidity positions.",
+    color: "#8B5CF6",
   },
   {
-    id: '2',
-    title: 'Stablecoin Yield',
-    description: 'Low-risk lending and farming strategies',
+    id: "2",
+    title: "Stablecoin Yield",
+    description: "Low-risk lending and farming strategies",
     allocation: 40,
-    expectedReturn: '8-12% APY',
-    riskLevel: 'low',
-    explanation: 'Your preference for stability makes stablecoin strategies ideal for the core of your portfolio.',
-    color: '#10B981',
+    expectedReturn: "8-12% APY",
+    riskLevel: "low",
+    explanation:
+      "Your preference for stability makes stablecoin strategies ideal for the core of your portfolio.",
+    color: "#10B981",
   },
   {
-    id: '3',
-    title: 'ETH Staking',
-    description: 'Liquid staking through trusted protocols',
+    id: "3",
+    title: "NIGHT Staking",
+    description: "Privacy-focused staking on Midnight Protocol",
     allocation: 20,
-    expectedReturn: '4-6% APY',
-    riskLevel: 'medium',
-    explanation: 'ETH staking provides steady returns with moderate risk, perfect for long-term growth.',
-    color: '#3B82F6',
+    expectedReturn: "3-8% APY",
+    riskLevel: "medium",
+    explanation:
+      "NIGHT staking on Midnight Protocol provides privacy-preserving rewards while generating DUST tokens for free transactions. Built on Cardano's proven PoS consensus.",
+    color: "#8B5CF6",
   },
   {
-    id: '4',
-    title: 'Reserve Fund',
-    description: 'Emergency liquidity in stablecoins',
+    id: "4",
+    title: "Reserve Fund",
+    description: "Emergency liquidity in stablecoins",
     allocation: 10,
-    expectedReturn: '0-2% APY',
-    riskLevel: 'low',
-    explanation: 'Maintaining liquid reserves ensures you can handle unexpected expenses without disrupting investments.',
-    color: '#6B7280',
+    expectedReturn: "0-2% APY",
+    riskLevel: "low",
+    explanation:
+      "Maintaining liquid reserves ensures you can handle unexpected expenses without disrupting investments.",
+    color: "#6B7280",
   },
 ];
 
@@ -60,26 +64,29 @@ interface RecommendationsDisplayProps {
   onComplete?: (data?: any) => void;
 }
 
-export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({ className = '', onComplete }) => {
+export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({
+  className = "",
+  onComplete,
+}) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const getRiskColor = (risk: 'low' | 'medium' | 'high') => {
+  const getRiskColor = (risk: "low" | "medium" | "high") => {
     switch (risk) {
-      case 'low':
-        return 'text-green-400 bg-green-400/10';
-      case 'medium':
-        return 'text-yellow-400 bg-yellow-400/10';
-      case 'high':
-        return 'text-red-400 bg-red-400/10';
+      case "low":
+        return "text-green-400 bg-green-400/10";
+      case "medium":
+        return "text-yellow-400 bg-yellow-400/10";
+      case "high":
+        return "text-red-400 bg-red-400/10";
     }
   };
 
-  const getRiskLabel = (risk: 'low' | 'medium' | 'high') => {
-    return risk.charAt(0).toUpperCase() + risk.slice(1) + ' Risk';
+  const getRiskLabel = (risk: "low" | "medium" | "high") => {
+    return risk.charAt(0).toUpperCase() + risk.slice(1) + " Risk";
   };
 
   // Calculate pie chart segments
@@ -123,8 +130,10 @@ export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({ 
         transition={{ duration: 0.5, delay: 0.1 }}
         className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-gray-700"
       >
-        <h3 className="text-xl font-semibold text-white mb-6">Portfolio Allocation</h3>
-        
+        <h3 className="text-xl font-semibold text-white mb-6">
+          Portfolio Allocation
+        </h3>
+
         <div className="flex flex-col lg:flex-row items-center gap-8">
           {/* Pie Chart */}
           <div className="relative w-64 h-64">
@@ -133,11 +142,16 @@ export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({ 
               className="w-full h-full transform -rotate-90"
             >
               {pieSegments.map((segment, index) => {
-                const largeArcFlag = segment.endAngle - segment.startAngle > 180 ? 1 : 0;
-                const x1 = 100 + 80 * Math.cos((segment.startAngle * Math.PI) / 180);
-                const y1 = 100 + 80 * Math.sin((segment.startAngle * Math.PI) / 180);
-                const x2 = 100 + 80 * Math.cos((segment.endAngle * Math.PI) / 180);
-                const y2 = 100 + 80 * Math.sin((segment.endAngle * Math.PI) / 180);
+                const largeArcFlag =
+                  segment.endAngle - segment.startAngle > 180 ? 1 : 0;
+                const x1 =
+                  100 + 80 * Math.cos((segment.startAngle * Math.PI) / 180);
+                const y1 =
+                  100 + 80 * Math.sin((segment.startAngle * Math.PI) / 180);
+                const x2 =
+                  100 + 80 * Math.cos((segment.endAngle * Math.PI) / 180);
+                const y2 =
+                  100 + 80 * Math.sin((segment.endAngle * Math.PI) / 180);
 
                 return (
                   <motion.path
@@ -160,7 +174,7 @@ export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({ 
                 className="pointer-events-none"
               />
             </svg>
-            
+
             {/* Center text */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
@@ -185,7 +199,9 @@ export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({ 
                   style={{ backgroundColor: rec.color }}
                 />
                 <span className="text-gray-300 flex-1">{rec.title}</span>
-                <span className="text-white font-semibold">{rec.allocation}%</span>
+                <span className="text-white font-semibold">
+                  {rec.allocation}%
+                </span>
               </motion.div>
             ))}
           </div>
@@ -205,10 +221,14 @@ export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({ 
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h4 className="text-xl font-semibold text-white mb-1">{rec.title}</h4>
+                <h4 className="text-xl font-semibold text-white mb-1">
+                  {rec.title}
+                </h4>
                 <p className="text-gray-400 text-sm">{rec.description}</p>
               </div>
-              <div className={`px-3 py-1 rounded-full text-xs font-medium ${getRiskColor(rec.riskLevel)}`}>
+              <div
+                className={`px-3 py-1 rounded-full text-xs font-medium ${getRiskColor(rec.riskLevel)}`}
+              >
                 {getRiskLabel(rec.riskLevel)}
               </div>
             </div>
@@ -217,7 +237,9 @@ export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({ 
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-400">Allocation</span>
-                <span className="text-lg font-semibold text-white">{rec.allocation}%</span>
+                <span className="text-lg font-semibold text-white">
+                  {rec.allocation}%
+                </span>
               </div>
               <div className="w-full h-3 bg-gray-700 rounded-full overflow-hidden">
                 <motion.div
@@ -236,13 +258,17 @@ export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({ 
             <div className="mb-4 p-3 bg-gray-900/50 rounded-lg">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">Expected Return</span>
-                <span className="text-lg font-semibold text-green-400">{rec.expectedReturn}</span>
+                <span className="text-lg font-semibold text-green-400">
+                  {rec.expectedReturn}
+                </span>
               </div>
             </div>
 
             {/* Personalized Explanation */}
             <div className="pt-4 border-t border-gray-700">
-              <p className="text-sm text-gray-300 leading-relaxed">{rec.explanation}</p>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                {rec.explanation}
+              </p>
             </div>
           </motion.div>
         ))}
@@ -255,7 +281,7 @@ export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({ 
         transition={{ duration: 0.5, delay: 1 }}
         className="mt-8 text-center"
       >
-        <button 
+        <button
           onClick={() => onComplete?.()}
           className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
         >

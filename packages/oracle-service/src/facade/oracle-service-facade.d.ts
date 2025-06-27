@@ -5,10 +5,10 @@
  * circuit breakers, aggregation, and fallback mechanisms in a unified
  * functional programming interface
  */
-import { Option } from 'fp-ts/Option';
-import { IOracleService, OracleFeedConfig, PriceValidator, HealthCheck, PriceFetch } from '../types/oracle-types';
-import { AggregationStrategy, ConsensusConfig } from '../types/aggregation-types';
-import { ChainlinkOracleConfig } from '../services/chainlink-oracle-service-simple';
+import { Option } from "fp-ts/Option";
+import { IOracleService, OracleFeedConfig, PriceValidator, HealthCheck, PriceFetch } from "../types/oracle-types";
+import { AggregationStrategy, ConsensusConfig } from "../types/aggregation-types";
+import { ChainlinkOracleConfig } from "../services/chainlink-oracle-service-simple";
 /**
  * Simplified oracle service facade configuration
  */

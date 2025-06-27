@@ -3,9 +3,9 @@
  *
  * Mock implementation for testing package structure
  */
-import { Option } from 'fp-ts/Option';
-import { z } from 'zod';
-import { OracleFeedConfig, IOracleService, PriceFetch, HealthCheck, PriceValidator } from '../types/oracle-types';
+import { Option } from "fp-ts/Option";
+import { z } from "zod";
+import { OracleFeedConfig, IOracleService, PriceFetch, HealthCheck, PriceValidator } from "../types/oracle-types";
 /**
  * Simplified configuration
  */

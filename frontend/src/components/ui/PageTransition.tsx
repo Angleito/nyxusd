@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { cn } from '../../utils/cn';
-import { usePageTransition } from '../../hooks/useAnimations';
+import React, { useEffect, useState } from "react";
+import { cn } from "../../utils/cn";
+import { usePageTransition } from "../../hooks/useAnimations";
 
 export interface PageTransitionProps {
   /** Children to animate */
   children: React.ReactNode;
   /** Transition type */
-  type?: 'fade' | 'slide' | 'scale' | 'blur';
+  type?: "fade" | "slide" | "scale" | "blur";
   /** Transition duration in milliseconds */
   duration?: number;
   /** Whether page is currently transitioning */
@@ -19,15 +19,15 @@ export interface PageTransitionProps {
 
 export const PageTransition: React.FC<PageTransitionProps> = ({
   children,
-  type = 'fade',
+  type = "fade",
   duration = 300,
   isTransitioning = false,
   className,
-  onTransitionComplete
+  onTransitionComplete,
 }) => {
   const { pageClasses, isEntering, isExiting } = usePageTransition({
-    type: 'fadeIn',
-    duration
+    type: "fadeIn",
+    duration,
   });
 
   const [mounted, setMounted] = useState(false);
@@ -44,50 +44,54 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
 
   const transitionClasses = {
     fade: {
-      enter: 'opacity-0',
-      enterActive: 'opacity-100 transition-opacity duration-300 ease-out',
-      exit: 'opacity-100',
-      exitActive: 'opacity-0 transition-opacity duration-200 ease-in'
+      enter: "opacity-0",
+      enterActive: "opacity-100 transition-opacity duration-300 ease-out",
+      exit: "opacity-100",
+      exitActive: "opacity-0 transition-opacity duration-200 ease-in",
     },
     slide: {
-      enter: 'transform translate-y-4 opacity-0',
-      enterActive: 'transform translate-y-0 opacity-100 transition-all duration-300 ease-out',
-      exit: 'transform translate-y-0 opacity-100',
-      exitActive: 'transform -translate-y-4 opacity-0 transition-all duration-200 ease-in'
+      enter: "transform translate-y-4 opacity-0",
+      enterActive:
+        "transform translate-y-0 opacity-100 transition-all duration-300 ease-out",
+      exit: "transform translate-y-0 opacity-100",
+      exitActive:
+        "transform -translate-y-4 opacity-0 transition-all duration-200 ease-in",
     },
     scale: {
-      enter: 'transform scale-95 opacity-0',
-      enterActive: 'transform scale-100 opacity-100 transition-all duration-300 ease-out',
-      exit: 'transform scale-100 opacity-100',
-      exitActive: 'transform scale-105 opacity-0 transition-all duration-200 ease-in'
+      enter: "transform scale-95 opacity-0",
+      enterActive:
+        "transform scale-100 opacity-100 transition-all duration-300 ease-out",
+      exit: "transform scale-100 opacity-100",
+      exitActive:
+        "transform scale-105 opacity-0 transition-all duration-200 ease-in",
     },
     blur: {
-      enter: 'blur-sm opacity-0',
-      enterActive: 'blur-none opacity-100 transition-all duration-300 ease-out',
-      exit: 'blur-none opacity-100',
-      exitActive: 'blur-sm opacity-0 transition-all duration-200 ease-in'
-    }
+      enter: "blur-sm opacity-0",
+      enterActive: "blur-none opacity-100 transition-all duration-300 ease-out",
+      exit: "blur-none opacity-100",
+      exitActive: "blur-sm opacity-0 transition-all duration-200 ease-in",
+    },
   };
 
   const getCurrentClasses = () => {
     const classes = transitionClasses[type];
-    
+
     if (isTransitioning || isExiting) {
       return `${classes.exit} ${classes.exitActive}`;
     } else if (isEntering || !mounted) {
       return `${classes.enter} ${classes.enterActive}`;
     }
-    
-    return '';
+
+    return "";
   };
 
   return (
     <div
       className={cn(
-        'min-h-screen',
+        "min-h-screen",
         getCurrentClasses(),
         pageClasses,
-        className
+        className,
       )}
     >
       {children}
@@ -105,7 +109,7 @@ export interface RouteTransitionProps {
   children: React.ReactNode;
   /** Transition configuration */
   config?: {
-    type?: PageTransitionProps['type'];
+    type?: PageTransitionProps["type"];
     duration?: number;
   };
   /** Custom className */
@@ -116,7 +120,7 @@ export const RouteTransition: React.FC<RouteTransitionProps> = ({
   routeKey,
   children,
   config = {},
-  className
+  className,
 }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [currentRouteKey, setCurrentRouteKey] = useState(routeKey);
@@ -125,7 +129,7 @@ export const RouteTransition: React.FC<RouteTransitionProps> = ({
   useEffect(() => {
     if (routeKey !== currentRouteKey) {
       setIsTransitioning(true);
-      
+
       // Start exit transition
       setTimeout(() => {
         setCurrentRouteKey(routeKey);
@@ -169,7 +173,7 @@ export const ModalTransition: React.FC<ModalTransitionProps> = ({
   children,
   backdrop,
   className,
-  onClose
+  onClose,
 }) => {
   const [shouldRender, setShouldRender] = useState(isOpen);
 
@@ -180,7 +184,7 @@ export const ModalTransition: React.FC<ModalTransitionProps> = ({
       const timer = setTimeout(() => {
         setShouldRender(false);
       }, 200); // Animation duration
-      
+
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
@@ -192,20 +196,20 @@ export const ModalTransition: React.FC<ModalTransitionProps> = ({
       {/* Backdrop */}
       <div
         className={cn(
-          'absolute inset-0 bg-black/50 backdrop-blur-sm',
-          isOpen ? 'backdrop-enter-active' : 'backdrop-exit-active'
+          "absolute inset-0 bg-black/50 backdrop-blur-sm",
+          isOpen ? "backdrop-enter-active" : "backdrop-exit-active",
         )}
         onClick={onClose}
       >
         {backdrop}
       </div>
-      
+
       {/* Modal Content */}
       <div
         className={cn(
-          'relative z-10 max-w-lg w-full mx-4',
-          isOpen ? 'modal-enter-active' : 'modal-exit-active',
-          className
+          "relative z-10 max-w-lg w-full mx-4",
+          isOpen ? "modal-enter-active" : "modal-exit-active",
+          className,
         )}
       >
         {children}
@@ -223,7 +227,7 @@ export interface StaggeredListProps {
   /** Stagger delay between items in milliseconds */
   staggerDelay?: number;
   /** Animation type for each item */
-  itemAnimation?: 'slideUp' | 'slideDown' | 'fadeIn' | 'scaleIn';
+  itemAnimation?: "slideUp" | "slideDown" | "fadeIn" | "scaleIn";
   /** Custom className for container */
   className?: string;
   /** Custom className for items */
@@ -233,58 +237,55 @@ export interface StaggeredListProps {
 export const StaggeredList: React.FC<StaggeredListProps> = ({
   children,
   staggerDelay = 100,
-  itemAnimation = 'slideUp',
+  itemAnimation = "slideUp",
   className,
-  itemClassName
+  itemClassName,
 }) => {
   const [visibleItems, setVisibleItems] = useState<boolean[]>(
-    new Array(children.length).fill(false)
+    new Array(children.length).fill(false),
   );
 
   useEffect(() => {
     const timers: NodeJS.Timeout[] = [];
-    
+
     children.forEach((_, index) => {
       const timer = setTimeout(() => {
-        setVisibleItems(prev => {
+        setVisibleItems((prev) => {
           const newState = [...prev];
           newState[index] = true;
           return newState;
         });
       }, index * staggerDelay);
-      
+
       timers.push(timer);
     });
 
     return () => {
-      timers.forEach(timer => clearTimeout(timer));
+      timers.forEach((timer) => clearTimeout(timer));
     };
   }, [children.length, staggerDelay]);
 
   const getItemClasses = (index: number) => {
     const isVisible = visibleItems[index];
-    const baseClasses = 'transition-all duration-500 ease-out';
-    
+    const baseClasses = "transition-all duration-500 ease-out";
+
     switch (itemAnimation) {
-      case 'slideUp':
+      case "slideUp":
         return cn(
           baseClasses,
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
         );
-      case 'slideDown':
+      case "slideDown":
         return cn(
           baseClasses,
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4",
         );
-      case 'fadeIn':
+      case "fadeIn":
+        return cn(baseClasses, isVisible ? "opacity-100" : "opacity-0");
+      case "scaleIn":
         return cn(
           baseClasses,
-          isVisible ? 'opacity-100' : 'opacity-0'
-        );
-      case 'scaleIn':
-        return cn(
-          baseClasses,
-          isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+          isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95",
         );
       default:
         return baseClasses;
@@ -294,13 +295,7 @@ export const StaggeredList: React.FC<StaggeredListProps> = ({
   return (
     <div className={className}>
       {children.map((child, index) => (
-        <div
-          key={index}
-          className={cn(
-            getItemClasses(index),
-            itemClassName
-          )}
-        >
+        <div key={index} className={cn(getItemClasses(index), itemClassName)}>
           {child}
         </div>
       ))}

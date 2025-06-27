@@ -47,57 +47,60 @@ nyxusd/
 ## Functional Programming Principles
 
 ### Pure Functions
+
 All core business logic is implemented as pure functions:
 
 ```typescript
 // Example: CDP ratio calculation
 const calculateCollateralizationRatio = (
   collateralValue: CollateralValue,
-  debtAmount: DebtAmount
+  debtAmount: DebtAmount,
 ): CollateralizationRatio => {
   return pipe(
     collateralValue,
     multiply(PRECISION_FACTOR),
     divide(debtAmount),
-    CollateralizationRatio.of
-  )
-}
+    CollateralizationRatio.of,
+  );
+};
 ```
 
 ### Immutable State Management
+
 State changes are modeled as transformations:
 
 ```typescript
 // Example: CDP state transition
 const updateCdpCollateral = (
   cdp: Cdp,
-  additionalCollateral: CollateralAmount
+  additionalCollateral: CollateralAmount,
 ): Either<CdpError, Cdp> => {
   return pipe(
     cdp,
     addCollateral(additionalCollateral),
     validateMinimumRatio,
-    map(recalculateHealth)
-  )
-}
+    map(recalculateHealth),
+  );
+};
 ```
 
 ### Error Handling
+
 Uses functional error handling patterns:
 
 ```typescript
 // Example: Validation chain
 const validateCdpOperation = (
-  operation: CdpOperation
+  operation: CdpOperation,
 ): Either<ValidationError, ValidatedOperation> => {
   return pipe(
     operation,
     validateCollateralAmount,
     chain(validateDebtAmount),
     chain(validateRatioRequirements),
-    map(ValidatedOperation.of)
-  )
-}
+    map(ValidatedOperation.of),
+  );
+};
 ```
 
 ## Setup Instructions
@@ -111,22 +114,26 @@ const validateCdpOperation = (
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-org/nyxusd.git
    cd nyxusd
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Build all packages**
+
    ```bash
    npm run build
    ```
 
 4. **Run tests**
+
    ```bash
    npm run test
    ```
@@ -139,16 +146,19 @@ const validateCdpOperation = (
 ### Development Workflow
 
 1. **Create a new library**
+
    ```bash
    nx generate @nrwl/node:library my-lib --directory=libs
    ```
 
 2. **Create a new package**
+
    ```bash
    nx generate @nrwl/node:application my-app --directory=packages
    ```
 
 3. **Run specific package/library**
+
    ```bash
    nx serve my-app
    nx test my-lib
@@ -156,6 +166,7 @@ const validateCdpOperation = (
    ```
 
 4. **Build affected packages**
+
    ```bash
    npm run build:affected
    ```
@@ -167,16 +178,16 @@ const validateCdpOperation = (
 
 ## Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run build` | Build all packages and libraries |
-| `npm run test` | Run all tests |
-| `npm run lint` | Lint all code |
-| `npm run type-check` | TypeScript type checking |
-| `npm run format` | Format code with Prettier |
-| `npm run validate` | Run full validation (lint + type-check + test) |
-| `npm run dev` | Start development servers |
-| `npm run graph` | View dependency graph |
+| Script               | Description                                    |
+| -------------------- | ---------------------------------------------- |
+| `npm run build`      | Build all packages and libraries               |
+| `npm run test`       | Run all tests                                  |
+| `npm run lint`       | Lint all code                                  |
+| `npm run type-check` | TypeScript type checking                       |
+| `npm run format`     | Format code with Prettier                      |
+| `npm run validate`   | Run full validation (lint + type-check + test) |
+| `npm run dev`        | Start development servers                      |
+| `npm run graph`      | View dependency graph                          |
 
 ## Path Mappings
 
@@ -184,13 +195,14 @@ The project uses TypeScript path mappings for clean imports:
 
 ```typescript
 // Instead of relative imports
-import { CdpEngine } from '../../../packages/cdp-engine/src'
+import { CdpEngine } from "../../../packages/cdp-engine/src";
 
 // Use path mappings
-import { CdpEngine } from '@nyxusd/cdp-engine'
+import { CdpEngine } from "@nyxusd/cdp-engine";
 ```
 
 Available path mappings:
+
 - `@nyxusd/core` - Core business logic
 - `@nyxusd/types` - Type definitions
 - `@nyxusd/utils` - Utility functions
@@ -209,12 +221,14 @@ Available path mappings:
 ## Code Style and Conventions
 
 ### Naming Conventions
+
 - **Functions**: `camelCase` with descriptive verbs (`calculateRatio`, `validateInput`)
 - **Types**: `PascalCase` (`CollateralAmount`, `CdpState`)
 - **Constants**: `SCREAMING_SNAKE_CASE` (`MIN_COLLATERAL_RATIO`)
 - **Modules**: `kebab-case` (`cdp-engine`, `oracle-service`)
 
 ### Function Composition
+
 Use `pipe` for sequential operations:
 
 ```typescript
@@ -224,20 +238,21 @@ const processTransaction = (tx: Transaction) =>
     validateTransaction,
     chain(executeTransaction),
     chain(updateState),
-    fold(handleError, handleSuccess)
-  )
+    fold(handleError, handleSuccess),
+  );
 ```
 
 ### Type Definitions
+
 Define explicit types for all data:
 
 ```typescript
 interface Cdp {
-  readonly id: CdpId
-  readonly owner: Address
-  readonly collateral: CollateralAmount
-  readonly debt: DebtAmount
-  readonly createdAt: Timestamp
+  readonly id: CdpId;
+  readonly owner: Address;
+  readonly collateral: CollateralAmount;
+  readonly debt: DebtAmount;
+  readonly createdAt: Timestamp;
 }
 ```
 

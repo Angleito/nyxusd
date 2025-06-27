@@ -1,7 +1,7 @@
 /**
  * Either monad implementation for handling computations that can fail.
  * Represents a value that can be either Left (error/failure) or Right (success).
- * 
+ *
  * The Either type satisfies the monad laws:
  * - Left identity: Either.of(a).flatMap(f) === f(a)
  * - Right identity: m.flatMap(Either.of) === m
@@ -46,7 +46,7 @@ export abstract class Either<L, R> {
    */
   static tryCatch<L, R>(
     computation: () => R,
-    onError: (error: unknown) => L = (e) => e as L
+    onError: (error: unknown) => L = (e) => e as L,
   ): Either<L, R> {
     try {
       return Either.right(computation());
@@ -255,7 +255,7 @@ export class Right<L, R> extends Either<L, R> {
   }
 
   ap<U>(eitherFn: Either<L, (value: R) => U>): Either<L, U> {
-    return eitherFn.flatMap(fn => this.map(fn));
+    return eitherFn.flatMap((fn) => this.map(fn));
   }
 
   toString(): string {
@@ -296,10 +296,7 @@ export const EitherUtils = {
    * @param fn - Function that returns Either
    * @returns Either containing array of all success values or first error
    */
-  traverse<A, L, R>(
-    items: A[],
-    fn: (item: A) => Either<L, R>
-  ): Either<L, R[]> {
+  traverse<A, L, R>(items: A[], fn: (item: A) => Either<L, R>): Either<L, R[]> {
     return this.sequence(items.map(fn));
   },
 
@@ -318,10 +315,10 @@ export const EitherUtils = {
    * @returns Function that works with Either values
    */
   lift2<A, B, C>(
-    fn: (a: A, b: B) => C
+    fn: (a: A, b: B) => C,
   ): <L>(eitherA: Either<L, A>, eitherB: Either<L, B>) => Either<L, C> {
     return <L>(eitherA: Either<L, A>, eitherB: Either<L, B>) =>
-      eitherA.flatMap(a => eitherB.map(b => fn(a, b)));
+      eitherA.flatMap((a) => eitherB.map((b) => fn(a, b)));
   },
 
   /**
@@ -332,7 +329,7 @@ export const EitherUtils = {
   partition<L, R>(eithers: Either<L, R>[]): [L[], R[]] {
     const lefts: L[] = [];
     const rights: R[] = [];
-    
+
     for (const either of eithers) {
       if (either.isLeft()) {
         lefts.push((either as Left<L, R>).value);
@@ -340,7 +337,7 @@ export const EitherUtils = {
         rights.push((either as Right<L, R>).value);
       }
     }
-    
+
     return [lefts, rights];
-  }
+  },
 };

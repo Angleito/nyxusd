@@ -42,8 +42,8 @@ export class FallbackAIService implements AIService {
 
     switch (conversationStep) {
       case "initial":
-        message =
-          "Hi! I'm Nyx, your AI investment strategist. I'll help you build a custom DeFi strategy that maximizes your yields through CDPs and yield farming.\n\nFirst, let me get to know you better so I can create the perfect strategy for your needs.\n\nWhat's your occupation? This helps me explain DeFi concepts in ways that relate to your work.";
+        // Initial message is now handled by AIAssistant component to prevent duplication
+        message = "Welcome! Let's get started.";
         nextStep = "occupation";
         break;
 
