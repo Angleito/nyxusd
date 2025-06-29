@@ -6,6 +6,7 @@ import { fetchSystemStats, fetchOraclePrices } from "../../services/api";
 import { WelcomeCard } from "./WelcomeCard";
 import { SystemHealthCard } from "./SystemHealthCard";
 import { OraclePricesCard } from "./OraclePricesCard";
+import { WalletDashboardCard } from "./WalletDashboardCard";
 
 export const ModernDashboard: React.FC = () => {
   const {
@@ -90,13 +91,18 @@ export const ModernDashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Masonry Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Welcome Card - Full width on mobile, spans 8 columns on lg */}
-<motion.div className="lg:col-span-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          {/* Welcome Card - Full width on mobile, spans 5 columns on lg */}
+<motion.div className="lg:col-span-5" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <WelcomeCard />
           </motion.div>
 
-          {/* Oracle Prices Card - Spans 4 columns on lg */}
-<motion.div className="lg:col-span-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          {/* Wallet Dashboard Card - Spans 4 columns on lg */}
+<motion.div className="lg:col-span-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
+            <WalletDashboardCard className="h-full" />
+          </motion.div>
+
+          {/* Oracle Prices Card - Spans 3 columns on lg */}
+<motion.div className="lg:col-span-3" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
             <OraclePricesCard className="h-full" />
           </motion.div>
 

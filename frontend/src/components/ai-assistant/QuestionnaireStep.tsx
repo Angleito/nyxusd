@@ -45,7 +45,7 @@ export const QuestionnaireStep: React.FC<QuestionnaireStepProps> = ({
     addMessage(`${questionText} - My answer: ${answerText}`, "user");
 
     // Move to next step
-    onComplete();
+    onComplete({ [fieldKey]: value });
   };
 
   const getQuestionText = (step: string): string => {

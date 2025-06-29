@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wallet, CheckCircle } from "lucide-react";
+import { Wallet, CheckCircle, AlertCircle } from "lucide-react";
+import { useAccount, useConnect, useBalance } from "wagmi";
+import { formatAddress, formatBalance, getWalletErrorMessage } from "../../lib/wallet";
+import { parseUnits } from "viem";
 
 interface WalletConnectionStepProps {
   onComplete: (data?: any) => void;
@@ -9,36 +12,45 @@ interface WalletConnectionStepProps {
 export const WalletConnectionStep: React.FC<WalletConnectionStepProps> = ({
   onComplete,
 }) => {
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
+  const { address, isConnected } = useAccount();
+  const { connect, connectors, isPending, error } = useConnect();
+  const { data: ethBalance } = useBalance({ address });
   const [showSuccess, setShowSuccess] = useState(false);
+  const [selectedConnector, setSelectedConnector] = useState<any>(null);
 
-  const mockWalletAddress = "0x742d...8963";
+  // Check if already connected on mount
+  useEffect(() => {
+    if (isConnected && address) {
+      setShowSuccess(true);
+      // Prepare wallet data
+      const walletData = {
+        address,
+        balances: {
+          ETH: { 
+            amount: ethBalance ? formatBalance(ethBalance.value, ethBalance.decimals) : "0", 
+            value: ethBalance ? Number(ethBalance.formatted) * 2000 : 0 // Assuming $2000/ETH
+          },
+          // Mock NIGHT and DUST for Midnight (these would come from Midnight SDK)
+          NIGHT: { amount: 25.0, value: 3750 },
+          DUST: { amount: 10000, value: 250 },
+        },
+        totalValue: 0,
+      };
+      walletData.totalValue = Object.values(walletData.balances).reduce(
+        (sum, bal) => sum + bal.value,
+        0
+      );
+      
+      // Auto-advance after 1.5s
+      setTimeout(() => {
+        onComplete({ connected: true, walletData });
+      }, 1500);
+    }
+  }, [isConnected, address, ethBalance, onComplete]);
 
-  const mockWalletData = {
-    address: mockWalletAddress,
-    balances: {
-      NIGHT: { amount: 25.0, value: 3750 },
-      DUST: { amount: 10000, value: 250 },
-      USDC: { amount: 5000, value: 5000 },
-    },
-    totalValue: 9000,
-  };
-
-  const handleConnect = async () => {
-    setIsConnecting(true);
-
-    // Simulate connection delay
-    await new Promise((resolve) => setTimeout(resolve, 2500));
-
-    setIsConnecting(false);
-    setIsConnected(true);
-    setShowSuccess(true);
-
-    // Auto-advance after showing success with wallet data
-    setTimeout(() => {
-      onComplete({ connected: true, walletData: mockWalletData });
-    }, 1500);
+  const handleConnect = async (connector: any) => {
+    setSelectedConnector(connector);
+    await connect({ connector });
   };
 
   return (
@@ -60,38 +72,45 @@ export const WalletConnectionStep: React.FC<WalletConnectionStepProps> = ({
 
       <AnimatePresence mode="wait">
         {!isConnected ? (
-          <motion.button
-            key="connect-button"
-            onClick={handleConnect}
-            disabled={isConnecting}
-            data-action="connect-wallet"
-            whileHover={{ scale: isConnecting ? 1 : 1.02 }}
-            whileTap={{ scale: isConnecting ? 1 : 0.98 }}
-            className={`
-              w-full py-4 px-6 rounded-xl font-medium text-white
-              bg-gradient-to-r from-purple-600 to-purple-700
-              hover:from-purple-700 hover:to-purple-800
-              transition-all duration-200
-              ${isConnecting ? "opacity-75 cursor-not-allowed" : ""}
-              flex items-center justify-center gap-3
-            `}
-          >
-            {isConnecting ? (
-              <>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                />
-                <span>Connecting...</span>
-              </>
-            ) : (
-              <>
-                <Wallet className="w-5 h-5" />
-                <span>Connect Wallet</span>
-              </>
-            )}
-          </motion.button>
+          <motion.div key="wallet-options" className="space-y-3">
+            {connectors.map((connector) => (
+              <motion.button
+                key={connector.uid}
+                onClick={() => handleConnect(connector)}
+                disabled={isPending && selectedConnector?.uid === connector.uid}
+                whileHover={{ scale: isPending ? 1 : 1.02 }}
+                whileTap={{ scale: isPending ? 1 : 0.98 }}
+                className={`
+                  w-full py-4 px-6 rounded-xl font-medium text-white
+                  bg-gradient-to-r from-purple-600 to-purple-700
+                  hover:from-purple-700 hover:to-purple-800
+                  transition-all duration-200
+                  ${isPending && selectedConnector?.uid === connector.uid ? "opacity-75 cursor-not-allowed" : ""}
+                  flex items-center justify-between
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  {connector.icon ? (
+                    <img 
+                      src={connector.icon} 
+                      alt={connector.name}
+                      className="w-6 h-6 rounded"
+                    />
+                  ) : (
+                    <Wallet className="w-5 h-5" />
+                  )}
+                  <span>{connector.name}</span>
+                </div>
+                {isPending && selectedConnector?.uid === connector.uid && (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                  />
+                )}
+              </motion.button>
+            ))}
+          </motion.div>
         ) : (
           <motion.div
             key="success-state"
@@ -116,7 +135,7 @@ export const WalletConnectionStep: React.FC<WalletConnectionStepProps> = ({
                 </motion.div>
                 <div>
                   <p className="text-sm text-gray-400">Connected</p>
-                  <p className="text-white font-mono">{mockWalletAddress}</p>
+                  <p className="text-white font-mono">{address && formatAddress(address)}</p>
                 </div>
               </div>
               {showSuccess && (
@@ -134,7 +153,25 @@ export const WalletConnectionStep: React.FC<WalletConnectionStepProps> = ({
         )}
       </AnimatePresence>
 
-      {isConnecting && (
+      {/* Error message */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-900/20 border border-red-800/30 rounded-xl p-4"
+        >
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-red-400">Connection Failed</p>
+              <p className="text-sm text-red-300 mt-1">{getWalletErrorMessage(error)}</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Connecting status */}
+      {isPending && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
