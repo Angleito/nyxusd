@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 interface MetricsGridProps {
   totalTVL: number;
@@ -155,10 +156,40 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({
 
   const utilizationRatio = totalTVL > 0 ? (totalSupply / totalTVL) * 100 : 0;
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+      },
+    },
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <motion.div 
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       {/* Total Value Locked */}
-      <div className="card group hover:shadow-lg transition-shadow duration-300">
+      <motion.div className="card group hover:shadow-lg transition-shadow duration-300" variants={itemVariants} whileHover={{ scale: 1.02, y: -4 }}>
         <div className="flex items-center justify-between mb-4">
           <div className="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
             <svg
@@ -194,10 +225,10 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({
             color="purple"
           />
         </div>
-      </div>
+      </motion.div>
 
       {/* nyxUSD Supply */}
-      <div className="card group hover:shadow-lg transition-shadow duration-300">
+      <motion.div className="card group hover:shadow-lg transition-shadow duration-300" variants={itemVariants} whileHover={{ scale: 1.02, y: -4 }}>
         <div className="flex items-center justify-between mb-4">
           <div className="p-3 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition-colors">
             <svg
@@ -233,10 +264,10 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({
             color="blue"
           />
         </div>
-      </div>
+      </motion.div>
 
       {/* System Collateralization */}
-      <div className="card group hover:shadow-lg transition-shadow duration-300">
+      <motion.div className="card group hover:shadow-lg transition-shadow duration-300" variants={itemVariants} whileHover={{ scale: 1.02, y: -4 }}>
         <div className="flex items-center justify-between mb-4">
           <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
             <svg
@@ -288,10 +319,10 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({
             }
           />
         </div>
-      </div>
+      </motion.div>
 
       {/* Active CDPs */}
-      <div className="card group hover:shadow-lg transition-shadow duration-300">
+      <motion.div className="card group hover:shadow-lg transition-shadow duration-300" variants={itemVariants} whileHover={{ scale: 1.02, y: -4 }}>
         <div className="flex items-center justify-between mb-4">
           <div className="p-3 bg-pink-100 rounded-lg group-hover:bg-pink-200 transition-colors">
             <svg
@@ -334,10 +365,10 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({
             </span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Additional System Metrics */}
-      <div className="card lg:col-span-2 group hover:shadow-lg transition-shadow duration-300">
+      <motion.div className="card lg:col-span-2 group hover:shadow-lg transition-shadow duration-300" variants={itemVariants} whileHover={{ scale: 1.02, y: -4 }}>
         <h4 className="text-lg font-semibold mb-4">Real-time System Metrics</h4>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-3">
@@ -374,10 +405,10 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({
             />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Network Status */}
-      <div className="card lg:col-span-2 group hover:shadow-lg transition-shadow duration-300">
+      <motion.div className="card lg:col-span-2 group hover:shadow-lg transition-shadow duration-300" variants={itemVariants} whileHover={{ scale: 1.02, y: -4 }}>
         <h4 className="text-lg font-semibold mb-4">Network Status</h4>
         <div className="grid grid-cols-3 gap-4 text-center">
           <div className="space-y-2">
@@ -431,7 +462,7 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({
             <div className="text-xs text-gray-500">Zero-Knowledge</div>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };

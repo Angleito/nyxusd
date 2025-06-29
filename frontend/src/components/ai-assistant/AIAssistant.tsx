@@ -232,11 +232,13 @@ export const AIAssistant: React.FC = () => {
 
   return (
     <motion.div
-      className="flex flex-col h-full bg-gray-900"
+      className="flex flex-col h-full bg-gray-900 relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
+      {/* Background gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-900 to-purple-900/10 pointer-events-none" />
       {/* Add styles for auto-action focus */}
       <style>{`
         .auto-action-focus {

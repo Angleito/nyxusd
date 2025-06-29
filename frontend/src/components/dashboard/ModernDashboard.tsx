@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { fetchSystemStats, fetchOraclePrices } from "../../services/api";
 import { WelcomeCard } from "./WelcomeCard";
 import { SystemHealthCard } from "./SystemHealthCard";
@@ -90,18 +91,18 @@ export const ModernDashboard: React.FC = () => {
         {/* Masonry Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Welcome Card - Full width on mobile, spans 8 columns on lg */}
-          <div className="lg:col-span-8">
+<motion.div className="lg:col-span-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <WelcomeCard />
-          </div>
+          </motion.div>
 
           {/* Oracle Prices Card - Spans 4 columns on lg */}
-          <div className="lg:col-span-4">
+<motion.div className="lg:col-span-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <OraclePricesCard className="h-full" />
-          </div>
+          </motion.div>
 
           {/* AI Portfolio Assistant Card - Full width, prominent placement */}
-          <div className="lg:col-span-12">
-            <div className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-xl shadow-lg border border-purple-500/20 p-8 hover:shadow-xl transition-all duration-300">
+          <motion.div className="lg:col-span-12" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
+            <motion.div className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-xl shadow-lg border border-purple-500/20 p-8 hover:shadow-xl transition-all duration-300" whileHover={{ y: -4, scale: 1.02 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
               {/* Background pattern */}
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-white rounded-full blur-3xl"></div>
@@ -196,21 +197,21 @@ export const ModernDashboard: React.FC = () => {
                   <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" />
                 </svg>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* System Health Card - Spans 8 columns on lg */}
-          <div className="lg:col-span-8">
+          <motion.div className="lg:col-span-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}>
             <SystemHealthCard
               systemStats={systemStats}
               isLoading={statsLoading}
             />
-          </div>
+          </motion.div>
 
           {/* Privacy Protection Card - Spans 4 columns on lg */}
-          <div className="lg:col-span-4">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200 h-full">
-              <div className="flex items-center justify-between mb-4">
+          <motion.div className="lg:col-span-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}>
+            <motion.div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200 h-full" whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
+            <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
                   <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -266,12 +267,12 @@ export const ModernDashboard: React.FC = () => {
                   Learn More About Privacy
                 </button>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Additional Cards Row */}
-          <div className="lg:col-span-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
+          <motion.div className="lg:col-span-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }}>
+            <motion.div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200" whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
                   <svg
@@ -354,11 +355,11 @@ export const ModernDashboard: React.FC = () => {
                   </div>
                 </Link>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <div className="lg:col-span-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
+          <motion.div className="lg:col-span-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }}>
+            <motion.div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200" whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
                   <svg
@@ -416,12 +417,12 @@ export const ModernDashboard: React.FC = () => {
                   View System Details
                 </button>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
 
         {/* Footer CTA */}
-        <div className="mt-12 text-center bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+        <motion.div className="mt-12 text-center bg-white rounded-xl shadow-sm border border-gray-100 p-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.7 }}>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
             Ready to Start?
           </h3>
@@ -437,7 +438,7 @@ export const ModernDashboard: React.FC = () => {
               Learn More
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

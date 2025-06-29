@@ -790,7 +790,7 @@ export const QuestionnaireStep: React.FC<QuestionnaireStepProps> = ({
         transition={{ duration: 0.3 }}
         className="w-full max-w-2xl mx-auto"
       >
-        <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
+        <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50 shadow-2xl">
           {renderQuestion()}
 
           <motion.button
