@@ -9,7 +9,7 @@ import {
   midnightTestnet 
 } from './chains';
 
-const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'demo-project-id';
+const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 const enableTestnets = import.meta.env.VITE_ENABLE_TESTNETS === 'true';
 
 // Define chains based on environment
@@ -18,16 +18,19 @@ const chains = enableTestnets
   : [mainnet, polygon, arbitrum] as const;
 
 // Validate WalletConnect Project ID
-if (!import.meta.env.VITE_WALLETCONNECT_PROJECT_ID) {
-  console.warn('⚠️ WalletConnect Project ID not found. Using demo ID. Get yours at https://cloud.walletconnect.com');
+const hasValidProjectId = walletConnectProjectId && walletConnectProjectId !== 'your_walletconnect_project_id_here';
+
+if (!hasValidProjectId) {
+  console.warn('⚠️ RainbowKit: WalletConnect Project ID not configured. Some wallet features may be limited. Get yours at https://cloud.walletconnect.com');
 }
 
-// RainbowKit configuration
+// RainbowKit configuration - only include project ID if valid
 export const rainbowkitConfig = getDefaultConfig({
   appName: 'NYX USD',
-  projectId: walletConnectProjectId,
+  projectId: hasValidProjectId ? walletConnectProjectId! : '', // Use empty string if no valid project ID
   chains,
-  ssr: false, // Not using SSR
+  ssr: false, // Disable SSR to prevent hydration issues
+  multiInjectedProviderDiscovery: false, // Reduce connector conflicts
 });
 
 // Custom theme for RainbowKit

@@ -23,6 +23,13 @@ const infuraApiKey = import.meta.env.VITE_INFURA_API_KEY
 const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID
 const enableTestnets = import.meta.env.VITE_ENABLE_TESTNETS === 'true'
 
+// Validate WalletConnect Project ID
+const hasValidProjectId = walletConnectProjectId && walletConnectProjectId !== 'your_walletconnect_project_id_here'
+
+if (!hasValidProjectId) {
+  console.warn('⚠️ WalletConnect Project ID not configured. WalletConnect features will be disabled. Get yours at https://cloud.walletconnect.com');
+}
+
 // Define chains based on environment
 const chains = enableTestnets 
   ? [mainnet, sepolia, polygon, polygonMumbai, arbitrum, arbitrumSepolia, midnightTestnet] as const
@@ -55,6 +62,9 @@ const transports = {
 export const wagmiConfig = createConfig({
   chains,
   transports,
+  // Configure multiInjectedProviderDiscovery to reduce connector issues
+  multiInjectedProviderDiscovery: false,
+  
   connectors: [
     // Injected connector (detects MetaMask, Rabby, Frame, etc.)
     injected({
@@ -62,28 +72,30 @@ export const wagmiConfig = createConfig({
         return {
           id: 'injected',
           name: 'Browser Wallet',
-          provider: window.ethereum,
+          provider: typeof window !== 'undefined' ? window.ethereum : undefined,
         }
-      }
+      },
+      shimDisconnect: true,
     }),
     
     // MetaMask specific connector
     metaMask({
       dappMetadata: {
         name: 'NYX USD',
-        url: window.location.origin,
+        url: typeof window !== 'undefined' ? window.location.origin : 'https://nyxusd.com',
       },
+      shimDisconnect: true,
     }),
     
-    // WalletConnect v2 (supports 300+ wallets including Uniswap, Trust, Rainbow, etc.)
-    ...(walletConnectProjectId ? [
+    // WalletConnect v2 - only include if valid project ID is available
+    ...(hasValidProjectId ? [
       walletConnect({
-        projectId: walletConnectProjectId,
+        projectId: walletConnectProjectId!,
         metadata: {
           name: 'NYX USD',
           description: 'Privacy-preserving CDP protocol on Midnight Protocol',
-          url: window.location.origin,
-          icons: ['/logo.png'],
+          url: typeof window !== 'undefined' ? window.location.origin : 'https://nyxusd.com',
+          icons: ['/favicon.ico'],
         },
         showQrModal: true,
         qrModalOptions: {
@@ -98,7 +110,7 @@ export const wagmiConfig = createConfig({
     // Coinbase Wallet
     coinbaseWallet({
       appName: 'NYX USD',
-      appLogoUrl: '/logo.png',
+      appLogoUrl: '/favicon.ico',
       preference: 'all', // Support both extension and mobile
     }),
     
@@ -106,6 +118,7 @@ export const wagmiConfig = createConfig({
     safe({
       allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
       debug: false,
+      shimDisconnect: true,
     }),
     
     // Midnight Protocol wallet connector
