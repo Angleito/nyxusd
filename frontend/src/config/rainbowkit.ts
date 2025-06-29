@@ -1,4 +1,11 @@
-import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
+import {
+  metaMaskWallet,
+  coinbaseWallet,
+  injectedWallet,
+  safeWallet,
+  walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets';
 import { 
   mainnet, 
   sepolia, 
@@ -21,17 +28,35 @@ const chains = enableTestnets
 const hasValidProjectId = walletConnectProjectId && walletConnectProjectId !== 'your_walletconnect_project_id_here';
 
 if (!hasValidProjectId) {
-  console.warn('⚠️ RainbowKit: WalletConnect Project ID not configured. Some wallet features may be limited. Get yours at https://cloud.walletconnect.com');
+  console.warn('⚠️ RainbowKit: WalletConnect Project ID not configured. WalletConnect features will be disabled. Get yours at https://cloud.walletconnect.com');
 }
 
-// RainbowKit configuration - only include project ID if valid
-export const rainbowkitConfig = getDefaultConfig({
-  appName: 'NYX USD',
-  projectId: hasValidProjectId ? walletConnectProjectId! : '', // Use empty string if no valid project ID
-  chains,
-  ssr: false, // Disable SSR to prevent hydration issues
-  multiInjectedProviderDiscovery: false, // Reduce connector conflicts
-});
+// Base wallet list without WalletConnect
+const baseWallets = [
+  metaMaskWallet,
+  coinbaseWallet, 
+  safeWallet,
+  injectedWallet,
+];
+
+// Add WalletConnect only if valid project ID exists
+const wallets = hasValidProjectId 
+  ? [...baseWallets, walletConnectWallet]
+  : baseWallets;
+
+// RainbowKit connectors configuration
+export const rainbowkitConnectors = connectorsForWallets(
+  [
+    {
+      groupName: 'Popular',
+      wallets,
+    },
+  ],
+  {
+    appName: 'NYX USD',
+    ...(hasValidProjectId && { projectId: walletConnectProjectId! }),
+  }
+);
 
 // Custom theme for RainbowKit
 export const rainbowkitTheme = {
