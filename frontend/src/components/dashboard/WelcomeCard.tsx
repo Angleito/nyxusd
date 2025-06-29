@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export interface WelcomeCardProps {
   className?: string;
@@ -7,8 +8,12 @@ export interface WelcomeCardProps {
 
 export const WelcomeCard: React.FC<WelcomeCardProps> = ({ className = "" }) => {
   return (
-    <div
+    <motion.div
       className={`bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-xl shadow-lg p-8 text-white relative overflow-hidden ${className}`}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ scale: 1.02, y: -4 }}
     >
       {/* Background decoration */}
       <div className="absolute inset-0 bg-black opacity-10"></div>
@@ -48,10 +53,11 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({ className = "" }) => {
           <h3 className="text-lg font-semibold mb-3">Quick Actions</h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Link
-              to="/cdp"
-              className="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 transition-all duration-200 transform hover:scale-105 backdrop-blur-sm border border-white border-opacity-20"
-            >
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                to="/cdp"
+                className="block bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 transition-all duration-200 backdrop-blur-sm border border-white border-opacity-20"
+              >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-white bg-opacity-30 rounded-lg flex items-center justify-center">
                   <svg
@@ -75,9 +81,10 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({ className = "" }) => {
                   </div>
                 </div>
               </div>
-            </Link>
+              </Link>
+            </motion.div>
 
-            <div className="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 transition-all duration-200 transform hover:scale-105 backdrop-blur-sm border border-white border-opacity-20 cursor-pointer">
+            <motion.div className="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 transition-all duration-200 backdrop-blur-sm border border-white border-opacity-20 cursor-pointer" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-white bg-opacity-30 rounded-lg flex items-center justify-center">
                   <svg
@@ -101,11 +108,11 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({ className = "" }) => {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

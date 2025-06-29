@@ -37,7 +37,7 @@ export const TypingIndicator: React.FC = () => {
 
   return (
     <motion.div
-      className="flex items-center gap-3 p-4 bg-gray-800/30 rounded-lg"
+      className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-800/40 to-gray-800/20 rounded-2xl border border-gray-700/30"
       variants={containerVariants}
       initial="initial"
       animate="animate"

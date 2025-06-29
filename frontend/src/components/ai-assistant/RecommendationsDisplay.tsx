@@ -128,7 +128,7 @@ export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({
         initial={{ opacity: 0, scale: 0.9 }}
         animate={mounted ? { opacity: 1, scale: 1 } : {}}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-gray-700"
+        className="bg-gradient-to-br from-gray-800/50 to-gray-900/30 backdrop-blur-lg rounded-2xl p-8 mb-8 border border-gray-700/50 shadow-2xl"
       >
         <h3 className="text-xl font-semibold text-white mb-6">
           Portfolio Allocation
@@ -216,7 +216,7 @@ export const RecommendationsDisplay: React.FC<RecommendationsDisplayProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={mounted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-            className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-6 border border-gray-700 hover:border-gray-600 transition-all duration-300"
+            className="bg-gradient-to-br from-gray-800/40 to-gray-900/30 backdrop-blur-lg rounded-2xl p-6 border border-gray-700/50 hover:border-purple-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10 hover:scale-105"
           >
             {/* Header */}
             <div className="flex items-start justify-between mb-4">

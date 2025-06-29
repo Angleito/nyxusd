@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "30494:80"
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro
+      - ./nginx-frontend-only.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - nyxusd-network
+
+networks:
+  nyxusd-network:
+    driver: bridge
