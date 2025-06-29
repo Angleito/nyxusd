@@ -224,7 +224,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ className }) => {
                 className="px-6 py-3 bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-lg"
                 whileHover={{ scale: 1.05 }}
               >
-                <span className="text-green-300 font-medium">💡 Open Source Contributor</span>
+                <span className="text-green-300 font-medium">🤖 AI Integrator</span>
               </motion.div>
             </div>
           </Card>
