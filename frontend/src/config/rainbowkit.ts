@@ -9,13 +9,18 @@ import {
   midnightTestnet 
 } from './chains';
 
-const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '';
+const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'demo-project-id';
 const enableTestnets = import.meta.env.VITE_ENABLE_TESTNETS === 'true';
 
 // Define chains based on environment
 const chains = enableTestnets 
   ? [mainnet, sepolia, polygon, polygonMumbai, arbitrum, arbitrumSepolia, midnightTestnet] as const
   : [mainnet, polygon, arbitrum] as const;
+
+// Validate WalletConnect Project ID
+if (!import.meta.env.VITE_WALLETCONNECT_PROJECT_ID) {
+  console.warn('⚠️ WalletConnect Project ID not found. Using demo ID. Get yours at https://cloud.walletconnect.com');
+}
 
 // RainbowKit configuration
 export const rainbowkitConfig = getDefaultConfig({
