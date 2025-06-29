@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 export interface StatsCardProps {
   title: string;
@@ -40,8 +41,12 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   }
 
   return (
-    <div
-      className={`bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-purple-200 transition-all duration-200 transform hover:scale-105 ${className}`}
+    <motion.div
+      className={`bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-purple-200 transition-all duration-200 ${className}`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ scale: 1.05, y: -4 }}
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">
@@ -83,7 +88,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

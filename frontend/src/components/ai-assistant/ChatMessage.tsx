@@ -41,16 +41,16 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   return (
     <motion.div
       className={clsx(
-        "flex gap-3 p-4 rounded-lg transition-all duration-200",
+        "flex gap-4 p-4 rounded-2xl transition-all duration-300",
         isAI
-          ? "bg-gray-800/30 hover:bg-gray-800/40"
-          : "bg-transparent hover:bg-gray-800/10",
+          ? "bg-gradient-to-r from-gray-800/40 to-gray-800/20 hover:from-gray-800/50 hover:to-gray-800/30 border border-gray-700/30"
+          : "bg-gradient-to-l from-purple-900/10 to-transparent hover:from-purple-900/20 hover:to-purple-800/10",
       )}
       variants={messageVariants}
       initial="hidden"
       animate="visible"
-      whileHover={{ scale: 1.01 }}
-      transition={{ type: "spring", stiffness: 500 }}
+      whileHover={{ scale: 1.01, y: -1 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >
       {/* Avatar */}
       <motion.div

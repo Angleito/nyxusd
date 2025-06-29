@@ -42,6 +42,16 @@ const mainNavItems: NavItem[] = [
     href: "/ai-assistant",
     description: "Get personalized investment recommendations",
   },
+  {
+    label: "About Us",
+    href: "/about",
+    description: "Learn more about our platform and team",
+  },
+  {
+    label: "Contact",
+    href: "/contact",
+    description: "Get in touch with Angel",
+  },
 ];
 
 // Removed unimplemented navigation sections for MVP focus

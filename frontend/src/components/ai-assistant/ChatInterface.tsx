@@ -35,7 +35,7 @@ export const ChatInterface: React.FC = () => {
 
   return (
     <motion.div
-      className="flex flex-col h-full bg-gray-900 rounded-lg border border-gray-800 shadow-2xl relative overflow-hidden"
+      className="flex flex-col h-full bg-gray-900 rounded-2xl border border-gray-800/50 shadow-2xl relative overflow-hidden backdrop-blur-sm"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}

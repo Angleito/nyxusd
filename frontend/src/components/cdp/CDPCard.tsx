@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   depositCollateral,
   withdrawCollateral,
@@ -163,7 +164,7 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
 
   return (
     <>
-      <div className="bg-card rounded-xl shadow-sm border border-border hover:shadow-md transition-all duration-200">
+      <motion.div className="bg-card rounded-xl shadow-sm border border-border hover:shadow-md transition-all duration-200" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} whileHover={{ scale: 1.02, y: -4 }}>
         {/* Header */}
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center justify-between">
@@ -299,8 +300,9 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
         </div>
 
         {/* Collapsible Details */}
-        {expanded && (
-          <div className="border-t border-border p-6 bg-muted">
+        <AnimatePresence>
+          {expanded && (
+            <motion.div className="border-t border-border p-6 bg-muted" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3 }}>
             <h4 className="font-semibold text-card-foreground mb-4">
               Detailed Information
             </h4>
@@ -424,14 +426,16 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
                 </p>
               </div>
             )}
-          </div>
-        )}
-      </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
       {/* Action Modal */}
-      {showActionModal && actionType && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-card rounded-xl shadow-2xl max-w-md w-full">
+      <AnimatePresence>
+        {showActionModal && actionType && (
+          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <motion.div className="bg-card rounded-xl shadow-2xl max-w-md w-full" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.2, type: "spring", stiffness: 300, damping: 20 }}>
             <div className="p-6 border-b border-border">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-card-foreground">
@@ -533,9 +537,10 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { fetchSystemStats, fetchOraclePrices } from "../../services/api";
 import HeroSection from "./HeroSection";
 
@@ -40,7 +41,7 @@ export const DashboardWithHero: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                <div className="card-midnight">
+                <motion.div className="card-midnight" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} whileHover={{ scale: 1.05 }}>
                   <div className="text-3xl font-bold text-foreground mb-2">
                     $
                     {(systemStats as any)?.totalCollateral
@@ -50,9 +51,9 @@ export const DashboardWithHero: React.FC = () => {
                       : "0"}
                   </div>
                   <div className="text-purple-300">Total Collateral</div>
-                </div>
+                </motion.div>
 
-                <div className="card-midnight">
+                <motion.div className="card-midnight" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} whileHover={{ scale: 1.05 }}>
                   <div className="text-3xl font-bold text-foreground mb-2">
                     $
                     {(systemStats as any)?.totalDebt
@@ -62,16 +63,16 @@ export const DashboardWithHero: React.FC = () => {
                       : "0"}
                   </div>
                   <div className="text-purple-300">Total Debt Issued</div>
-                </div>
+                </motion.div>
 
-                <div className="card-midnight">
+                <motion.div className="card-midnight" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }} whileHover={{ scale: 1.05 }}>
                   <div className="text-3xl font-bold text-foreground mb-2">
                     {(systemStats as any)?.systemCollateralizationRatio || 0}%
                   </div>
                   <div className="text-purple-300">System Ratio</div>
-                </div>
+                </motion.div>
 
-                <div className="card-midnight">
+                <motion.div className="card-midnight" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }} whileHover={{ scale: 1.05 }}>
                   <div className="text-3xl font-bold text-foreground mb-2">
                     {(systemStats as any)?.stabilityFeeRate
                       ? ((systemStats as any).stabilityFeeRate / 100).toFixed(1)
@@ -79,7 +80,7 @@ export const DashboardWithHero: React.FC = () => {
                     %
                   </div>
                   <div className="text-purple-300">Stability Fee APR</div>
-                </div>
+                </motion.div>
               </div>
             )}
           </div>
@@ -87,7 +88,7 @@ export const DashboardWithHero: React.FC = () => {
           {/* Oracle Prices and Collaterals Grid */}
           <div className="grid lg:grid-cols-2 gap-8 mb-16">
             {/* Oracle Prices */}
-            <div className="card-midnight">
+            <motion.div className="card-midnight" initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.5 }} whileHover={{ scale: 1.02 }}>
               <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center">
                 <div className="w-2 h-2 bg-green-400 rounded-full mr-3 animate-pulse"></div>
                 Live Oracle Prices
@@ -120,10 +121,10 @@ export const DashboardWithHero: React.FC = () => {
                   ? new Date((prices as any).timestamp).toLocaleString()
                   : "Loading..."}
               </div>
-            </div>
+            </motion.div>
 
             {/* Supported Collaterals */}
-            <div className="card-midnight">
+            <motion.div className="card-midnight" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.6 }} whileHover={{ scale: 1.02 }}>
               <h3 className="text-2xl font-bold text-foreground mb-6">
                 Supported Collaterals
               </h3>
@@ -162,11 +163,11 @@ export const DashboardWithHero: React.FC = () => {
                   ),
                 )}
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Call to Action */}
-          <div className="text-center">
+          <motion.div className="text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.7 }}>
             <div className="max-w-2xl mx-auto mb-8">
               <h3 className="text-3xl font-bold text-foreground mb-4">
                 Ready to Start?
@@ -176,26 +177,28 @@ export const DashboardWithHero: React.FC = () => {
                 nyxUSD with complete privacy.
               </p>
             </div>
-            <Link
-              to="/cdp"
-              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-foreground font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/25 transform hover:scale-105"
-            >
-              Create Your First CDP
-              <svg
-                className="ml-2 w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                to="/cdp"
+                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-foreground font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </Link>
-          </div>
+                Create Your First CDP
+                <svg
+                  className="ml-2 w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </div>

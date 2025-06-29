@@ -326,7 +326,7 @@ export const DEFAULT_ORACLE_CONFIGS: Record<
  */
 export const validateOracleConfig = (
   config: unknown,
-): z.SafeParseReturnType<OracleEnvironmentConfig> => {
+): z.SafeParseReturnType<unknown, OracleEnvironmentConfig> => {
   return OracleEnvironmentConfigSchema.safeParse(config);
 };
 
