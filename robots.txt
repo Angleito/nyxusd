@@ -1,0 +1,509 @@
+# robots.txt for NyxUSD - Privacy-Preserving CDP System on Midnight Protocol
+# Optimized for LLM AI Search Crawlers and SEO (2024/2025)
+# Generated: 2025-06-30
+
+# ===== SEARCH ENGINE CRAWLERS (ALLOWED) =====
+# Traditional search engines for SEO visibility
+User-agent: Googlebot
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Disallow: /node_modules/
+Disallow: /dist/
+Disallow: /coverage/
+Disallow: /.env*
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Disallow: /node_modules/
+Disallow: /dist/
+Disallow: /coverage/
+Disallow: /.env*
+Crawl-delay: 1
+
+User-agent: DuckDuckBot
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Crawl-delay: 1
+
+# ===== AI SEARCH ASSISTANTS (ALLOWED) =====
+# These provide value to users by helping them understand our platform
+
+# OpenAI Search & Browsing (Allowed for user assistance)
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Crawl-delay: 2
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Crawl-delay: 2
+
+# Anthropic Claude (Allowed for user assistance)
+User-agent: ClaudeBot
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Crawl-delay: 2
+
+User-agent: Claude-SearchBot
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Crawl-delay: 2
+
+User-agent: Claude-User
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Crawl-delay: 2
+
+# Perplexity (Allowed for user assistance)
+User-agent: PerplexityBot
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Crawl-delay: 2
+
+User-agent: Perplexity-User
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Crawl-delay: 2
+
+# You.com (Allowed for user assistance)
+User-agent: YouBot
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Crawl-delay: 2
+
+# DuckDuckGo AI Assistant (Allowed)
+User-agent: DuckAssistBot
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /*.json$
+Crawl-delay: 2
+
+# ===== AI TRAINING CRAWLERS (BLOCKED) =====
+# These are blocked to protect proprietary information and IP
+
+# OpenAI Training Bot (Blocked)
+User-agent: GPTBot
+Disallow: /
+
+# Anthropic Training Bot (Blocked)
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+# Google AI Training (Blocked)
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Google-CloudVertexBot
+Disallow: /
+
+User-agent: GoogleOther
+Disallow: /
+
+User-agent: GoogleOther-Image
+Disallow: /
+
+User-agent: GoogleOther-Video
+Disallow: /
+
+# Meta/Facebook AI (Blocked)
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: facebookexternalhit
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+User-agent: meta-externalfetcher
+Disallow: /
+
+User-agent: Meta-ExternalFetcher
+Disallow: /
+
+# Apple AI Training (Blocked)
+User-agent: Applebot-Extended
+Disallow: /
+
+# Amazon AI (Blocked)
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: bedrockbot
+Disallow: /
+
+# ByteDance/TikTok (Blocked)
+User-agent: Bytespider
+Disallow: /
+
+User-agent: TikTokSpider
+Disallow: /
+
+# Other AI Training Crawlers (Blocked)
+User-agent: CCBot
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: cohere-training-data-crawler
+Disallow: /
+
+User-agent: AI2Bot
+Disallow: /
+
+User-agent: Ai2Bot-Dolma
+Disallow: /
+
+User-agent: PanguBot
+Disallow: /
+
+User-agent: img2dataset
+Disallow: /
+
+User-agent: Scrapy
+Disallow: /
+
+User-agent: aiHitBot
+Disallow: /
+
+User-agent: Brightbot 1.0
+Disallow: /
+
+User-agent: Cotoyogi
+Disallow: /
+
+User-agent: Crawlspace
+Disallow: /
+
+User-agent: Datenbank Crawler
+Disallow: /
+
+User-agent: Devin
+Disallow: /
+
+User-agent: Diffbot
+Disallow: /
+
+User-agent: Echobot Bot
+Disallow: /
+
+User-agent: EchoboxBot
+Disallow: /
+
+User-agent: Factset_spyderbot
+Disallow: /
+
+User-agent: FirecrawlAgent
+Disallow: /
+
+User-agent: FriendlyCrawler
+Disallow: /
+
+User-agent: iaskspider/2.0
+Disallow: /
+
+User-agent: ICC-Crawler
+Disallow: /
+
+User-agent: ImagesiftBot
+Disallow: /
+
+User-agent: ISSCyberRiskCrawler
+Disallow: /
+
+User-agent: Kangaroo Bot
+Disallow: /
+
+User-agent: MistralAI-User
+Disallow: /
+
+User-agent: MistralAI-User/1.0
+Disallow: /
+
+User-agent: MyCentralAIScraperBot
+Disallow: /
+
+User-agent: NovaAct
+Disallow: /
+
+User-agent: omgili
+Disallow: /
+
+User-agent: omgilibot
+Disallow: /
+
+User-agent: Operator
+Disallow: /
+
+User-agent: Panscient
+Disallow: /
+
+User-agent: panscient.com
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: PhindBot
+Disallow: /
+
+User-agent: Poseidon Research Crawler
+Disallow: /
+
+User-agent: QualifiedBot
+Disallow: /
+
+User-agent: QuillBot
+Disallow: /
+
+User-agent: quillbot.com
+Disallow: /
+
+User-agent: SBIntuitionsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: SemrushBot-BA
+Disallow: /
+
+User-agent: SemrushBot-CT
+Disallow: /
+
+User-agent: SemrushBot-OCOB
+Disallow: /
+
+User-agent: SemrushBot-SI
+Disallow: /
+
+User-agent: SemrushBot-SWA
+Disallow: /
+
+User-agent: Sidetrade indexer bot
+Disallow: /
+
+User-agent: Timpibot
+Disallow: /
+
+User-agent: VelenPublicWebCrawler
+Disallow: /
+
+User-agent: WARDBot
+Disallow: /
+
+User-agent: Webzio-Extended
+Disallow: /
+
+User-agent: wpbot
+Disallow: /
+
+User-agent: YandexAdditional
+Disallow: /
+
+User-agent: YandexAdditionalBot
+Disallow: /
+
+User-agent: Awario
+Disallow: /
+
+User-agent: Andibot
+Disallow: /
+
+# ===== GENERAL CRAWLER RULES =====
+# Default rules for other crawlers
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /docs/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Disallow: /wallet/
+Disallow: /node_modules/
+Disallow: /dist/
+Disallow: /coverage/
+Disallow: /tests/
+Disallow: /libs/
+Disallow: /.env*
+Disallow: /.git/
+Disallow: /.claude/
+Disallow: /*.json$
+Disallow: /*.log$
+Disallow: /*.sql$
+Disallow: /*.db$
+Disallow: /*package-lock.json$
+Disallow: /*tsconfig*.json$
+Disallow: /*jest.config.js$
+Disallow: /*vite.config.ts$
+Disallow: /*tailwind.config.js$
+Disallow: /*postcss.config.js$
+Disallow: /*eslint.config.js$
+Disallow: /*Dockerfile*
+Disallow: /*docker-compose*.yml$
+Disallow: /*nginx*.conf$
+Crawl-delay: 2
+
+# ===== SITEMAP REFERENCES =====
+# Sitemap: https://nyxusd.com/sitemap.xml
+# Sitemap: https://nyxusd.com/sitemap-index.xml
+
+# ===== ADDITIONAL SECURITY MEASURES =====
+# Block access to sensitive files and directories
+Disallow: /.env
+Disallow: /.env.local
+Disallow: /.env.development
+Disallow: /.env.production
+Disallow: /.env.example
+Disallow: /config/
+Disallow: /secrets/
+Disallow: /backup/
+Disallow: /logs/
+Disallow: /temp/
+Disallow: /tmp/
+Disallow: /cache/
+Disallow: /*admin*
+Disallow: /*login*
+Disallow: /*auth*
+Disallow: /*session*
+Disallow: /*cookie*
+Disallow: /*token*
+Disallow: /*key*
+Disallow: /*secret*
+Disallow: /*password*
+Disallow: /*private*
+Disallow: /*internal*
+
+# ===== CRAWL OPTIMIZATION =====
+# Optimized crawl delays for different types of bots
+# AI Search Assistants: 2 seconds (balanced for user experience)
+# Search Engines: 1 second (faster for SEO indexing)
+# All Others: 2 seconds (conservative approach)
+
+# ===== CONTACT INFORMATION =====
+# For questions about this robots.txt file:
+# Email: contact@nyxusd.com
+# Website: https://nyxusd.com/contact
+
+# Last Updated: 2025-06-30
+# Next Review: 2025-12-30
