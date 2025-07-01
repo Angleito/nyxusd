@@ -244,6 +244,17 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                   and inclusive technology development—all focused on breaking down the 
                   barriers that keep people from financial sovereignty.
                 </p>
+                <p className="text-lg text-gray-300 leading-relaxed mt-4">
+                  Learn more about our founder: 
+                  <a 
+                    href="https://angelortegamelton.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-purple-400 hover:text-purple-300 transition-colors ml-2 underline underline-offset-4"
+                  >
+                    angelortegamelton.com
+                  </a>
+                </p>
               </motion.div>
               
               <motion.div

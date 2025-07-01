@@ -71,6 +71,14 @@ const contactMethods: ContactMethod[] = [
     icon: "🐦",
     gradient: "from-blue-400 to-blue-600",
     description: "Updates and thoughts on crypto & tech"
+  },
+  {
+    label: "Personal Website",
+    value: "angelortegamelton.com",
+    href: "https://angelortegamelton.com",
+    icon: "🌐",
+    gradient: "from-purple-500 to-indigo-600",
+    description: "Portfolio and personal projects"
   }
 ];
 
