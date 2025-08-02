@@ -331,7 +331,7 @@ export function demonstratePerformanceComparison() {
     console.log("✓ Context-aware personalization");
     console.log("✓ Configurable compression levels");
     console.log("✓ Type-safe with TypeScript");
-    console.log("✓ Functional programming patterns");
+    console.log("✓ Clean architecture patterns");
     console.log("✓ Built-in analytics and monitoring\n");
   }
 }

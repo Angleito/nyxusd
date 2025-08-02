@@ -2,8 +2,8 @@
  * @fileoverview Multi-dimensional Personalization Engine for NyxUSD AI Assistant
  *
  * A comprehensive personalization system that analyzes user profiles across multiple dimensions
- * to provide context-aware, highly personalized AI responses. Implements functional programming
- * patterns for maintainable and extensible personalization logic.
+ * to provide context-aware, highly personalized AI responses with clean, maintainable
+ * architecture.
  *
  * @author NyxUSD AI Team
  * @version 1.0.0

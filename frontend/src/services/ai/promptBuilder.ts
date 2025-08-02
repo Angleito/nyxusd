@@ -3,8 +3,7 @@
  *
  * A comprehensive prompt building system for the NyxUSD AI assistant that implements
  * composable prompt construction with dynamic context injection, template composition,
- * and compression utilities. Follows functional programming patterns with immutable
- * data structures and pure functions.
+ * and compression utilities.
  *
  * Key features:
  * - Fluent API for composable prompt construction

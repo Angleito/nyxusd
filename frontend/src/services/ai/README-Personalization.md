@@ -229,11 +229,11 @@ console.log(response.personalization.strategy);
 console.log(response.personalization.effectivenessScore);
 ```
 
-## Functional Programming Patterns
+## API Methods
 
-The PersonalizationEngine follows functional programming principles:
+The PersonalizationEngine provides straightforward methods for personalization:
 
-### Curried Functions
+### Core Methods
 
 ```typescript
 import {
@@ -244,22 +244,21 @@ import {
 const analyzer = analyzeUserProfile(engine);
 const selector = selectPersonalizationStrategy(engine);
 
-// Use as pure functions
+// Use directly
 const analysis = analyzer(profile);
 const result = selector(profile, context);
 ```
 
-### Composable Operations
+### Method Chaining
 
 ```typescript
-import { pipe } from "@nyxusd/fp-utils";
-
-const personalizeResponse = pipe(
-  convertToPersonalizationProfile,
-  analyzer,
-  (analysis) => selector(analysis.primaryProfile, context),
-  (result) => applyPersonalization(baseResponse, result),
-);
+// Chain operations for convenience
+const personalizeResponse = (profile, context, baseResponse) => {
+  const personalizationProfile = convertToPersonalizationProfile(profile);
+  const analysis = analyzer(personalizationProfile);
+  const result = selector(analysis.primaryProfile, context);
+  return applyPersonalization(baseResponse, result);
+};
 ```
 
 ## Configuration and Extension

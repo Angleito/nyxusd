@@ -4,7 +4,7 @@ A comprehensive prompt building system for the NyxUSD AI assistant that implemen
 
 ## Features
 
-- 🔧 **Modular Design**: Composable prompt building functions following functional programming patterns
+- 🔧 **Modular Design**: Composable prompt building functions with clean architecture
 - 🎯 **Context-Aware**: Dynamic injection of user profile and conversation context
 - 📦 **Template System**: Optimized prompt templates for each conversation step
 - 🗜️ **Compression**: Token optimization achieving 40-60% reduction
