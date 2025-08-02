@@ -21,11 +21,12 @@ const queryClient = new QueryClient({
 
 export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   return (
-    <WagmiProvider config={wagmiConfig}>
+    <WagmiProvider config={wagmiConfig} reconnectOnMount={true}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider 
           theme={lightTheme(rainbowkitTheme)}
           modalSize="compact"
+          showRecentTransactions={false}
         >
           {children}
         </RainbowKitProvider>

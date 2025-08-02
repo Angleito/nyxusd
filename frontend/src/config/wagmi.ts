@@ -55,6 +55,7 @@ export const wagmiConfig = createConfig({
       shimDisconnect: true,
     }),
   ],
+  ssr: false, // Disable SSR to avoid hydration issues
 })
 
 // Export chain IDs for convenience

@@ -1,0 +1,18 @@
+{
+  "name": "NyxUSD",
+  "short_name": "NyxUSD",
+  "description": "Chain-Agnostic AI Stablecoin Protocol",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/nyx-assets/images/nyx-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -39,6 +39,18 @@ const baseWallets = [
   injectedWallet,
 ];
 
+// Suppress Coinbase analytics errors in console
+if (typeof window !== 'undefined') {
+  const originalError = console.error;
+  console.error = (...args) => {
+    // Filter out Coinbase analytics errors
+    if (args[0]?.toString?.().includes('cca-lite.coinbase.com')) {
+      return;
+    }
+    originalError.apply(console, args);
+  };
+}
+
 // Add WalletConnect only if valid project ID exists
 const wallets = hasValidProjectId 
   ? [...baseWallets, walletConnectWallet]
