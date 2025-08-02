@@ -84,7 +84,7 @@ class CryptoMcpServer {
     );
 
     this.cache = new NodeCache({ stdTTL: 60, checkperiod: 120 });
-    this.hiveApiKey = process.env.HIVE_API_KEY || '';
+    this.hiveApiKey = process.env['HIVE_API_KEY'] || '';
 
     this.setupHandlers();
   }
@@ -167,16 +167,16 @@ class CryptoMcpServer {
       try {
         switch (name) {
           case 'get_crypto_price':
-            return await this.getCryptoPrice(args.symbol);
+            return await this.getCryptoPrice(args['symbol'] as string);
           
           case 'get_market_trends':
-            return await this.getMarketTrends(args.timeframe || '24h');
+            return await this.getMarketTrends((args['timeframe'] as string) || '24h');
           
           case 'analyze_portfolio':
-            return await this.analyzePortfolio(args.holdings);
+            return await this.analyzePortfolio(args['holdings'] as PortfolioAsset[]);
           
           case 'get_defi_rates':
-            return await this.getDefiRates(args.protocol || 'all', args.chain || 'all');
+            return await this.getDefiRates((args['protocol'] as string) || 'all', (args['chain'] as string) || 'all');
           
           default:
             throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
@@ -534,7 +534,7 @@ Provide risk mitigation strategies and hedging recommendations.`,
       const maxAllocation = Math.max(...breakdown.map(b => b.percentage));
       const diversificationScore = 100 - (maxAllocation - (100 / holdings.length));
 
-      const volatilityScore = holdings.includes(h => h.symbol === 'BTC' || h.symbol === 'ETH') ? 60 : 80;
+      const volatilityScore = holdings.some((h: PortfolioAsset) => h.symbol === 'BTC' || h.symbol === 'ETH') ? 60 : 80;
       const riskScore = (100 - diversificationScore + volatilityScore) / 2;
 
       const recommendations = [];

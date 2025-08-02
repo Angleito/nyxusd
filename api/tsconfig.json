@@ -17,6 +17,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "strict": false,
+    "exactOptionalPropertyTypes": false,
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"],

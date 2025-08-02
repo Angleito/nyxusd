@@ -26,6 +26,8 @@ export interface EnhancedAIContext {
     }>;
   };
   enableCryptoTools?: boolean;
+  memoryContext?: string;
+  conversationSummary?: string;
 }
 
 export interface EnhancedAIResponse {
@@ -228,7 +230,13 @@ export class ProductionEnhancedService {
 
       // Generate response with context
       const chain = await this.getOrCreateChain(context.sessionId, complexity);
-      const enrichedMessage = `${context.userMessage}\n\nData: ${JSON.stringify(cryptoData, null, 2)}`;
+      let enrichedMessage = context.userMessage;
+      
+      if (context.memoryContext) {
+        enrichedMessage = `[Previous Context:\n${context.memoryContext}]\n\n${enrichedMessage}`;
+      }
+      
+      enrichedMessage += `\n\nData: ${JSON.stringify(cryptoData, null, 2)}`;
       
       const result = await chain.invoke({
         input: enrichedMessage,
@@ -252,6 +260,15 @@ export class ProductionEnhancedService {
     const chain = await this.getOrCreateChain(context.sessionId, complexity);
 
     let input = context.userMessage;
+
+    // Add memory context first for better continuity
+    if (context.memoryContext) {
+      input = `[Previous Context:\n${context.memoryContext}]\n\n${input}`;
+    }
+
+    if (context.conversationSummary) {
+      input = `[Conversation Summary: ${context.conversationSummary}]\n\n${input}`;
+    }
 
     if (context.walletData && Object.keys(context.walletData).length > 0) {
       input += `\n\n[Wallet Context: ${JSON.stringify(context.walletData)}]`;
@@ -296,8 +313,19 @@ export class ProductionEnhancedService {
 
       let fullResponse = '';
       
+      let input = context.userMessage;
+      
+      // Add memory context for continuity
+      if (context.memoryContext) {
+        input = `[Previous Context:\n${context.memoryContext}]\n\n${input}`;
+      }
+      
+      if (context.conversationSummary) {
+        input = `[Conversation Summary: ${context.conversationSummary}]\n\n${input}`;
+      }
+      
       const result = await chain.invoke(
-        { input: context.userMessage },
+        { input },
         {
           callbacks: [
             {

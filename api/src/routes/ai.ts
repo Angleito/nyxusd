@@ -19,7 +19,7 @@ dotenv.config();
 
 const router = express.Router();
 
-const USE_MOCK_AI = process.env.USE_MOCK_AI === "true";
+const USE_MOCK_AI = process.env['USE_MOCK_AI'] === "true";
 
 const requestSchema = z.object({
   message: z.string().min(1).max(1000),
@@ -128,14 +128,14 @@ Always be friendly, encouraging, and explain DeFi concepts simply.`;
 
     let response;
     try {
-      response = JSON.parse(result.text);
+      response = JSON.parse(result['text']);
       aiLogger.info("Structured response parsed successfully");
     } catch {
       aiLogger.warn(
         "Failed to parse structured response, using fallback format",
       );
       response = {
-        message: result.text,
+        message: result['text'],
         intent: { action: "unclear", confidence: 0.5 },
       };
     }
@@ -244,7 +244,7 @@ router.post("/chat/stream", async (req: Request, res: Response) => {
     const stream = await chain.stream({ input: message });
 
     for await (const chunk of stream) {
-      const text = chunk.text || "";
+      const text = chunk['text'] || "";
       res.write(`data: ${JSON.stringify({ chunk: text })}\n\n`);
     }
 
@@ -256,15 +256,15 @@ router.post("/chat/stream", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/reset/:sessionId", (req: Request, res: Response) => {
-  const { sessionId } = req.params;
+router.post("/reset/:sessionId", (_req: Request, res: Response) => {
+  const { sessionId } = _req.params;
 
   openRouterService.clearMemory(sessionId);
 
   res.json({ success: true, message: "Session reset" });
 });
 
-router.get("/health", async (req: Request, res: Response) => {
+router.get("/health", async (_req: Request, res: Response) => {
   const serviceInfo = openRouterService.getServiceInfo();
   const connectionTest = await openRouterService.testConnection();
   
@@ -277,7 +277,7 @@ router.get("/health", async (req: Request, res: Response) => {
   });
 });
 
-router.get("/models", (req: Request, res: Response) => {
+router.get("/models", (_req: Request, res: Response) => {
   const models = openRouterService.getAvailableModels();
   const modelsInfo = models.map(id => ({
     id,

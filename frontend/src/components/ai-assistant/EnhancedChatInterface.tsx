@@ -1,38 +1,43 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Sparkles, TrendingUp, Wallet, DollarSign, BarChart3, RefreshCw } from "lucide-react";
+import { Send, Sparkles, TrendingUp, Wallet, DollarSign, BarChart3, RefreshCw, History, Settings, Download } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { TypingIndicator } from "./TypingIndicator";
 import { enhancedAIService } from "../../services/ai/enhancedAIService";
 import { useWallet } from "../../hooks/useWallet";
+import { chatMemoryService, ChatMessage as MemoryMessage } from "../../services/memory/chatMemoryService";
 
-interface Message {
-  id: string;
-  role: "user" | "assistant" | "system";
-  content: string;
-  timestamp: Date;
-  metadata?: {
-    toolsUsed?: string[];
-    cryptoData?: any;
-    recommendations?: string[];
-  };
-}
+interface Message extends MemoryMessage {}
 
 export const EnhancedChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
+  const [showHistory, setShowHistory] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { address, balance, isConnected } = useWallet();
+  const [sessionStarted, setSessionStarted] = useState(false);
 
-  // Initialize with welcome message
+  // Initialize with welcome message and load user profile
   useEffect(() => {
-    const welcomeMessage: Message = {
-      id: "welcome",
-      role: "assistant",
-      content: `Hi! I'm Nyx, your crypto intelligence assistant. I can help you with:
+    if (!sessionStarted) {
+      // Load existing session or create new one
+      const currentSession = chatMemoryService.getCurrentSession();
+      if (currentSession && currentSession.messages.length > 0) {
+        setMessages(currentSession.messages);
+      } else {
+        const userProfile = address ? chatMemoryService.getUserProfile(address) : null;
+        const isReturningUser = userProfile && userProfile.history.totalInteractions > 1;
+        
+        const welcomeMessage: Message = {
+          id: "welcome",
+          role: "assistant",
+          content: isReturningUser 
+            ? `Welcome back! I remember you prefer ${userProfile.preferences.experience} level explanations with ${userProfile.preferences.riskTolerance} risk tolerance.\n\n${userProfile.portfolio?.watchlist?.length ? `Your watchlist: ${userProfile.portfolio.watchlist.join(', ')}` : ''}\n\nWhat would you like to explore today?`
+            : `Hi! I'm Nyx, your crypto intelligence assistant. I can help you with:
       
 🪙 Real-time crypto prices and market analysis
 📊 Portfolio analysis and recommendations  
@@ -42,9 +47,27 @@ export const EnhancedChatInterface: React.FC = () => {
 I see ${isConnected ? `you're connected with wallet ${address?.slice(0, 6)}...${address?.slice(-4)}` : "you haven't connected your wallet yet"}.
 
 What would you like to explore today?`,
-      timestamp: new Date(),
-    };
-    setMessages([welcomeMessage]);
+          timestamp: new Date(),
+        };
+        setMessages([welcomeMessage]);
+        chatMemoryService.addMessage(welcomeMessage);
+      }
+      setSessionStarted(true);
+    }
+  }, [isConnected, address, sessionStarted]);
+
+  // Update user profile when wallet connects
+  useEffect(() => {
+    if (isConnected && address) {
+      chatMemoryService.createOrUpdateUserProfile(address, {
+        history: {
+          lastSeen: new Date(),
+          totalInteractions: 0,
+          firstSeen: new Date(),
+          topQueries: [],
+        },
+      });
+    }
   }, [isConnected, address]);
 
   // Auto-scroll to bottom
@@ -53,9 +76,15 @@ What would you like to explore today?`,
   }, [messages, streamingContent]);
 
   const getContext = useCallback(() => {
+    const userProfile = address ? chatMemoryService.getUserProfile(address) : null;
+    const memoryContext = chatMemoryService.getMemoryPromptContext(address);
+    
     return {
       conversationStep: "natural_conversation",
-      userProfile: {
+      userProfile: userProfile ? {
+        experience: userProfile.preferences.experience,
+        riskTolerance: userProfile.preferences.riskTolerance,
+      } : {
         experience: "intermediate",
         riskTolerance: "moderate",
       },
@@ -63,6 +92,8 @@ What would you like to explore today?`,
         address,
         balance,
       } : undefined,
+      memoryContext,
+      conversationSummary: chatMemoryService.summarizeConversation(),
     };
   }, [isConnected, address, balance]);
 
@@ -77,6 +108,7 @@ What would you like to explore today?`,
     };
 
     setMessages(prev => [...prev, userMessage]);
+    chatMemoryService.addMessage(userMessage);
     setInputValue("");
     setIsTyping(true);
     setStreamingContent("");
@@ -106,6 +138,17 @@ What would you like to explore today?`,
         };
 
         setMessages(prev => [...prev, assistantMessage]);
+        chatMemoryService.addMessage(assistantMessage);
+        
+        // Update user profile based on interaction
+        if (address) {
+          const tokens = response.cryptoData?.tokens || [];
+          if (tokens.length > 0) {
+            tokens.forEach((token: string) => {
+              chatMemoryService.addToWatchlist(address, token);
+            });
+          }
+        }
       } else {
         // Stream response for non-crypto queries
         let fullResponse = "";
@@ -128,6 +171,7 @@ What would you like to explore today?`,
         };
 
         setMessages(prev => [...prev, assistantMessage]);
+        chatMemoryService.addMessage(assistantMessage);
         setStreamingContent("");
       }
     } catch (error) {
@@ -144,6 +188,7 @@ What would you like to explore today?`,
       };
       
       setMessages(prev => [...prev, errorMessage]);
+      chatMemoryService.addMessage(errorMessage);
     } finally {
       setIsTyping(false);
       inputRef.current?.focus();
@@ -226,12 +271,52 @@ What would you like to explore today?`,
             </div>
           </div>
           
-          {isConnected && (
-            <div className="flex items-center space-x-2 text-sm">
-              <Wallet className="w-4 h-4 text-green-400" />
-              <span className="text-gray-400">Connected</span>
-            </div>
-          )}
+          <div className="flex items-center space-x-2">
+            {isConnected && (
+              <div className="flex items-center space-x-2 text-sm">
+                <Wallet className="w-4 h-4 text-green-400" />
+                <span className="text-gray-400">Connected</span>
+              </div>
+            )}
+            
+            <motion.button
+              onClick={() => setShowHistory(!showHistory)}
+              className="p-2 hover:bg-purple-800/30 rounded-lg transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Chat History"
+            >
+              <History className="w-4 h-4 text-gray-400" />
+            </motion.button>
+            
+            <motion.button
+              onClick={() => setShowSettings(!showSettings)}
+              className="p-2 hover:bg-purple-800/30 rounded-lg transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Settings"
+            >
+              <Settings className="w-4 h-4 text-gray-400" />
+            </motion.button>
+            
+            <motion.button
+              onClick={() => {
+                const data = chatMemoryService.exportChatHistory(address);
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `nyx-chat-${Date.now()}.json`;
+                a.click();
+              }}
+              className="p-2 hover:bg-purple-800/30 rounded-lg transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Export Chat"
+            >
+              <Download className="w-4 h-4 text-gray-400" />
+            </motion.button>
+          </div>
         </div>
 
         {/* Quick Actions */}

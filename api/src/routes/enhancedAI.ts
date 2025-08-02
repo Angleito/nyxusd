@@ -8,7 +8,7 @@ dotenv.config();
 
 const router = express.Router();
 
-const USE_MOCK_AI = process.env.USE_MOCK_AI === "true";
+const USE_MOCK_AI = process.env['USE_MOCK_AI'] === "true";
 
 const requestSchema = z.object({
   message: z.string().min(1).max(1000),
@@ -29,6 +29,8 @@ const requestSchema = z.object({
         purchasePrice: z.number().optional(),
       })).optional(),
     }).optional(),
+    memoryContext: z.string().optional(),
+    conversationSummary: z.string().optional(),
   }),
   enableCryptoTools: z.boolean().default(true),
 });
@@ -77,9 +79,23 @@ router.post("/chat", async (req: Request, res: Response) => {
       sessionId,
       userMessage: message,
       conversationStep: context.conversationStep,
-      userProfile: context.userProfile,
-      walletData: context.walletData,
+      userProfile: context.userProfile ? {
+        experience: context.userProfile.experience,
+        riskTolerance: context.userProfile.riskTolerance,
+        investmentGoals: context.userProfile.investmentGoals,
+      } : undefined,
+      walletData: context.walletData ? {
+        address: context.walletData.address,
+        balance: context.walletData.balance,
+        holdings: context.walletData.holdings?.map(h => ({
+          symbol: h.symbol,
+          amount: h.amount,
+          purchasePrice: h.purchasePrice,
+        })),
+      } : undefined,
       enableCryptoTools,
+      memoryContext: context.memoryContext,
+      conversationSummary: context.conversationSummary,
     };
 
     const response = await enhancedAIService.generateResponse(enhancedContext);
@@ -135,9 +151,23 @@ router.post("/chat/stream", async (req: Request, res: Response) => {
       sessionId,
       userMessage: message,
       conversationStep: context.conversationStep,
-      userProfile: context.userProfile,
-      walletData: context.walletData,
+      userProfile: context.userProfile ? {
+        experience: context.userProfile.experience,
+        riskTolerance: context.userProfile.riskTolerance,
+        investmentGoals: context.userProfile.investmentGoals,
+      } : undefined,
+      walletData: context.walletData ? {
+        address: context.walletData.address,
+        balance: context.walletData.balance,
+        holdings: context.walletData.holdings?.map(h => ({
+          symbol: h.symbol,
+          amount: h.amount,
+          purchasePrice: h.purchasePrice,
+        })),
+      } : undefined,
       enableCryptoTools,
+      memoryContext: context.memoryContext,
+      conversationSummary: context.conversationSummary,
     };
 
     await enhancedAIService.streamResponse(

@@ -10,7 +10,7 @@ import { z } from "zod";
 
 // Dynamic imports to handle potential build issues during development
 let oracleService: any = null;
-let OracleServiceFacade: any = null;
+// OracleServiceFacade is loaded dynamically
 let createOracleServiceFacade: any = null;
 let DEFAULT_AGGREGATION_STRATEGY: any = null;
 let DEFAULT_CONSENSUS_CONFIG: any = null;
@@ -20,7 +20,7 @@ const initializeOracleService = async () => {
   if (!oracleService) {
     try {
       const oracleModule = await import("@nyxusd/oracle-service");
-      OracleServiceFacade = oracleModule.OracleServiceFacade;
+      // OracleServiceFacade = oracleModule.OracleServiceFacade;
       createOracleServiceFacade = oracleModule.createOracleServiceFacade;
       DEFAULT_AGGREGATION_STRATEGY = oracleModule.DEFAULT_AGGREGATION_STRATEGY;
       DEFAULT_CONSENSUS_CONFIG = oracleModule.DEFAULT_CONSENSUS_CONFIG;
@@ -28,30 +28,30 @@ const initializeOracleService = async () => {
       const oracleConfig = {
         primaryOracle: {
           network:
-            process.env.NODE_ENV === "production" ? "ethereum" : "sepolia",
+            process.env['NODE_ENV'] === "production" ? "ethereum" : "sepolia",
           provider:
-            process.env.ORACLE_RPC_URL || "https://sepolia.infura.io/v3/demo",
-          defaultTimeout: parseInt(process.env.ORACLE_TIMEOUT || "5000", 10),
+            process.env['ORACLE_RPC_URL'] || "https://sepolia.infura.io/v3/demo",
+          defaultTimeout: parseInt(process.env['ORACLE_TIMEOUT'] || "5000", 10),
           defaultMaxStaleness: parseInt(
-            process.env.ORACLE_MAX_STALENESS || "3600",
+            process.env['ORACLE_MAX_STALENESS'] || "3600",
             10,
           ),
           defaultMinConfidence: parseFloat(
-            process.env.ORACLE_MIN_CONFIDENCE || "95",
+            process.env['ORACLE_MIN_CONFIDENCE'] || "95",
           ),
-          cacheTtl: parseInt(process.env.ORACLE_CACHE_TTL || "60", 10),
+          cacheTtl: parseInt(process.env['ORACLE_CACHE_TTL'] || "60", 10),
           retry: {
             maxAttempts: 3,
             delayMs: 1000,
             backoffMultiplier: 2,
           },
         },
-        enableFallback: process.env.ORACLE_ENABLE_FALLBACK !== "false",
+        enableFallback: process.env['ORACLE_ENABLE_FALLBACK'] !== "false",
         aggregationStrategy: DEFAULT_AGGREGATION_STRATEGY,
         consensusConfig: DEFAULT_CONSENSUS_CONFIG,
         cache: {
-          enabled: process.env.ORACLE_CACHE_ENABLED !== "false",
-          ttl: parseInt(process.env.ORACLE_CACHE_TTL || "60", 10),
+          enabled: process.env['ORACLE_CACHE_ENABLED'] !== "false",
+          ttl: parseInt(process.env['ORACLE_CACHE_TTL'] || "60", 10),
         },
       };
 
