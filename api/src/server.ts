@@ -8,6 +8,7 @@ import { createClient } from "redis";
 // Import routes
 import oracleRoutes from "./routes/oracle.js";
 import aiRoutes from "./routes/ai.js";
+import enhancedAIRoutes from "./routes/enhancedAI.js";
 
 // Import CDP operations (mock for now since we need to resolve import paths)
 // import * as CDPOperations from '@nyxusd/core';
@@ -182,6 +183,9 @@ app.use("/api/oracle", oracleRoutes);
 
 // AI routes
 app.use("/api/ai", aiRoutes);
+
+// Enhanced AI routes with MCP integration
+app.use("/api/ai/enhanced", enhancedAIRoutes);
 
 // System information endpoints
 app.get("/api/system", (req, res) => {

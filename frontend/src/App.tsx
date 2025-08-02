@@ -6,8 +6,7 @@ import { NyxDashboard } from "./components/dashboard/NyxDashboard";
 import CDPHub from "./components/cdp/CDPHub";
 import { ModernSystemStats } from "./components/stats/ModernSystemStats";
 import NyxHeroSection from "./components/dashboard/NyxHeroSection";
-import { AIAssistantProvider } from "./providers/AIAssistantProvider";
-import { AIAssistant } from "./components/ai-assistant";
+import { UnifiedAIAssistant, StandaloneAIAssistant } from "./components/ai-assistant/UnifiedAIAssistant";
 import { AboutPage } from "./components/about/AboutPage";
 import ContactPage from "./components/contact/ContactPage";
 import "./styles/nyx-global.css";
@@ -59,6 +58,10 @@ function App() {
       {/* Starfield Background */}
       <div className="stars" id="app-starfield" />
       <NyxHeader />
+      
+      {/* Global AI Assistant - Available on all pages */}
+      <UnifiedAIAssistant position="bottom-right" />
+      
       <main>
         <AnimatePresence mode="wait">
           <Routes>
@@ -103,7 +106,7 @@ function App() {
                   exit="out"
                   variants={pageVariants}
                   transition={pageTransition}
-                  className="container mx-auto px-4 py-8 pt-24"
+                  className="py-8"
                 >
                   <ModernSystemStats />
                 </motion.div>
@@ -112,18 +115,16 @@ function App() {
             <Route
               path="/ai-assistant"
               element={
-                <AIAssistantProvider>
-                  <motion.div
-                    initial="initial"
-                    animate="in"
-                    exit="out"
-                    variants={pageVariants}
-                    transition={pageTransition}
-                    className="container mx-auto px-4 py-8 pt-24"
-                  >
-                    <AIAssistant />
-                  </motion.div>
-                </AIAssistantProvider>
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={pageTransition}
+                  className="container mx-auto px-4 py-8 h-[calc(100vh-80px)]"
+                >
+                  <StandaloneAIAssistant />
+                </motion.div>
               }
             />
             <Route
@@ -135,7 +136,6 @@ function App() {
                   exit="out"
                   variants={pageVariants}
                   transition={pageTransition}
-                  className="container mx-auto px-4 py-8 pt-24"
                 >
                   <AboutPage />
                 </motion.div>
@@ -150,7 +150,6 @@ function App() {
                   exit="out"
                   variants={pageVariants}
                   transition={pageTransition}
-                  className="container mx-auto px-4 py-8 pt-24"
                 >
                   <ContactPage />
                 </motion.div>
