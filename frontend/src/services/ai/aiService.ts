@@ -78,7 +78,7 @@ export const DEFAULT_AI_CONFIG: AIServiceConfig = {
   apiEndpoint: "/api/ai/chat",
   model: "google/gemini-2.5-flash",
   temperature: 0.7,
-  maxTokens: 500,
+  maxTokens: 1048576, // Gemini supports up to 1M tokens
   streamResponse: true,
   trackCosts: false,
   providerPreferences: {

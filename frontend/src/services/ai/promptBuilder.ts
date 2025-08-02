@@ -112,7 +112,7 @@ export interface PromptBuildResult {
  * Default configuration for the prompt builder
  */
 export const DEFAULT_PROMPT_CONFIG: PromptBuilderConfig = {
-  maxTokens: 4000,
+  maxTokens: 128000, // Updated for modern LLM limits
   compressionLevel: "basic",
   personalizeWith: ["occupation", "riskTolerance"],
   includeHistory: true,
@@ -692,7 +692,7 @@ export const createPromptBuilder = (
 export const PRESET_CONFIGS: Record<string, PromptBuilderConfig> = {
   /** Optimized for chat responses */
   chat: {
-    maxTokens: 1000,
+    maxTokens: 32000, // Chat context window
     compressionLevel: "basic",
     personalizeWith: [],
     includeHistory: true,
@@ -701,7 +701,7 @@ export const PRESET_CONFIGS: Record<string, PromptBuilderConfig> = {
 
   /** Optimized for strategy building */
   strategy: {
-    maxTokens: 2000,
+    maxTokens: 64000, // Strategy building context
     compressionLevel: "basic",
     personalizeWith: ["occupation", "riskTolerance", "timeline"],
     includeHistory: false,
@@ -709,7 +709,7 @@ export const PRESET_CONFIGS: Record<string, PromptBuilderConfig> = {
 
   /** Optimized for questionnaire steps */
   questionnaire: {
-    maxTokens: 500,
+    maxTokens: 16000, // Questionnaire context
     compressionLevel: "aggressive",
     personalizeWith: ["occupation"],
     includeHistory: false,
@@ -717,7 +717,7 @@ export const PRESET_CONFIGS: Record<string, PromptBuilderConfig> = {
 
   /** Optimized for recommendations */
   recommendations: {
-    maxTokens: 3000,
+    maxTokens: 96000, // Recommendations context
     compressionLevel: "basic",
     personalizeWith: [
       "occupation",

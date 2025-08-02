@@ -195,7 +195,7 @@ export class LangChainAIService implements AIService {
       openAIApiKey: import.meta.env.VITE_OPENROUTER_API_KEY || this.config.apiKey,
       modelName: modelName,
       temperature: this.config.temperature || 0.7,
-      maxTokens: this.config.maxTokens || 500,
+      maxTokens: this.config.maxTokens || 128000, // Default to higher limit for Gemini
       streaming: this.config.streamResponse,
       configuration: {
         baseURL: this.openRouterConfig.baseURL,
@@ -261,7 +261,7 @@ export class LangChainAIService implements AIService {
         openAIApiKey: import.meta.env.VITE_OPENROUTER_API_KEY || this.config.apiKey,
         modelName: "google/gemini-2.5-flash",
         temperature: 0.5,
-        maxTokens: 200,
+        maxTokens: 8000, // Summary context
         configuration: {
           baseURL: this.openRouterConfig.baseURL,
           defaultHeaders: {
@@ -527,7 +527,7 @@ export class LangChainAIService implements AIService {
 
       // Build prompt using new system
       const promptResult = new PromptBuilder({
-        maxTokens: this.config.maxTokens || 500,
+        maxTokens: this.config.maxTokens || 128000, // Default to higher limit for Gemini
         compressionLevel: "balanced",
         personalizeWith: ["occupation", "riskTolerance", "timeline"],
         includeHistory: true,
