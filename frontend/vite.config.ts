@@ -17,5 +17,14 @@ export default defineConfig({
   build: {
     outDir: "dist",
     sourcemap: true,
+    target: "esnext",
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: "esnext",
+      supported: {
+        "import-assertions": true,
+      },
+    },
   },
 });

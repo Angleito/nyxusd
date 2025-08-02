@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYX Design System - Showcase</title>
+    
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="../styles/tokens/colors.css">
+    <link rel="stylesheet" href="../styles/tokens/typography.css">
+    <link rel="stylesheet" href="../styles/tokens/spacing.css">
+    <link rel="stylesheet" href="../styles/tokens/effects.css">
+    <link rel="stylesheet" href="../styles/components/buttons.css">
+    <link rel="stylesheet" href="../styles/components/cards.css">
+    <link rel="stylesheet" href="../styles/components/forms.css">
+    <link rel="stylesheet" href="../styles/utilities/animations.css">
+    <link rel="stylesheet" href="../styles/utilities/effects.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--nyx-cosmic-black);
+            color: var(--nyx-gleam-90);
+            font-family: var(--nyx-font-body);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: radial-gradient(ellipse at center, rgba(107, 70, 193, 0.1) 0%, transparent 50%);
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C0C5CE' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            animation: starfield-drift 60s linear infinite;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--nyx-space-moon);
+        }
+        
+        .section {
+            margin-bottom: var(--nyx-space-cosmos);
+        }
+        
+        .grid {
+            display: grid;
+            gap: var(--nyx-gap-lg);
+            margin-bottom: var(--nyx-space-galaxy);
+        }
+        
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+        
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+        
+        /* Demo specific styles */
+        .color-swatch {
+            height: 100px;
+            border-radius: var(--nyx-radius-star);
+            display: flex;
+            align-items: flex-end;
+            padding: var(--nyx-padding-md);
+            font-size: var(--nyx-text-atom);
+            font-weight: var(--nyx-weight-medium);
+            transition: transform var(--nyx-transition-normal);
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.05);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: var(--nyx-gap-md);
+            flex-wrap: wrap;
+            margin-bottom: var(--nyx-space-planet);
+        }
+        
+        /* Starfield particles */
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--nyx-star-silver);
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Starfield -->
+    <div class="stars" id="starfield"></div>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <img src="../assets/images/nyx-logo.svg" alt="NYX Logo" style="width: 200px; height: 200px; margin-bottom: var(--nyx-space-moon);">
+        <h1 class="nyx-display-large nyx-text-gradient">NYX</h1>
+        <p class="nyx-heading-3" style="opacity: 0.8; margin-top: var(--nyx-space-star);">
+            Where Ancient Night Meets Digital Future
+        </p>
+        <p class="nyx-body-large" style="opacity: 0.6; margin-top: var(--nyx-space-planet); max-width: 600px; text-align: center;">
+            A design system inspired by the primordial goddess of night, 
+            crafted for the crypto cosmos with gleaming aesthetics and futuristic elements.
+        </p>
+    </section>
+    
+    <div class="container">
+        <!-- Color Palette Section -->
+        <section class="section">
+            <h2 class="nyx-heading-1 nyx-text-glow" style="margin-bottom: var(--nyx-space-moon);">Color Palette</h2>
+            
+            <h3 class="nyx-heading-3" style="margin-bottom: var(--nyx-space-planet);">Primary Colors</h3>
+            <div class="grid grid-4" style="margin-bottom: var(--nyx-space-comet);">
+                <div class="color-swatch" style="background: var(--nyx-cosmic-black); border: 1px solid var(--nyx-void-60);">
+                    <span>Cosmic Black</span>
+                </div>
+                <div class="color-swatch" style="background: var(--nyx-midnight-blue);">
+                    <span>Midnight Blue</span>
+                </div>
+                <div class="color-swatch" style="background: var(--nyx-electric-purple);">
+                    <span>Electric Purple</span>
+                </div>
+                <div class="color-swatch" style="background: var(--nyx-neon-cyan);">
+                    <span style="color: var(--nyx-cosmic-black);">Neon Cyan</span>
+                </div>
+            </div>
+            
+            <h3 class="nyx-heading-3" style="margin-bottom: var(--nyx-space-planet);">Accent Colors</h3>
+            <div class="grid grid-4">
+                <div class="color-swatch" style="background: var(--nyx-star-silver);">
+                    <span style="color: var(--nyx-cosmic-black);">Star Silver</span>
+                </div>
+                <div class="color-swatch" style="background: var(--nyx-moon-pearl);">
+                    <span style="color: var(--nyx-cosmic-black);">Moon Pearl</span>
+                </div>
+                <div class="color-swatch" style="background: var(--nyx-plasma-pink);">
+                    <span>Plasma Pink</span>
+                </div>
+                <div class="color-swatch" style="background: var(--nyx-gold-circuit);">
+                    <span style="color: var(--nyx-cosmic-black);">Gold Circuit</span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Typography Section -->
+        <section class="section">
+            <h2 class="nyx-heading-1 nyx-text-glow" style="margin-bottom: var(--nyx-space-moon);">Typography</h2>
+            
+            <div class="nyx-card nyx-card-elevated" style="padding: var(--nyx-space-comet);">
+                <p class="nyx-display-medium" style="margin-bottom: var(--nyx-space-planet);">Display Large</p>
+                <p class="nyx-heading-1" style="margin-bottom: var(--nyx-space-planet);">Heading One</p>
+                <p class="nyx-heading-2" style="margin-bottom: var(--nyx-space-planet);">Heading Two</p>
+                <p class="nyx-heading-3" style="margin-bottom: var(--nyx-space-planet);">Heading Three</p>
+                <p class="nyx-body-large" style="margin-bottom: var(--nyx-space-star);">Body Large - Lorem ipsum dolor sit amet</p>
+                <p class="nyx-body" style="margin-bottom: var(--nyx-space-star);">Body Regular - Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+                <p class="nyx-body-small">Body Small - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod</p>
+            </div>
+        </section>
+        
+        <!-- Buttons Section -->
+        <section class="section">
+            <h2 class="nyx-heading-1 nyx-text-glow" style="margin-bottom: var(--nyx-space-moon);">Buttons</h2>
+            
+            <h3 class="nyx-heading-3" style="margin-bottom: var(--nyx-space-planet);">Button Variants</h3>
+            <div class="button-group">
+                <button class="nyx-button nyx-button-primary">Primary Button</button>
+                <button class="nyx-button nyx-button-secondary">Secondary Button</button>
+                <button class="nyx-button nyx-button-ghost">Ghost Button</button>
+                <button class="nyx-button nyx-button-glow">Glow Button</button>
+            </div>
+            
+            <h3 class="nyx-heading-3" style="margin-bottom: var(--nyx-space-planet);">Button Sizes</h3>
+            <div class="button-group">
+                <button class="nyx-button nyx-button-primary nyx-button-small">Small</button>
+                <button class="nyx-button nyx-button-primary">Default</button>
+                <button class="nyx-button nyx-button-primary nyx-button-large">Large</button>
+            </div>
+            
+            <h3 class="nyx-heading-3" style="margin-bottom: var(--nyx-space-planet);">Button States</h3>
+            <div class="button-group">
+                <button class="nyx-button nyx-button-primary nyx-button-loading">Loading</button>
+                <button class="nyx-button nyx-button-primary" disabled>Disabled</button>
+            </div>
+        </section>
+        
+        <!-- Cards Section -->
+        <section class="section">
+            <h2 class="nyx-heading-1 nyx-text-glow" style="margin-bottom: var(--nyx-space-moon);">Cards</h2>
+            
+            <div class="grid grid-3">
+                <div class="nyx-card">
+                    <h3 class="nyx-card-title">Basic Card</h3>
+                    <p class="nyx-card-subtitle">Glass morphism effect</p>
+                    <div class="nyx-card-content">
+                        <p>This is a basic card with glass morphism effect and subtle animations.</p>
+                    </div>
+                </div>
+                
+                <div class="nyx-card nyx-card-elevated">
+                    <h3 class="nyx-card-title">Elevated Card</h3>
+                    <p class="nyx-card-subtitle">Floating shadow effect</p>
+                    <div class="nyx-card-content">
+                        <p>This card appears to float above the surface with enhanced shadows.</p>
+                    </div>
+                </div>
+                
+                <div class="nyx-card nyx-card-glow">
+                    <h3 class="nyx-card-title">Glowing Card</h3>
+                    <p class="nyx-card-subtitle">Neon border effect</p>
+                    <div class="nyx-card-content">
+                        <p>This card has a glowing neon border perfect for highlighting important content.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-2" style="margin-top: var(--nyx-space-moon);">
+                <div class="nyx-card nyx-card-data">
+                    <h3 class="nyx-card-title">Data Card</h3>
+                    <div class="nyx-card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p class="nyx-body-small" style="opacity: 0.7;">Total Value Locked</p>
+                                <p class="nyx-heading-2 nyx-text-gradient">$1,234,567</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <p class="nyx-body-small" style="color: var(--nyx-success);">+12.5%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nyx-card nyx-card-nft">
+                    <h3 class="nyx-card-title">NFT Card</h3>
+                    <div class="nyx-card-content">
+                        <p>Holographic border animation for digital collectibles and crypto assets.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Forms Section -->
+        <section class="section">
+            <h2 class="nyx-heading-1 nyx-text-glow" style="margin-bottom: var(--nyx-space-moon);">Forms</h2>
+            
+            <div class="grid grid-2">
+                <div class="nyx-card">
+                    <h3 class="nyx-card-title">Input Fields</h3>
+                    <div class="nyx-card-content">
+                        <div class="nyx-form-group">
+                            <label class="nyx-label">Wallet Address</label>
+                            <input type="text" class="nyx-input" placeholder="0x...">
+                        </div>
+                        
+                        <div class="nyx-form-group">
+                            <label class="nyx-label">Amount</label>
+                            <input type="number" class="nyx-input nyx-input-glow" placeholder="0.00">
+                            <p class="nyx-helper-text">Enter amount in ETH</p>
+                        </div>
+                        
+                        <div class="nyx-form-group">
+                            <label class="nyx-label">Network</label>
+                            <select class="nyx-input nyx-select">
+                                <option>Ethereum Mainnet</option>
+                                <option>Polygon</option>
+                                <option>Arbitrum</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nyx-card">
+                    <h3 class="nyx-card-title">Controls</h3>
+                    <div class="nyx-card-content">
+                        <div class="nyx-form-group">
+                            <label class="nyx-checkbox">
+                                <input type="checkbox" checked>
+                                <span class="nyx-checkbox-indicator"></span>
+                                <span>Enable notifications</span>
+                            </label>
+                        </div>
+                        
+                        <div class="nyx-form-group">
+                            <label class="nyx-radio">
+                                <input type="radio" name="theme" checked>
+                                <span class="nyx-radio-indicator"></span>
+                                <span>Dark theme</span>
+                            </label>
+                            <label class="nyx-radio" style="margin-top: var(--nyx-space-atom);">
+                                <input type="radio" name="theme">
+                                <span class="nyx-radio-indicator"></span>
+                                <span>Cosmic theme</span>
+                            </label>
+                        </div>
+                        
+                        <div class="nyx-form-group">
+                            <label class="nyx-label">Auto-compound</label>
+                            <label class="nyx-toggle">
+                                <input type="checkbox">
+                                <span class="nyx-toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="nyx-form-group">
+                            <label class="nyx-label">Slippage Tolerance</label>
+                            <input type="range" class="nyx-range" min="0" max="100" value="50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Effects Section -->
+        <section class="section">
+            <h2 class="nyx-heading-1 nyx-text-glow" style="margin-bottom: var(--nyx-space-moon);">Visual Effects</h2>
+            
+            <div class="grid grid-3">
+                <div class="nyx-card nyx-glass-dark nyx-shimmer">
+                    <h3 class="nyx-card-title">Shimmer Effect</h3>
+                    <p class="nyx-card-content">Subtle light sweep animation</p>
+                </div>
+                
+                <div class="nyx-card nyx-levitate">
+                    <h3 class="nyx-card-title">Levitate Effect</h3>
+                    <p class="nyx-card-content">Floating animation</p>
+                </div>
+                
+                <div class="nyx-card nyx-morph">
+                    <h3 class="nyx-card-title">Morph Effect</h3>
+                    <p class="nyx-card-content">Shape-shifting borders</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-2" style="margin-top: var(--nyx-space-moon);">
+                <div class="nyx-card nyx-scanlines">
+                    <h3 class="nyx-card-title">Scanlines</h3>
+                    <p class="nyx-card-content">Retro-futuristic monitor effect</p>
+                </div>
+                
+                <div class="nyx-card nyx-cosmic-dust">
+                    <h3 class="nyx-card-title">Cosmic Dust</h3>
+                    <p class="nyx-card-content">Drifting particle effect</p>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // Generate random stars
+        const starfield = document.getElementById('starfield');
+        const starCount = 100;
+        
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            starfield.appendChild(star);
+        }
+        
+        // Ripple effect for interactive cards
+        document.querySelectorAll('.nyx-card-interactive').forEach(card => {
+            card.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.className = 'nyx-ripple-effect';
+                
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+/* NYX Design System - Global Styles */
+
+/* Import all NYX design tokens and components */
+@import '../nyx-design-system/tokens/colors.css';
+@import '../nyx-design-system/tokens/typography.css';
+@import '../nyx-design-system/tokens/spacing.css';
+@import '../nyx-design-system/tokens/effects.css';
+@import '../nyx-design-system/components/buttons.css';
+@import '../nyx-design-system/components/cards.css';
+@import '../nyx-design-system/components/forms.css';
+@import '../nyx-design-system/utilities/animations.css';
+@import '../nyx-design-system/utilities/effects.css';
+
+/* Global styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--nyx-cosmic-black);
+  color: var(--nyx-gleam-90);
+  font-family: var(--nyx-font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Override Tailwind defaults with NYX colors */
+:root {
+  /* Map Tailwind-like colors to NYX palette */
+  --background: var(--nyx-cosmic-black);
+  --foreground: var(--nyx-gleam-90);
+  --card: var(--nyx-void-80);
+  --card-foreground: var(--nyx-gleam-90);
+  --popover: var(--nyx-void-70);
+  --popover-foreground: var(--nyx-gleam-90);
+  --primary: var(--nyx-electric-purple);
+  --primary-foreground: var(--nyx-gleam-100);
+  --secondary: var(--nyx-neon-cyan);
+  --secondary-foreground: var(--nyx-cosmic-black);
+  --muted: var(--nyx-void-60);
+  --muted-foreground: var(--nyx-gleam-70);
+  --accent: var(--nyx-plasma-pink);
+  --accent-foreground: var(--nyx-gleam-100);
+  --destructive: var(--nyx-error);
+  --destructive-foreground: var(--nyx-gleam-100);
+  --border: var(--nyx-void-60);
+  --input: var(--nyx-void-70);
+  --ring: var(--nyx-electric-purple);
+}
+
+/* Starfield animation */
+.stars {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--nyx-star-silver);
+  border-radius: 50%;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--nyx-void-80);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--nyx-void-50);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nyx-void-40);
+}
+
+/* Selection styling */
+::selection {
+  background: var(--nyx-electric-purple);
+  color: var(--nyx-gleam-100);
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--nyx-electric-purple);
+  outline-offset: 2px;
+}
+
+/* Link styles */
+a {
+  color: var(--nyx-neon-cyan);
+  text-decoration: none;
+  transition: color var(--nyx-transition-normal);
+}
+
+a:hover {
+  color: var(--nyx-electric-purple);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--nyx-font-display);
+  font-weight: var(--nyx-weight-bold);
+  line-height: 1.2;
+}
+
+/* Utility classes for easy NYX styling */
+.nyx-bg-gradient {
+  background: linear-gradient(135deg, var(--nyx-nebula-start), var(--nyx-nebula-mid), var(--nyx-nebula-end));
+}
+
+.nyx-text-gradient {
+  background: linear-gradient(135deg, var(--nyx-electric-purple), var(--nyx-neon-cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Container with cosmic background */
+.nyx-container {
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(107, 70, 193, 0.1) 0%, transparent 50%);
+}
+
+/* Page wrapper */
+.nyx-page {
+  position: relative;
+  min-height: 100vh;
+  background: var(--nyx-cosmic-black);
+}
+
+/* Section spacing */
+.nyx-section {
+  padding: var(--nyx-space-galaxy) 0;
+}
+
+/* Grid utilities */
+.nyx-grid {
+  display: grid;
+  gap: var(--nyx-gap-lg);
+}
+
+.nyx-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.nyx-grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.nyx-grid-4 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}

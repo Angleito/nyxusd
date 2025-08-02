@@ -60,8 +60,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Making cryptocurrency accessible, private, and inclusive for everyone through 
-            innovative stablecoin technology built on the Midnight Protocol.
+            Building the chain-agnostic future with personalized investing experiences that adapt 
+            to each user's unique journey across every blockchain ecosystem.
           </motion.p>
           
           {/* Decorative elements */}
@@ -82,14 +82,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                 Mission Statement
               </h2>
               <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-6">
-                Our mission is to democratize access to digital finance by creating a privacy-preserving 
-                stablecoin that anyone can use, regardless of their technical expertise or geographical location. 
-                We believe financial privacy is a fundamental right, not a privilege.
+                Our mission is to unite the fragmented blockchain landscape by creating a truly chain-agnostic 
+                stablecoin protocol. We're breaking down the walls between chains, allowing liquidity and 
+                technology to flow seamlessly across all ecosystems. Built with AI at its core, NyxUSD adapts to any chain.
               </p>
               <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-                Built on the Midnight Protocol, NyxUSD combines zero-knowledge cryptography with 
-                AI-powered user guidance to make sophisticated DeFi strategies accessible to everyone. 
-                We're breaking down barriers between traditional finance and the decentralized future.
+                As a chain-agnostic protocol, NyxUSD doesn't just bridge chains—it unites them. Our AI learns 
+                your investing style, risk tolerance, and goals to deliver personalized strategies. Every user gets 
+                an adapted experience tailored to their unique financial journey, regardless of which blockchain they prefer.
               </p>
             </div>
           </Card>
@@ -105,14 +105,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
                 {
-                  title: "Privacy First",
-                  description: "Built on Midnight Protocol's zero-knowledge infrastructure, ensuring your financial activities remain completely private and secure.",
+                  title: "Personalized Investing",
+                  description: "AI that learns your unique investing style and adapts strategies to your goals, risk profile, and preferences for truly personalized DeFi.",
                   icon: "🔒",
                   gradient: "from-purple-500 to-indigo-500"
                 },
                 {
-                  title: "Radically Accessible", 
-                  description: "AI-powered guidance and intuitive interfaces make DeFi approachable for everyone, from crypto newcomers to advanced users.",
+                  title: "Adapted User Experiences", 
+                  description: "Every user gets a tailored interface and investment journey. Our AI adapts complexity, recommendations, and strategies to match your expertise level.",
                   icon: "🌍",
                   gradient: "from-blue-500 to-cyan-500"
                 },
@@ -175,18 +175,18 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
               <div className="grid md:grid-cols-2 gap-10">
                 {[
                   {
-                    title: "Midnight Protocol Foundation",
-                    description: "Built on Midnight's privacy-preserving blockchain, enabling completely private transactions while maintaining the security and decentralization of public networks.",
+                    title: "Chain-Agnostic Architecture",
+                    description: "Built to be truly chain-agnostic, uniting liquidity and technology across all blockchains. One protocol, infinite possibilities, zero boundaries.",
                     icon: "🌙"
                   },
                   {
-                    title: "Zero-Knowledge Privacy", 
-                    description: "Advanced cryptographic proofs ensure your transaction amounts, balances, and activity patterns remain completely hidden from all observers.",
+                    title: "Unified Liquidity Network", 
+                    description: "We don't just bridge liquidity—we unite it. Access the combined liquidity of all chains through our chain-agnostic protocol with AI optimization.",
                     icon: "🔐"
                   },
                   {
-                    title: "Intelligent AI Assistant",
-                    description: "Personal AI guide that explains complex DeFi concepts in simple terms and helps you navigate strategies safely, regardless of your experience level.",
+                    title: "Personal Investment AI",
+                    description: "Your personalized DeFi companion that adapts to your investing style, learns your preferences, and provides tailored strategies for your unique financial goals.",
                     icon: "🧠"
                   },
                   {
@@ -235,9 +235,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                   Our Team
                 </h3>
                 <p className="text-lg text-gray-300 leading-relaxed">
-                  We're a distributed team of privacy advocates, accessibility experts, 
-                  and blockchain pioneers united by the belief that financial freedom 
-                  should be universal, private, and simple to access.
+                  We're a distributed team of AI researchers, blockchain experts, 
+                  and DeFi pioneers united by the belief that financial freedom 
+                  should be universal, intelligent, and simple to access.
                 </p>
                 <p className="text-lg text-gray-300 leading-relaxed">
                   Our expertise spans cryptography, user experience design, AI research, 
@@ -269,7 +269,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                 </h3>
                 <p className="text-lg text-gray-300 leading-relaxed mb-8">
                   Join a global community working to make crypto accessible to everyone. 
-                  Whether you're building privacy tools, advocating for financial inclusion, 
+                  Whether you're building AI tools, developing cross-chain solutions, 
                   or just starting your DeFi journey—you belong here.
                 </p>
                 <div className="grid grid-cols-2 gap-4">
@@ -314,8 +314,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                 Ready to Start Your Journey?
               </h2>
               <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                Experience truly private, accessible DeFi that adapts to your needs. 
-                Start your journey to financial freedom with AI-guided support every step of the way.
+                Experience DeFi that adapts to you. With personalized investing strategies and user experiences 
+                tailored to your journey, NyxUSD brings truly individualized finance to every blockchain.
               </p>
               <motion.div
                 className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8"

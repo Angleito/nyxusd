@@ -1,18 +1,38 @@
 import { Routes, Route } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ModernHeader } from "./components/layout/ModernHeader";
-import { ModernDashboard } from "./components/dashboard/ModernDashboard";
+import { NyxHeader } from "./components/layout/NyxHeader";
+import { NyxDashboard } from "./components/dashboard/NyxDashboard";
 import { CDPDashboard } from "./components/cdp/CDPDashboard";
 import { ModernSystemStats } from "./components/stats/ModernSystemStats";
-import HeroSection from "./components/dashboard/HeroSection";
+import NyxHeroSection from "./components/dashboard/NyxHeroSection";
 import { AIAssistantProvider } from "./providers/AIAssistantProvider";
 import { AIAssistant } from "./components/ai-assistant";
 import { AboutPage } from "./components/about/AboutPage";
 import ContactPage from "./components/contact/ContactPage";
+import "./styles/nyx-global.css";
 import "./styles/App.css";
+import { useEffect } from "react";
 
 function App() {
+  useEffect(() => {
+    // Generate starfield effect
+    const starfield = document.getElementById('app-starfield');
+    if (starfield && starfield.children.length === 0) {
+      const starCount = 150;
+      
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        starfield.appendChild(star);
+      }
+    }
+  }, []);
+
   const pageVariants = {
     initial: {
       opacity: 0,
@@ -35,8 +55,10 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen theme-midnight">
-      <ModernHeader />
+    <div className="nyx-page">
+      {/* Starfield Background */}
+      <div className="stars" id="app-starfield" />
+      <NyxHeader />
       <main>
         <AnimatePresence mode="wait">
           <Routes>
@@ -50,9 +72,9 @@ function App() {
                   variants={pageVariants}
                   transition={pageTransition}
                 >
-                  <HeroSection />
+                  <NyxHeroSection />
                   <div className="container mx-auto px-4 py-8">
-                    <ModernDashboard />
+                    <NyxDashboard />
                   </div>
                 </motion.div>
               }

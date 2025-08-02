@@ -122,7 +122,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ className }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Let's connect and build the future of privacy-preserving finance together
+            Let's connect and unite the blockchain ecosystem through chain-agnostic innovation
           </motion.p>
           
           {/* Decorative element */}
@@ -212,8 +212,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ className }) => {
             </h2>
             <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8">
               Passionate about building the future of decentralized finance with a focus on 
-              privacy, accessibility, and user empowerment. Creator of NyxUSD—a privacy-preserving 
-              stablecoin protocol on Midnight that makes DeFi accessible to everyone.
+              chain-agnostic innovation, unified liquidity, and user empowerment. Creator of NyxUSD—the protocol 
+              that unites liquidity and technology across all blockchains, making DeFi truly borderless.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <motion.div
@@ -226,7 +226,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ className }) => {
                 className="px-6 py-3 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border border-blue-500/30 rounded-lg"
                 whileHover={{ scale: 1.05 }}
               >
-                <span className="text-blue-300 font-medium">🔒 Privacy Advocate</span>
+                <span className="text-blue-300 font-medium">🌐 Multi-Chain Expert</span>
               </motion.div>
               <motion.div
                 className="px-6 py-3 bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-lg"

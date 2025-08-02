@@ -1,0 +1,128 @@
+/* NYX Design System - Color Tokens */
+/* Combining Greek mythology with futuristic crypto aesthetics */
+
+:root {
+  /* Primary Palette - The Night */
+  --nyx-cosmic-black: #0A0A0F;
+  --nyx-cosmic-black-rgb: 10, 10, 15;
+  --nyx-midnight-blue: #0D1B2A;
+  --nyx-midnight-blue-rgb: 13, 27, 42;
+  --nyx-electric-purple: #6B46C1;
+  --nyx-electric-purple-rgb: 107, 70, 193;
+  --nyx-neon-cyan: #00D9FF;
+  --nyx-neon-cyan-rgb: 0, 217, 255;
+  
+  /* Accent Colors - Celestial Bodies */
+  --nyx-star-silver: #C0C5CE;
+  --nyx-star-silver-rgb: 192, 197, 206;
+  --nyx-moon-pearl: #F7F7FF;
+  --nyx-moon-pearl-rgb: 247, 247, 255;
+  --nyx-plasma-pink: #FF006E;
+  --nyx-plasma-pink-rgb: 255, 0, 110;
+  --nyx-gold-circuit: #FFD700;
+  --nyx-gold-circuit-rgb: 255, 215, 0;
+  
+  /* Gradient Colors - Cosmic Transitions */
+  --nyx-nebula-start: #2D1B69;
+  --nyx-nebula-mid: #0F3460;
+  --nyx-nebula-end: #16213E;
+  
+  /* Darkness Levels - Veil of Night */
+  --nyx-void-100: #000000;
+  --nyx-void-90: #0A0A0F;
+  --nyx-void-80: #141420;
+  --nyx-void-70: #1E1E2E;
+  --nyx-void-60: #282838;
+  --nyx-void-50: #323248;
+  --nyx-void-40: #3C3C58;
+  --nyx-void-30: #464668;
+  
+  /* Light Accents - Stars & Gleam */
+  --nyx-gleam-100: #FFFFFF;
+  --nyx-gleam-90: #F7F7FF;
+  --nyx-gleam-80: #E8E8F5;
+  --nyx-gleam-70: #D9D9EB;
+  --nyx-gleam-60: #CACAE1;
+  --nyx-gleam-50: #BBBBD7;
+  
+  /* Functional Colors - Crypto Operations */
+  --nyx-success: #00FF88;
+  --nyx-success-dark: #00CC6A;
+  --nyx-warning: #FFB800;
+  --nyx-warning-dark: #CC9200;
+  --nyx-error: #FF3366;
+  --nyx-error-dark: #CC2952;
+  --nyx-info: #00D9FF;
+  --nyx-info-dark: #00AECC;
+  
+  /* Glow Effects - Luminous Elements */
+  --nyx-glow-purple: 0 0 20px rgba(107, 70, 193, 0.6);
+  --nyx-glow-cyan: 0 0 20px rgba(0, 217, 255, 0.6);
+  --nyx-glow-pink: 0 0 20px rgba(255, 0, 110, 0.6);
+  --nyx-glow-gold: 0 0 20px rgba(255, 215, 0, 0.6);
+  
+  /* Transparency Levels - Mist & Veils */
+  --nyx-opacity-95: 0.95;
+  --nyx-opacity-90: 0.90;
+  --nyx-opacity-80: 0.80;
+  --nyx-opacity-60: 0.60;
+  --nyx-opacity-40: 0.40;
+  --nyx-opacity-20: 0.20;
+  --nyx-opacity-10: 0.10;
+  --nyx-opacity-5: 0.05;
+}
+
+/* Dark Theme (Default) */
+[data-theme="dark"], :root {
+  --nyx-background: var(--nyx-cosmic-black);
+  --nyx-surface: var(--nyx-void-80);
+  --nyx-surface-variant: var(--nyx-void-70);
+  --nyx-text-primary: var(--nyx-gleam-90);
+  --nyx-text-secondary: var(--nyx-gleam-70);
+  --nyx-text-tertiary: var(--nyx-gleam-50);
+  --nyx-border: var(--nyx-void-60);
+  --nyx-border-variant: var(--nyx-void-50);
+}
+
+/* Cosmic Gradients */
+.gradient-nebula {
+  background: linear-gradient(135deg, var(--nyx-nebula-start), var(--nyx-nebula-mid), var(--nyx-nebula-end));
+}
+
+.gradient-aurora {
+  background: linear-gradient(45deg, var(--nyx-electric-purple), var(--nyx-neon-cyan), var(--nyx-plasma-pink));
+}
+
+.gradient-midnight {
+  background: linear-gradient(180deg, var(--nyx-cosmic-black), var(--nyx-midnight-blue));
+}
+
+.gradient-stardust {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(var(--nyx-star-silver-rgb), 0.1) 25%, 
+    rgba(var(--nyx-star-silver-rgb), 0.3) 50%, 
+    rgba(var(--nyx-star-silver-rgb), 0.1) 75%, 
+    transparent 100%
+  );
+}
+
+/* Holographic Effects */
+.holographic {
+  background: linear-gradient(
+    45deg,
+    var(--nyx-electric-purple),
+    var(--nyx-neon-cyan),
+    var(--nyx-plasma-pink),
+    var(--nyx-gold-circuit),
+    var(--nyx-electric-purple)
+  );
+  background-size: 300% 300%;
+  animation: holographic-shift 8s ease infinite;
+}
+
+@keyframes holographic-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

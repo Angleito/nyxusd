@@ -1,0 +1,281 @@
+/* NYX Design System - Visual Effects Utilities */
+
+/* Glass Morphism */
+.nyx-glass {
+  background: rgba(var(--nyx-void-80-rgb), 0.2);
+  backdrop-filter: blur(var(--nyx-blur-md));
+  -webkit-backdrop-filter: blur(var(--nyx-blur-md));
+  border: 1px solid rgba(var(--nyx-gleam-100-rgb), 0.1);
+}
+
+.nyx-glass-dark {
+  background: rgba(var(--nyx-cosmic-black-rgb), 0.5);
+  backdrop-filter: blur(var(--nyx-blur-lg));
+  -webkit-backdrop-filter: blur(var(--nyx-blur-lg));
+  border: 1px solid rgba(var(--nyx-void-60-rgb), 0.5);
+}
+
+.nyx-glass-purple {
+  background: rgba(var(--nyx-electric-purple-rgb), 0.1);
+  backdrop-filter: blur(var(--nyx-blur-md));
+  -webkit-backdrop-filter: blur(var(--nyx-blur-md));
+  border: 1px solid rgba(var(--nyx-electric-purple-rgb), 0.3);
+}
+
+/* Neon Borders */
+.nyx-border-glow {
+  position: relative;
+}
+
+.nyx-border-glow::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    var(--nyx-electric-purple),
+    var(--nyx-neon-cyan),
+    var(--nyx-plasma-pink),
+    var(--nyx-electric-purple)
+  );
+  border-radius: inherit;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity var(--nyx-transition-normal);
+}
+
+.nyx-border-glow:hover::before {
+  opacity: 1;
+}
+
+/* Gradient Overlays */
+.nyx-overlay-gradient {
+  position: relative;
+}
+
+.nyx-overlay-gradient::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(var(--nyx-cosmic-black-rgb), 0.9) 100%
+  );
+  pointer-events: none;
+}
+
+/* Noise Texture */
+.nyx-noise {
+  position: relative;
+}
+
+.nyx-noise::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.05;
+  background-image: 
+    repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.05) 35px, rgba(255,255,255,.05) 70px);
+  pointer-events: none;
+}
+
+/* Holographic Effect */
+.nyx-holographic {
+  position: relative;
+  background: linear-gradient(
+    45deg,
+    var(--nyx-electric-purple),
+    var(--nyx-neon-cyan),
+    var(--nyx-plasma-pink),
+    var(--nyx-gold-circuit)
+  );
+  background-size: 300% 300%;
+  animation: holographic-shift 8s ease infinite;
+}
+
+.nyx-holographic-text {
+  background: linear-gradient(
+    45deg,
+    var(--nyx-electric-purple),
+    var(--nyx-neon-cyan),
+    var(--nyx-plasma-pink),
+    var(--nyx-gold-circuit)
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: holographic-shift 8s ease infinite;
+}
+
+/* Scanline Effect */
+.nyx-scanlines {
+  position: relative;
+}
+
+.nyx-scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(var(--nyx-gleam-100-rgb), 0.03) 2px,
+    rgba(var(--nyx-gleam-100-rgb), 0.03) 4px
+  );
+  pointer-events: none;
+}
+
+.nyx-scanlines::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(var(--nyx-gleam-100-rgb), 0.1) 50%,
+    transparent 100%
+  );
+  animation: scanline-move 8s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scanline-move {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* Matrix Rain Effect */
+.nyx-matrix-rain {
+  position: relative;
+  overflow: hidden;
+}
+
+.nyx-matrix-rain::before {
+  content: '10101010101';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  color: var(--nyx-neon-cyan);
+  font-family: var(--nyx-font-mono);
+  font-size: var(--nyx-text-atom);
+  line-height: 1;
+  opacity: 0.1;
+  animation: matrix-fall 20s linear infinite;
+  white-space: pre;
+  pointer-events: none;
+}
+
+@keyframes matrix-fall {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+/* Cosmic Dust */
+.nyx-cosmic-dust {
+  position: relative;
+}
+
+.nyx-cosmic-dust::before,
+.nyx-cosmic-dust::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.nyx-cosmic-dust::before {
+  background: radial-gradient(
+    1px 1px at 20% 30%,
+    white,
+    transparent
+  ),
+  radial-gradient(
+    1px 1px at 60% 70%,
+    var(--nyx-star-silver),
+    transparent
+  ),
+  radial-gradient(
+    1px 1px at 80% 10%,
+    white,
+    transparent
+  );
+  background-size: 200px 200px;
+  animation: cosmic-dust-drift 120s linear infinite;
+}
+
+@keyframes cosmic-dust-drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-100px, -100px); }
+}
+
+/* Chromatic Aberration */
+.nyx-chromatic {
+  position: relative;
+}
+
+.nyx-chromatic:hover {
+  animation: chromatic-shift 0.3s ease-in-out;
+}
+
+@keyframes chromatic-shift {
+  0%, 100% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 
+      -2px 0 var(--nyx-plasma-pink),
+      2px 0 var(--nyx-neon-cyan);
+  }
+}
+
+/* Depth Shadow */
+.nyx-depth-shadow {
+  box-shadow: 
+    0 1px 1px rgba(var(--nyx-cosmic-black-rgb), 0.12),
+    0 2px 2px rgba(var(--nyx-cosmic-black-rgb), 0.12),
+    0 4px 4px rgba(var(--nyx-cosmic-black-rgb), 0.12),
+    0 8px 8px rgba(var(--nyx-cosmic-black-rgb), 0.12),
+    0 16px 16px rgba(var(--nyx-cosmic-black-rgb), 0.12);
+}
+
+/* Inner Glow */
+.nyx-inner-glow {
+  box-shadow: 
+    inset 0 0 20px rgba(var(--nyx-neon-cyan-rgb), 0.1),
+    inset 0 0 40px rgba(var(--nyx-electric-purple-rgb), 0.05);
+}
+
+/* Utility Classes for Quick Effects */
+.nyx-blur-sm { filter: blur(var(--nyx-blur-sm)); }
+.nyx-blur-md { filter: blur(var(--nyx-blur-md)); }
+.nyx-blur-lg { filter: blur(var(--nyx-blur-lg)); }
+
+.nyx-opacity-10 { opacity: var(--nyx-opacity-10); }
+.nyx-opacity-20 { opacity: var(--nyx-opacity-20); }
+.nyx-opacity-40 { opacity: var(--nyx-opacity-40); }
+.nyx-opacity-60 { opacity: var(--nyx-opacity-60); }
+.nyx-opacity-80 { opacity: var(--nyx-opacity-80); }
+.nyx-opacity-90 { opacity: var(--nyx-opacity-90); }

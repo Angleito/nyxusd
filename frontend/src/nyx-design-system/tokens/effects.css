@@ -1,0 +1,72 @@
+/* NYX Design System - Visual Effects Tokens */
+
+:root {
+  /* Shadows - Depth of Night */
+  --nyx-shadow-xs: 0 2px 4px rgba(var(--nyx-cosmic-black-rgb), 0.1);
+  --nyx-shadow-sm: 0 4px 6px rgba(var(--nyx-cosmic-black-rgb), 0.15);
+  --nyx-shadow-md: 0 6px 12px rgba(var(--nyx-cosmic-black-rgb), 0.2);
+  --nyx-shadow-lg: 0 12px 24px rgba(var(--nyx-cosmic-black-rgb), 0.25);
+  --nyx-shadow-xl: 0 24px 48px rgba(var(--nyx-cosmic-black-rgb), 0.3);
+  
+  /* Elevated Shadows - Floating Elements */
+  --nyx-shadow-float: 0 8px 32px rgba(var(--nyx-cosmic-black-rgb), 0.4),
+                      0 0 1px rgba(var(--nyx-star-silver-rgb), 0.1);
+  
+  /* Glow Shadows - Neon Effects */
+  --nyx-shadow-glow-purple: 0 0 20px rgba(var(--nyx-electric-purple-rgb), 0.5),
+                            0 0 40px rgba(var(--nyx-electric-purple-rgb), 0.3),
+                            0 0 60px rgba(var(--nyx-electric-purple-rgb), 0.1);
+  
+  --nyx-shadow-glow-cyan: 0 0 20px rgba(var(--nyx-neon-cyan-rgb), 0.5),
+                          0 0 40px rgba(var(--nyx-neon-cyan-rgb), 0.3),
+                          0 0 60px rgba(var(--nyx-neon-cyan-rgb), 0.1);
+  
+  --nyx-shadow-glow-pink: 0 0 20px rgba(var(--nyx-plasma-pink-rgb), 0.5),
+                          0 0 40px rgba(var(--nyx-plasma-pink-rgb), 0.3),
+                          0 0 60px rgba(var(--nyx-plasma-pink-rgb), 0.1);
+  
+  /* Border Radius - Cosmic Curves */
+  --nyx-radius-quantum: 2px;
+  --nyx-radius-atom: 4px;
+  --nyx-radius-star: 8px;
+  --nyx-radius-planet: 12px;
+  --nyx-radius-moon: 16px;
+  --nyx-radius-orbit: 24px;
+  --nyx-radius-galaxy: 32px;
+  --nyx-radius-round: 50%;
+  --nyx-radius-pill: 9999px;
+  
+  /* Blur Effects - Mist of Night */
+  --nyx-blur-xs: 2px;
+  --nyx-blur-sm: 4px;
+  --nyx-blur-md: 8px;
+  --nyx-blur-lg: 16px;
+  --nyx-blur-xl: 24px;
+  --nyx-blur-cosmic: 40px;
+  
+  /* Transitions - Temporal Flow */
+  --nyx-transition-instant: 100ms;
+  --nyx-transition-fast: 200ms;
+  --nyx-transition-normal: 300ms;
+  --nyx-transition-slow: 500ms;
+  --nyx-transition-cosmic: 800ms;
+  
+  /* Easing Functions - Movement of Celestial Bodies */
+  --nyx-ease-linear: linear;
+  --nyx-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --nyx-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --nyx-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --nyx-ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --nyx-ease-cosmic: cubic-bezier(0.23, 1, 0.32, 1);
+  
+  /* Z-Index Layers - Cosmic Hierarchy */
+  --nyx-z-base: 0;
+  --nyx-z-dropdown: 100;
+  --nyx-z-sticky: 200;
+  --nyx-z-overlay: 300;
+  --nyx-z-modal: 400;
+  --nyx-z-popover: 500;
+  --nyx-z-tooltip: 600;
+  --nyx-z-notification: 700;
+  --nyx-z-cosmos: 9999;
+}

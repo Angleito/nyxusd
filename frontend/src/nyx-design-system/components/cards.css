@@ -1,0 +1,240 @@
+/* NYX Design System - Card Components */
+
+.nyx-card {
+  /* Base styles */
+  position: relative;
+  background: var(--nyx-void-80);
+  border: 1px solid var(--nyx-void-60);
+  border-radius: var(--nyx-radius-planet);
+  padding: var(--nyx-padding-lg);
+  overflow: hidden;
+  transition: all var(--nyx-transition-normal) var(--nyx-ease-cosmic);
+  
+  /* Glass morphism effect */
+  backdrop-filter: blur(var(--nyx-blur-md));
+  background: linear-gradient(
+    135deg,
+    rgba(var(--nyx-void-80-rgb), 0.8),
+    rgba(var(--nyx-void-70-rgb), 0.6)
+  );
+}
+
+/* Card with cosmic background */
+.nyx-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at center,
+    rgba(var(--nyx-electric-purple-rgb), 0.1) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity var(--nyx-transition-slow) var(--nyx-ease-cosmic);
+  pointer-events: none;
+}
+
+/* Hover effect */
+.nyx-card:hover {
+  border-color: var(--nyx-electric-purple);
+  transform: translateY(-4px);
+  box-shadow: 
+    var(--nyx-shadow-lg),
+    0 0 30px rgba(var(--nyx-electric-purple-rgb), 0.2);
+}
+
+.nyx-card:hover::before {
+  opacity: 1;
+}
+
+/* Card Variants */
+
+/* Elevated Card */
+.nyx-card-elevated {
+  box-shadow: var(--nyx-shadow-float);
+  border: none;
+}
+
+.nyx-card-elevated:hover {
+  box-shadow: 
+    var(--nyx-shadow-xl),
+    0 0 40px rgba(var(--nyx-neon-cyan-rgb), 0.3);
+}
+
+/* Outlined Card */
+.nyx-card-outlined {
+  background: transparent;
+  border: 2px solid var(--nyx-void-50);
+}
+
+.nyx-card-outlined:hover {
+  border-color: var(--nyx-neon-cyan);
+  background: rgba(var(--nyx-void-80-rgb), 0.3);
+}
+
+/* Glowing Card */
+.nyx-card-glow {
+  border: 1px solid var(--nyx-neon-cyan);
+  box-shadow: 
+    inset 0 0 20px rgba(var(--nyx-neon-cyan-rgb), 0.1),
+    0 0 20px rgba(var(--nyx-neon-cyan-rgb), 0.2);
+}
+
+.nyx-card-glow:hover {
+  box-shadow: 
+    inset 0 0 30px rgba(var(--nyx-neon-cyan-rgb), 0.2),
+    0 0 40px rgba(var(--nyx-neon-cyan-rgb), 0.4);
+}
+
+/* Interactive Card */
+.nyx-card-interactive {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.nyx-card-interactive::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(var(--nyx-neon-cyan-rgb), 0.3),
+    transparent
+  );
+  transform: translate(-50%, -50%);
+  transition: width var(--nyx-transition-slow), 
+              height var(--nyx-transition-slow);
+}
+
+.nyx-card-interactive:active::after {
+  width: 300%;
+  height: 300%;
+}
+
+/* Card Sections */
+
+.nyx-card-header {
+  margin: calc(var(--nyx-padding-lg) * -1);
+  margin-bottom: var(--nyx-padding-lg);
+  padding: var(--nyx-padding-lg);
+  border-bottom: 1px solid var(--nyx-void-60);
+  background: rgba(var(--nyx-void-70-rgb), 0.5);
+}
+
+.nyx-card-footer {
+  margin: calc(var(--nyx-padding-lg) * -1);
+  margin-top: var(--nyx-padding-lg);
+  padding: var(--nyx-padding-lg);
+  border-top: 1px solid var(--nyx-void-60);
+  background: rgba(var(--nyx-void-70-rgb), 0.5);
+}
+
+.nyx-card-title {
+  font-family: var(--nyx-font-display);
+  font-size: var(--nyx-text-comet);
+  font-weight: var(--nyx-weight-semibold);
+  color: var(--nyx-gleam-100);
+  margin: 0 0 var(--nyx-space-atom) 0;
+}
+
+.nyx-card-subtitle {
+  font-family: var(--nyx-font-body);
+  font-size: var(--nyx-text-planet);
+  font-weight: var(--nyx-weight-regular);
+  color: var(--nyx-gleam-70);
+  margin: 0;
+}
+
+.nyx-card-content {
+  color: var(--nyx-gleam-80);
+  line-height: var(--nyx-leading-relaxed);
+}
+
+/* Special Cards */
+
+/* Data Card - For displaying crypto metrics */
+.nyx-card-data {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--nyx-void-90-rgb), 0.9),
+    rgba(var(--nyx-void-80-rgb), 0.8)
+  );
+  border: 1px solid var(--nyx-electric-purple);
+  position: relative;
+  overflow: hidden;
+}
+
+.nyx-card-data::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--nyx-neon-cyan),
+    transparent
+  );
+  animation: data-scan 3s linear infinite;
+}
+
+@keyframes data-scan {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* NFT Card */
+.nyx-card-nft {
+  background: var(--nyx-cosmic-black);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+}
+
+.nyx-card-nft::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: -2px;
+  background: linear-gradient(
+    45deg,
+    var(--nyx-electric-purple),
+    var(--nyx-neon-cyan),
+    var(--nyx-plasma-pink),
+    var(--nyx-gold-circuit)
+  );
+  background-size: 300% 300%;
+  border-radius: inherit;
+  z-index: -1;
+  animation: holographic-border 8s ease infinite;
+}
+
+@keyframes holographic-border {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Card Grid */
+.nyx-card-grid {
+  display: grid;
+  gap: var(--nyx-gap-lg);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}

@@ -38,9 +38,9 @@ const mainNavItems: NavItem[] = [
     description: "System-wide statistics and health metrics",
   },
   {
-    label: "AI Portfolio Assistant",
+    label: "Personalized Investing",
     href: "/ai-assistant",
-    description: "Get personalized investment recommendations",
+    description: "AI-adapted strategies tailored to your unique financial journey",
   },
   {
     label: "About Us",
@@ -73,20 +73,20 @@ export const Navigation: React.FC<NavigationProps> = ({
 
   const navItemClass = (path: string) =>
     clsx(
-      "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-      "focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-gray-900",
+      "relative inline-flex items-center px-3 py-2 rounded-lg nyx-body transition-all duration-200",
+      "focus:outline-none focus:ring-2 focus:ring-purple-400 whitespace-nowrap min-h-[36px]",
       isActive(path)
-        ? "text-purple-200 bg-purple-900/30 shadow-lg shadow-purple-900/20"
-        : "text-gray-300 hover:text-white hover:bg-gray-800/50",
+        ? "nyx-glass border border-purple-500/30 text-purple-200"
+        : "text-gray-300 hover:text-white hover:nyx-glass",
     );
 
   const mobileNavItemClass = (path: string) =>
     clsx(
-      "block w-full text-left px-4 py-3 text-base font-medium transition-all duration-200",
-      "focus:outline-none focus:bg-gray-800",
+      "block w-full text-left px-4 py-3 nyx-body transition-all duration-200 rounded-lg mx-2",
+      "focus:outline-none",
       isActive(path)
-        ? "text-purple-200 bg-purple-900/30 border-r-2 border-purple-400"
-        : "text-gray-300 hover:text-white hover:bg-gray-800/50",
+        ? "nyx-glass border border-purple-500/30 text-purple-200"
+        : "text-gray-300 hover:text-white hover:nyx-glass",
     );
 
   const handleNavClick = () => {
@@ -155,7 +155,7 @@ export const Navigation: React.FC<NavigationProps> = ({
 
   return (
     <nav
-      className={clsx("flex items-center space-x-1", className)}
+      className={clsx("flex items-center gap-1", className)}
       role="navigation"
       aria-label="Main navigation"
     >
@@ -165,16 +165,17 @@ export const Navigation: React.FC<NavigationProps> = ({
           key={item.href}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
+          className="inline-block"
         >
           <Link
             to={item.href}
             className={navItemClass(item.href)}
             aria-current={isActive(item.href) ? "page" : undefined}
           >
-            {item.label}
+            <span className="relative z-10">{item.label}</span>
             {isActive(item.href) && (
               <motion.div
-                className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-600/20 to-purple-400/20 -z-10"
+                className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-600/20 to-purple-400/20"
                 layoutId="activeNavItem"
                 initial={false}
                 transition={{
