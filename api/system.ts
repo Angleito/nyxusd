@@ -22,10 +22,19 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Generate dynamic stats based on current time for realistic data
+  const now = new Date();
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  
+  // Use day of year to generate consistent but changing values
+  const baseCollateral = 250000 + (dayOfYear * 1000);
+  const baseDebt = 180000 + (dayOfYear * 500);
+  const ratio = Math.floor((baseCollateral / baseDebt) * 100);
+
   res.json({
-    totalCollateral: "250000000000000000000000", // $250,000
-    totalDebt: "180000000000000000000000", // $180,000
-    systemCollateralizationRatio: 139, // 139%
+    totalCollateral: (baseCollateral * 1e18).toString(),
+    totalDebt: (baseDebt * 1e18).toString(),
+    systemCollateralizationRatio: ratio,
     stabilityFeeRate: 500, // 5% APR in basis points
     liquidationRatio: 150, // 150%
     emergencyShutdown: false,
