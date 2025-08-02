@@ -18,7 +18,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def handler(request):
+def handler(request, response):
     """
     Vercel serverless function handler for DeFi yield finder.
     
@@ -29,47 +29,39 @@ def handler(request):
     """
     
     # CORS headers
-    headers = {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Content-Type": "application/json"
-    }
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    response.headers['Content-Type'] = 'application/json'
     
     # Handle OPTIONS request for CORS
     if request.method == "OPTIONS":
-        return {
-            "statusCode": 200,
-            "headers": headers,
-            "body": ""
-        }
+        response.status_code = 200
+        return ""
     
     try:
-        # Parse query parameters
-        params = request.args if hasattr(request, 'args') else {}
+        # Parse query parameters from URL
+        from urllib.parse import parse_qs, urlparse
+        parsed_url = urlparse(request.url)
+        params = parse_qs(parsed_url.query)
         
-        min_safety_score = int(params.get("min_safety_score", 60))
-        max_results = int(params.get("max_results", 20))
-        use_cache = params.get("cache", "true").lower() == "true"
+        # Get parameters with defaults
+        min_safety_score = int(params.get("min_safety_score", ["60"])[0])
+        max_results = int(params.get("max_results", ["20"])[0])
+        use_cache = params.get("cache", ["true"])[0].lower() == "true"
         
         # Validate parameters
         if not 0 <= min_safety_score <= 100:
-            return {
-                "statusCode": 400,
-                "headers": headers,
-                "body": json.dumps({
-                    "error": "min_safety_score must be between 0 and 100"
-                })
-            }
+            response.status_code = 400
+            return json.dumps({
+                "error": "min_safety_score must be between 0 and 100"
+            })
         
         if not 1 <= max_results <= 100:
-            return {
-                "statusCode": 400,
-                "headers": headers,
-                "body": json.dumps({
-                    "error": "max_results must be between 1 and 100"
-                })
-            }
+            response.status_code = 400
+            return json.dumps({
+                "error": "max_results must be between 1 and 100"
+            })
         
         # Configure finder
         custom_config = {
@@ -83,31 +75,15 @@ def handler(request):
         result = finder.get_safe_base_yields(min_safety_score=min_safety_score)
         
         # Return successful response
-        return {
-            "statusCode": 200,
-            "headers": headers,
-            "body": json.dumps(result.to_dict())
-        }
+        response.status_code = 200
+        return json.dumps(result.to_dict())
         
     except Exception as e:
         logger.error(f"Error in DeFi yield finder: {str(e)}", exc_info=True)
         
-        return {
-            "statusCode": 500,
-            "headers": headers,
-            "body": json.dumps({
-                "error": "Internal server error",
-                "message": str(e) if os.environ.get("DEBUG") else "An error occurred processing your request"
-            })
-        }
+        response.status_code = 500
+        return json.dumps({
+            "error": "Internal server error",
+            "message": str(e) if os.environ.get("DEBUG") else "An error occurred processing your request"
+        })
 
-
-# For local testing
-if __name__ == "__main__":
-    class MockRequest:
-        method = "GET"
-        args = {"min_safety_score": "70", "max_results": "10"}
-    
-    response = handler(MockRequest())
-    print(f"Status: {response['statusCode']}")
-    print(f"Response: {response['body']}")
