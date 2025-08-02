@@ -11,6 +11,13 @@ export interface AIServiceConfig {
   temperature?: number;
   maxTokens?: number;
   streamResponse?: boolean;
+  // OpenRouter specific
+  trackCosts?: boolean;
+  providerPreferences?: {
+    order: string[];
+    allow_fallbacks: boolean;
+  };
+  transforms?: string[];
 }
 
 export interface AIContext {
@@ -69,8 +76,14 @@ export class AIServiceError extends Error {
 
 export const DEFAULT_AI_CONFIG: AIServiceConfig = {
   apiEndpoint: "/api/ai/chat",
-  model: "gpt-4-turbo-preview",
+  model: "google/gemini-2.5-flash",
   temperature: 0.7,
   maxTokens: 500,
   streamResponse: true,
+  trackCosts: false,
+  providerPreferences: {
+    order: ["Google", "DeepSeek", "Qwen", "OpenAI"],
+    allow_fallbacks: true,
+  },
+  transforms: ["middle-out"],
 };

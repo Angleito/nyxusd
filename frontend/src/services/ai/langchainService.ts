@@ -137,6 +137,13 @@ export class LangChainAIService implements AIService {
 
   // Fallback system for backward compatibility
   private fallbackMode = false;
+  
+  // OpenRouter specific
+  private openRouterConfig = {
+    baseURL: import.meta.env.VITE_OPENROUTER_API_URL || "https://openrouter.ai/api/v1",
+    appName: import.meta.env.VITE_APP_NAME || "NyxUSD",
+    appUrl: import.meta.env.VITE_APP_URL || window.location.origin,
+  };
 
   constructor(config: AIServiceConfig = DEFAULT_AI_CONFIG) {
     this.config = { ...DEFAULT_AI_CONFIG, ...config };
@@ -178,23 +185,90 @@ export class LangChainAIService implements AIService {
     }
   }
 
-  private createLLM(): ChatOpenAI {
+  private createLLM(queryType?: "simple" | "complex" | "crypto" | "reasoning"): ChatOpenAI {
+    const modelName = this.selectModelByQueryType(
+      queryType || "simple",
+      this.config.model
+    );
+    
     return new ChatOpenAI({
-      openAIApiKey: this.config.apiKey,
-      modelName: this.config.model || "gpt-4-turbo-preview",
+      openAIApiKey: import.meta.env.VITE_OPENROUTER_API_KEY || this.config.apiKey,
+      modelName: modelName,
       temperature: this.config.temperature || 0.7,
       maxTokens: this.config.maxTokens || 500,
       streaming: this.config.streamResponse,
+      configuration: {
+        baseURL: this.openRouterConfig.baseURL,
+        defaultHeaders: {
+          "HTTP-Referer": this.openRouterConfig.appUrl,
+          "X-Title": this.openRouterConfig.appName,
+        },
+      },
+      modelKwargs: {
+        provider: {
+          order: ["Google", "DeepSeek", "Qwen", "OpenAI"],
+          allow_fallbacks: true,
+        },
+        transforms: ["middle-out"],
+      },
     });
+  }
+  
+  private selectModelByQueryType(
+    queryType: "simple" | "complex" | "crypto" | "reasoning",
+    customModel?: string
+  ): string {
+    if (customModel) return customModel;
+    
+    const modelMap = {
+      simple: "google/gemini-2.5-flash",
+      complex: "qwen/qwen3-30b-a3b-instruct-2507",
+      crypto: "deepseek/deepseek-chat-v3-0324",
+      reasoning: "qwen/qwen3-235b-a22b-thinking-2507",
+    };
+    
+    return modelMap[queryType] || "google/gemini-2.5-flash";
+  }
+  
+  private analyzeQueryType(userMessage: string, context: AIContext): "simple" | "complex" | "crypto" | "reasoning" {
+    const message = userMessage.toLowerCase();
+    
+    // Check for reasoning/thinking requirements
+    if (/step.?by.?step|think.*through|explain.*reasoning|analyze.*deeply/i.test(message)) {
+      return "reasoning";
+    }
+    
+    // Check for crypto/DeFi specific terms
+    if (/cdp|leverage|liquidation|collateral|defi|yield|apy|protocol|vault/i.test(message)) {
+      return "crypto";
+    }
+    
+    // Check complexity based on message characteristics
+    const wordCount = message.split(/\s+/).length;
+    const hasMultipleQuestions = /\?.*\?/.test(message);
+    const requiresAnalysis = /analyze|compare|evaluate|explain|how|why/i.test(message);
+    
+    if (wordCount > 50 || hasMultipleQuestions || requiresAnalysis) {
+      return "complex";
+    }
+    
+    return "simple";
   }
 
   private createMemory(): ConversationSummaryMemory {
     return new ConversationSummaryMemory({
       llm: new ChatOpenAI({
-        openAIApiKey: this.config.apiKey,
-        modelName: "gpt-3.5-turbo",
+        openAIApiKey: import.meta.env.VITE_OPENROUTER_API_KEY || this.config.apiKey,
+        modelName: "google/gemini-2.5-flash",
         temperature: 0.5,
         maxTokens: 200,
+        configuration: {
+          baseURL: this.openRouterConfig.baseURL,
+          defaultHeaders: {
+            "HTTP-Referer": this.openRouterConfig.appUrl,
+            "X-Title": this.openRouterConfig.appName,
+          },
+        },
       }),
       memoryKey: "conversation_summary",
       returnMessages: true,
@@ -234,6 +308,15 @@ export class LangChainAIService implements AIService {
             "INVALID_CONFIG",
           );
         }
+      }
+      
+      // Determine query type for model selection
+      const queryType = this.analyzeQueryType(userMessage, context);
+      this.llm = this.createLLM(queryType);
+      
+      // Track costs if using generation endpoint
+      if (this.config.trackCosts) {
+        await this.trackGeneration(userMessage, queryType);
       }
 
       // Build enhanced system prompt
@@ -287,8 +370,8 @@ export class LangChainAIService implements AIService {
         { output: parsedResponse.message },
       );
 
-      // Update analytics
-      this.updateAnalytics(startTime, systemPrompt, parsedResponse);
+      // Update analytics with OpenRouter info
+      this.updateAnalytics(startTime, systemPrompt, parsedResponse, queryType);
 
       return parsedResponse;
     } catch (error: any) {
@@ -340,6 +423,10 @@ export class LangChainAIService implements AIService {
       if (!this.isInitialized) {
         await this.validateConfiguration();
       }
+      
+      // Determine query type for model selection
+      const queryType = this.analyzeQueryType(userMessage, context);
+      this.llm = this.createLLM(queryType);
 
       // Build enhanced system prompt for streaming
       const systemPrompt = await this.buildEnhancedSystemPrompt(
@@ -376,8 +463,8 @@ export class LangChainAIService implements AIService {
         { output: fullResponse },
       );
 
-      // Update analytics for streaming
-      this.updateAnalytics(startTime, systemPrompt, { message: fullResponse });
+      // Update analytics for streaming with OpenRouter info
+      this.updateAnalytics(startTime, systemPrompt, { message: fullResponse }, queryType);
 
       return {
         message: fullResponse,
@@ -895,12 +982,85 @@ Always structure your response with:
   }
 
   /**
+   * Track generation for cost monitoring (OpenRouter feature)
+   */
+  private async trackGeneration(
+    userMessage: string,
+    queryType: string
+  ): Promise<void> {
+    try {
+      const response = await fetch(`${this.openRouterConfig.baseURL}/generation`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
+          "HTTP-Referer": this.openRouterConfig.appUrl,
+          "X-Title": this.openRouterConfig.appName,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: this.selectModelByQueryType(queryType as any),
+          messages: [{ role: "user", content: userMessage }],
+        }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Generation tracked:", data.usage);
+      }
+    } catch (error) {
+      console.warn("Failed to track generation:", error);
+    }
+  }
+  
+  /**
+   * Get available models from OpenRouter
+   */
+  async getAvailableModels(): Promise<string[]> {
+    try {
+      const response = await fetch(`${this.openRouterConfig.baseURL}/models`, {
+        headers: {
+          "Authorization": `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
+          "HTTP-Referer": this.openRouterConfig.appUrl,
+          "X-Title": this.openRouterConfig.appName,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return data.data.map((model: any) => model.id);
+      }
+    } catch (error) {
+      console.error("Failed to fetch models:", error);
+    }
+    return [];
+  }
+  
+  /**
+   * Set provider routing preferences
+   */
+  setProviderPreferences(providers: string[], allowFallbacks: boolean = true): void {
+    // This will be used in the next LLM creation
+    this.config.providerPreferences = {
+      order: providers,
+      allow_fallbacks: allowFallbacks,
+    };
+  }
+  
+  /**
+   * Enable transform settings for better responses
+   */
+  enableTransforms(transforms: string[]): void {
+    this.config.transforms = transforms;
+  }
+  
+  /**
    * Update analytics with response data
    */
   private updateAnalytics(
     startTime: number,
     systemPrompt: string,
     response: { message: string },
+    queryType?: string,
   ): void {
     const responseTime = Date.now() - startTime;
     const promptTokens = this.estimateTokens(systemPrompt);

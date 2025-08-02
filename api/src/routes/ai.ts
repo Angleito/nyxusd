@@ -1,12 +1,10 @@
 import express, { Request, Response } from "express";
-import { ChatOpenAI } from "@langchain/openai";
 import {
   ChatPromptTemplate,
   SystemMessagePromptTemplate,
   HumanMessagePromptTemplate,
 } from "@langchain/core/prompts";
 import { LLMChain } from "langchain/chains";
-import { ConversationSummaryMemory } from "langchain/memory";
 import { z } from "zod";
 import dotenv from "dotenv";
 import {
@@ -15,15 +13,13 @@ import {
   performanceLogger,
   aiRequestLogger,
 } from "../utils/logger.js";
+import { openRouterService } from "../services/openRouterService.js";
 
 dotenv.config();
 
 const router = express.Router();
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const USE_MOCK_AI = process.env.USE_MOCK_AI === "true";
-
-const conversationMemories = new Map<string, ConversationSummaryMemory>();
 
 const requestSchema = z.object({
   message: z.string().min(1).max(1000),
@@ -48,22 +44,6 @@ const responseSchema = z.object({
   nextStep: z.string().optional(),
 });
 
-function getOrCreateMemory(sessionId: string): ConversationSummaryMemory {
-  if (!conversationMemories.has(sessionId)) {
-    const memory = new ConversationSummaryMemory({
-      llm: new ChatOpenAI({
-        openAIApiKey: OPENAI_API_KEY,
-        modelName: "gpt-3.5-turbo",
-        temperature: 0.5,
-        maxTokens: 200,
-      }),
-      memoryKey: "conversation_summary",
-      returnMessages: true,
-    });
-    conversationMemories.set(sessionId, memory);
-  }
-  return conversationMemories.get(sessionId)!;
-}
 
 router.use(aiRequestLogger);
 
@@ -80,8 +60,9 @@ router.post("/chat", async (req: Request, res: Response) => {
       messageLength: message.length,
     });
 
-    if (!OPENAI_API_KEY && !USE_MOCK_AI) {
-      aiLogger.warn("AI service not configured, using fallback");
+    const serviceInfo = openRouterService.getServiceInfo();
+    if (!serviceInfo.configured && !USE_MOCK_AI) {
+      aiLogger.warn("OpenRouter service not configured, using fallback");
       return res.status(503).json({
         error: "AI service not configured",
         fallback: true,
@@ -100,13 +81,20 @@ router.post("/chat", async (req: Request, res: Response) => {
       return res.json(mockResponse);
     }
 
-    const memory = getOrCreateMemory(sessionId);
+    const memory = openRouterService.getOrCreateMemory(sessionId);
 
-    const llm = new ChatOpenAI({
-      openAIApiKey: OPENAI_API_KEY,
-      modelName: "gpt-4-turbo-preview",
+    const queryComplexity = openRouterService.analyzeQueryComplexity(message, context);
+    
+    const llm = openRouterService.createLLM({
+      queryComplexity,
       temperature: 0.7,
       maxTokens: 500,
+      openRouterParams: {
+        provider: {
+          order: ["Google", "DeepSeek", "Qwen", "OpenAI"],
+          allow_fallbacks: true,
+        },
+      },
     });
 
     const systemPrompt = `You are Nyx, an AI investment assistant for a DeFi platform.
@@ -134,9 +122,9 @@ Always be friendly, encouraging, and explain DeFi concepts simply.`;
       memory,
     });
 
-    const apiTimer = performanceLogger.startTimer("openai-api-call");
+    const apiTimer = performanceLogger.startTimer("openrouter-api-call");
     const result = await chain.call({ input: message });
-    apiTimer.end({ model: "gpt-4-turbo-preview" });
+    apiTimer.end({ model: llm.modelName });
 
     let response;
     try {
@@ -179,13 +167,11 @@ Always be friendly, encouraging, and explain DeFi concepts simply.`;
     });
     timer.end({ error: true, errorType: error.name });
 
-    if (error.response?.status === 429) {
-      aiLogger.warn("Rate limit exceeded", {
-        retryAfter: error.response.headers["retry-after"],
-      });
+    const rateLimit = await openRouterService.handleRateLimit(error);
+    if (rateLimit.shouldRetry) {
       return res.status(429).json({
         error: "Rate limit exceeded",
-        retryAfter: error.response.headers["retry-after"],
+        retryAfter: rateLimit.retryAfter,
       });
     }
 
@@ -214,7 +200,8 @@ router.post("/chat/stream", async (req: Request, res: Response) => {
     const validatedData = requestSchema.parse(req.body);
     const { message, sessionId, context } = validatedData;
 
-    if (!OPENAI_API_KEY) {
+    const serviceInfo = openRouterService.getServiceInfo();
+    if (!serviceInfo.configured) {
       return res.status(503).json({
         error: "Streaming not available without API key",
       });
@@ -224,14 +211,21 @@ router.post("/chat/stream", async (req: Request, res: Response) => {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    const memory = getOrCreateMemory(sessionId);
+    const memory = openRouterService.getOrCreateMemory(sessionId);
 
-    const llm = new ChatOpenAI({
-      openAIApiKey: OPENAI_API_KEY,
-      modelName: "gpt-4-turbo-preview",
+    const queryComplexity = openRouterService.analyzeQueryComplexity(message, context);
+    
+    const llm = openRouterService.createLLM({
+      queryComplexity,
       temperature: 0.7,
       maxTokens: 500,
       streaming: true,
+      openRouterParams: {
+        provider: {
+          order: ["Google", "DeepSeek", "Qwen", "OpenAI"],
+          allow_fallbacks: true,
+        },
+      },
     });
 
     const systemPrompt = `You are Nyx, an AI investment assistant. Current step: ${context.conversationStep}`;
@@ -265,32 +259,40 @@ router.post("/chat/stream", async (req: Request, res: Response) => {
 router.post("/reset/:sessionId", (req: Request, res: Response) => {
   const { sessionId } = req.params;
 
-  if (conversationMemories.has(sessionId)) {
-    conversationMemories.delete(sessionId);
-  }
+  openRouterService.clearMemory(sessionId);
 
   res.json({ success: true, message: "Session reset" });
 });
 
-router.get("/health", (req: Request, res: Response) => {
+router.get("/health", async (req: Request, res: Response) => {
+  const serviceInfo = openRouterService.getServiceInfo();
+  const connectionTest = await openRouterService.testConnection();
+  
   res.json({
-    status: "healthy",
-    hasApiKey: !!OPENAI_API_KEY,
+    status: connectionTest ? "healthy" : "degraded",
+    service: "OpenRouter",
+    ...serviceInfo,
     useMockAI: USE_MOCK_AI,
-    activeSessions: conversationMemories.size,
+    connectionTest,
+  });
+});
+
+router.get("/models", (req: Request, res: Response) => {
+  const models = openRouterService.getAvailableModels();
+  const modelsInfo = models.map(id => ({
+    id,
+    info: openRouterService.getModelInfo(id),
+  }));
+  
+  res.json({
+    models: modelsInfo,
+    count: models.length,
   });
 });
 
 setInterval(
   () => {
-    const now = Date.now();
-    const maxAge = 30 * 60 * 1000;
-
-    for (const [sessionId, memory] of conversationMemories.entries()) {
-      if (now - (memory as any).lastUsed > maxAge) {
-        conversationMemories.delete(sessionId);
-      }
-    }
+    openRouterService.cleanupOldSessions(30 * 60 * 1000);
   },
   5 * 60 * 1000,
 );
