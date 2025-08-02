@@ -65,7 +65,8 @@ dist
 
 # Gatsby files
 .cache/
-public
+# public folder needed for Vercel deployment
+# public
 
 # Storybook build outputs
 .out

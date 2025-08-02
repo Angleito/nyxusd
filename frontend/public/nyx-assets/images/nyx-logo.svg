@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient definitions -->
+    <linearGradient id="nyxGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6B46C1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00D9FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF006E;stop-opacity:1" />
+    </linearGradient>
+    
+    <radialGradient id="glowGradient">
+      <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:0.6" />
+      <stop offset="50%" style="stop-color:#6B46C1;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#FF006E;stop-opacity:0" />
+    </radialGradient>
+    
+    <!-- Glow filter -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Star pattern for background -->
+    <pattern id="stars" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="1" fill="#C0C5CE" opacity="0.6"/>
+      <circle cx="25" cy="15" r="0.5" fill="#F7F7FF" opacity="0.8"/>
+      <circle cx="35" cy="35" r="0.8" fill="#C0C5CE" opacity="0.7"/>
+      <circle cx="15" cy="30" r="0.6" fill="#F7F7FF" opacity="0.5"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background circle with stars -->
+  <circle cx="100" cy="100" r="95" fill="#0A0A0F"/>
+  <circle cx="100" cy="100" r="95" fill="url(#stars)" opacity="0.3"/>
+  
+  <!-- Outer glow -->
+  <circle cx="100" cy="100" r="90" fill="url(#glowGradient)" opacity="0.5"/>
+  
+  <!-- Crescent moon shape (representing NYX) -->
+  <g transform="translate(100, 100)">
+    <!-- Main moon crescent -->
+    <path d="M -30,-40 C -30,-20 -20,0 0,10 C 20,0 30,-20 30,-40 C 10,-30 -10,-30 -30,-40 Z" 
+          fill="url(#nyxGradient)" 
+          filter="url(#glow)"
+          opacity="0.9"/>
+    
+    <!-- Inner crescent highlight -->
+    <path d="M -20,-35 C -20,-20 -10,0 0,5 C 10,0 20,-20 20,-35 C 5,-28 -5,-28 -20,-35 Z" 
+          fill="#F7F7FF" 
+          opacity="0.3"/>
+  </g>
+  
+  <!-- Blockchain nodes forming constellation -->
+  <g opacity="0.8">
+    <!-- Central node -->
+    <circle cx="100" cy="100" r="4" fill="#00D9FF" filter="url(#glow)"/>
+    
+    <!-- Connected nodes -->
+    <circle cx="70" cy="80" r="3" fill="#6B46C1"/>
+    <circle cx="130" cy="80" r="3" fill="#6B46C1"/>
+    <circle cx="60" cy="120" r="3" fill="#FF006E"/>
+    <circle cx="140" cy="120" r="3" fill="#FF006E"/>
+    <circle cx="100" cy="140" r="3" fill="#00D9FF"/>
+    
+    <!-- Connection lines -->
+    <line x1="100" y1="100" x2="70" y2="80" stroke="#6B46C1" stroke-width="1" opacity="0.5"/>
+    <line x1="100" y1="100" x2="130" y2="80" stroke="#6B46C1" stroke-width="1" opacity="0.5"/>
+    <line x1="100" y1="100" x2="60" y2="120" stroke="#FF006E" stroke-width="1" opacity="0.5"/>
+    <line x1="100" y1="100" x2="140" y2="120" stroke="#FF006E" stroke-width="1" opacity="0.5"/>
+    <line x1="100" y1="100" x2="100" y2="140" stroke="#00D9FF" stroke-width="1" opacity="0.5"/>
+    
+    <!-- Hexagonal blockchain patterns -->
+    <path d="M 70,80 L 75,75 L 75,85 Z" fill="#6B46C1" opacity="0.3"/>
+    <path d="M 130,80 L 125,75 L 125,85 Z" fill="#6B46C1" opacity="0.3"/>
+  </g>
+  
+  <!-- NYX text -->
+  <text x="100" y="170" font-family="Arial, sans-serif" font-size="24" font-weight="bold" 
+        text-anchor="middle" fill="url(#nyxGradient)" letter-spacing="4">NYX</text>
+</svg>
