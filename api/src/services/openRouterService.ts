@@ -1,7 +1,7 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { ConversationSummaryMemory } from "langchain/memory";
 import dotenv from "dotenv";
-import { aiLogger } from "../utils/logger.js";
+import { aiLogger } from "../utils/logger";
 
 dotenv.config();
 

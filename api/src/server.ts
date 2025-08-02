@@ -6,9 +6,9 @@ import rateLimit from "express-rate-limit";
 import { createClient } from "redis";
 
 // Import routes
-import oracleRoutes from "./routes/oracle.js";
-import aiRoutes from "./routes/ai.js";
-import enhancedAIRoutes from "./routes/enhancedAI.js";
+import oracleRoutes from "./routes/oracle";
+import aiRoutes from "./routes/ai";
+import enhancedAIRoutes from "./routes/enhancedAI";
 
 // Import CDP operations (mock for now since we need to resolve import paths)
 // import * as CDPOperations from '@nyxusd/core';

@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
 import { z } from "zod";
 import dotenv from "dotenv";
-import { aiLogger, aiMetrics, performanceLogger, aiRequestLogger } from "../utils/logger.js";
-import { enhancedAIService, EnhancedAIContext } from "../services/enhancedOpenRouterService.js";
+import { aiLogger, aiMetrics, performanceLogger, aiRequestLogger } from "../utils/logger";
+import { productionEnhancedService as enhancedAIService, EnhancedAIContext } from "../services/productionEnhancedService";
 
 dotenv.config();
 
@@ -189,15 +189,28 @@ router.post("/crypto", async (req: Request, res: Response) => {
         if (!params?.holdings || params.holdings.length === 0) {
           return res.status(400).json({ error: "Holdings required for portfolio analysis" });
         }
-        response = await enhancedAIService.getPortfolioReview(sessionId, params.holdings);
+        response = await enhancedAIService.generateResponse({
+          sessionId,
+          userMessage: `Analyze this portfolio: ${JSON.stringify(params.holdings)}`,
+          enableCryptoTools: true,
+          walletData: { holdings: params.holdings }
+        });
         break;
 
       case 'defi':
-        response = await enhancedAIService.getDefiOpportunities(sessionId, params?.chain);
+        response = await enhancedAIService.generateResponse({
+          sessionId,
+          userMessage: `Show me DeFi opportunities ${params?.chain ? `on ${params.chain}` : ''}`,
+          enableCryptoTools: true,
+        });
         break;
 
       case 'market_analysis':
-        response = await enhancedAIService.getMarketAnalysis(sessionId);
+        response = await enhancedAIService.generateResponse({
+          sessionId,
+          userMessage: 'Give me a comprehensive market analysis',
+          enableCryptoTools: true,
+        });
         break;
 
       default:
@@ -221,7 +234,12 @@ router.post("/portfolio/analyze", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Holdings required" });
     }
 
-    const response = await enhancedAIService.getPortfolioReview(sessionId, holdings);
+    const response = await enhancedAIService.generateResponse({
+      sessionId,
+      userMessage: `Analyze this portfolio: ${JSON.stringify(holdings)}`,
+      enableCryptoTools: true,
+      walletData: { holdings }
+    });
     res.json(response);
   } catch (error: any) {
     aiLogger.error("Portfolio analysis error", { error });
@@ -234,7 +252,11 @@ router.get("/defi/opportunities", async (req: Request, res: Response) => {
     const sessionId = req.query.sessionId as string || 'default';
     const chain = req.query.chain as string;
 
-    const response = await enhancedAIService.getDefiOpportunities(sessionId, chain);
+    const response = await enhancedAIService.generateResponse({
+      sessionId,
+      userMessage: `Show me DeFi opportunities ${chain ? `on ${chain}` : ''}`,
+      enableCryptoTools: true,
+    });
     res.json(response);
   } catch (error: any) {
     aiLogger.error("DeFi opportunities error", { error });
@@ -246,7 +268,11 @@ router.get("/market/analysis", async (req: Request, res: Response) => {
   try {
     const sessionId = req.query.sessionId as string || 'default';
     
-    const response = await enhancedAIService.getMarketAnalysis(sessionId);
+    const response = await enhancedAIService.generateResponse({
+      sessionId,
+      userMessage: 'Give me a comprehensive market analysis',
+      enableCryptoTools: true,
+    });
     res.json(response);
   } catch (error: any) {
     aiLogger.error("Market analysis error", { error });

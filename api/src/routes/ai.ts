@@ -12,8 +12,8 @@ import {
   aiMetrics,
   performanceLogger,
   aiRequestLogger,
-} from "../utils/logger.js";
-import { openRouterService } from "../services/openRouterService.js";
+} from "../utils/logger";
+import { openRouterService } from "../services/openRouterService";
 
 dotenv.config();
 
