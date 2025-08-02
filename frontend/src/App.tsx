@@ -3,7 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NyxHeader } from "./components/layout/NyxHeader";
 import { NyxDashboard } from "./components/dashboard/NyxDashboard";
-import { CDPDashboard } from "./components/cdp/CDPDashboard";
+import CDPHub from "./components/cdp/CDPHub";
 import { ModernSystemStats } from "./components/stats/ModernSystemStats";
 import NyxHeroSection from "./components/dashboard/NyxHeroSection";
 import { AIAssistantProvider } from "./providers/AIAssistantProvider";
@@ -88,9 +88,9 @@ function App() {
                   exit="out"
                   variants={pageVariants}
                   transition={pageTransition}
-                  className="container mx-auto px-4 py-8 pt-24"
+                  className="pt-24"
                 >
-                  <CDPDashboard />
+                  <CDPHub />
                 </motion.div>
               }
             />

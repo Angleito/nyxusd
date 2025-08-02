@@ -127,7 +127,7 @@ const RiskIndicatorCard: React.FC<RiskIndicatorCardProps> = ({
   );
 };
 
-export const CDPDashboard: React.FC = () => {
+const CDPDashboard: React.FC = () => {
   const [showCreateWizard, setShowCreateWizard] = useState(false);
   const [expandedActions, setExpandedActions] = useState(false);
 
@@ -420,3 +420,5 @@ export const CDPDashboard: React.FC = () => {
     </div>
   );
 };
+
+export default CDPDashboard;
