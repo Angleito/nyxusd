@@ -41,16 +41,12 @@ interface OpenRouterParams {
 export class OpenRouterService {
   private apiKey: string;
   private baseURL: string = "https://openrouter.ai/api/v1";
-  private appName: string;
-  private appUrl: string;
   private defaultModel: string = "google/gemini-2.5-flash";
   private availableModels: Map<string, OpenRouterModel> = new Map();
   private conversationMemories: Map<string, ConversationSummaryMemory> = new Map();
 
   constructor() {
     this.apiKey = process.env.OPENROUTER_API_KEY || "";
-    this.appName = process.env.APP_NAME || "NyxUSD";
-    this.appUrl = process.env.APP_URL || "http://localhost:3000";
     
     if (!this.apiKey) {
       aiLogger.warn("OpenRouter API key not configured");
@@ -64,8 +60,8 @@ export class OpenRouterService {
       const response = await fetch(`${this.baseURL}/models`, {
         headers: {
           "Authorization": `Bearer ${this.apiKey}`,
-          "HTTP-Referer": this.appUrl,
-          "X-Title": this.appName,
+          "HTTP-Referer": "https://nyxusd.vercel.app",
+          "X-Title": "NyxUSD",
         },
       });
 
@@ -206,8 +202,8 @@ export class OpenRouterService {
       configuration: {
         baseURL: this.baseURL,
         defaultHeaders: {
-          "HTTP-Referer": this.appUrl,
-          "X-Title": this.appName,
+          "HTTP-Referer": "https://nyxusd.vercel.app",
+          "X-Title": "NyxUSD",
         },
       },
     };
@@ -343,8 +339,8 @@ export class OpenRouterService {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${this.apiKey}`,
-          "HTTP-Referer": this.appUrl,
-          "X-Title": this.appName,
+          "HTTP-Referer": "https://nyxusd.vercel.app",
+          "X-Title": "NyxUSD",
         },
       });
 

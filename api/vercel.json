@@ -16,8 +16,6 @@
     "OPENROUTER_API_KEY": "@openrouter_api_key",
     "HIVE_API_KEY": "@hive_api_key",
     "HIVE_API_URL": "@hive_api_url",
-    "APP_NAME": "@app_name",
-    "APP_URL": "@app_url",
     "NODE_ENV": "production",
     "MCP_SERVER_ENABLED": "@mcp_server_enabled",
     "MCP_CACHE_TTL": "@mcp_cache_ttl"

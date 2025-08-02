@@ -41,8 +41,6 @@ VITE_HIVE_API_KEY=hive_xxxxx
 VITE_HIVE_API_URL=https://hiveintelligence.xyz/mcp
 VITE_WALLETCONNECT_PROJECT_ID=xxxxx
 VITE_API_URL=https://your-api.vercel.app
-VITE_APP_NAME=NyxUSD
-VITE_APP_URL=https://your-frontend.vercel.app
 VITE_USE_MOCK_AI=false
 VITE_DEFAULT_CHAIN=mainnet
 VITE_ENABLE_TESTNETS=false
@@ -62,8 +60,6 @@ Add these environment variables:
 OPENROUTER_API_KEY=sk-or-v1-xxxxx
 HIVE_API_KEY=hive_xxxxx
 HIVE_API_URL=https://hiveintelligence.xyz/mcp
-APP_NAME=NyxUSD
-APP_URL=https://your-frontend.vercel.app
 NODE_ENV=production
 MCP_SERVER_ENABLED=true
 MCP_CACHE_TTL=60
@@ -90,8 +86,6 @@ After deploying the API, update the frontend environment variable:
 | `VITE_HIVE_API_URL` | Hive API endpoint | ✅ | `https://hiveintelligence.xyz/mcp` |
 | `VITE_WALLETCONNECT_PROJECT_ID` | WalletConnect project ID | ✅ | `xxxxx` |
 | `VITE_API_URL` | Backend API URL | ✅ | `https://api.vercel.app` |
-| `VITE_APP_NAME` | Application name | ✅ | `NyxUSD` |
-| `VITE_APP_URL` | Frontend URL | ✅ | `https://app.vercel.app` |
 | `VITE_USE_MOCK_AI` | Use mock AI responses | ❌ | `false` |
 | `VITE_DEFAULT_CHAIN` | Default blockchain | ❌ | `mainnet` |
 | `VITE_ENABLE_TESTNETS` | Enable test networks | ❌ | `false` |
@@ -105,8 +99,6 @@ After deploying the API, update the frontend environment variable:
 | `OPENROUTER_API_KEY` | OpenRouter API key | ✅ | `sk-or-v1-xxxxx` |
 | `HIVE_API_KEY` | Hive Intelligence API key | ✅ | `hive_xxxxx` |
 | `HIVE_API_URL` | Hive API endpoint | ✅ | `https://hiveintelligence.xyz/mcp` |
-| `APP_NAME` | Application name | ✅ | `NyxUSD` |
-| `APP_URL` | Frontend URL | ✅ | `https://app.vercel.app` |
 | `NODE_ENV` | Environment | ✅ | `production` |
 | `MCP_SERVER_ENABLED` | Enable MCP server | ✅ | `true` |
 | `MCP_CACHE_TTL` | Cache TTL in seconds | ❌ | `60` |

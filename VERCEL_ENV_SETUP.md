@@ -11,10 +11,6 @@ Add these environment variables in your Vercel project settings:
 VITE_OPENROUTER_API_KEY=your_openrouter_api_key_here
 VITE_OPENROUTER_API_URL=https://openrouter.ai/api/v1
 
-# App Configuration
-VITE_APP_NAME=NyxUSD
-VITE_APP_URL=https://your-vercel-app.vercel.app
-
 # API Configuration
 VITE_API_URL=https://your-api-endpoint.vercel.app
 VITE_USE_MOCK_AI=false
@@ -40,10 +36,6 @@ VITE_HIVE_API_URL=https://hiveintelligence.xyz/mcp
 ```bash
 # OpenRouter Configuration
 OPENROUTER_API_KEY=your_openrouter_api_key_here
-
-# App Configuration
-APP_NAME=NyxUSD
-APP_URL=https://your-vercel-app.vercel.app
 
 # Crypto Intelligence Services
 HIVE_API_KEY=your_hive_intelligence_api_key
