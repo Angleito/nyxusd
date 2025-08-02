@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Sparkles, TrendingUp, Wallet, DollarSign, BarChart3, RefreshCw, History, Settings, Download } from "lucide-react";
+import { Send, Sparkles, TrendingUp, Wallet, DollarSign, BarChart3, RefreshCw, History, Settings, Download, ArrowRightLeft } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { TypingIndicator } from "./TypingIndicator";
 import { enhancedAIService } from "../../services/ai/enhancedAIService";
 import { useWallet } from "../../hooks/useWallet";
 import { chatMemoryService, ChatMessage as MemoryMessage } from "../../services/memory/chatMemoryService";
 import { ConversationStep } from "../../providers/AIAssistantProvider";
+import { swapDetectionService } from "../../services/swapDetectionService";
+import { SwapInterface } from "../swap/SwapInterface";
+import { VoiceControls } from "../voice/VoiceControls";
+import { voiceService } from "../../services/voice/voiceService";
 
 interface Message extends MemoryMessage {}
 
@@ -17,6 +21,15 @@ export const EnhancedChatInterface: React.FC = () => {
   const [streamingContent, setStreamingContent] = useState("");
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [activeSwap, setActiveSwap] = useState<{
+    inputToken?: string;
+    outputToken?: string;
+    amount?: string;
+    messageId: string;
+  } | null>(null);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [isListeningToVoice, setIsListeningToVoice] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { address, balance, isConnected } = useWallet();
@@ -99,21 +112,109 @@ What would you like to explore today?`,
     };
   }, [isConnected, address, balance]);
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isTyping) return;
+  // Voice handling callbacks
+  const handleVoiceTranscription = useCallback((text: string, isFinal: boolean) => {
+    setVoiceTranscript(text);
+    if (isFinal && text.trim()) {
+      setInputValue(text);
+      // Automatically send the message after final transcription
+      setTimeout(() => {
+        handleSendMessage(text);
+      }, 500);
+    }
+  }, []);
+
+  const handleVoiceError = useCallback((error: any) => {
+    console.error('Voice error:', error);
+    const errorMessage: Message = {
+      id: `msg_${Date.now()}_voice_error`,
+      role: "system",
+      content: `Voice error: ${error.message || 'Failed to process voice input'}`,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, errorMessage]);
+  }, []);
+
+  const handleVoiceStatusChange = useCallback((status: string) => {
+    setIsListeningToVoice(status === 'listening');
+  }, []);
+
+  // Speak AI response if voice is enabled
+  const speakResponse = useCallback(async (text: string) => {
+    if (voiceEnabled && voiceService.isSessionActive()) {
+      try {
+        await voiceService.speakText(text);
+      } catch (error) {
+        console.error('Failed to speak response:', error);
+      }
+    }
+  }, [voiceEnabled]);
+
+  const handleSendMessage = async (messageText?: string) => {
+    const textToSend = messageText || inputValue.trim();
+    if (!textToSend || isTyping) return;
 
     const userMessage: Message = {
       id: `msg_${Date.now()}`,
       role: "user",
-      content: inputValue.trim(),
+      content: textToSend,
       timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
     chatMemoryService.addMessage(userMessage);
     setInputValue("");
+    setVoiceTranscript("");
     setIsTyping(true);
     setStreamingContent("");
+
+    // Check for swap intent
+    const swapIntent = swapDetectionService.detectSwapIntent(userMessage.content);
+    
+    if (swapIntent.isSwapIntent && swapIntent.confidence > 0.6) {
+      // Handle swap intent
+      if (swapIntent.missingParams && swapIntent.missingParams.length > 0) {
+        // Ask for missing parameters
+        const clarifyingQuestion = swapDetectionService.generateClarifyingQuestion(swapIntent.missingParams);
+        const assistantMessage: Message = {
+          id: `msg_${Date.now()}_assistant`,
+          role: "assistant",
+          content: clarifyingQuestion,
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+        chatMemoryService.addMessage(assistantMessage);
+        setIsTyping(false);
+        return;
+      }
+      
+      // Create swap interface
+      const swapMessage: Message = {
+        id: `msg_${Date.now()}_swap`,
+        role: "assistant",
+        content: "I'll help you swap tokens. Here's the swap interface:",
+        timestamp: new Date(),
+        metadata: {
+          isSwap: true,
+          swapParams: {
+            inputToken: swapIntent.inputToken,
+            outputToken: swapIntent.outputToken,
+            amount: swapIntent.amount,
+          }
+        }
+      };
+      
+      setMessages(prev => [...prev, swapMessage]);
+      chatMemoryService.addMessage(swapMessage);
+      setActiveSwap({
+        inputToken: swapIntent.inputToken,
+        outputToken: swapIntent.outputToken,
+        amount: swapIntent.amount,
+        messageId: swapMessage.id,
+      });
+      setIsTyping(false);
+      return;
+    }
 
     try {
       // Check if this is a specific crypto query
@@ -141,6 +242,9 @@ What would you like to explore today?`,
 
         setMessages(prev => [...prev, assistantMessage]);
         chatMemoryService.addMessage(assistantMessage);
+        
+        // Speak the response if voice is enabled
+        await speakResponse(response.message);
         
         // Update user profile based on interaction
         if (address) {
@@ -175,6 +279,9 @@ What would you like to explore today?`,
         setMessages(prev => [...prev, assistantMessage]);
         chatMemoryService.addMessage(assistantMessage);
         setStreamingContent("");
+        
+        // Speak the response if voice is enabled
+        await speakResponse(fullResponse);
       }
     } catch (error) {
       // Only log in development mode to avoid console spam
@@ -226,6 +333,9 @@ What would you like to explore today?`,
       case "analysis":
         query = "Give me a comprehensive market analysis";
         break;
+      case "swap":
+        query = "I want to swap tokens";
+        break;
     }
 
     if (query) {
@@ -274,6 +384,15 @@ What would you like to explore today?`,
           </div>
           
           <div className="flex items-center space-x-2">
+            {/* Voice Controls */}
+            <VoiceControls
+              onTranscription={handleVoiceTranscription}
+              onError={handleVoiceError}
+              onStatusChange={handleVoiceStatusChange}
+              apiKey={process.env.REACT_APP_ELEVENLABS_API_KEY}
+              className="mr-2"
+            />
+            
             {isConnected && (
               <div className="flex items-center space-x-2 text-sm">
                 <Wallet className="w-4 h-4 text-green-400" />
@@ -362,6 +481,16 @@ What would you like to explore today?`,
             <RefreshCw className="w-3 h-3" />
             <span>DeFi</span>
           </motion.button>
+          
+          <motion.button
+            onClick={() => handleQuickAction("swap")}
+            className="flex items-center space-x-1 px-3 py-1 bg-purple-800/30 hover:bg-purple-700/40 rounded-full text-xs text-gray-300 whitespace-nowrap transition-all"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <ArrowRightLeft className="w-3 h-3" />
+            <span>Swap</span>
+          </motion.button>
         </div>
       </motion.div>
 
@@ -382,6 +511,30 @@ What would you like to explore today?`,
                   ...message,
                   sender: message.role === "user" ? "user" : "ai"
                 }} />
+                
+                {/* Show swap interface for swap messages */}
+                {message.metadata?.isSwap && activeSwap?.messageId === message.id && (
+                  <div className="mt-4">
+                    <SwapInterface
+                      initialInputToken={activeSwap.inputToken}
+                      initialOutputToken={activeSwap.outputToken}
+                      initialAmount={activeSwap.amount}
+                      embedded={true}
+                      onSwapComplete={(txHash) => {
+                        const successMessage: Message = {
+                          id: `msg_${Date.now()}_success`,
+                          role: "assistant",
+                          content: `✅ Swap executed successfully!\n\nTransaction hash: ${txHash}\n\n[View on BaseScan](https://basescan.org/tx/${txHash})`,
+                          timestamp: new Date(),
+                        };
+                        setMessages(prev => [...prev, successMessage]);
+                        chatMemoryService.addMessage(successMessage);
+                        setActiveSwap(null);
+                      }}
+                      onCancel={() => setActiveSwap(null)}
+                    />
+                  </div>
+                )}
                 
                 {/* Show metadata for crypto responses */}
                 {message.metadata?.toolsUsed && (
@@ -457,11 +610,11 @@ What would you like to explore today?`,
             <input
               ref={inputRef}
               type="text"
-              value={inputValue}
+              value={voiceTranscript || inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask about crypto prices, portfolio analysis, DeFi opportunities..."
-              disabled={isTyping}
+              placeholder={isListeningToVoice ? "Listening..." : "Ask about crypto prices, portfolio analysis, DeFi opportunities..."}
+              disabled={isTyping || isListeningToVoice}
               className="w-full px-4 py-3 bg-gray-800/70 border border-purple-700/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             />
             

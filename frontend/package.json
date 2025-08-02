@@ -5,6 +5,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@elevenlabs/client": "^0.4.4",
+    "@elevenlabs/react": "^0.4.5",
     "@heroicons/react": "^2.0.18",
     "@langchain/openai": "^0.5.16",
     "@radix-ui/react-dialog": "^1.1.14",

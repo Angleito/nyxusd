@@ -13,6 +13,12 @@ export interface ChatMessage {
       mentioned?: string[];
       prices?: Record<string, number>;
     };
+    isSwap?: boolean;
+    swapParams?: {
+      inputToken?: string;
+      outputToken?: string;
+      amount?: string;
+    };
   };
 }
 
