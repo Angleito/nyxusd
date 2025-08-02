@@ -29,9 +29,11 @@ export default async function handler(
     const { message, sessionId, context, enableCryptoTools } = req.body;
 
     if (!OPENROUTER_API_KEY) {
+      console.error('OpenRouter API key not found in environment variables');
       return res.status(500).json({
         error: "Configuration error",
         message: "OpenRouter API key not configured. Please set OPENROUTER_API_KEY environment variable.",
+        debug: process.env.NODE_ENV === 'development' ? 'Key not found' : undefined
       });
     }
 
@@ -46,8 +48,10 @@ export default async function handler(
     }
 
     if (context?.walletData?.holdings) {
-      systemPrompt += ` User's portfolio includes: ${context.walletData.holdings.map(h => `${h.amount} ${h.symbol}`).join(', ')}.`;
+      systemPrompt += ` User's portfolio includes: ${context.walletData.holdings.map((h: any) => `${h.amount} ${h.symbol}`).join(', ')}.`;
     }
+
+    console.log('Calling OpenRouter API with message:', message);
 
     // Call OpenRouter API
     const response = await fetch(OPENROUTER_API_URL, {
@@ -55,7 +59,7 @@ export default async function handler(
       headers: {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': req.headers.referer || 'https://nyxusd.vercel.app',
+        'HTTP-Referer': 'https://nyxusd-git-main-angleitos-projects.vercel.app',
         'X-Title': 'NYX USD Assistant',
       },
       body: JSON.stringify({
@@ -70,16 +74,30 @@ export default async function handler(
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('OpenRouter API error:', error);
+      const errorText = await response.text();
+      console.error('OpenRouter API error:', response.status, errorText);
+      
+      // Parse error if possible
+      let errorMessage = 'Failed to get AI response';
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.error?.message || errorData.message || errorMessage;
+      } catch {
+        // Use text as-is if not JSON
+      }
+      
       return res.status(500).json({
         error: "AI service error",
-        message: "Failed to get AI response. Please try again.",
+        message: errorMessage,
+        status: response.status,
+        debug: process.env.NODE_ENV === 'development' ? errorText : undefined
       });
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0]?.message?.content || "I couldn't generate a response. Please try again.";
+    console.log('OpenRouter response received');
+    
+    const aiResponse = data.choices?.[0]?.message?.content || data.message || "I couldn't generate a response. Please try again.";
 
     // Structure response
     const result = {
@@ -89,16 +107,17 @@ export default async function handler(
         "Consider diversifying your portfolio across different sectors",
         "Research DeFi yield opportunities matching your risk profile",
         "Stay updated with market trends and protocol updates"
-      ].filter(() => Math.random() > 0.5) : undefined, // Randomly include some recommendations
+      ].filter(() => Math.random() > 0.5) : undefined,
     };
 
     res.json(result);
   } catch (error: any) {
-    console.error("Error in enhanced chat endpoint:", error);
+    console.error("Error in enhanced chat endpoint:", error.message, error.stack);
 
     res.status(500).json({
       error: "Internal server error",
-      message: "Failed to process your request. Please try again.",
+      message: error.message || "Failed to process your request. Please try again.",
+      debug: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }
