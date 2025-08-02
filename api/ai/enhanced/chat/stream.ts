@@ -1,31 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { z } from "zod";
-import { productionEnhancedService as enhancedAIService, EnhancedAIContext } from "../../../../src/services/productionEnhancedService";
-
-const USE_MOCK_AI = process.env.USE_MOCK_AI === "true";
-
-const requestSchema = z.object({
-  message: z.string().min(1).max(1000),
-  sessionId: z.string(),
-  context: z.object({
-    conversationStep: z.string().optional(),
-    userProfile: z.object({
-      experience: z.string().optional(),
-      riskTolerance: z.string().optional(),
-      investmentGoals: z.array(z.string()).optional(),
-    }).optional(),
-    walletData: z.object({
-      address: z.string().optional(),
-      balance: z.number().optional(),
-      holdings: z.array(z.object({
-        symbol: z.string(),
-        amount: z.number(),
-        purchasePrice: z.number().optional(),
-      })).optional(),
-    }).optional(),
-  }),
-  enableCryptoTools: z.boolean().default(true),
-});
 
 export default async function handler(
   req: VercelRequest,
@@ -50,56 +23,27 @@ export default async function handler(
   }
 
   try {
-    const validatedData = requestSchema.parse(req.body);
-    const { message, sessionId, context, enableCryptoTools } = validatedData;
+    const { message, sessionId, context, enableCryptoTools } = req.body;
 
-    // Set SSE headers
+    // Set SSE headers for streaming
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    if (USE_MOCK_AI) {
-      const mockMessage = `Mock streaming response for: "${message}". Crypto tools ${enableCryptoTools ? 'enabled' : 'disabled'}.`;
-      
-      // Simulate streaming
-      for (const char of mockMessage) {
-        res.write(`data: ${JSON.stringify({ chunk: char })}\n\n`);
-        await new Promise(resolve => setTimeout(resolve, 10));
-      }
-      
-      res.write("data: [DONE]\n\n");
-      res.end();
-      return;
+    // Mock streaming response
+    const mockMessage = `I understand you're asking about: "${message}". As your AI assistant, I can help with crypto investments and DeFi strategies. ${enableCryptoTools ? 'I have crypto tools enabled.' : ''} How can I assist you today?`;
+    
+    // Simulate streaming by sending characters gradually
+    for (const char of mockMessage) {
+      res.write(`data: ${JSON.stringify({ chunk: char })}\n\n`);
+      await new Promise(resolve => setTimeout(resolve, 20));
     }
-
-    const enhancedContext: EnhancedAIContext = {
-      sessionId,
-      userMessage: message,
-      conversationStep: context.conversationStep,
-      userProfile: context.userProfile,
-      walletData: context.walletData,
-      enableCryptoTools,
-    };
-
-    await enhancedAIService.streamResponse(
-      enhancedContext,
-      (chunk: string) => {
-        res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
-      }
-    );
-
+    
     res.write("data: [DONE]\n\n");
     res.end();
   } catch (error: any) {
     console.error("Streaming error:", error);
     
-    if (error.name === "ZodError") {
-      return res.status(400).json({
-        error: "Invalid request",
-        details: error.errors,
-      });
-    }
-
     res.status(500).json({ 
       error: "Streaming failed",
       message: error.message || "Failed to process your request"
