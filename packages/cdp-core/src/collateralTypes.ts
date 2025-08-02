@@ -15,7 +15,7 @@ type Either<E, A> =
 type Option<A> =
   | { readonly _tag: "None" }
   | { readonly _tag: "Some"; readonly value: A };
-import { Amount, Timestamp } from "./cdp";
+import { Amount, Timestamp } from "./types";
 
 /**
  * Unique identifier for a collateral type

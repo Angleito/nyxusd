@@ -8,9 +8,18 @@
     },
     "api/**/*.ts": {
       "maxDuration": 30
+    },
+    "api/defi_yields.py": {
+      "runtime": "python3.9",
+      "maxDuration": 30,
+      "memory": 512
     }
   },
   "rewrites": [
+    {
+      "source": "/api/defi-yields",
+      "destination": "/api/defi_yields.py"
+    },
     {
       "source": "/api/:path*",
       "destination": "/api/:path*"

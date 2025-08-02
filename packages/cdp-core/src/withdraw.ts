@@ -26,6 +26,7 @@ import {
   Amount,
   Timestamp,
   mkAmount,
+  mkCollateralizationRatio,
 } from "./types";
 
 /**
