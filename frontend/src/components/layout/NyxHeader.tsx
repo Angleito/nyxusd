@@ -138,7 +138,7 @@ export const NyxHeader: React.FC = () => {
                       NyxUSD
                     </h1>
                     <p className="nyx-body-small" style={{ color: 'var(--nyx-gleam-60)', marginTop: '-4px' }}>
-                      Personalized • Adaptive • Unified
+                      wagmi • ngmi • gm
                     </p>
                   </div>
                 </div>

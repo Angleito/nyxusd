@@ -1,6 +1,12 @@
-# NYXUSD - Functional CDP System on Midnight Protocol
+# NYXUSD - Chain-Agnostic AI Stablecoin Protocol
 
-A privacy-preserving Collateralized Debt Position (CDP) system built using functional programming principles on the Midnight Protocol. This project implements a stablecoin backed by collateral assets with privacy-first design and mathematical rigor.
+<div align="center">
+  <img src="frontend/public/nyx-mascot.jpg" alt="Nyx-chan" width="200" style="border-radius: 50%; border: 3px solid #8B5CF6;"/>
+  <h3>gm anon, ready to make it? 🌙</h3>
+  <p><i>"I've been hodling since before time existed"</i> - Nyx-chan</p>
+</div>
+
+A chain-agnostic stablecoin protocol with personalized AI guidance. Built by degens, for degens. Your terminally online goddess of gains awaits.
 
 ## Architecture Overview
 
@@ -37,12 +43,12 @@ nyxusd/
 
 ## Key Features
 
-- **Privacy-Preserving**: Built on Midnight Protocol for transaction privacy
-- **Functional Design**: Immutable state, pure functions, type safety
-- **Modular Architecture**: Composable libraries and services
-- **Type-Safe**: Comprehensive TypeScript with strict mode
-- **Zero-Knowledge**: Leverages ZK proofs for privacy
-- **Decentralized**: No central authority or single points of failure
+- **Chain-Agnostic**: Seamlessly operates across all major blockchains
+- **AI-Powered**: Personalized strategies adapted to your degen level
+- **Nyx-chan Approved**: Guided by your favorite terminally online goddess
+- **Touch Grass Optional**: Built for those who live in the charts
+- **WAGMI Technology**: We're all gonna make it (probably)
+- **Based AF**: No normie energy allowed
 
 ## Functional Programming Principles
 

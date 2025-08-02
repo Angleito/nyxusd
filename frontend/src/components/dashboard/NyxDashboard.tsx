@@ -107,20 +107,20 @@ export const NyxDashboard: React.FC = () => {
             </div>
             <div className="relative z-10">
               <h2 className="nyx-heading-1 mb-4">
-                Welcome to <span className="nyx-text-gradient">NyxUSD</span>
+                Welcome back, <span className="nyx-text-gradient">anon</span>
               </h2>
               <p className="nyx-body-large mb-6" style={{ color: 'var(--nyx-gleam-70)' }}>
-                Your personalized DeFi companion • Adapted experiences across every blockchain
+                Nyx-chan has been watching your bags 👀 • Let's pump those numbers
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link to="/cdp">
                   <NyxButton variant="primary" icon={<CurrencyDollarIcon className="w-5 h-5" />}>
-                    Create CDP
+                    Ape In
                   </NyxButton>
                 </Link>
                 <Link to="/ai-assistant">
                   <NyxButton variant="secondary" icon={<UserCircleIcon className="w-5 h-5" />}>
-                    Personalized Assistant
+                    Ask Nyx-chan
                   </NyxButton>
                 </Link>
               </div>

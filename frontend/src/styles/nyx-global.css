@@ -176,3 +176,64 @@ h1, h2, h3, h4, h5, h6 {
 .nyx-grid-4 {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
+
+/* Degen Mode Enhancements */
+.degen-glow {
+  text-shadow: 
+    0 0 10px var(--nyx-electric-purple),
+    0 0 20px var(--nyx-electric-purple),
+    0 0 30px var(--nyx-electric-purple);
+}
+
+.based-gradient {
+  background: linear-gradient(
+    45deg,
+    var(--nyx-electric-purple),
+    var(--nyx-plasma-pink),
+    var(--nyx-neon-cyan)
+  );
+  background-size: 300% 300%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Internet Culture Typography */
+.monospace-degen {
+  font-family: 'Courier New', monospace;
+  letter-spacing: -0.05em;
+}
+
+/* Based Button */
+.nyx-button-based {
+  background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 50%, #06B6D4 100%);
+  background-size: 200% 100%;
+  animation: based-shift 2s ease infinite;
+  color: var(--nyx-gleam-100);
+  text-transform: lowercase;
+  font-weight: 700;
+}
+
+@keyframes based-shift {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+.nyx-button-based:hover {
+  animation-duration: 0.5s;
+  transform: scale(1.05) rotate(-1deg);
+}
+
+/* Mascot Animations */
+@keyframes blink {
+  0%, 90%, 100% { opacity: 1; }
+  95% { opacity: 0.3; }
+}
+
+.mascot-blink {
+  animation: blink 5s infinite;
+}

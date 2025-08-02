@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ChevronDoubleDownIcon } from "@heroicons/react/24/outline";
+import { ChevronDoubleDownIcon, SparklesIcon } from "@heroicons/react/24/outline";
 
 const NyxHeroSection: React.FC = () => {
   const scrollToContent = () => {
@@ -65,7 +65,7 @@ const NyxHeroSection: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Logo */}
+          {/* Mascot */}
           <motion.div
             className="mb-8 flex justify-center"
             initial={{ scale: 0 }}
@@ -77,14 +77,31 @@ const NyxHeroSection: React.FC = () => {
               delay: 0.2 
             }}
           >
-            <img 
-              src="/nyx-assets/images/nyx-logo.svg" 
-              alt="NYX" 
-              className="w-32 h-32 md:w-48 md:h-48"
-              style={{
-                filter: 'drop-shadow(0 0 30px rgba(107, 70, 193, 0.5))',
-              }}
-            />
+            <div className="relative group">
+              <img 
+                src="/nyx-mascot.jpg" 
+                alt="Nyx-chan" 
+                className="w-40 h-40 md:w-56 md:h-56 rounded-full border-4 border-purple-500/30 shadow-2xl"
+                style={{
+                  filter: 'drop-shadow(0 0 30px rgba(107, 70, 193, 0.5))',
+                }}
+              />
+              <motion.div 
+                className="absolute -bottom-4 -right-4 bg-gradient-to-br from-purple-600 to-purple-800 rounded-full p-3 shadow-lg"
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              >
+                <SparklesIcon className="w-6 h-6 text-white" />
+              </motion.div>
+              <motion.div
+                className="absolute -top-2 -left-2 px-3 py-1 bg-purple-900/80 rounded-full backdrop-blur-sm"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <span className="text-xs text-purple-200">ONLINE</span>
+              </motion.div>
+            </div>
           </motion.div>
 
           {/* Title */}
@@ -105,21 +122,25 @@ const NyxHeroSection: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            Chain-Agnostic AI Protocol
+            gm anon, ready to make it? 🌙
           </motion.p>
 
           {/* Description */}
-          <motion.p
-            className="nyx-body-large max-w-3xl mx-auto mb-12"
-            style={{ color: 'var(--nyx-gleam-70)' }}
+          <motion.div
+            className="max-w-3xl mx-auto mb-12 space-y-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            As a truly chain-agnostic protocol, NyxUSD seamlessly operates across all major blockchains,
-            uniting liquidity and technology into one unified ecosystem. Experience personalized investing with
-            AI that adapts to your goals, risk profile, and preferences—bringing tailored DeFi to every user.
-          </motion.p>
+            <p className="nyx-body-large" style={{ color: 'var(--nyx-gleam-70)' }}>
+              Your terminally online goddess of gains has awakened. Chain-agnostic, caffeine-dependent, 
+              and blessed with divine alpha. Let Nyx-chan guide your portfolio through the dark while you 
+              do whatever normies do (touching grass? idk).
+            </p>
+            <p className="nyx-body-small" style={{ color: 'var(--nyx-gleam-50)' }}>
+              <span className="italic">"I've been hodling since before time existed, anon"</span> - Nyx-chan
+            </p>
+          </motion.div>
 
           {/* CTA Buttons */}
           <motion.div
@@ -133,7 +154,7 @@ const NyxHeroSection: React.FC = () => {
               className="nyx-button nyx-button-glow nyx-button-large"
             >
               <span className="flex items-center gap-2">
-                Launch App
+                Enter the Void
                 <svg 
                   className="w-5 h-5" 
                   fill="none" 
@@ -154,7 +175,7 @@ const NyxHeroSection: React.FC = () => {
               to="/about"
               className="nyx-button nyx-button-secondary nyx-button-large"
             >
-              Learn More
+              Read the Lore
             </Link>
           </motion.div>
 
