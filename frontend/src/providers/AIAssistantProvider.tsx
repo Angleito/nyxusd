@@ -360,6 +360,9 @@ export function validateProfileField(
       );
     case "monthlyAmount":
       return typeof value === "number" && value >= 0;
+    case "occupation":
+      // Accept any non-empty string as occupation (now supports any profession)
+      return typeof value === "string" && value.length > 0;
     case "hobbies":
     case "interests":
     case "personalGoals":
@@ -855,7 +858,9 @@ export function AIAssistantProvider({
           updateUserProfile({ investmentGoal: value as any });
         } else if (["conservative", "moderate", "aggressive"].includes(value)) {
           updateUserProfile({ riskTolerance: value as any });
-        } else if (["chef", "truck_driver", "retail_manager"].includes(value)) {
+        }
+        // Accept any occupation value since it's now free text
+        else if (state.currentStep === "occupation") {
           updateUserProfile({ occupation: value });
         }
 

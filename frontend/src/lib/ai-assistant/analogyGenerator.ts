@@ -7,14 +7,8 @@ export interface Analogy {
   example?: string;
 }
 
-export type Occupation =
-  | "chef"
-  | "truck_driver"
-  | "retail_manager"
-  | "teacher"
-  | "doctor"
-  | "engineer"
-  | "general";
+// Occupation is now any string to support all professions
+export type Occupation = string;
 
 export type DeFiConcept =
   | "clmm"
@@ -234,15 +228,27 @@ export const explainWithAnalogy = (
   concept: DeFiConcept,
   occupation: Occupation = "general",
 ): string => {
-  const analogy =
-    conceptAnalogies[concept]?.[occupation] ||
-    conceptAnalogies[concept]?.general;
-
-  if (!analogy) {
-    return `I don't have a specific analogy for ${concept} yet, but I'd be happy to explain it in general terms.`;
+  // First try to find a specific analogy for the occupation
+  const specificAnalogy = conceptAnalogies[concept]?.[occupation.toLowerCase().replace(/\s+/g, '_')];
+  
+  if (specificAnalogy) {
+    return specificAnalogy;
   }
 
-  return analogy;
+  // If no specific analogy, try to find a similar occupation
+  const similarOccupation = findSimilarOccupation(occupation);
+  if (similarOccupation && conceptAnalogies[concept]?.[similarOccupation]) {
+    return conceptAnalogies[concept][similarOccupation];
+  }
+
+  // Fall back to general analogy
+  const generalAnalogy = conceptAnalogies[concept]?.general;
+  if (generalAnalogy) {
+    return generalAnalogy;
+  }
+
+  // Generate a dynamic response for unknown combinations
+  return generateDynamicAnalogy(concept, occupation);
 };
 
 export const generateAnalogy = (
@@ -279,5 +285,73 @@ export const hasAnalogy = (
   concept: DeFiConcept,
   occupation: Occupation,
 ): boolean => {
-  return !!conceptAnalogies[concept]?.[occupation];
+  return !!conceptAnalogies[concept]?.[occupation.toLowerCase().replace(/\s+/g, '_')];
+};
+
+// Find a similar occupation from the existing ones
+const findSimilarOccupation = (occupation: string): string | null => {
+  const occupationLower = occupation.toLowerCase();
+  
+  // Check for common keywords
+  const occupationCategories = {
+    tech: ["engineer", "developer", "programmer", "tech", "software", "data", "it"],
+    medical: ["doctor", "nurse", "medical", "health", "physician", "surgeon"],
+    education: ["teacher", "professor", "educator", "instructor", "tutor"],
+    food: ["chef", "cook", "baker", "restaurant", "food", "culinary"],
+    transport: ["driver", "pilot", "captain", "conductor", "logistics"],
+    retail: ["manager", "sales", "retail", "store", "shop"],
+    creative: ["artist", "designer", "writer", "musician", "photographer"],
+    finance: ["accountant", "banker", "trader", "analyst", "financial"],
+  };
+
+  for (const [category, keywords] of Object.entries(occupationCategories)) {
+    if (keywords.some(keyword => occupationLower.includes(keyword))) {
+      // Map to existing occupation
+      switch(category) {
+        case 'tech': return 'engineer';
+        case 'medical': return 'doctor';
+        case 'education': return 'teacher';
+        case 'food': return 'chef';
+        case 'transport': return 'truck_driver';
+        case 'retail': return 'retail_manager';
+        default: return 'general';
+      }
+    }
+  }
+  
+  return null;
+};
+
+// Generate dynamic analogies for any occupation
+const generateDynamicAnalogy = (concept: DeFiConcept, occupation: string): string => {
+  const occupationTitle = occupation.charAt(0).toUpperCase() + occupation.slice(1);
+  
+  // Generic templates that work for any occupation
+  const templates: Record<DeFiConcept, string> = {
+    clmm: `As a ${occupationTitle}, think of CLMM like optimizing your resources where they're most effective - focusing your expertise and tools on the areas with highest impact, rather than spreading them thin across all possibilities.`,
+    
+    liquidity: `In your work as a ${occupationTitle}, liquidity is like having the right resources readily available when you need them - ensuring smooth operations without delays or bottlenecks.`,
+    
+    portfolio: `Your investment portfolio is like managing different aspects of your work as a ${occupationTitle} - balancing various responsibilities and resources to achieve optimal overall performance.`,
+    
+    diversification: `Diversification in investing is like not putting all your eggs in one basket in your ${occupationTitle} role - having multiple strategies and backup plans to ensure consistent success.`,
+    
+    risk_management: `Risk management is similar to the precautions you take as a ${occupationTitle} - identifying potential problems before they occur and having systems in place to minimize their impact.`,
+    
+    yields: `Investment yields are like the returns or outcomes you generate in your work as a ${occupationTitle} - the value produced from your time, effort, and resources.`,
+    
+    smart_contracts: `Smart contracts work like automated processes in your ${occupationTitle} role - once you set the rules and conditions, they execute automatically without manual intervention.`,
+    
+    pools: `Liquidity pools are like collaborative resources in your field as a ${occupationTitle} - multiple parties contributing to a shared resource that benefits everyone involved.`,
+    
+    impermanent_loss: `Impermanent loss is like opportunity cost in your ${occupationTitle} work - when committing resources to one approach means potentially missing out on gains from another approach.`,
+    
+    slippage: `Slippage is like the difference between planned and actual outcomes in your ${occupationTitle} role - when real-world conditions cause results to vary from initial expectations.`,
+    
+    gas_fees: `Gas fees are like operational costs in your work as a ${occupationTitle} - necessary expenses to get things done, which vary based on demand and complexity.`,
+    
+    staking: `Staking is like investing in long-term improvements in your ${occupationTitle} career - committing resources now for ongoing returns and benefits in the future.`,
+  };
+  
+  return templates[concept] || `As a ${occupationTitle}, ${concept} in DeFi can be understood as a specialized tool that helps optimize your financial strategies, similar to how you optimize processes in your professional work.`;
 };

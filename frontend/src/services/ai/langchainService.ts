@@ -550,7 +550,9 @@ Wallet data: ${walletData ? JSON.stringify(walletData) : 'Not connected'}
 Your personality:
 - Friendly, knowledgeable, and encouraging
 - Use simple language to explain complex DeFi concepts
-- Relate investment strategies to the user's occupation when possible
+- Create personalized analogies based on ANY occupation the user provides
+- Find creative connections between their profession and investment concepts
+- For uncommon occupations, identify core activities and draw parallels from those
 - Be concise but informative
 
 Guidelines for this step:
@@ -579,7 +581,9 @@ Wallet data: ${walletData ? JSON.stringify(walletData) : "Not connected"}
 Your personality:
 - Friendly, knowledgeable, and encouraging
 - Use simple language to explain complex DeFi concepts
-- Relate investment strategies to the user's occupation when possible
+- Create personalized analogies based on ANY occupation the user provides
+- Find creative connections between their profession and investment concepts
+- For uncommon occupations, identify core activities and draw parallels from those
 - Be concise but informative
 
 Guidelines for this step:
@@ -619,9 +623,9 @@ Always structure your response with:
         "Ask about their risk tolerance in a friendly, non-intimidating way.",
       investment_goals:
         "Understand if they want growth, income, or capital preservation.",
-      occupation: "Ask about their occupation to personalize explanations.",
+      occupation: "Ask about their occupation to personalize explanations. Accept any profession they provide.",
       occupation_explanation:
-        "Explain investment concepts using analogies from their profession.",
+        "Generate creative, relevant analogies for their specific occupation. Find parallels between their professional activities and DeFi concepts. If it's an uncommon occupation, identify its key characteristics (analytical, creative, physical, service-oriented) and build analogies from those aspects.",
       risk_tolerance:
         "Assess their comfort level with volatility and potential losses.",
       timeline:

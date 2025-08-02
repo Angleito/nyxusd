@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAIAssistant } from "../../providers/AIAssistantProvider";
 import {
@@ -8,7 +8,9 @@ import {
   Clock,
   Briefcase,
   Shield,
+  Search,
 } from "lucide-react";
+import occupationData from "../../data/occupationSuggestions.json";
 
 interface QuestionnaireStepProps {
   step: string;
@@ -22,12 +24,67 @@ export const QuestionnaireStep: React.FC<QuestionnaireStepProps> = ({
   const { updateUserProfile, addMessage } = useAIAssistant();
   const [localValue, setLocalValue] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [filteredOccupations, setFilteredOccupations] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Reset local value when step changes
   useEffect(() => {
     setLocalValue("");
     setError("");
+    setShowSuggestions(false);
+    setSelectedSuggestionIndex(-1);
   }, [step]);
+
+  // Handle occupation input and filtering
+  const handleOccupationInput = (value: string) => {
+    setLocalValue(value);
+    
+    if (value.length > 0) {
+      const filtered = occupationData.allOccupations
+        .filter(occ => occ.toLowerCase().includes(value.toLowerCase()))
+        .slice(0, 8); // Show max 8 suggestions
+      setFilteredOccupations(filtered);
+      setShowSuggestions(true);
+    } else {
+      setFilteredOccupations([]);
+      setShowSuggestions(false);
+    }
+    setSelectedSuggestionIndex(-1);
+  };
+
+  // Handle keyboard navigation for suggestions
+  const handleOccupationKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || filteredOccupations.length === 0) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => 
+        prev < filteredOccupations.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => prev > -1 ? prev - 1 : -1);
+    } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+      e.preventDefault();
+      const selected = filteredOccupations[selectedSuggestionIndex];
+      setLocalValue(selected);
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+    }
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (occupation: string) => {
+    setLocalValue(occupation);
+    setShowSuggestions(false);
+    setSelectedSuggestionIndex(-1);
+    inputRef.current?.focus();
+  };
 
   const handleSubmit = (value: string, fieldKey: string) => {
     if (!value && step !== "experience_level") {
@@ -83,12 +140,8 @@ export const QuestionnaireStep: React.FC<QuestionnaireStepProps> = ({
         };
         return goals[value as keyof typeof goals] || value;
       case "occupation":
-        const occupations = {
-          chef: "Chef",
-          truck_driver: "Truck Driver",
-          retail_manager: "Retail Store Manager",
-        };
-        return occupations[value as keyof typeof occupations] || value;
+        // Return the value as-is since it's now free text
+        return value;
       case "risk_tolerance":
         const risks = {
           conservative: "Conservative",
@@ -425,64 +478,79 @@ export const QuestionnaireStep: React.FC<QuestionnaireStepProps> = ({
               </h3>
             </div>
 
-            <div className="space-y-3">
-              {[
-                {
-                  value: "chef",
-                  label: "Chef",
-                  description: "Culinary professional managing kitchens",
-                },
-                {
-                  value: "truck_driver",
-                  label: "Truck Driver",
-                  description: "Professional freight transportation",
-                },
-                {
-                  value: "retail_manager",
-                  label: "Retail Store Manager",
-                  description: "Managing retail operations",
-                },
-              ].map((option) => (
-                <label
-                  key={option.value}
-                  data-option={option.value}
-                  className={`block p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    localValue === option.value
-                      ? "border-purple-500 bg-purple-500/10"
-                      : "border-gray-700 hover:border-gray-600 bg-gray-800/50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="occupation"
-                    value={option.value}
-                    checked={localValue === option.value}
-                    onChange={(e) => setLocalValue(e.target.value)}
-                    className="sr-only"
-                  />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium text-white">
-                        {option.label}
-                      </div>
-                      <div className="text-sm text-gray-400 mt-1">
-                        {option.description}
-                      </div>
-                    </div>
-                    <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        localValue === option.value
-                          ? "border-purple-500"
-                          : "border-gray-600"
-                      }`}
+            <div className="relative">
+              {/* Occupation Input Field */}
+              <div className="relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={localValue}
+                  onChange={(e) => handleOccupationInput(e.target.value)}
+                  onKeyDown={handleOccupationKeyDown}
+                  onFocus={() => {
+                    if (localValue && filteredOccupations.length > 0) {
+                      setShowSuggestions(true);
+                    }
+                  }}
+                  placeholder="Enter your occupation (e.g., teacher, engineer, nurse...)"
+                  className="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none transition-all"
+                  data-step="occupation"
+                />
+                <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+              </div>
+
+              {/* Suggestions Dropdown */}
+              <AnimatePresence>
+                {showSuggestions && filteredOccupations.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute z-10 w-full mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden"
+                  >
+                    {filteredOccupations.map((occupation, index) => (
+                      <button
+                        key={occupation}
+                        type="button"
+                        onClick={() => handleSuggestionClick(occupation)}
+                        className={`w-full px-4 py-3 text-left hover:bg-purple-500/20 transition-colors ${
+                          index === selectedSuggestionIndex
+                            ? "bg-purple-500/20 text-white"
+                            : "text-gray-300"
+                        }`}
+                      >
+                        {occupation}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Popular Occupations */}
+              <div className="mt-4">
+                <p className="text-sm text-gray-400 mb-2">Popular occupations:</p>
+                <div className="flex flex-wrap gap-2">
+                  {occupationData.popularOccupations.slice(0, 6).map((occ) => (
+                    <button
+                      key={occ}
+                      type="button"
+                      onClick={() => {
+                        setLocalValue(occ);
+                        setShowSuggestions(false);
+                      }}
+                      className="px-3 py-1 bg-gray-700/50 hover:bg-purple-500/20 text-gray-300 hover:text-white rounded-full text-sm transition-all"
                     >
-                      {localValue === option.value && (
-                        <div className="w-3 h-3 rounded-full bg-purple-500" />
-                      )}
-                    </div>
-                  </div>
-                </label>
-              ))}
+                      {occ}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Help Text */}
+              <p className="mt-4 text-sm text-gray-500">
+                Your occupation helps me explain investment concepts using familiar terms from your profession.
+              </p>
             </div>
           </div>
         );
