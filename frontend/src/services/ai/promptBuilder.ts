@@ -23,11 +23,17 @@ class Ok<T, E> {
   constructor(public readonly value: T) {}
   isOk(): this is Ok<T, E> { return true; }
   isErr(): this is Err<T, E> { return false; }
+  map<U>(fn: (value: T) => U): Result<U, E> {
+    return new Ok(fn(this.value));
+  }
 }
 class Err<T, E> {
-  constructor(public readonly value: E) {}
+  constructor(public readonly error: E) {}
   isOk(): this is Ok<T, E> { return false; }
   isErr(): this is Err<T, E> { return true; }
+  map<U>(fn: (value: T) => U): Result<U, E> {
+    return new Err(this.error);
+  }
 }
 type Result<T, E> = Ok<T, E> | Err<T, E>;
 import {
@@ -658,12 +664,17 @@ export const buildSystemPrompt = (
   userMessage: string,
   options: Partial<PromptBuilderConfig> = {},
 ): Result<string, string> => {
-  return new PromptBuilder(options)
+  const buildResult = new PromptBuilder(options)
     .withStep(step)
     .withPersonalization(userProfile)
     .withContext({ userMessage })
-    .build()
-    .map((result) => result.prompt);
+    .build();
+  
+  if (buildResult.isOk()) {
+    return new Ok(buildResult.value.prompt);
+  } else {
+    return new Err((buildResult as Err<PromptBuildResult, string>).error);
+  }
 };
 
 /**

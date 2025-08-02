@@ -37,15 +37,23 @@ class Ok<T, E> {
   constructor(public readonly value: T) {}
   isOk(): this is Ok<T, E> { return true; }
   isErr(): this is Err<T, E> { return false; }
+  map<U>(fn: (value: T) => U): Result<U, E> {
+    return new Ok(fn(this.value));
+  }
 }
 
 class Err<T, E> {
-  constructor(public readonly value: E) {}
+  constructor(public readonly error: E) {}
   isOk(): this is Ok<T, E> { return false; }
   isErr(): this is Err<T, E> { return true; }
+  map<U>(fn: (value: T) => U): Result<U, E> {
+    return new Err(this.error);
+  }
 }
 
 type Result<T, E> = Ok<T, E> | Err<T, E>;
+const ResultOk = <T, E>(value: T): Result<T, E> => new Ok(value);
+const ResultErr = <T, E>(error: E): Result<T, E> => new Err(error);
 
 export interface PromptContext {
   step: ConversationStep;
@@ -865,7 +873,7 @@ export function analyzePromptEffectiveness(
   const result = buildEnhancedPrompt(context, config);
 
   if (result.isErr()) {
-    return Result.err((result as Err<EnhancedPromptResult, string>).value);
+    return ResultErr((result as Err<EnhancedPromptResult, string>).error);
   }
 
   const { prompt, tokenCount, personalization, optimization } = (result as Ok<EnhancedPromptResult, string>).value;

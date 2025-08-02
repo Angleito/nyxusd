@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { clsx } from "clsx";
 import { SparklesIcon, UserIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon, ExclamationTriangleIcon } from "@heroicons/react/24/solid";
+import { RefreshCw } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { nightOwl } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -197,11 +198,12 @@ export const ChatMessageImproved: React.FC<ChatMessageImprovedProps> = ({
                     <ReactMarkdown
                       className="prose prose-sm prose-invert max-w-none"
                       components={{
-                        code({ node, inline, className, children, ...props }) {
+                        code({ node, className, children, ...props }: any) {
                           const match = /language-(\w+)/.exec(className || "");
+                          const inline = props.inline || false;
                           return !inline && match ? (
                             <SyntaxHighlighter
-                              style={nightOwl}
+                              style={nightOwl as any}
                               language={match[1]}
                               PreTag="div"
                               className="rounded-lg my-2"

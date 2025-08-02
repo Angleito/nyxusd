@@ -11,6 +11,8 @@ export interface EnhancedAIRequest {
     conversationStep?: ConversationStep;
     userProfile?: Partial<UserProfile>;
     walletData?: Partial<WalletData>;
+    memoryContext?: string;
+    conversationSummary?: string;
   };
   enableCryptoTools?: boolean;
 }

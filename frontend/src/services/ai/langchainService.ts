@@ -477,7 +477,7 @@ export class LangChainAIService implements AIService {
       console.error("Streaming error:", error);
 
       // Fallback to legacy streaming if enhanced system fails
-      if (!this.fallbackMode && error.message?.includes("personalization")) {
+      if (!this.fallbackMode && (error as any).message?.includes("personalization")) {
         console.warn("Enhanced streaming failed, falling back to legacy mode");
         this.fallbackMode = true;
         return this.streamLegacyResponse(userMessage, context, onChunk);

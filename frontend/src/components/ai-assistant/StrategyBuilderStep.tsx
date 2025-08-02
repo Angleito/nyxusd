@@ -96,11 +96,9 @@ export const StrategyBuilderStep: React.FC<StrategyBuilderStepProps> = ({
 
     // Store strategy in user profile
     updateUserProfile({
-      strategy: {
-        allocations,
-        projectedAPY: calculateProjectedAPY(),
-      } as any,
-    });
+      // Strategy is stored separately, not as part of UserProfile
+      // This is handled by the context provider
+    } as any);
 
     if (state.userProfile?.riskTolerance !== "conservative") {
       setShowLeverageOption(true);

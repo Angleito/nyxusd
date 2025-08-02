@@ -69,31 +69,27 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
     },
   );
 
-  const mintMutation = useMutation(
-    ({ cdpId, amount }: { cdpId: string; amount: string }) =>
+  const mintMutation = useMutation({
+    mutationFn: ({ cdpId, amount }: { cdpId: string; amount: string }) =>
       mintNyxUSD(cdpId, amount),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["cdps"]);
-        setShowActionModal(false);
-        setActionType(null);
-        reset();
-      },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cdps"] });
+      setShowActionModal(false);
+      setActionType(null);
+      reset();
     },
-  );
+  });
 
-  const burnMutation = useMutation(
-    ({ cdpId, amount }: { cdpId: string; amount: string }) =>
+  const burnMutation = useMutation({
+    mutationFn: ({ cdpId, amount }: { cdpId: string; amount: string }) =>
       burnNyxUSD(cdpId, amount),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["cdps"]);
-        setShowActionModal(false);
-        setActionType(null);
-        reset();
-      },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cdps"] });
+      setShowActionModal(false);
+      setActionType(null);
+      reset();
     },
-  );
+  });
 
   const handleAction = (data: CDPActionForm) => {
     if (!actionType) return;

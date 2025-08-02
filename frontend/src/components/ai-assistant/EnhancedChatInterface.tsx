@@ -6,6 +6,7 @@ import { TypingIndicator } from "./TypingIndicator";
 import { enhancedAIService } from "../../services/ai/enhancedAIService";
 import { useWallet } from "../../hooks/useWallet";
 import { chatMemoryService, ChatMessage as MemoryMessage } from "../../services/memory/chatMemoryService";
+import { ConversationStep } from "../../providers/AIAssistantProvider";
 
 interface Message extends MemoryMessage {}
 
@@ -80,7 +81,7 @@ What would you like to explore today?`,
     const memoryContext = chatMemoryService.getMemoryPromptContext(address);
     
     return {
-      conversationStep: "natural_conversation",
+      conversationStep: "chat" as ConversationStep,
       userProfile: userProfile ? {
         experience: userProfile.preferences.experience,
         riskTolerance: userProfile.preferences.riskTolerance,
@@ -88,9 +89,10 @@ What would you like to explore today?`,
         experience: "intermediate",
         riskTolerance: "moderate",
       },
-      walletData: isConnected ? {
+      walletData: isConnected && address ? {
         address,
-        balance,
+        assets: [],
+        totalValueUSD: 0,
       } : undefined,
       memoryContext,
       conversationSummary: chatMemoryService.summarizeConversation(),
@@ -376,7 +378,10 @@ What would you like to explore today?`,
               className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div className={`max-w-[85%] ${message.role === "user" ? "order-2" : ""}`}>
-                <ChatMessage message={message} />
+                <ChatMessage message={{
+                  ...message,
+                  sender: message.role === "user" ? "user" : "ai"
+                }} />
                 
                 {/* Show metadata for crypto responses */}
                 {message.metadata?.toolsUsed && (
