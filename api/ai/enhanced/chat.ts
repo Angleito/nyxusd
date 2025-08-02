@@ -63,7 +63,7 @@ export default async function handler(
         'X-Title': 'NYX USD Assistant',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'qwen/qwen3-coder:free',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
