@@ -131,7 +131,10 @@ What would you like to explore today?`,
         setStreamingContent("");
       }
     } catch (error) {
-      console.error("Failed to get AI response:", error);
+      // Only log in development mode to avoid console spam
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Failed to get AI response:", error);
+      }
       
       const errorMessage: Message = {
         id: `msg_${Date.now()}_error`,

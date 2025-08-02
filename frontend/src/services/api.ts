@@ -29,7 +29,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    console.error("API Error:", error.response?.data || error.message);
+    // Only log errors in development and avoid logging 404s for expected missing endpoints
+    if (process.env.NODE_ENV === 'development' && error.response?.status !== 404) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
     return Promise.reject(error.response?.data || error.message);
   },
 );

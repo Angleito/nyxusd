@@ -78,7 +78,10 @@ export class EnhancedAIService {
 
       return await response.json();
     } catch (error) {
-      console.error('Failed to send message to enhanced AI:', error);
+      // Only log in development mode
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to send message to enhanced AI:', error);
+      }
       return {
         message: 'Sorry, I encountered an error processing your request.',
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -146,7 +149,10 @@ export class EnhancedAIService {
         }
       }
     } catch (error) {
-      console.error('Failed to stream message:', error);
+      // Only log in development mode
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to stream message:', error);
+      }
       throw error;
     }
   }

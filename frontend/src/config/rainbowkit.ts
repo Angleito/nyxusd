@@ -45,10 +45,20 @@ if (typeof window !== 'undefined') {
   const originalWarn = console.warn;
   
   console.error = (...args) => {
-    // Filter out Coinbase analytics errors
+    // Filter out Coinbase analytics errors and API 404 errors during development
     const errorString = args[0]?.toString?.() || '';
+    const firstArg = args[0];
+    
+    // Filter out various known non-critical errors
     if (errorString.includes('cca-lite.coinbase.com') || 
-        errorString.includes('Failed to load resource') && errorString.includes('coinbase')) {
+        (errorString.includes('Failed to load resource') && errorString.includes('coinbase')) ||
+        (errorString.includes('Failed to load resource') && errorString.includes('404')) ||
+        (errorString.includes('API Error') && args[1]?.response?.status === 404) ||
+        (firstArg === 'API Error:' && typeof args[1] === 'object')) {
+      // Only log these in development mode if explicitly debugging
+      if (import.meta.env.DEV && import.meta.env.VITE_DEBUG_API === 'true') {
+        originalError.apply(console, args);
+      }
       return;
     }
     originalError.apply(console, args);
