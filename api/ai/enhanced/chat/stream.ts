@@ -60,11 +60,11 @@ export default async function handler(
       headers: {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': req.headers.referer || 'https://nyxusd.vercel.app',
+        'HTTP-Referer': 'https://nyxusd-git-main-angleitos-projects.vercel.app',
         'X-Title': 'NYX USD Assistant',
       },
       body: JSON.stringify({
-        model: 'meta-llama/llama-3.2-3b-instruct:free',
+        model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
