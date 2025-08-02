@@ -83,11 +83,11 @@ What would you like to explore today?`,
     return {
       conversationStep: "chat" as ConversationStep,
       userProfile: userProfile ? {
-        experience: userProfile.preferences.experience,
-        riskTolerance: userProfile.preferences.riskTolerance,
+        experienceLevel: userProfile.preferences.experience as "beginner" | "intermediate" | "advanced",
+        riskTolerance: userProfile.preferences.riskTolerance as "conservative" | "moderate" | "aggressive",
       } : {
-        experience: "intermediate",
-        riskTolerance: "moderate",
+        experienceLevel: "intermediate" as const,
+        riskTolerance: "moderate" as const,
       },
       walletData: isConnected && address ? {
         address,
