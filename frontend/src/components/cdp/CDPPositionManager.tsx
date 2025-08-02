@@ -19,8 +19,8 @@ import {
 } from 'lucide-react';
 
 interface CDPPositionManagerProps {
-  cdpId: string;
-  collateralType: string;
+  cdpId?: string;
+  collateralType?: string;
   onClose?: () => void;
 }
 
@@ -34,7 +34,11 @@ interface SimulationResult {
   maxWithdrawable: number;
 }
 
-const CDPPositionManager: React.FC<CDPPositionManagerProps> = ({ cdpId, collateralType, onClose }) => {
+const CDPPositionManager: React.FC<CDPPositionManagerProps> = ({ 
+  cdpId = 'demo-001', 
+  collateralType = 'ETH', 
+  onClose 
+}) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'manage' | 'history'>('overview');
   const [selectedAction, setSelectedAction] = useState<ActionType>('deposit');
   const [amount, setAmount] = useState<string>('');
