@@ -150,7 +150,12 @@ export const QuestionnaireStep: React.FC<QuestionnaireStepProps> = ({
         };
         return risks[value as keyof typeof risks] || value;
       case "timeline":
-        return `${value} years`;
+        const timelines = {
+          short: "Short-term (< 2 years)",
+          medium: "Medium-term (2-5 years)",
+          long: "Long-term (> 5 years)"
+        };
+        return timelines[value as keyof typeof timelines] || value;
       case "amount":
         return `$${value} per month`;
       case "experience_level":
@@ -636,40 +641,63 @@ export const QuestionnaireStep: React.FC<QuestionnaireStepProps> = ({
               </h3>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Investment horizon (in years)
+            <div className="space-y-3">
+              {[
+                {
+                  value: "short",
+                  label: "Short-term",
+                  description: "Less than 2 years",
+                },
+                {
+                  value: "medium",
+                  label: "Medium-term",
+                  description: "2-5 years",
+                },
+                {
+                  value: "long",
+                  label: "Long-term",
+                  description: "More than 5 years",
+                },
+              ].map((option) => (
+                <label
+                  key={option.value}
+                  className={`block p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                    localValue === option.value
+                      ? "border-purple-500 bg-purple-500/10"
+                      : "border-gray-700 hover:border-gray-600 bg-gray-800/50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="timeline"
+                    value={option.value}
+                    checked={localValue === option.value}
+                    onChange={(e) => setLocalValue(e.target.value)}
+                    className="sr-only"
+                  />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium text-white">
+                        {option.label}
+                      </div>
+                      <div className="text-sm text-gray-400 mt-1">
+                        {option.description}
+                      </div>
+                    </div>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        localValue === option.value
+                          ? "border-purple-500"
+                          : "border-gray-600"
+                      }`}
+                    >
+                      {localValue === option.value && (
+                        <div className="w-3 h-3 rounded-full bg-purple-500" />
+                      )}
+                    </div>
+                  </div>
                 </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="50"
-                  value={localValue}
-                  onChange={(e) => {
-                    setLocalValue(e.target.value);
-                    setError("");
-                  }}
-                  placeholder="e.g., 10"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-                {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 mt-4">
-                {["5", "10", "20"].map((years) => (
-                  <button
-                    key={years}
-                    onClick={() => {
-                      setLocalValue(years);
-                      setError("");
-                    }}
-                    className="px-3 py-2 text-sm bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors border border-gray-700"
-                  >
-                    {years} years
-                  </button>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
         );
@@ -828,10 +856,6 @@ export const QuestionnaireStep: React.FC<QuestionnaireStepProps> = ({
         break;
       case "timeline":
         fieldKey = "timeline";
-        if (!value || parseInt(value) < 1) {
-          setError("Please enter a valid timeline");
-          return;
-        }
         break;
       case "amount":
         fieldKey = "monthlyAmount";

@@ -183,7 +183,7 @@ export const AIAssistant: React.FC = () => {
       case "timeline":
         setStep("amount");
         addMessage(
-          "Great timeline! Finally, how much can you comfortably invest each month? Any amount works - I'll optimize strategies for your budget.",
+          "Perfect! I'll optimize strategies for your timeline. Finally, how much can you comfortably invest each month? Any amount works - I'll tailor strategies for your budget.",
           "ai",
         );
         break;

@@ -9,9 +9,9 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/nyx-assets/images/nyx-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/nyx-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
