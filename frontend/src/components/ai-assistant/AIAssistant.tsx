@@ -103,7 +103,7 @@ export const AIAssistant: React.FC = () => {
 
   // Handle conversation flow based on current step
   const handleStepComplete = (data?: any) => {
-    console.log("handleStepComplete called with currentStep:", currentStep, "data:", data);
+    // Debug logging removed for production
     switch (currentStep) {
       case "wallet_prompt":
         if (data?.connected) {
