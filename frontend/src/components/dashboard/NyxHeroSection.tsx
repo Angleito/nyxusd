@@ -81,9 +81,16 @@ const NyxHeroSection: React.FC = () => {
               <img 
                 src="/nyx-mascot.jpg" 
                 alt="Nyx-chan" 
-                className="w-40 h-40 md:w-56 md:h-56 rounded-full border-4 border-purple-500/30 shadow-2xl"
+                className="w-40 h-40 md:w-56 md:h-56 rounded-full border-4 border-purple-500/30 shadow-2xl object-cover"
                 style={{
                   filter: 'drop-shadow(0 0 30px rgba(107, 70, 193, 0.5))',
+                }}
+                loading="eager"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = '/nyx-assets/images/nyx-icon.svg';
+                  target.style.padding = '2rem';
                 }}
               />
               <motion.div 
