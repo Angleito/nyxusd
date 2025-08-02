@@ -18,7 +18,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.estimateMinCollateral = exports.estimateMaxDebt = exports.createCDPBatch = exports.createCDP = exports.createInitialCDPState = exports.generateCDPId = exports.calculateHealthFactor = exports.validateCDPCreation = void 0;
 const fp_utils_1 = require("@nyxusd/fp-utils");
-const cdp_1 = require("../types/cdp");
+const types_1 = require("./types");
 /**
  * Validates CDP creation parameters against system requirements
  *
@@ -110,15 +110,15 @@ const validateCDPCreation = (params, context) => {
     if (collateralizationRatio < context.config.minCollateralizationRatio) {
         return fp_utils_1.Result.err({
             type: "below_min_collateral_ratio",
-            current: (0, cdp_1.mkCollateralizationRatio)(collateralizationRatio),
-            minimum: (0, cdp_1.mkCollateralizationRatio)(context.config.minCollateralizationRatio),
+            current: (0, types_1.mkCollateralizationRatio)(collateralizationRatio),
+            minimum: (0, types_1.mkCollateralizationRatio)(context.config.minCollateralizationRatio),
         });
     }
     // Validate against CDP config minimum
     if (collateralizationRatio < params.config.minCollateralizationRatio) {
         return fp_utils_1.Result.err({
             type: "below_min_collateral_ratio",
-            current: (0, cdp_1.mkCollateralizationRatio)(collateralizationRatio),
+            current: (0, types_1.mkCollateralizationRatio)(collateralizationRatio),
             minimum: params.config.minCollateralizationRatio,
         });
     }
@@ -190,7 +190,7 @@ const generateCDPId = (owner, collateralType, timestamp) => {
         hash = hash & hash; // Convert to 32-bit integer
     }
     const cdpId = `cdp_${Math.abs(hash).toString(16)}_${timestamp}`;
-    return (0, cdp_1.mkCDPId)(cdpId);
+    return (0, types_1.mkCDPId)(cdpId);
 };
 exports.generateCDPId = generateCDPId;
 /**
@@ -215,7 +215,7 @@ const createInitialCDPState = (healthFactor, _liquidationRatio) => {
     if (healthFactor <= 1.0) {
         return {
             type: "liquidating",
-            liquidationPrice: (0, cdp_1.mkAmount)(0n), // Will be calculated by liquidation system
+            liquidationPrice: (0, types_1.mkAmount)(0n), // Will be calculated by liquidation system
         };
     }
     return {
@@ -297,7 +297,7 @@ const createCDP = (params, context) => {
         config: params.config,
         createdAt: context.currentTime,
         updatedAt: context.currentTime,
-        accruedFees: (0, cdp_1.mkAmount)(0n),
+        accruedFees: (0, types_1.mkAmount)(0n),
     };
     return fp_utils_1.Result.ok(cdp);
 };
@@ -365,7 +365,7 @@ exports.createCDPBatch = createCDPBatch;
 const estimateMaxDebt = (collateralAmount, collateralPrice, minCollateralizationRatio) => {
     const collateralValue = (collateralAmount * collateralPrice) / BigInt(10 ** 18);
     const maxDebt = (collateralValue * BigInt(10000)) / BigInt(minCollateralizationRatio);
-    return (0, cdp_1.mkAmount)(maxDebt);
+    return (0, types_1.mkAmount)(maxDebt);
 };
 exports.estimateMaxDebt = estimateMaxDebt;
 /**
@@ -392,7 +392,7 @@ exports.estimateMaxDebt = estimateMaxDebt;
 const estimateMinCollateral = (debtAmount, collateralPrice, minCollateralizationRatio) => {
     const requiredCollateralValue = (debtAmount * BigInt(minCollateralizationRatio)) / BigInt(10000);
     const minCollateral = (requiredCollateralValue * BigInt(10 ** 18)) / collateralPrice;
-    return (0, cdp_1.mkAmount)(minCollateral);
+    return (0, types_1.mkAmount)(minCollateral);
 };
 exports.estimateMinCollateral = estimateMinCollateral;
 //# sourceMappingURL=create.js.map

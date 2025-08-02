@@ -15,7 +15,7 @@
  * @packageDocumentation
  */
 import { Result } from "@nyxusd/fp-utils";
-import { CDP, CDPId, CDPCreationParams, CDPError, CDPState, Amount, Timestamp } from "../types/cdp";
+import { CDP, CDPId, CDPCreationParams, CDPError, CDPState, Amount, Timestamp } from "./types";
 /**
  * Configuration for CDP creation validation
  */

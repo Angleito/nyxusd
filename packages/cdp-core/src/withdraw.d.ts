@@ -18,7 +18,7 @@
  * @packageDocumentation
  */
 import { Result } from "@nyxusd/fp-utils";
-import { CDP, CDPError, CDPState, Amount, Timestamp } from "../types/cdp";
+import { CDP, CDPError, CDPState, Amount, Timestamp } from "./types";
 /**
  * Parameters for withdrawing collateral from a CDP
  */

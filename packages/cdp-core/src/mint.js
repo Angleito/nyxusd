@@ -22,7 +22,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calculateCollateralizationRatioAfterMint = exports.estimateAnnualBorrowingCost = exports.mintNYXUSDBatch = exports.mintNYXUSD = exports.createUpdatedCDP = exports.updateCDPStateAfterMint = exports.calculateCurrentHealthFactor = exports.calculateHealthFactorAfterMint = exports.calculateMaxMintableAmount = exports.validateMintNYXUSD = exports.calculateAccruedFees = void 0;
 const fp_utils_1 = require("@nyxusd/fp-utils");
-const cdp_1 = require("../types/cdp");
+const types_1 = require("./types");
 /**
  * Calculates accrued stability fees for a CDP
  *
@@ -46,7 +46,7 @@ const cdp_1 = require("../types/cdp");
  */
 const calculateAccruedFees = (currentDebt, stabilityFeeRate, timeElapsed) => {
     if (currentDebt === 0n || stabilityFeeRate === 0 || timeElapsed === 0) {
-        return (0, cdp_1.mkAmount)(0n);
+        return (0, types_1.mkAmount)(0n);
     }
     // Calculate fees using compound interest formula: A = P * (1 + r)^t
     // For small time periods, we can use simple interest approximation: A = P * r * t
@@ -56,7 +56,7 @@ const calculateAccruedFees = (currentDebt, stabilityFeeRate, timeElapsed) => {
     const fees = (currentDebt *
         BigInt(Math.floor(stabilityFeeRate * timeInYears * 1000000))) /
         BigInt(1000000);
-    return (0, cdp_1.mkAmount)(fees);
+    return (0, types_1.mkAmount)(fees);
 };
 exports.calculateAccruedFees = calculateAccruedFees;
 /**
@@ -147,7 +147,7 @@ const validateMintNYXUSD = (params, context) => {
         return fp_utils_1.Result.err({
             type: "debt_ceiling_exceeded",
             ceiling: params.cdp.config.debtCeiling,
-            requested: (0, cdp_1.mkAmount)(newTotalDebt),
+            requested: (0, types_1.mkAmount)(newTotalDebt),
         });
     }
     // Check global debt ceiling
@@ -156,7 +156,7 @@ const validateMintNYXUSD = (params, context) => {
         return fp_utils_1.Result.err({
             type: "debt_ceiling_exceeded",
             ceiling: context.globalDebtCeiling,
-            requested: (0, cdp_1.mkAmount)(newGlobalDebt),
+            requested: (0, types_1.mkAmount)(newGlobalDebt),
         });
     }
     // Calculate collateralization ratio after minting
@@ -166,7 +166,7 @@ const validateMintNYXUSD = (params, context) => {
     if (newCollateralizationRatio < params.cdp.config.minCollateralizationRatio) {
         return fp_utils_1.Result.err({
             type: "below_min_collateral_ratio",
-            current: (0, cdp_1.mkCollateralizationRatio)(newCollateralizationRatio),
+            current: (0, types_1.mkCollateralizationRatio)(newCollateralizationRatio),
             minimum: params.cdp.config.minCollateralizationRatio,
         });
     }
@@ -210,10 +210,10 @@ const calculateMaxMintableAmount = (cdp, collateralPrice, stabilityFeeRate, time
     // Use the most restrictive limit
     const effectiveMaxDebt = maxTotalDebt < debtCeilingLimit ? maxTotalDebt : debtCeilingLimit;
     if (effectiveMaxDebt <= currentDebtWithFees) {
-        return (0, cdp_1.mkAmount)(0n); // Cannot mint anything
+        return (0, types_1.mkAmount)(0n); // Cannot mint anything
     }
     const maxMintable = effectiveMaxDebt - currentDebtWithFees;
-    return (0, cdp_1.mkAmount)(maxMintable);
+    return (0, types_1.mkAmount)(maxMintable);
 };
 exports.calculateMaxMintableAmount = calculateMaxMintableAmount;
 /**
@@ -307,7 +307,7 @@ const updateCDPStateAfterMint = (_currentState, newHealthFactor, _liquidationRat
     if (newHealthFactor <= 1.0) {
         return {
             type: "liquidating",
-            liquidationPrice: (0, cdp_1.mkAmount)(0n), // Will be calculated by liquidation system
+            liquidationPrice: (0, types_1.mkAmount)(0n), // Will be calculated by liquidation system
         };
     }
     // If health factor is still reasonable, keep active
@@ -353,8 +353,8 @@ exports.updateCDPStateAfterMint = updateCDPStateAfterMint;
 const createUpdatedCDP = (cdp, mintAmount, accruedFees, newState, timestamp) => {
     return {
         ...cdp,
-        debtAmount: (0, cdp_1.mkAmount)(cdp.debtAmount + mintAmount),
-        accruedFees: (0, cdp_1.mkAmount)(cdp.accruedFees + accruedFees),
+        debtAmount: (0, types_1.mkAmount)(cdp.debtAmount + mintAmount),
+        accruedFees: (0, types_1.mkAmount)(cdp.accruedFees + accruedFees),
         state: newState,
         updatedAt: timestamp,
     };
@@ -427,7 +427,7 @@ const mintNYXUSD = (params, context) => {
         newHealthFactor,
         previousHealthFactor,
         accruedFees,
-        newTotalDebt: (0, cdp_1.mkAmount)(newTotalDebt),
+        newTotalDebt: (0, types_1.mkAmount)(newTotalDebt),
     };
     return fp_utils_1.Result.ok(mintResult);
 };
@@ -474,7 +474,7 @@ const mintNYXUSDBatch = (mints, context) => {
         const mintResult = result.value;
         results.push(mintResult);
         // Update running total for next iteration
-        runningTotalDebt = (0, cdp_1.mkAmount)(runningTotalDebt + mintResult.mintedAmount + mintResult.accruedFees);
+        runningTotalDebt = (0, types_1.mkAmount)(runningTotalDebt + mintResult.mintedAmount + mintResult.accruedFees);
     }
     return fp_utils_1.Result.ok(results);
 };
@@ -501,7 +501,7 @@ exports.mintNYXUSDBatch = mintNYXUSDBatch;
 const estimateAnnualBorrowingCost = (debtAmount, stabilityFeeRate) => {
     const annualFees = (debtAmount * BigInt(Math.floor(stabilityFeeRate * 1000000))) /
         BigInt(1000000);
-    return (0, cdp_1.mkAmount)(annualFees);
+    return (0, types_1.mkAmount)(annualFees);
 };
 exports.estimateAnnualBorrowingCost = estimateAnnualBorrowingCost;
 /**

@@ -23,7 +23,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calculateFullClosureAmount = exports.calculateHealthFactorImprovement = exports.estimateMinBurnForHealthFactor = exports.burnNYXUSDBatch = exports.burnNYXUSD = exports.createUpdatedCDP = exports.updateCDPStateAfterBurn = exports.calculateCurrentHealthFactor = exports.calculateHealthFactorAfterBurn = exports.validateBurnNYXUSD = exports.calculateBurnAllocation = exports.calculateAccruedFees = void 0;
 const fp_utils_1 = require("@nyxusd/fp-utils");
-const cdp_1 = require("../types/cdp");
+const types_1 = require("./types");
 /**
  * Calculates accrued stability fees for a CDP
  *
@@ -47,7 +47,7 @@ const cdp_1 = require("../types/cdp");
  */
 const calculateAccruedFees = (currentDebt, stabilityFeeRate, timeElapsed) => {
     if (currentDebt === 0n || stabilityFeeRate === 0 || timeElapsed === 0) {
-        return (0, cdp_1.mkAmount)(0n);
+        return (0, types_1.mkAmount)(0n);
     }
     // Calculate fees using compound interest formula: A = P * (1 + r)^t
     // For small time periods, we can use simple interest approximation: A = P * r * t
@@ -57,7 +57,7 @@ const calculateAccruedFees = (currentDebt, stabilityFeeRate, timeElapsed) => {
     const fees = (currentDebt *
         BigInt(Math.floor(stabilityFeeRate * timeInYears * 1000000))) /
         BigInt(1000000);
-    return (0, cdp_1.mkAmount)(fees);
+    return (0, types_1.mkAmount)(fees);
 };
 exports.calculateAccruedFees = calculateAccruedFees;
 /**
@@ -84,20 +84,20 @@ exports.calculateAccruedFees = calculateAccruedFees;
  * ```
  */
 const calculateBurnAllocation = (burnAmount, currentDebt, accruedFees) => {
-    let feesPayment = (0, cdp_1.mkAmount)(0n);
-    let principalPayment = (0, cdp_1.mkAmount)(0n);
+    let feesPayment = (0, types_1.mkAmount)(0n);
+    let principalPayment = (0, types_1.mkAmount)(0n);
     let remainingBurn = burnAmount;
     // First, pay accrued fees
     if (accruedFees > 0n && remainingBurn > 0n) {
-        feesPayment = (0, cdp_1.mkAmount)(remainingBurn >= accruedFees ? accruedFees : remainingBurn);
-        remainingBurn = (0, cdp_1.mkAmount)(remainingBurn - feesPayment);
+        feesPayment = (0, types_1.mkAmount)(remainingBurn >= accruedFees ? accruedFees : remainingBurn);
+        remainingBurn = (0, types_1.mkAmount)(remainingBurn - feesPayment);
     }
     // Then, pay principal debt
     if (currentDebt > 0n && remainingBurn > 0n) {
-        principalPayment = (0, cdp_1.mkAmount)(remainingBurn >= currentDebt ? currentDebt : remainingBurn);
+        principalPayment = (0, types_1.mkAmount)(remainingBurn >= currentDebt ? currentDebt : remainingBurn);
     }
-    const totalBurned = (0, cdp_1.mkAmount)(feesPayment + principalPayment);
-    const remainingDebt = (0, cdp_1.mkAmount)(currentDebt - principalPayment);
+    const totalBurned = (0, types_1.mkAmount)(feesPayment + principalPayment);
+    const remainingDebt = (0, types_1.mkAmount)(currentDebt - principalPayment);
     const fullRepayment = remainingDebt === 0n && accruedFees <= feesPayment;
     return {
         feesPayment,
@@ -190,7 +190,7 @@ const validateBurnNYXUSD = (params, context) => {
     if (params.burnAmount > totalDebt) {
         return fp_utils_1.Result.err({
             type: "burn_amount_exceeds_debt",
-            debt: (0, cdp_1.mkAmount)(totalDebt),
+            debt: (0, types_1.mkAmount)(totalDebt),
             requested: params.burnAmount,
         });
     }
@@ -314,7 +314,7 @@ const updateCDPStateAfterBurn = (currentState, remainingDebt, newHealthFactor, a
         if (newHealthFactor <= 1.0) {
             return {
                 type: "liquidating",
-                liquidationPrice: (0, cdp_1.mkAmount)(0n), // Will be calculated by liquidation system
+                liquidationPrice: (0, types_1.mkAmount)(0n), // Will be calculated by liquidation system
             };
         }
         // Default to active state
@@ -358,8 +358,8 @@ exports.updateCDPStateAfterBurn = updateCDPStateAfterBurn;
 const createUpdatedCDP = (cdp, principalRepaid, feesPaid, newState, timestamp) => {
     return {
         ...cdp,
-        debtAmount: (0, cdp_1.mkAmount)(cdp.debtAmount - principalRepaid),
-        accruedFees: (0, cdp_1.mkAmount)(cdp.accruedFees - feesPaid),
+        debtAmount: (0, types_1.mkAmount)(cdp.debtAmount - principalRepaid),
+        accruedFees: (0, types_1.mkAmount)(cdp.accruedFees - feesPaid),
         state: newState,
         updatedAt: timestamp,
     };
@@ -517,12 +517,12 @@ const estimateMinBurnForHealthFactor = (cdp, targetHealthFactor, collateralPrice
     const accruedFees = (0, exports.calculateAccruedFees)(cdp.debtAmount, stabilityFeeRate, timeElapsed);
     const totalCurrentDebt = cdp.debtAmount + accruedFees;
     if (totalCurrentDebt === 0n) {
-        return (0, cdp_1.mkAmount)(0n); // No debt to repay
+        return (0, types_1.mkAmount)(0n); // No debt to repay
     }
     const currentHealthFactor = (0, exports.calculateCurrentHealthFactor)(cdp, collateralPrice);
     // If already at or above target, no burn needed
     if (currentHealthFactor >= targetHealthFactor) {
-        return (0, cdp_1.mkAmount)(0n);
+        return (0, types_1.mkAmount)(0n);
     }
     // Calculate required debt for target health factor
     const collateralValue = (cdp.collateralAmount * collateralPrice) / BigInt(10 ** 18);
@@ -530,10 +530,10 @@ const estimateMinBurnForHealthFactor = (cdp, targetHealthFactor, collateralPrice
     const requiredDebt = (liquidationThreshold / BigInt(Math.floor(targetHealthFactor * 100))) *
         BigInt(100);
     if (requiredDebt >= totalCurrentDebt) {
-        return (0, cdp_1.mkAmount)(0n); // Target cannot be achieved by burning
+        return (0, types_1.mkAmount)(0n); // Target cannot be achieved by burning
     }
     const debtReduction = totalCurrentDebt - requiredDebt;
-    return (0, cdp_1.mkAmount)(debtReduction);
+    return (0, types_1.mkAmount)(debtReduction);
 };
 exports.estimateMinBurnForHealthFactor = estimateMinBurnForHealthFactor;
 /**
@@ -600,7 +600,7 @@ exports.calculateHealthFactorImprovement = calculateHealthFactorImprovement;
  */
 const calculateFullClosureAmount = (cdp, stabilityFeeRate, timeElapsed) => {
     const accruedFees = (0, exports.calculateAccruedFees)(cdp.debtAmount, stabilityFeeRate, timeElapsed);
-    return (0, cdp_1.mkAmount)(cdp.debtAmount + accruedFees);
+    return (0, types_1.mkAmount)(cdp.debtAmount + accruedFees);
 };
 exports.calculateFullClosureAmount = calculateFullClosureAmount;
 //# sourceMappingURL=burn.js.map

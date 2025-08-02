@@ -20,7 +20,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.estimateMinDepositForHealthFactor = exports.calculateHealthFactorImprovement = exports.depositCollateralBatch = exports.depositCollateral = exports.createUpdatedCDP = exports.updateCDPStateAfterDeposit = exports.calculateCurrentHealthFactor = exports.calculateHealthFactorAfterDeposit = exports.validateDepositCollateral = void 0;
 const fp_utils_1 = require("@nyxusd/fp-utils");
-const cdp_1 = require("../types/cdp");
+const types_1 = require("./types");
 /**
  * Validates collateral deposit parameters and system state
  *
@@ -194,7 +194,7 @@ const updateCDPStateAfterDeposit = (currentState, newHealthFactor, _liquidationR
         }
         return {
             type: "liquidating",
-            liquidationPrice: (0, cdp_1.mkAmount)(0n), // Will be calculated by liquidation system
+            liquidationPrice: (0, types_1.mkAmount)(0n), // Will be calculated by liquidation system
         };
     }
     // If health factor improved sufficiently, move to active state
@@ -243,7 +243,7 @@ exports.updateCDPStateAfterDeposit = updateCDPStateAfterDeposit;
 const createUpdatedCDP = (cdp, depositAmount, newState, timestamp) => {
     return {
         ...cdp,
-        collateralAmount: (0, cdp_1.mkAmount)(cdp.collateralAmount + depositAmount),
+        collateralAmount: (0, types_1.mkAmount)(cdp.collateralAmount + depositAmount),
         state: newState,
         updatedAt: timestamp,
     };
@@ -411,12 +411,12 @@ exports.calculateHealthFactorImprovement = calculateHealthFactorImprovement;
  */
 const estimateMinDepositForHealthFactor = (cdp, targetHealthFactor, collateralPrice) => {
     if (cdp.debtAmount === 0n) {
-        return (0, cdp_1.mkAmount)(0n); // No debt means no deposit needed
+        return (0, types_1.mkAmount)(0n); // No debt means no deposit needed
     }
     const currentHealthFactor = (0, exports.calculateCurrentHealthFactor)(cdp, collateralPrice);
     // If already at or above target, no deposit needed
     if (currentHealthFactor >= targetHealthFactor) {
-        return (0, cdp_1.mkAmount)(0n);
+        return (0, types_1.mkAmount)(0n);
     }
     // Calculate required total collateral value for target health factor
     const requiredCollateralValue = (cdp.debtAmount *
@@ -428,11 +428,11 @@ const estimateMinDepositForHealthFactor = (cdp, targetHealthFactor, collateralPr
     // Calculate additional collateral value needed
     const additionalCollateralValue = requiredCollateralValue - currentCollateralValue;
     if (additionalCollateralValue <= 0n) {
-        return (0, cdp_1.mkAmount)(0n);
+        return (0, types_1.mkAmount)(0n);
     }
     // Convert additional collateral value to collateral amount
     const additionalCollateral = (additionalCollateralValue * BigInt(10 ** 18)) / collateralPrice;
-    return (0, cdp_1.mkAmount)(additionalCollateral);
+    return (0, types_1.mkAmount)(additionalCollateral);
 };
 exports.estimateMinDepositForHealthFactor = estimateMinDepositForHealthFactor;
 //# sourceMappingURL=deposit.js.map

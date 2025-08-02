@@ -21,7 +21,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.estimateFreedCollateralValue = exports.calculateHealthFactorImpact = exports.withdrawCollateralBatch = exports.withdrawCollateral = exports.createUpdatedCDP = exports.updateCDPStateAfterWithdraw = exports.calculateCurrentHealthFactor = exports.calculateHealthFactorAfterWithdraw = exports.calculateMaxWithdrawableAmount = exports.validateWithdrawCollateral = void 0;
 const fp_utils_1 = require("@nyxusd/fp-utils");
-const cdp_1 = require("../types/cdp");
+const types_1 = require("./types");
 /**
  * Validates collateral withdrawal parameters and system state
  *
@@ -118,8 +118,8 @@ const validateWithdrawCollateral = (params, context) => {
     if (newCollateralizationRatio < requiredRatio) {
         return fp_utils_1.Result.err({
             type: "below_min_collateral_ratio",
-            current: (0, cdp_1.mkCollateralizationRatio)(newCollateralizationRatio),
-            minimum: (0, cdp_1.mkCollateralizationRatio)(requiredRatio),
+            current: (0, types_1.mkCollateralizationRatio)(newCollateralizationRatio),
+            minimum: (0, types_1.mkCollateralizationRatio)(requiredRatio),
         });
     }
     return fp_utils_1.Result.ok(undefined);
@@ -155,10 +155,10 @@ const calculateMaxWithdrawableAmount = (cdp, collateralPrice, safetyBuffer) => {
     const requiredCollateralValue = (cdp.debtAmount * BigInt(requiredRatio)) / BigInt(10000);
     const requiredCollateralAmount = (requiredCollateralValue * BigInt(10 ** 18)) / collateralPrice;
     if (requiredCollateralAmount >= cdp.collateralAmount) {
-        return (0, cdp_1.mkAmount)(0n); // Cannot withdraw anything
+        return (0, types_1.mkAmount)(0n); // Cannot withdraw anything
     }
     const maxWithdrawable = cdp.collateralAmount - requiredCollateralAmount;
-    return (0, cdp_1.mkAmount)(maxWithdrawable);
+    return (0, types_1.mkAmount)(maxWithdrawable);
 };
 exports.calculateMaxWithdrawableAmount = calculateMaxWithdrawableAmount;
 /**
@@ -250,7 +250,7 @@ const updateCDPStateAfterWithdraw = (_currentState, newHealthFactor, _liquidatio
     if (newHealthFactor <= 1.0) {
         return {
             type: "liquidating",
-            liquidationPrice: (0, cdp_1.mkAmount)(0n), // Will be calculated by liquidation system
+            liquidationPrice: (0, types_1.mkAmount)(0n), // Will be calculated by liquidation system
         };
     }
     // If health factor is still reasonable, keep active
@@ -295,7 +295,7 @@ exports.updateCDPStateAfterWithdraw = updateCDPStateAfterWithdraw;
 const createUpdatedCDP = (cdp, withdrawAmount, newState, timestamp) => {
     return {
         ...cdp,
-        collateralAmount: (0, cdp_1.mkAmount)(cdp.collateralAmount - withdrawAmount),
+        collateralAmount: (0, types_1.mkAmount)(cdp.collateralAmount - withdrawAmount),
         state: newState,
         updatedAt: timestamp,
     };
