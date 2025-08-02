@@ -1,5 +1,3 @@
-import { VoiceService } from './voiceService';
-
 export interface Voice {
   voice_id: string;
   name: string;
@@ -35,15 +33,12 @@ export interface StreamConfig {
 export class ElevenLabsClient {
   private apiKey: string | null = null;
   private baseUrl: string = 'https://api.elevenlabs.io/v1';
-  private voiceService: VoiceService;
 
-  constructor(voiceService: VoiceService) {
-    this.voiceService = voiceService;
+  constructor() {
   }
 
   async initialize(apiKey: string): Promise<void> {
     this.apiKey = apiKey;
-    await this.voiceService.initialize(apiKey);
   }
 
   async getVoices(): Promise<Voice[]> {
@@ -381,4 +376,4 @@ export class ElevenLabsClient {
 }
 
 // Export singleton instance
-export const elevenLabsClient = new ElevenLabsClient(voiceService);
+export const elevenLabsClient = new ElevenLabsClient();

@@ -79,6 +79,7 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
     const initialize = async () => {
       try {
         if (apiKey) {
+          await voiceService.initialize(apiKey);
           await elevenLabsClient.initialize(apiKey);
           
           if (voiceId) {

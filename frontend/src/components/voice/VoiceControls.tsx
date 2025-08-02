@@ -40,6 +40,7 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
     const initializeServices = async () => {
       try {
         if (apiKey) {
+          await voiceService.initialize(apiKey);
           await elevenLabsClient.initialize(apiKey);
           setIsInitialized(true);
         }
