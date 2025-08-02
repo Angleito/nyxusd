@@ -78,21 +78,30 @@ const NyxHeroSection: React.FC = () => {
             }}
           >
             <div className="relative group">
-              <img 
-                src="/nyx-mascot.jpg" 
-                alt="Nyx-chan" 
-                className="w-40 h-40 md:w-56 md:h-56 rounded-full border-4 border-purple-500/30 shadow-2xl object-cover"
+              <div className="w-40 h-40 md:w-56 md:h-56 rounded-full border-4 border-purple-500/30 shadow-2xl overflow-hidden bg-gradient-to-br from-purple-900/50 to-blue-900/50 flex items-center justify-center"
                 style={{
                   filter: 'drop-shadow(0 0 30px rgba(107, 70, 193, 0.5))',
-                }}
-                loading="eager"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = '/nyx-assets/images/nyx-icon.svg';
-                  target.style.padding = '2rem';
-                }}
-              />
+                }}>
+                <img 
+                  src="/nyx-mascot.jpg" 
+                  alt="Nyx-chan" 
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  onError={(e) => {
+                    // Hide the broken image and show the gradient background with icon
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent) {
+                      const icon = document.createElement('img');
+                      icon.src = '/nyx-assets/images/nyx-icon.svg';
+                      icon.className = 'w-24 h-24 md:w-32 md:h-32';
+                      icon.alt = 'NYX';
+                      parent.appendChild(icon);
+                    }
+                  }}
+                />
+              </div>
               <motion.div 
                 className="absolute -bottom-4 -right-4 bg-gradient-to-br from-purple-600 to-purple-800 rounded-full p-3 shadow-lg"
                 animate={{ rotate: [0, 360] }}
