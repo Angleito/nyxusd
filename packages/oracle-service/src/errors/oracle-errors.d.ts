@@ -24,21 +24,21 @@ export declare const OracleErrorSchema: z.ZodObject<{
     /** Suggested recovery actions */
     recoveryActions: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
-    code: string;
-    message: string;
-    severity: "low" | "medium" | "high" | "critical";
-    timestamp: number;
-    context?: Record<string, unknown> | undefined;
+    code?: string;
+    message?: string;
+    severity?: "low" | "medium" | "high" | "critical";
+    timestamp?: number;
+    context?: Record<string, unknown>;
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }, {
-    code: string;
-    message: string;
-    severity: "low" | "medium" | "high" | "critical";
-    timestamp: number;
-    context?: Record<string, unknown> | undefined;
+    code?: string;
+    message?: string;
+    severity?: "low" | "medium" | "high" | "critical";
+    timestamp?: number;
+    context?: Record<string, unknown>;
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }>;
 export type OracleError = z.infer<typeof OracleErrorSchema>;
 /**
@@ -58,38 +58,38 @@ export declare const NetworkErrorSchema: z.ZodObject<{
         statusCode: z.ZodOptional<z.ZodNumber>;
         timeout: z.ZodOptional<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
-        endpoint?: string | undefined;
-        statusCode?: number | undefined;
-        timeout?: boolean | undefined;
+        endpoint?: string;
+        statusCode?: number;
+        timeout?: boolean;
     }, {
-        endpoint?: string | undefined;
-        statusCode?: number | undefined;
-        timeout?: boolean | undefined;
+        endpoint?: string;
+        statusCode?: number;
+        timeout?: boolean;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    code: "NETWORK_ERROR";
-    message: string;
-    severity: "medium" | "high";
-    timestamp: number;
+    code?: "NETWORK_ERROR";
+    message?: string;
+    severity?: "medium" | "high";
+    timestamp?: number;
     context?: {
-        endpoint?: string | undefined;
-        statusCode?: number | undefined;
-        timeout?: boolean | undefined;
-    } | undefined;
+        endpoint?: string;
+        statusCode?: number;
+        timeout?: boolean;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }, {
-    code: "NETWORK_ERROR";
-    message: string;
-    severity: "medium" | "high";
-    timestamp: number;
+    code?: "NETWORK_ERROR";
+    message?: string;
+    severity?: "medium" | "high";
+    timestamp?: number;
     context?: {
-        endpoint?: string | undefined;
-        statusCode?: number | undefined;
-        timeout?: boolean | undefined;
-    } | undefined;
+        endpoint?: string;
+        statusCode?: number;
+        timeout?: boolean;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }>;
 export type NetworkError = z.infer<typeof NetworkErrorSchema>;
 /** Invalid oracle data errors */
@@ -106,38 +106,38 @@ export declare const DataValidationErrorSchema: z.ZodObject<{
         receivedData: z.ZodOptional<z.ZodUnknown>;
         validationRules: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
-        feedId?: string | undefined;
+        feedId?: string;
         receivedData?: unknown;
-        validationRules?: string[] | undefined;
+        validationRules?: string[];
     }, {
-        feedId?: string | undefined;
+        feedId?: string;
         receivedData?: unknown;
-        validationRules?: string[] | undefined;
+        validationRules?: string[];
     }>>;
 }, "strip", z.ZodTypeAny, {
-    code: "DATA_VALIDATION_ERROR";
-    message: string;
-    severity: "medium" | "high";
-    timestamp: number;
+    code?: "DATA_VALIDATION_ERROR";
+    message?: string;
+    severity?: "medium" | "high";
+    timestamp?: number;
     context?: {
-        feedId?: string | undefined;
+        feedId?: string;
         receivedData?: unknown;
-        validationRules?: string[] | undefined;
-    } | undefined;
+        validationRules?: string[];
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }, {
-    code: "DATA_VALIDATION_ERROR";
-    message: string;
-    severity: "medium" | "high";
-    timestamp: number;
+    code?: "DATA_VALIDATION_ERROR";
+    message?: string;
+    severity?: "medium" | "high";
+    timestamp?: number;
     context?: {
-        feedId?: string | undefined;
+        feedId?: string;
         receivedData?: unknown;
-        validationRules?: string[] | undefined;
-    } | undefined;
+        validationRules?: string[];
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }>;
 export type DataValidationError = z.infer<typeof DataValidationErrorSchema>;
 /** Stale data errors */
@@ -155,42 +155,42 @@ export declare const StaleDataErrorSchema: z.ZodObject<{
         maxAge: z.ZodOptional<z.ZodNumber>;
         staleness: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
-        feedId?: string | undefined;
-        lastUpdate?: number | undefined;
-        maxAge?: number | undefined;
-        staleness?: number | undefined;
+        feedId?: string;
+        lastUpdate?: number;
+        maxAge?: number;
+        staleness?: number;
     }, {
-        feedId?: string | undefined;
-        lastUpdate?: number | undefined;
-        maxAge?: number | undefined;
-        staleness?: number | undefined;
+        feedId?: string;
+        lastUpdate?: number;
+        maxAge?: number;
+        staleness?: number;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    code: "STALE_DATA_ERROR";
-    message: string;
-    severity: "low" | "medium";
-    timestamp: number;
+    code?: "STALE_DATA_ERROR";
+    message?: string;
+    severity?: "low" | "medium";
+    timestamp?: number;
     context?: {
-        feedId?: string | undefined;
-        lastUpdate?: number | undefined;
-        maxAge?: number | undefined;
-        staleness?: number | undefined;
-    } | undefined;
+        feedId?: string;
+        lastUpdate?: number;
+        maxAge?: number;
+        staleness?: number;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }, {
-    code: "STALE_DATA_ERROR";
-    message: string;
-    severity: "low" | "medium";
-    timestamp: number;
+    code?: "STALE_DATA_ERROR";
+    message?: string;
+    severity?: "low" | "medium";
+    timestamp?: number;
     context?: {
-        feedId?: string | undefined;
-        lastUpdate?: number | undefined;
-        maxAge?: number | undefined;
-        staleness?: number | undefined;
-    } | undefined;
+        feedId?: string;
+        lastUpdate?: number;
+        maxAge?: number;
+        staleness?: number;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }>;
 export type StaleDataError = z.infer<typeof StaleDataErrorSchema>;
 /** Price deviation errors */
@@ -209,46 +209,46 @@ export declare const PriceDeviationErrorSchema: z.ZodObject<{
         deviation: z.ZodOptional<z.ZodNumber>;
         threshold: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
-        feedId?: string | undefined;
-        currentPrice?: string | undefined;
-        expectedPrice?: string | undefined;
-        deviation?: number | undefined;
-        threshold?: number | undefined;
+        feedId?: string;
+        currentPrice?: string;
+        expectedPrice?: string;
+        deviation?: number;
+        threshold?: number;
     }, {
-        feedId?: string | undefined;
-        currentPrice?: string | undefined;
-        expectedPrice?: string | undefined;
-        deviation?: number | undefined;
-        threshold?: number | undefined;
+        feedId?: string;
+        currentPrice?: string;
+        expectedPrice?: string;
+        deviation?: number;
+        threshold?: number;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    code: "PRICE_DEVIATION_ERROR";
-    message: string;
-    severity: "medium" | "high" | "critical";
-    timestamp: number;
+    code?: "PRICE_DEVIATION_ERROR";
+    message?: string;
+    severity?: "medium" | "high" | "critical";
+    timestamp?: number;
     context?: {
-        feedId?: string | undefined;
-        currentPrice?: string | undefined;
-        expectedPrice?: string | undefined;
-        deviation?: number | undefined;
-        threshold?: number | undefined;
-    } | undefined;
+        feedId?: string;
+        currentPrice?: string;
+        expectedPrice?: string;
+        deviation?: number;
+        threshold?: number;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }, {
-    code: "PRICE_DEVIATION_ERROR";
-    message: string;
-    severity: "medium" | "high" | "critical";
-    timestamp: number;
+    code?: "PRICE_DEVIATION_ERROR";
+    message?: string;
+    severity?: "medium" | "high" | "critical";
+    timestamp?: number;
     context?: {
-        feedId?: string | undefined;
-        currentPrice?: string | undefined;
-        expectedPrice?: string | undefined;
-        deviation?: number | undefined;
-        threshold?: number | undefined;
-    } | undefined;
+        feedId?: string;
+        currentPrice?: string;
+        expectedPrice?: string;
+        deviation?: number;
+        threshold?: number;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }>;
 export type PriceDeviationError = z.infer<typeof PriceDeviationErrorSchema>;
 /** Low confidence errors */
@@ -266,42 +266,42 @@ export declare const LowConfidenceErrorSchema: z.ZodObject<{
         requiredConfidence: z.ZodOptional<z.ZodNumber>;
         sources: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
-        feedId?: string | undefined;
-        confidence?: number | undefined;
-        requiredConfidence?: number | undefined;
-        sources?: string[] | undefined;
+        feedId?: string;
+        confidence?: number;
+        requiredConfidence?: number;
+        sources?: string[];
     }, {
-        feedId?: string | undefined;
-        confidence?: number | undefined;
-        requiredConfidence?: number | undefined;
-        sources?: string[] | undefined;
+        feedId?: string;
+        confidence?: number;
+        requiredConfidence?: number;
+        sources?: string[];
     }>>;
 }, "strip", z.ZodTypeAny, {
-    code: "LOW_CONFIDENCE_ERROR";
-    message: string;
-    severity: "low" | "medium";
-    timestamp: number;
+    code?: "LOW_CONFIDENCE_ERROR";
+    message?: string;
+    severity?: "low" | "medium";
+    timestamp?: number;
     context?: {
-        feedId?: string | undefined;
-        confidence?: number | undefined;
-        requiredConfidence?: number | undefined;
-        sources?: string[] | undefined;
-    } | undefined;
+        feedId?: string;
+        confidence?: number;
+        requiredConfidence?: number;
+        sources?: string[];
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }, {
-    code: "LOW_CONFIDENCE_ERROR";
-    message: string;
-    severity: "low" | "medium";
-    timestamp: number;
+    code?: "LOW_CONFIDENCE_ERROR";
+    message?: string;
+    severity?: "low" | "medium";
+    timestamp?: number;
     context?: {
-        feedId?: string | undefined;
-        confidence?: number | undefined;
-        requiredConfidence?: number | undefined;
-        sources?: string[] | undefined;
-    } | undefined;
+        feedId?: string;
+        confidence?: number;
+        requiredConfidence?: number;
+        sources?: string[];
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }>;
 export type LowConfidenceError = z.infer<typeof LowConfidenceErrorSchema>;
 /** Circuit breaker errors */
@@ -319,42 +319,42 @@ export declare const CircuitBreakerErrorSchema: z.ZodObject<{
         failureCount: z.ZodOptional<z.ZodNumber>;
         lastFailure: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
-        feedId?: string | undefined;
-        state?: "open" | "half_open" | undefined;
-        failureCount?: number | undefined;
-        lastFailure?: number | undefined;
+        feedId?: string;
+        state?: "open" | "half_open";
+        failureCount?: number;
+        lastFailure?: number;
     }, {
-        feedId?: string | undefined;
-        state?: "open" | "half_open" | undefined;
-        failureCount?: number | undefined;
-        lastFailure?: number | undefined;
+        feedId?: string;
+        state?: "open" | "half_open";
+        failureCount?: number;
+        lastFailure?: number;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    code: "CIRCUIT_BREAKER_ERROR";
-    message: string;
-    severity: "high" | "critical";
-    timestamp: number;
+    code?: "CIRCUIT_BREAKER_ERROR";
+    message?: string;
+    severity?: "high" | "critical";
+    timestamp?: number;
     context?: {
-        feedId?: string | undefined;
-        state?: "open" | "half_open" | undefined;
-        failureCount?: number | undefined;
-        lastFailure?: number | undefined;
-    } | undefined;
+        feedId?: string;
+        state?: "open" | "half_open";
+        failureCount?: number;
+        lastFailure?: number;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }, {
-    code: "CIRCUIT_BREAKER_ERROR";
-    message: string;
-    severity: "high" | "critical";
-    timestamp: number;
+    code?: "CIRCUIT_BREAKER_ERROR";
+    message?: string;
+    severity?: "high" | "critical";
+    timestamp?: number;
     context?: {
-        feedId?: string | undefined;
-        state?: "open" | "half_open" | undefined;
-        failureCount?: number | undefined;
-        lastFailure?: number | undefined;
-    } | undefined;
+        feedId?: string;
+        state?: "open" | "half_open";
+        failureCount?: number;
+        lastFailure?: number;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }>;
 export type CircuitBreakerError = z.infer<typeof CircuitBreakerErrorSchema>;
 /** Aggregation errors */
@@ -372,42 +372,42 @@ export declare const AggregationErrorSchema: z.ZodObject<{
         requiredSources: z.ZodOptional<z.ZodNumber>;
         failures: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
-        method?: string | undefined;
-        sourceCount?: number | undefined;
-        requiredSources?: number | undefined;
-        failures?: string[] | undefined;
+        method?: string;
+        sourceCount?: number;
+        requiredSources?: number;
+        failures?: string[];
     }, {
-        method?: string | undefined;
-        sourceCount?: number | undefined;
-        requiredSources?: number | undefined;
-        failures?: string[] | undefined;
+        method?: string;
+        sourceCount?: number;
+        requiredSources?: number;
+        failures?: string[];
     }>>;
 }, "strip", z.ZodTypeAny, {
-    code: "AGGREGATION_ERROR";
-    message: string;
-    severity: "medium" | "high";
-    timestamp: number;
+    code?: "AGGREGATION_ERROR";
+    message?: string;
+    severity?: "medium" | "high";
+    timestamp?: number;
     context?: {
-        method?: string | undefined;
-        sourceCount?: number | undefined;
-        requiredSources?: number | undefined;
-        failures?: string[] | undefined;
-    } | undefined;
+        method?: string;
+        sourceCount?: number;
+        requiredSources?: number;
+        failures?: string[];
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }, {
-    code: "AGGREGATION_ERROR";
-    message: string;
-    severity: "medium" | "high";
-    timestamp: number;
+    code?: "AGGREGATION_ERROR";
+    message?: string;
+    severity?: "medium" | "high";
+    timestamp?: number;
     context?: {
-        method?: string | undefined;
-        sourceCount?: number | undefined;
-        requiredSources?: number | undefined;
-        failures?: string[] | undefined;
-    } | undefined;
+        method?: string;
+        sourceCount?: number;
+        requiredSources?: number;
+        failures?: string[];
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }>;
 export type AggregationError = z.infer<typeof AggregationErrorSchema>;
 /** Configuration errors */
@@ -425,37 +425,37 @@ export declare const ConfigurationErrorSchema: z.ZodObject<{
         expectedType: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         value?: unknown;
-        parameter?: string | undefined;
-        expectedType?: string | undefined;
+        parameter?: string;
+        expectedType?: string;
     }, {
         value?: unknown;
-        parameter?: string | undefined;
-        expectedType?: string | undefined;
+        parameter?: string;
+        expectedType?: string;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    code: "CONFIGURATION_ERROR";
-    message: string;
-    severity: "medium" | "high";
-    timestamp: number;
+    code?: "CONFIGURATION_ERROR";
+    message?: string;
+    severity?: "medium" | "high";
+    timestamp?: number;
     context?: {
         value?: unknown;
-        parameter?: string | undefined;
-        expectedType?: string | undefined;
-    } | undefined;
+        parameter?: string;
+        expectedType?: string;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }, {
-    code: "CONFIGURATION_ERROR";
-    message: string;
-    severity: "medium" | "high";
-    timestamp: number;
+    code?: "CONFIGURATION_ERROR";
+    message?: string;
+    severity?: "medium" | "high";
+    timestamp?: number;
     context?: {
         value?: unknown;
-        parameter?: string | undefined;
-        expectedType?: string | undefined;
-    } | undefined;
+        parameter?: string;
+        expectedType?: string;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }>;
 export type ConfigurationError = z.infer<typeof ConfigurationErrorSchema>;
 /** Rate limiting errors */
@@ -473,42 +473,42 @@ export declare const RateLimitErrorSchema: z.ZodObject<{
         resetTime: z.ZodOptional<z.ZodNumber>;
         retryAfter: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
-        endpoint?: string | undefined;
-        limit?: number | undefined;
-        resetTime?: number | undefined;
-        retryAfter?: number | undefined;
+        endpoint?: string;
+        limit?: number;
+        resetTime?: number;
+        retryAfter?: number;
     }, {
-        endpoint?: string | undefined;
-        limit?: number | undefined;
-        resetTime?: number | undefined;
-        retryAfter?: number | undefined;
+        endpoint?: string;
+        limit?: number;
+        resetTime?: number;
+        retryAfter?: number;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    code: "RATE_LIMIT_ERROR";
-    message: string;
-    severity: "low" | "medium";
-    timestamp: number;
+    code?: "RATE_LIMIT_ERROR";
+    message?: string;
+    severity?: "low" | "medium";
+    timestamp?: number;
     context?: {
-        endpoint?: string | undefined;
-        limit?: number | undefined;
-        resetTime?: number | undefined;
-        retryAfter?: number | undefined;
-    } | undefined;
+        endpoint?: string;
+        limit?: number;
+        resetTime?: number;
+        retryAfter?: number;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }, {
-    code: "RATE_LIMIT_ERROR";
-    message: string;
-    severity: "low" | "medium";
-    timestamp: number;
+    code?: "RATE_LIMIT_ERROR";
+    message?: string;
+    severity?: "low" | "medium";
+    timestamp?: number;
     context?: {
-        endpoint?: string | undefined;
-        limit?: number | undefined;
-        resetTime?: number | undefined;
-        retryAfter?: number | undefined;
-    } | undefined;
+        endpoint?: string;
+        limit?: number;
+        resetTime?: number;
+        retryAfter?: number;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }>;
 export type RateLimitError = z.infer<typeof RateLimitErrorSchema>;
 /** Authentication errors */
@@ -524,34 +524,34 @@ export declare const AuthenticationErrorSchema: z.ZodObject<{
         provider: z.ZodOptional<z.ZodString>;
         endpoint: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        endpoint?: string | undefined;
-        provider?: string | undefined;
+        endpoint?: string;
+        provider?: string;
     }, {
-        endpoint?: string | undefined;
-        provider?: string | undefined;
+        endpoint?: string;
+        provider?: string;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    code: "AUTHENTICATION_ERROR";
-    message: string;
-    severity: "medium" | "high";
-    timestamp: number;
+    code?: "AUTHENTICATION_ERROR";
+    message?: string;
+    severity?: "medium" | "high";
+    timestamp?: number;
     context?: {
-        endpoint?: string | undefined;
-        provider?: string | undefined;
-    } | undefined;
+        endpoint?: string;
+        provider?: string;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }, {
-    code: "AUTHENTICATION_ERROR";
-    message: string;
-    severity: "medium" | "high";
-    timestamp: number;
+    code?: "AUTHENTICATION_ERROR";
+    message?: string;
+    severity?: "medium" | "high";
+    timestamp?: number;
     context?: {
-        endpoint?: string | undefined;
-        provider?: string | undefined;
-    } | undefined;
+        endpoint?: string;
+        provider?: string;
+    };
     cause?: unknown;
-    recoveryActions?: string[] | undefined;
+    recoveryActions?: string[];
 }>;
 export type AuthenticationError = z.infer<typeof AuthenticationErrorSchema>;
 /**
@@ -567,34 +567,34 @@ export declare const ValidationErrorSchema: z.ZodObject<{
         message: z.ZodString;
         code: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        code: string;
-        message: string;
-        path: (string | number)[];
+        code?: string;
+        message?: string;
+        path?: (string | number)[];
     }, {
-        code: string;
-        message: string;
-        path: (string | number)[];
+        code?: string;
+        message?: string;
+        path?: (string | number)[];
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
-    code: "VALIDATION_ERROR";
-    message: string;
+    code?: "VALIDATION_ERROR";
+    message?: string;
     value?: unknown;
-    field?: string | undefined;
+    field?: string;
     details?: {
-        code: string;
-        message: string;
-        path: (string | number)[];
-    }[] | undefined;
+        code?: string;
+        message?: string;
+        path?: (string | number)[];
+    }[];
 }, {
-    code: "VALIDATION_ERROR";
-    message: string;
+    code?: "VALIDATION_ERROR";
+    message?: string;
     value?: unknown;
-    field?: string | undefined;
+    field?: string;
     details?: {
-        code: string;
-        message: string;
-        path: (string | number)[];
-    }[] | undefined;
+        code?: string;
+        message?: string;
+        path?: (string | number)[];
+    }[];
 }>;
 export type ValidationError = z.infer<typeof ValidationErrorSchema>;
 /**

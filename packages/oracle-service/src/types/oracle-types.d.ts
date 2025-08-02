@@ -28,21 +28,21 @@ export declare const OraclePriceDataSchema: z.ZodObject<{
     /** Oracle data source identifier */
     source: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    timestamp: number;
-    feedId: string;
-    confidence: number;
-    price: bigint;
-    decimals: number;
-    roundId: bigint;
-    source: string;
+    timestamp?: number;
+    feedId?: string;
+    confidence?: number;
+    price?: bigint;
+    decimals?: number;
+    roundId?: bigint;
+    source?: string;
 }, {
-    timestamp: number;
-    feedId: string;
-    confidence: number;
-    price: bigint;
-    decimals: number;
-    roundId: bigint;
-    source: string;
+    timestamp?: number;
+    feedId?: string;
+    confidence?: number;
+    price?: bigint;
+    decimals?: number;
+    roundId?: bigint;
+    source?: string;
 }>;
 export type OraclePriceData = z.infer<typeof OraclePriceDataSchema>;
 /**
@@ -68,25 +68,25 @@ export declare const OracleFeedConfigSchema: z.ZodObject<{
     /** Whether this feed is currently active */
     isActive: z.ZodBoolean;
 }, "strip", z.ZodTypeAny, {
-    feedId: string;
-    decimals: number;
-    description: string;
-    address: string;
-    heartbeat: number;
-    deviationThreshold: number;
-    minConfidence: number;
-    priority: number;
-    isActive: boolean;
+    feedId?: string;
+    decimals?: number;
+    description?: string;
+    address?: string;
+    heartbeat?: number;
+    deviationThreshold?: number;
+    minConfidence?: number;
+    priority?: number;
+    isActive?: boolean;
 }, {
-    feedId: string;
-    decimals: number;
-    description: string;
-    address: string;
-    heartbeat: number;
-    deviationThreshold: number;
-    minConfidence: number;
-    priority: number;
-    isActive: boolean;
+    feedId?: string;
+    decimals?: number;
+    description?: string;
+    address?: string;
+    heartbeat?: number;
+    deviationThreshold?: number;
+    minConfidence?: number;
+    priority?: number;
+    isActive?: boolean;
 }>;
 export type OracleFeedConfig = z.infer<typeof OracleFeedConfigSchema>;
 /**
@@ -108,17 +108,17 @@ export declare const OracleHealthSchema: z.ZodObject<{
         confidence: z.ZodNumber;
         errorCount: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        status: "critical" | "healthy" | "degraded" | "offline";
-        lastUpdate: number;
-        staleness: number;
-        confidence: number;
-        errorCount: number;
+        status?: "critical" | "healthy" | "degraded" | "offline";
+        lastUpdate?: number;
+        staleness?: number;
+        confidence?: number;
+        errorCount?: number;
     }, {
-        status: "critical" | "healthy" | "degraded" | "offline";
-        lastUpdate: number;
-        staleness: number;
-        confidence: number;
-        errorCount: number;
+        status?: "critical" | "healthy" | "degraded" | "offline";
+        lastUpdate?: number;
+        staleness?: number;
+        confidence?: number;
+        errorCount?: number;
     }>>;
     /** System-wide metrics */
     metrics: z.ZodObject<{
@@ -128,53 +128,53 @@ export declare const OracleHealthSchema: z.ZodObject<{
         averageStaleness: z.ZodNumber;
         uptime: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        totalFeeds: number;
-        healthyFeeds: number;
-        averageConfidence: number;
-        averageStaleness: number;
-        uptime: number;
+        totalFeeds?: number;
+        healthyFeeds?: number;
+        averageConfidence?: number;
+        averageStaleness?: number;
+        uptime?: number;
     }, {
-        totalFeeds: number;
-        healthyFeeds: number;
-        averageConfidence: number;
-        averageStaleness: number;
-        uptime: number;
+        totalFeeds?: number;
+        healthyFeeds?: number;
+        averageConfidence?: number;
+        averageStaleness?: number;
+        uptime?: number;
     }>;
     /** Timestamp of health check */
     timestamp: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    status: "critical" | "healthy" | "degraded" | "offline";
-    timestamp: number;
-    feeds: Record<string, {
-        status: "critical" | "healthy" | "degraded" | "offline";
-        lastUpdate: number;
-        staleness: number;
-        confidence: number;
-        errorCount: number;
+    status?: "critical" | "healthy" | "degraded" | "offline";
+    timestamp?: number;
+    feeds?: Record<string, {
+        status?: "critical" | "healthy" | "degraded" | "offline";
+        lastUpdate?: number;
+        staleness?: number;
+        confidence?: number;
+        errorCount?: number;
     }>;
-    metrics: {
-        totalFeeds: number;
-        healthyFeeds: number;
-        averageConfidence: number;
-        averageStaleness: number;
-        uptime: number;
+    metrics?: {
+        totalFeeds?: number;
+        healthyFeeds?: number;
+        averageConfidence?: number;
+        averageStaleness?: number;
+        uptime?: number;
     };
 }, {
-    status: "critical" | "healthy" | "degraded" | "offline";
-    timestamp: number;
-    feeds: Record<string, {
-        status: "critical" | "healthy" | "degraded" | "offline";
-        lastUpdate: number;
-        staleness: number;
-        confidence: number;
-        errorCount: number;
+    status?: "critical" | "healthy" | "degraded" | "offline";
+    timestamp?: number;
+    feeds?: Record<string, {
+        status?: "critical" | "healthy" | "degraded" | "offline";
+        lastUpdate?: number;
+        staleness?: number;
+        confidence?: number;
+        errorCount?: number;
     }>;
-    metrics: {
-        totalFeeds: number;
-        healthyFeeds: number;
-        averageConfidence: number;
-        averageStaleness: number;
-        uptime: number;
+    metrics?: {
+        totalFeeds?: number;
+        healthyFeeds?: number;
+        averageConfidence?: number;
+        averageStaleness?: number;
+        uptime?: number;
     };
 }>;
 export type OracleHealth = z.infer<typeof OracleHealthSchema>;
@@ -193,17 +193,17 @@ export declare const OracleQuerySchema: z.ZodObject<{
     /** Timeout for the query (milliseconds) */
     timeout: z.ZodDefault<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
-    timeout: number;
-    feedId: string;
-    allowCached: boolean;
-    minConfidence?: number | undefined;
-    maxStaleness?: number | undefined;
+    timeout?: number;
+    feedId?: string;
+    minConfidence?: number;
+    maxStaleness?: number;
+    allowCached?: boolean;
 }, {
-    feedId: string;
-    timeout?: number | undefined;
-    minConfidence?: number | undefined;
-    maxStaleness?: number | undefined;
-    allowCached?: boolean | undefined;
+    timeout?: number;
+    feedId?: string;
+    minConfidence?: number;
+    maxStaleness?: number;
+    allowCached?: boolean;
 }>;
 export type OracleQueryData = z.infer<typeof OracleQuerySchema>;
 /**
@@ -227,21 +227,21 @@ export declare const OracleResponseSchema: z.ZodObject<{
         /** Oracle data source identifier */
         source: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        timestamp: number;
-        feedId: string;
-        confidence: number;
-        price: bigint;
-        decimals: number;
-        roundId: bigint;
-        source: string;
+        timestamp?: number;
+        feedId?: string;
+        confidence?: number;
+        price?: bigint;
+        decimals?: number;
+        roundId?: bigint;
+        source?: string;
     }, {
-        timestamp: number;
-        feedId: string;
-        confidence: number;
-        price: bigint;
-        decimals: number;
-        roundId: bigint;
-        source: string;
+        timestamp?: number;
+        feedId?: string;
+        confidence?: number;
+        price?: bigint;
+        decimals?: number;
+        roundId?: bigint;
+        source?: string;
     }>;
     /** Response metadata */
     metadata: z.ZodObject<{
@@ -254,47 +254,47 @@ export declare const OracleResponseSchema: z.ZodObject<{
         /** Aggregation method if multiple sources used */
         aggregationMethod: z.ZodOptional<z.ZodEnum<["single", "median", "weighted_average"]>>;
     }, "strip", z.ZodTypeAny, {
-        source: string;
-        responseTime: number;
-        fromCache: boolean;
-        aggregationMethod?: "single" | "median" | "weighted_average" | undefined;
+        source?: string;
+        responseTime?: number;
+        fromCache?: boolean;
+        aggregationMethod?: "single" | "median" | "weighted_average";
     }, {
-        source: string;
-        responseTime: number;
-        fromCache: boolean;
-        aggregationMethod?: "single" | "median" | "weighted_average" | undefined;
+        source?: string;
+        responseTime?: number;
+        fromCache?: boolean;
+        aggregationMethod?: "single" | "median" | "weighted_average";
     }>;
 }, "strip", z.ZodTypeAny, {
-    data: {
-        timestamp: number;
-        feedId: string;
-        confidence: number;
-        price: bigint;
-        decimals: number;
-        roundId: bigint;
-        source: string;
+    data?: {
+        timestamp?: number;
+        feedId?: string;
+        confidence?: number;
+        price?: bigint;
+        decimals?: number;
+        roundId?: bigint;
+        source?: string;
     };
-    metadata: {
-        source: string;
-        responseTime: number;
-        fromCache: boolean;
-        aggregationMethod?: "single" | "median" | "weighted_average" | undefined;
+    metadata?: {
+        source?: string;
+        responseTime?: number;
+        fromCache?: boolean;
+        aggregationMethod?: "single" | "median" | "weighted_average";
     };
 }, {
-    data: {
-        timestamp: number;
-        feedId: string;
-        confidence: number;
-        price: bigint;
-        decimals: number;
-        roundId: bigint;
-        source: string;
+    data?: {
+        timestamp?: number;
+        feedId?: string;
+        confidence?: number;
+        price?: bigint;
+        decimals?: number;
+        roundId?: bigint;
+        source?: string;
     };
-    metadata: {
-        source: string;
-        responseTime: number;
-        fromCache: boolean;
-        aggregationMethod?: "single" | "median" | "weighted_average" | undefined;
+    metadata?: {
+        source?: string;
+        responseTime?: number;
+        fromCache?: boolean;
+        aggregationMethod?: "single" | "median" | "weighted_average";
     };
 }>;
 export type OracleResponse = z.infer<typeof OracleResponseSchema>;
@@ -313,15 +313,15 @@ export declare const PriceValidationResultSchema: z.ZodObject<{
         message: z.ZodString;
         metadata: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     }, "strip", z.ZodTypeAny, {
-        code: string;
-        message: string;
-        severity: "info" | "warning" | "error";
-        metadata?: Record<string, unknown> | undefined;
+        code?: string;
+        message?: string;
+        severity?: "info" | "warning" | "error";
+        metadata?: Record<string, unknown>;
     }, {
-        code: string;
-        message: string;
-        severity: "info" | "warning" | "error";
-        metadata?: Record<string, unknown> | undefined;
+        code?: string;
+        message?: string;
+        severity?: "info" | "warning" | "error";
+        metadata?: Record<string, unknown>;
     }>, "many">;
     /** Validated price data (if valid) */
     validatedData: z.ZodOptional<z.ZodObject<{
@@ -340,58 +340,58 @@ export declare const PriceValidationResultSchema: z.ZodObject<{
         /** Oracle data source identifier */
         source: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        timestamp: number;
-        feedId: string;
-        confidence: number;
-        price: bigint;
-        decimals: number;
-        roundId: bigint;
-        source: string;
+        timestamp?: number;
+        feedId?: string;
+        confidence?: number;
+        price?: bigint;
+        decimals?: number;
+        roundId?: bigint;
+        source?: string;
     }, {
-        timestamp: number;
-        feedId: string;
-        confidence: number;
-        price: bigint;
-        decimals: number;
-        roundId: bigint;
-        source: string;
+        timestamp?: number;
+        feedId?: string;
+        confidence?: number;
+        price?: bigint;
+        decimals?: number;
+        roundId?: bigint;
+        source?: string;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    issues: {
-        code: string;
-        message: string;
-        severity: "info" | "warning" | "error";
-        metadata?: Record<string, unknown> | undefined;
+    issues?: {
+        code?: string;
+        message?: string;
+        severity?: "info" | "warning" | "error";
+        metadata?: Record<string, unknown>;
     }[];
-    isValid: boolean;
-    score: number;
+    isValid?: boolean;
+    score?: number;
     validatedData?: {
-        timestamp: number;
-        feedId: string;
-        confidence: number;
-        price: bigint;
-        decimals: number;
-        roundId: bigint;
-        source: string;
-    } | undefined;
+        timestamp?: number;
+        feedId?: string;
+        confidence?: number;
+        price?: bigint;
+        decimals?: number;
+        roundId?: bigint;
+        source?: string;
+    };
 }, {
-    issues: {
-        code: string;
-        message: string;
-        severity: "info" | "warning" | "error";
-        metadata?: Record<string, unknown> | undefined;
+    issues?: {
+        code?: string;
+        message?: string;
+        severity?: "info" | "warning" | "error";
+        metadata?: Record<string, unknown>;
     }[];
-    isValid: boolean;
-    score: number;
+    isValid?: boolean;
+    score?: number;
     validatedData?: {
-        timestamp: number;
-        feedId: string;
-        confidence: number;
-        price: bigint;
-        decimals: number;
-        roundId: bigint;
-        source: string;
-    } | undefined;
+        timestamp?: number;
+        feedId?: string;
+        confidence?: number;
+        price?: bigint;
+        decimals?: number;
+        roundId?: bigint;
+        source?: string;
+    };
 }>;
 export type PriceValidationResult = z.infer<typeof PriceValidationResultSchema>;
 /**
@@ -441,19 +441,19 @@ export declare const AggregationConfigSchema: z.ZodObject<{
     /** Recency weighting factor */
     recencyWeight: z.ZodDefault<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
-    method: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
-    minSources: number;
-    maxSources: number;
-    outlierThreshold: number;
-    confidenceWeight: number;
-    recencyWeight: number;
+    method?: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
+    minSources?: number;
+    maxSources?: number;
+    outlierThreshold?: number;
+    confidenceWeight?: number;
+    recencyWeight?: number;
 }, {
-    method: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
-    minSources: number;
-    maxSources: number;
-    outlierThreshold?: number | undefined;
-    confidenceWeight?: number | undefined;
-    recencyWeight?: number | undefined;
+    method?: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
+    minSources?: number;
+    maxSources?: number;
+    outlierThreshold?: number;
+    confidenceWeight?: number;
+    recencyWeight?: number;
 }>;
 export type AggregationConfig = z.infer<typeof AggregationConfigSchema>;
 /**
@@ -473,17 +473,17 @@ export declare const CircuitBreakerConfigSchema: z.ZodObject<{
     /** Monitor window size (milliseconds) */
     monitoringWindow: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    timeout: number;
-    failureThreshold: number;
-    successThreshold: number;
-    maxPriceDeviation: number;
-    monitoringWindow: number;
+    timeout?: number;
+    failureThreshold?: number;
+    successThreshold?: number;
+    maxPriceDeviation?: number;
+    monitoringWindow?: number;
 }, {
-    timeout: number;
-    failureThreshold: number;
-    successThreshold: number;
-    maxPriceDeviation: number;
-    monitoringWindow: number;
+    timeout?: number;
+    failureThreshold?: number;
+    successThreshold?: number;
+    maxPriceDeviation?: number;
+    monitoringWindow?: number;
 }>;
 export type CircuitBreakerConfig = z.infer<typeof CircuitBreakerConfigSchema>;
 export type { OracleError, ValidationError } from "../errors/oracle-errors";

@@ -21,15 +21,15 @@ export declare const AggregationWeightSchema: z.ZodObject<{
     /** Provider reliability score */
     reliabilityScore: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    provider: string;
-    isActive: boolean;
-    weight: number;
-    reliabilityScore: number;
+    provider?: string;
+    isActive?: boolean;
+    weight?: number;
+    reliabilityScore?: number;
 }, {
-    provider: string;
-    isActive: boolean;
-    weight: number;
-    reliabilityScore: number;
+    provider?: string;
+    isActive?: boolean;
+    weight?: number;
+    reliabilityScore?: number;
 }>;
 export type AggregationWeight = z.infer<typeof AggregationWeightSchema>;
 /**
@@ -49,19 +49,19 @@ export declare const AggregationResultSchema: z.ZodObject<{
         included: z.ZodBoolean;
         reason: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        confidence: number;
-        provider: string;
-        price: bigint;
-        weight: number;
-        included: boolean;
-        reason?: string | undefined;
+        confidence?: number;
+        provider?: string;
+        price?: bigint;
+        weight?: number;
+        included?: boolean;
+        reason?: string;
     }, {
-        confidence: number;
-        provider: string;
-        price: bigint;
-        weight: number;
-        included: boolean;
-        reason?: string | undefined;
+        confidence?: number;
+        provider?: string;
+        price?: bigint;
+        weight?: number;
+        included?: boolean;
+        reason?: string;
     }>, "many">;
     /** Overall confidence in result */
     confidence: z.ZodNumber;
@@ -78,17 +78,17 @@ export declare const AggregationResultSchema: z.ZodObject<{
         /** Interquartile range */
         interquartileRange: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        standardDeviation: number;
-        variance: number;
-        medianAbsoluteDeviation: number;
-        range: number;
-        interquartileRange: number;
+        standardDeviation?: number;
+        variance?: number;
+        medianAbsoluteDeviation?: number;
+        range?: number;
+        interquartileRange?: number;
     }, {
-        standardDeviation: number;
-        variance: number;
-        medianAbsoluteDeviation: number;
-        range: number;
-        interquartileRange: number;
+        standardDeviation?: number;
+        variance?: number;
+        medianAbsoluteDeviation?: number;
+        range?: number;
+        interquartileRange?: number;
     }>;
     /** Outlier detection results */
     outliers: z.ZodArray<z.ZodObject<{
@@ -97,15 +97,15 @@ export declare const AggregationResultSchema: z.ZodObject<{
         deviationScore: z.ZodNumber;
         reason: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        provider: string;
-        price: bigint;
-        reason: string;
-        deviationScore: number;
+        provider?: string;
+        price?: bigint;
+        reason?: string;
+        deviationScore?: number;
     }, {
-        provider: string;
-        price: bigint;
-        reason: string;
-        deviationScore: number;
+        provider?: string;
+        price?: bigint;
+        reason?: string;
+        deviationScore?: number;
     }>, "many">;
     /** Consensus information */
     consensus: z.ZodObject<{
@@ -116,13 +116,13 @@ export declare const AggregationResultSchema: z.ZodObject<{
         /** Whether consensus threshold was met */
         thresholdMet: z.ZodBoolean;
     }, "strip", z.ZodTypeAny, {
-        agreement: number;
-        participantCount: number;
-        thresholdMet: boolean;
+        agreement?: number;
+        participantCount?: number;
+        thresholdMet?: boolean;
     }, {
-        agreement: number;
-        participantCount: number;
-        thresholdMet: boolean;
+        agreement?: number;
+        participantCount?: number;
+        thresholdMet?: boolean;
     }>;
     /** Aggregation metadata */
     metadata: z.ZodObject<{
@@ -133,83 +133,83 @@ export declare const AggregationResultSchema: z.ZodObject<{
         /** Aggregation quality score */
         qualityScore: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        timestamp: number;
-        processingTime: number;
-        qualityScore: number;
+        timestamp?: number;
+        processingTime?: number;
+        qualityScore?: number;
     }, {
-        timestamp: number;
-        processingTime: number;
-        qualityScore: number;
+        timestamp?: number;
+        processingTime?: number;
+        qualityScore?: number;
     }>;
 }, "strip", z.ZodTypeAny, {
-    confidence: number;
-    sources: {
-        confidence: number;
-        provider: string;
-        price: bigint;
-        weight: number;
-        included: boolean;
-        reason?: string | undefined;
+    confidence?: number;
+    sources?: {
+        confidence?: number;
+        provider?: string;
+        price?: bigint;
+        weight?: number;
+        included?: boolean;
+        reason?: string;
     }[];
-    method: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
-    metadata: {
-        timestamp: number;
-        processingTime: number;
-        qualityScore: number;
+    method?: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
+    metadata?: {
+        timestamp?: number;
+        processingTime?: number;
+        qualityScore?: number;
     };
-    aggregatedPrice: bigint;
-    statistics: {
-        standardDeviation: number;
-        variance: number;
-        medianAbsoluteDeviation: number;
-        range: number;
-        interquartileRange: number;
+    aggregatedPrice?: bigint;
+    statistics?: {
+        standardDeviation?: number;
+        variance?: number;
+        medianAbsoluteDeviation?: number;
+        range?: number;
+        interquartileRange?: number;
     };
-    outliers: {
-        provider: string;
-        price: bigint;
-        reason: string;
-        deviationScore: number;
+    outliers?: {
+        provider?: string;
+        price?: bigint;
+        reason?: string;
+        deviationScore?: number;
     }[];
-    consensus: {
-        agreement: number;
-        participantCount: number;
-        thresholdMet: boolean;
+    consensus?: {
+        agreement?: number;
+        participantCount?: number;
+        thresholdMet?: boolean;
     };
 }, {
-    confidence: number;
-    sources: {
-        confidence: number;
-        provider: string;
-        price: bigint;
-        weight: number;
-        included: boolean;
-        reason?: string | undefined;
+    confidence?: number;
+    sources?: {
+        confidence?: number;
+        provider?: string;
+        price?: bigint;
+        weight?: number;
+        included?: boolean;
+        reason?: string;
     }[];
-    method: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
-    metadata: {
-        timestamp: number;
-        processingTime: number;
-        qualityScore: number;
+    method?: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
+    metadata?: {
+        timestamp?: number;
+        processingTime?: number;
+        qualityScore?: number;
     };
-    aggregatedPrice: bigint;
-    statistics: {
-        standardDeviation: number;
-        variance: number;
-        medianAbsoluteDeviation: number;
-        range: number;
-        interquartileRange: number;
+    aggregatedPrice?: bigint;
+    statistics?: {
+        standardDeviation?: number;
+        variance?: number;
+        medianAbsoluteDeviation?: number;
+        range?: number;
+        interquartileRange?: number;
     };
-    outliers: {
-        provider: string;
-        price: bigint;
-        reason: string;
-        deviationScore: number;
+    outliers?: {
+        provider?: string;
+        price?: bigint;
+        reason?: string;
+        deviationScore?: number;
     }[];
-    consensus: {
-        agreement: number;
-        participantCount: number;
-        thresholdMet: boolean;
+    consensus?: {
+        agreement?: number;
+        participantCount?: number;
+        thresholdMet?: boolean;
     };
 }>;
 export type AggregationResult = z.infer<typeof AggregationResultSchema>;
@@ -234,23 +234,23 @@ export declare const ConsensusConfigSchema: z.ZodObject<{
     /** Time window for data staleness (seconds) */
     stalenessWindow: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    minSources: number;
-    maxSources: number;
-    outlierThreshold: number;
-    consensusThreshold: number;
-    maxDeviation: number;
-    outlierDetection: "zscore" | "iqr" | "mad" | "isolation_forest";
-    minSourceConfidence: number;
-    stalenessWindow: number;
+    minSources?: number;
+    maxSources?: number;
+    outlierThreshold?: number;
+    consensusThreshold?: number;
+    maxDeviation?: number;
+    outlierDetection?: "zscore" | "iqr" | "mad" | "isolation_forest";
+    minSourceConfidence?: number;
+    stalenessWindow?: number;
 }, {
-    minSources: number;
-    maxSources: number;
-    outlierThreshold: number;
-    consensusThreshold: number;
-    maxDeviation: number;
-    outlierDetection: "zscore" | "iqr" | "mad" | "isolation_forest";
-    minSourceConfidence: number;
-    stalenessWindow: number;
+    minSources?: number;
+    maxSources?: number;
+    outlierThreshold?: number;
+    consensusThreshold?: number;
+    maxDeviation?: number;
+    outlierDetection?: "zscore" | "iqr" | "mad" | "isolation_forest";
+    minSourceConfidence?: number;
+    stalenessWindow?: number;
 }>;
 export type ConsensusConfig = z.infer<typeof ConsensusConfigSchema>;
 /**
@@ -267,12 +267,12 @@ export declare const MultiOracleDataSchema: z.ZodObject<{
             priceData: z.ZodAny;
             responseTime: z.ZodNumber;
         }, "strip", z.ZodTypeAny, {
-            responseTime: number;
-            success: true;
+            responseTime?: number;
+            success?: true;
             priceData?: any;
         }, {
-            responseTime: number;
-            success: true;
+            responseTime?: number;
+            success?: true;
             priceData?: any;
         }>, z.ZodObject<{
             success: z.ZodLiteral<false>;
@@ -280,42 +280,42 @@ export declare const MultiOracleDataSchema: z.ZodObject<{
             errorCode: z.ZodString;
             responseTime: z.ZodNumber;
         }, "strip", z.ZodTypeAny, {
-            responseTime: number;
-            error: string;
-            success: false;
-            errorCode: string;
+            responseTime?: number;
+            error?: string;
+            success?: false;
+            errorCode?: string;
         }, {
-            responseTime: number;
-            error: string;
-            success: false;
-            errorCode: string;
+            responseTime?: number;
+            error?: string;
+            success?: false;
+            errorCode?: string;
         }>]>;
         timestamp: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        timestamp: number;
-        provider: string;
-        data: {
-            responseTime: number;
-            success: true;
+        timestamp?: number;
+        provider?: string;
+        data?: {
+            responseTime?: number;
+            success?: true;
             priceData?: any;
         } | {
-            responseTime: number;
-            error: string;
-            success: false;
-            errorCode: string;
+            responseTime?: number;
+            error?: string;
+            success?: false;
+            errorCode?: string;
         };
     }, {
-        timestamp: number;
-        provider: string;
-        data: {
-            responseTime: number;
-            success: true;
+        timestamp?: number;
+        provider?: string;
+        data?: {
+            responseTime?: number;
+            success?: true;
             priceData?: any;
         } | {
-            responseTime: number;
-            error: string;
-            success: false;
-            errorCode: string;
+            responseTime?: number;
+            error?: string;
+            success?: false;
+            errorCode?: string;
         };
     }>, "many">;
     /** Collection metadata */
@@ -329,58 +329,58 @@ export declare const MultiOracleDataSchema: z.ZodObject<{
         /** Number of failed responses */
         failedResponses: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        totalTime: number;
-        successRate: number;
-        successfulResponses: number;
-        failedResponses: number;
+        totalTime?: number;
+        successRate?: number;
+        successfulResponses?: number;
+        failedResponses?: number;
     }, {
-        totalTime: number;
-        successRate: number;
-        successfulResponses: number;
-        failedResponses: number;
+        totalTime?: number;
+        successRate?: number;
+        successfulResponses?: number;
+        failedResponses?: number;
     }>;
 }, "strip", z.ZodTypeAny, {
-    feedId: string;
-    metadata: {
-        totalTime: number;
-        successRate: number;
-        successfulResponses: number;
-        failedResponses: number;
+    feedId?: string;
+    metadata?: {
+        totalTime?: number;
+        successRate?: number;
+        successfulResponses?: number;
+        failedResponses?: number;
     };
-    responses: {
-        timestamp: number;
-        provider: string;
-        data: {
-            responseTime: number;
-            success: true;
+    responses?: {
+        timestamp?: number;
+        provider?: string;
+        data?: {
+            responseTime?: number;
+            success?: true;
             priceData?: any;
         } | {
-            responseTime: number;
-            error: string;
-            success: false;
-            errorCode: string;
+            responseTime?: number;
+            error?: string;
+            success?: false;
+            errorCode?: string;
         };
     }[];
 }, {
-    feedId: string;
-    metadata: {
-        totalTime: number;
-        successRate: number;
-        successfulResponses: number;
-        failedResponses: number;
+    feedId?: string;
+    metadata?: {
+        totalTime?: number;
+        successRate?: number;
+        successfulResponses?: number;
+        failedResponses?: number;
     };
-    responses: {
-        timestamp: number;
-        provider: string;
-        data: {
-            responseTime: number;
-            success: true;
+    responses?: {
+        timestamp?: number;
+        provider?: string;
+        data?: {
+            responseTime?: number;
+            success?: true;
             priceData?: any;
         } | {
-            responseTime: number;
-            error: string;
-            success: false;
-            errorCode: string;
+            responseTime?: number;
+            error?: string;
+            success?: false;
+            errorCode?: string;
         };
     }[];
 }>;
@@ -404,21 +404,21 @@ export declare const PriceValidationRulesSchema: z.ZodObject<{
     /** Required decimal precision */
     requiredDecimals: z.ZodOptional<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
-    maxAge?: number | undefined;
-    minConfidence?: number | undefined;
-    maxDeviation?: number | undefined;
-    minPrice?: bigint | undefined;
-    maxPrice?: bigint | undefined;
-    referencePrice?: bigint | undefined;
-    requiredDecimals?: number | undefined;
+    maxAge?: number;
+    minConfidence?: number;
+    maxDeviation?: number;
+    minPrice?: bigint;
+    maxPrice?: bigint;
+    referencePrice?: bigint;
+    requiredDecimals?: number;
 }, {
-    maxAge?: number | undefined;
-    minConfidence?: number | undefined;
-    maxDeviation?: number | undefined;
-    minPrice?: bigint | undefined;
-    maxPrice?: bigint | undefined;
-    referencePrice?: bigint | undefined;
-    requiredDecimals?: number | undefined;
+    maxAge?: number;
+    minConfidence?: number;
+    maxDeviation?: number;
+    minPrice?: bigint;
+    maxPrice?: bigint;
+    referencePrice?: bigint;
+    requiredDecimals?: number;
 }>;
 export type PriceValidationRules = z.infer<typeof PriceValidationRulesSchema>;
 /**
@@ -444,42 +444,42 @@ export declare const AggregationStrategySchema: z.ZodObject<{
         reliabilityWeight: z.ZodNumber;
         consensusWeight: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        confidenceWeight: number;
-        freshnessWeight: number;
-        reliabilityWeight: number;
-        consensusWeight: number;
+        confidenceWeight?: number;
+        freshnessWeight?: number;
+        reliabilityWeight?: number;
+        consensusWeight?: number;
     }, {
-        confidenceWeight: number;
-        freshnessWeight: number;
-        reliabilityWeight: number;
-        consensusWeight: number;
+        confidenceWeight?: number;
+        freshnessWeight?: number;
+        reliabilityWeight?: number;
+        consensusWeight?: number;
     }>;
 }, "strip", z.ZodTypeAny, {
-    method: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
-    name: string;
-    weighting: "custom" | "confidence" | "equal" | "reliability";
-    outlierHandling: "exclude" | "cap" | "transform" | "include";
-    qualityFactors: {
-        confidenceWeight: number;
-        freshnessWeight: number;
-        reliabilityWeight: number;
-        consensusWeight: number;
+    method?: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
+    name?: string;
+    weighting?: "custom" | "confidence" | "equal" | "reliability";
+    customWeights?: Record<string, number>;
+    trimPercentage?: number;
+    outlierHandling?: "exclude" | "cap" | "transform" | "include";
+    qualityFactors?: {
+        confidenceWeight?: number;
+        freshnessWeight?: number;
+        reliabilityWeight?: number;
+        consensusWeight?: number;
     };
-    customWeights?: Record<string, number> | undefined;
-    trimPercentage?: number | undefined;
 }, {
-    method: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
-    name: string;
-    weighting: "custom" | "confidence" | "equal" | "reliability";
-    outlierHandling: "exclude" | "cap" | "transform" | "include";
-    qualityFactors: {
-        confidenceWeight: number;
-        freshnessWeight: number;
-        reliabilityWeight: number;
-        consensusWeight: number;
+    method?: "median" | "weighted_average" | "mean" | "trimmed_mean" | "mode";
+    name?: string;
+    weighting?: "custom" | "confidence" | "equal" | "reliability";
+    customWeights?: Record<string, number>;
+    trimPercentage?: number;
+    outlierHandling?: "exclude" | "cap" | "transform" | "include";
+    qualityFactors?: {
+        confidenceWeight?: number;
+        freshnessWeight?: number;
+        reliabilityWeight?: number;
+        consensusWeight?: number;
     };
-    customWeights?: Record<string, number> | undefined;
-    trimPercentage?: number | undefined;
 }>;
 export type AggregationStrategy = z.infer<typeof AggregationStrategySchema>;
 /**
@@ -507,23 +507,23 @@ export declare const OraclePerformanceSchema: z.ZodObject<{
         /** Average confidence */
         avgConfidence: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        uptime: number;
-        reliabilityScore: number;
-        successRate: number;
-        avgResponseTime: number;
-        dataQualityScore: number;
-        totalRequests: number;
-        failedRequests: number;
-        avgConfidence: number;
+        uptime?: number;
+        reliabilityScore?: number;
+        successRate?: number;
+        avgResponseTime?: number;
+        dataQualityScore?: number;
+        totalRequests?: number;
+        failedRequests?: number;
+        avgConfidence?: number;
     }, {
-        uptime: number;
-        reliabilityScore: number;
-        successRate: number;
-        avgResponseTime: number;
-        dataQualityScore: number;
-        totalRequests: number;
-        failedRequests: number;
-        avgConfidence: number;
+        uptime?: number;
+        reliabilityScore?: number;
+        successRate?: number;
+        avgResponseTime?: number;
+        dataQualityScore?: number;
+        totalRequests?: number;
+        failedRequests?: number;
+        avgConfidence?: number;
     }>;
     /** Historical statistics */
     historical: z.ZodObject<{
@@ -533,13 +533,13 @@ export declare const OraclePerformanceSchema: z.ZodObject<{
             avgResponseTime: z.ZodNumber;
             requestCount: z.ZodNumber;
         }, "strip", z.ZodTypeAny, {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         }, {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         }>;
         /** 7d statistics */
         "7d": z.ZodObject<{
@@ -547,13 +547,13 @@ export declare const OraclePerformanceSchema: z.ZodObject<{
             avgResponseTime: z.ZodNumber;
             requestCount: z.ZodNumber;
         }, "strip", z.ZodTypeAny, {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         }, {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         }>;
         /** 30d statistics */
         "30d": z.ZodObject<{
@@ -561,109 +561,109 @@ export declare const OraclePerformanceSchema: z.ZodObject<{
             avgResponseTime: z.ZodNumber;
             requestCount: z.ZodNumber;
         }, "strip", z.ZodTypeAny, {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         }, {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         }>;
     }, "strip", z.ZodTypeAny, {
-        "24h": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+        "24h"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
-        "7d": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+        "7d"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
-        "30d": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+        "30d"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
     }, {
-        "24h": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+        "24h"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
-        "7d": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+        "7d"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
-        "30d": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+        "30d"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
     }>;
     /** Last updated timestamp */
     lastUpdated: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    provider: string;
-    metrics: {
-        uptime: number;
-        reliabilityScore: number;
-        successRate: number;
-        avgResponseTime: number;
-        dataQualityScore: number;
-        totalRequests: number;
-        failedRequests: number;
-        avgConfidence: number;
+    provider?: string;
+    metrics?: {
+        uptime?: number;
+        reliabilityScore?: number;
+        successRate?: number;
+        avgResponseTime?: number;
+        dataQualityScore?: number;
+        totalRequests?: number;
+        failedRequests?: number;
+        avgConfidence?: number;
     };
-    historical: {
-        "24h": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+    historical?: {
+        "24h"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
-        "7d": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+        "7d"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
-        "30d": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+        "30d"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
     };
-    lastUpdated: number;
+    lastUpdated?: number;
 }, {
-    provider: string;
-    metrics: {
-        uptime: number;
-        reliabilityScore: number;
-        successRate: number;
-        avgResponseTime: number;
-        dataQualityScore: number;
-        totalRequests: number;
-        failedRequests: number;
-        avgConfidence: number;
+    provider?: string;
+    metrics?: {
+        uptime?: number;
+        reliabilityScore?: number;
+        successRate?: number;
+        avgResponseTime?: number;
+        dataQualityScore?: number;
+        totalRequests?: number;
+        failedRequests?: number;
+        avgConfidence?: number;
     };
-    historical: {
-        "24h": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+    historical?: {
+        "24h"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
-        "7d": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+        "7d"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
-        "30d": {
-            successRate: number;
-            avgResponseTime: number;
-            requestCount: number;
+        "30d"?: {
+            successRate?: number;
+            avgResponseTime?: number;
+            requestCount?: number;
         };
     };
-    lastUpdated: number;
+    lastUpdated?: number;
 }>;
 export type OraclePerformance = z.infer<typeof OraclePerformanceSchema>;
 /**

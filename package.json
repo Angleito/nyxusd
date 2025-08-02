@@ -5,7 +5,10 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "libs/*"
+    "libs/*",
+    "packages/cdp-core",
+    "packages/cdp-adapters",
+    "packages/cdp-sdk"
   ],
   "scripts": {
     "build": "tsc --build",

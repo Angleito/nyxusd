@@ -36,6 +36,9 @@
       "@nyxusd/functional-utils": ["libs/functional-utils/src/index.ts"],
       "@nyxusd/fp-utils": ["libs/fp-utils/src/index.ts"],
       "@nyxusd/cdp-engine": ["packages/cdp-engine/src/index.ts"],
+"@nyxusd/cdp-core": ["packages/cdp-core/src/index.ts"],
+"@nyxusd/cdp-adapters": ["packages/cdp-adapters/src/index.ts"],
+"@nyxusd/cdp-sdk": ["packages/cdp-sdk/src/index.ts"],
       "@nyxusd/oracle-service": ["packages/oracle-service/src/index.ts"],
       "@nyxusd/liquidation-engine": [
         "packages/liquidation-engine/src/index.ts"

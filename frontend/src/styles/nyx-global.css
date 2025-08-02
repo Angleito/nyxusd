@@ -31,6 +31,14 @@ body {
   line-height: 1.6;
 }
 
+/* Fix text overflow in chat messages */
+.chat-message-content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
 /* Override Tailwind defaults with NYX colors */
 :root {
   /* Map Tailwind-like colors to NYX palette */

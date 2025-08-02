@@ -21,38 +21,38 @@ export declare const ChainlinkOracleConfigSchema: z.ZodObject<{
         delayMs: z.ZodDefault<z.ZodNumber>;
         backoffMultiplier: z.ZodDefault<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
-        maxAttempts: number;
-        delayMs: number;
-        backoffMultiplier: number;
+        maxAttempts?: number;
+        delayMs?: number;
+        backoffMultiplier?: number;
     }, {
-        maxAttempts?: number | undefined;
-        delayMs?: number | undefined;
-        backoffMultiplier?: number | undefined;
+        maxAttempts?: number;
+        delayMs?: number;
+        backoffMultiplier?: number;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    network: string;
-    defaultTimeout: number;
-    defaultMaxStaleness: number;
-    defaultMinConfidence: number;
-    cacheTtl: number;
-    retry: {
-        maxAttempts: number;
-        delayMs: number;
-        backoffMultiplier: number;
-    };
     provider?: any;
-}, {
-    network: string;
-    provider?: any;
-    defaultTimeout?: number | undefined;
-    defaultMaxStaleness?: number | undefined;
-    defaultMinConfidence?: number | undefined;
-    cacheTtl?: number | undefined;
+    network?: string;
+    defaultTimeout?: number;
+    defaultMaxStaleness?: number;
+    defaultMinConfidence?: number;
+    cacheTtl?: number;
     retry?: {
-        maxAttempts?: number | undefined;
-        delayMs?: number | undefined;
-        backoffMultiplier?: number | undefined;
-    } | undefined;
+        maxAttempts?: number;
+        delayMs?: number;
+        backoffMultiplier?: number;
+    };
+}, {
+    provider?: any;
+    network?: string;
+    defaultTimeout?: number;
+    defaultMaxStaleness?: number;
+    defaultMinConfidence?: number;
+    cacheTtl?: number;
+    retry?: {
+        maxAttempts?: number;
+        delayMs?: number;
+        backoffMultiplier?: number;
+    };
 }>;
 export type ChainlinkOracleConfig = z.infer<typeof ChainlinkOracleConfigSchema>;
 /**

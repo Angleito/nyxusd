@@ -10,8 +10,22 @@ import oracleRoutes from "./routes/oracle";
 import aiRoutes from "./routes/ai";
 import enhancedAIRoutes from "./routes/enhancedAI";
 
-// Import CDP operations (mock for now since we need to resolve import paths)
-// import * as CDPOperations from '@nyxusd/core';
+// Import CDP operations
+import { NyxUSD_CDP_SDK, CDPCreationParams, CDP } from '@nyxusd/cdp-sdk';
+
+// Initialize CDP SDK with default configuration
+const cdpSDK = new NyxUSD_CDP_SDK({
+  chain: process.env.DEFAULT_CHAIN || 'ethereum',
+  config: {
+    chainId: parseInt(process.env.CHAIN_ID || '1'),
+    rpcUrl: process.env.RPC_URL || 'https://mainnet.infura.io/v3/demo',
+    contracts: {
+      cdpManager: process.env.CDP_MANAGER_CONTRACT || '0x0000000000000000000000000000000000000001',
+      nyxUSD: process.env.NYXUSD_CONTRACT || '0x0000000000000000000000000000000000000002',
+      oracle: process.env.ORACLE_CONTRACT || '0x0000000000000000000000000000000000000003',
+    }
+  }
+});
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -61,121 +75,288 @@ app.get("/api/health", (req, res) => {
 });
 
 // CDP operations endpoints
-app.get("/api/cdp", (req, res) => {
-  // Mock CDP data for demonstration
-  res.json({
-    cdps: [
-      {
-        id: "cdp_001",
-        owner: "0x742d35Cc6634C0532925a3b8D",
-        collateralType: "WETH",
-        collateralAmount: "2500000000000000000", // 2.5 ETH
-        debtAmount: "3000000000000000000000", // 3000 DAI
-        collateralizationRatio: 150,
-        healthFactor: 1.5,
-        status: "active",
-        createdAt: "2024-01-15T10:30:00Z",
-        lastUpdated: "2024-01-15T10:30:00Z",
-      },
-      {
-        id: "cdp_002",
-        owner: "0x8ba1f109551bD432803012645Hac136c",
-        collateralType: "WBTC",
-        collateralAmount: "50000000", // 0.5 BTC
-        debtAmount: "15000000000000000000000", // 15000 DAI
-        collateralizationRatio: 200,
-        healthFactor: 2.0,
-        status: "active",
-        createdAt: "2024-01-14T15:45:00Z",
-        lastUpdated: "2024-01-15T08:20:00Z",
-      },
-    ],
-    totalCDPs: 2,
-    totalCollateralValue: "95000000000000000000000", // $95,000
-    totalDebtIssued: "18000000000000000000000", // $18,000
-  });
+app.get("/api/cdp", async (req, res) => {
+  try {
+    // Get system stats from the CDP SDK
+    const statsResult = await cdpSDK.getSystemStats();
+    
+    if (!statsResult.success) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch CDP system stats",
+        error: statsResult.error
+      });
+    }
+    
+    // Get CDPs by owner if owner parameter is provided
+    const { owner } = req.query;
+    let cdpData: CDP[] = [];
+    
+    if (owner && typeof owner === 'string') {
+      const ownerResult = await cdpSDK.getCDPsByOwner(owner);
+      if (ownerResult.success) {
+        cdpData = ownerResult.data;
+      }
+    }
+    
+    res.json({
+      cdps: cdpData,
+      totalCDPs: statsResult.data.totalCDPs,
+      totalCollateralValue: statsResult.data.totalCollateral,
+      totalDebtIssued: statsResult.data.totalDebt,
+      ...statsResult.data
+    });
+  } catch (error) {
+    console.error("CDP API Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
 });
 
-app.post("/api/cdp/create", (req, res) => {
-  const { collateralType, collateralAmount, debtAmount, owner } = req.body;
+app.post("/api/cdp/create", async (req, res) => {
+  try {
+    const { collateralType, collateralAmount, debtAmount, owner } = req.body;
 
-  // Mock CDP creation
-  const newCDP = {
-    id: `cdp_${Date.now()}`,
-    owner,
-    collateralType,
-    collateralAmount,
-    debtAmount,
-    collateralizationRatio: Math.floor(
-      ((parseInt(collateralAmount) * 2000) / parseInt(debtAmount)) * 100,
-    ), // Mock ratio
-    healthFactor: 1.8,
-    status: "active",
-    createdAt: new Date().toISOString(),
-    lastUpdated: new Date().toISOString(),
-  };
+    // Validate required parameters
+    if (!collateralType || !collateralAmount || !debtAmount || !owner) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required parameters",
+        required: ["collateralType", "collateralAmount", "debtAmount", "owner"]
+      });
+    }
 
-  res.status(201).json({
-    success: true,
-    cdp: newCDP,
-    message: "CDP created successfully",
-  });
+    // Create CDP using the SDK
+    // Note: In a real implementation, you would need to provide proper config values
+    const creationParams: CDPCreationParams = {
+      owner,
+      collateralType,
+      collateralAmount: BigInt(collateralAmount),
+      debtAmount: BigInt(debtAmount),
+      config: {
+        minCollateralizationRatio: 15000, // 150%
+        liquidationRatio: 13000, // 130%
+        stabilityFeeRate: 0.05, // 5% annual
+        liquidationPenalty: 0.1, // 10%
+        debtCeiling: BigInt("1000000000000000000000000"), // 1M NYXUSD
+        minDebtAmount: BigInt("100000000000000000000"), // 100 NYXUSD
+      }
+    };
+
+    const result = await cdpSDK.createCDP(creationParams);
+
+    if (result.success) {
+      res.status(201).json({
+        success: true,
+        cdp: result.data,
+        message: "CDP created successfully",
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "CDP creation failed",
+        error: result.error,
+      });
+    }
+  } catch (error) {
+    console.error("CDP Creation Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
 });
 
-app.post("/api/cdp/:id/deposit", (req, res) => {
-  const { id } = req.params;
-  const { amount } = req.body;
+app.post("/api/cdp/:id/deposit", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount } = req.body;
 
-  res.json({
-    success: true,
-    cdpId: id,
-    depositAmount: amount,
-    newCollateralAmount: "3000000000000000000", // Mock new amount
-    newHealthFactor: 2.1,
-    message: "Collateral deposited successfully",
-  });
+    // Validate required parameters
+    if (!amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required parameter: amount"
+      });
+    }
+
+    // In a real implementation, you would need to provide proper deposit parameters
+    // For now, we'll mock the deposit operation
+    const result = await cdpSDK.depositCollateral({
+      cdpId: id,
+      depositAmount: BigInt(amount),
+      // Additional parameters would be required in a real implementation
+    });
+
+    if (result.success) {
+      res.json({
+        success: true,
+        cdpId: id,
+        depositAmount: amount,
+        ...result.data,
+        message: "Collateral deposited successfully",
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        cdpId: id,
+        message: "Collateral deposit failed",
+        error: result.error,
+      });
+    }
+  } catch (error) {
+    console.error("CDP Deposit Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
 });
 
-app.post("/api/cdp/:id/withdraw", (req, res) => {
-  const { id } = req.params;
-  const { amount } = req.body;
+app.post("/api/cdp/:id/withdraw", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount } = req.body;
 
-  res.json({
-    success: true,
-    cdpId: id,
-    withdrawAmount: amount,
-    newCollateralAmount: "2000000000000000000", // Mock new amount
-    newHealthFactor: 1.3,
-    message: "Collateral withdrawn successfully",
-  });
+    // Validate required parameters
+    if (!amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required parameter: amount"
+      });
+    }
+
+    // In a real implementation, you would need to provide proper withdrawal parameters
+    // For now, we'll mock the withdrawal operation
+    const result = await cdpSDK.withdrawCollateral({
+      cdpId: id,
+      withdrawAmount: BigInt(amount),
+      // Additional parameters would be required in a real implementation
+    });
+
+    if (result.success) {
+      res.json({
+        success: true,
+        cdpId: id,
+        withdrawAmount: amount,
+        ...result.data,
+        message: "Collateral withdrawn successfully",
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        cdpId: id,
+        message: "Collateral withdrawal failed",
+        error: result.error,
+      });
+    }
+  } catch (error) {
+    console.error("CDP Withdraw Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
 });
 
-app.post("/api/cdp/:id/mint", (req, res) => {
-  const { id } = req.params;
-  const { amount } = req.body;
+app.post("/api/cdp/:id/mint", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount } = req.body;
 
-  res.json({
-    success: true,
-    cdpId: id,
-    mintAmount: amount,
-    newDebtAmount: "4000000000000000000000", // Mock new debt
-    newHealthFactor: 1.25,
-    message: "nyxUSD minted successfully",
-  });
+    // Validate required parameters
+    if (!amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required parameter: amount"
+      });
+    }
+
+    // In a real implementation, you would need to provide proper mint parameters
+    // For now, we'll mock the mint operation
+    const result = await cdpSDK.mintDebt({
+      cdpId: id,
+      mintAmount: BigInt(amount),
+      // Additional parameters would be required in a real implementation
+    });
+
+    if (result.success) {
+      res.json({
+        success: true,
+        cdpId: id,
+        mintAmount: amount,
+        ...result.data,
+        message: "nyxUSD minted successfully",
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        cdpId: id,
+        message: "nyxUSD minting failed",
+        error: result.error,
+      });
+    }
+  } catch (error) {
+    console.error("CDP Mint Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
 });
 
-app.post("/api/cdp/:id/burn", (req, res) => {
-  const { id } = req.params;
-  const { amount } = req.body;
+app.post("/api/cdp/:id/burn", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount } = req.body;
 
-  res.json({
-    success: true,
-    cdpId: id,
-    burnAmount: amount,
-    newDebtAmount: "2000000000000000000000", // Mock new debt
-    newHealthFactor: 1.75,
-    message: "nyxUSD burned successfully",
-  });
+    // Validate required parameters
+    if (!amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required parameter: amount"
+      });
+    }
+
+    // In a real implementation, you would need to provide proper burn parameters
+    // For now, we'll mock the burn operation
+    const result = await cdpSDK.burnDebt({
+      cdpId: id,
+      burnAmount: BigInt(amount),
+      // Additional parameters would be required in a real implementation
+    });
+
+    if (result.success) {
+      res.json({
+        success: true,
+        cdpId: id,
+        burnAmount: amount,
+        ...result.data,
+        message: "nyxUSD burned successfully",
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        cdpId: id,
+        message: "nyxUSD burning failed",
+        error: result.error,
+      });
+    }
+  } catch (error) {
+    console.error("CDP Burn Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
 });
 
 // Oracle routes

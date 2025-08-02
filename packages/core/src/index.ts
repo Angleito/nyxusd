@@ -9,7 +9,7 @@
  */
 
 // Export all CDP-related types
-export * from "./types/cdp";
+export * from "@nyxusd/cdp-core";
 
 // Export all collateral-related types
 export * from "./types/collateral";

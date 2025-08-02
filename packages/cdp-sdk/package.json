@@ -1,0 +1,28 @@
+{
+  "name": "@nyxusd/cdp-sdk",
+  "version": "1.0.0",
+  "description": "Unified SDK for NyxUSD CDP operations across multiple blockchains",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "cdp",
+    "sdk",
+    "stablecoin",
+    "defi",
+    "multichain"
+  ],
+  "author": "NYXUSD Team",
+  "license": "MIT",
+  "dependencies": {
+    "@nyxusd/cdp-core": "^1.0.0",
+    "@nyxusd/cdp-adapters": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6"
+  }
+}

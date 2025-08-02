@@ -20,17 +20,17 @@ export declare const ChainlinkRoundDataSchema: z.ZodObject<{
     /** Round ID that was answered */
     answeredInRound: z.ZodBigInt;
 }, "strip", z.ZodTypeAny, {
-    roundId: bigint;
-    answer: bigint;
-    startedAt: bigint;
-    updatedAt: bigint;
-    answeredInRound: bigint;
+    roundId?: bigint;
+    answer?: bigint;
+    startedAt?: bigint;
+    updatedAt?: bigint;
+    answeredInRound?: bigint;
 }, {
-    roundId: bigint;
-    answer: bigint;
-    startedAt: bigint;
-    updatedAt: bigint;
-    answeredInRound: bigint;
+    roundId?: bigint;
+    answer?: bigint;
+    startedAt?: bigint;
+    updatedAt?: bigint;
+    answeredInRound?: bigint;
 }>;
 export type ChainlinkRoundData = z.infer<typeof ChainlinkRoundDataSchema>;
 /**
@@ -50,19 +50,19 @@ export declare const ChainlinkFeedMetadataSchema: z.ZodObject<{
     /** Deviation threshold percentage */
     deviation: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    deviation: number;
-    decimals: number;
-    description: string;
-    address: string;
-    heartbeat: number;
-    version: number;
+    deviation?: number;
+    decimals?: number;
+    description?: string;
+    address?: string;
+    heartbeat?: number;
+    version?: number;
 }, {
-    deviation: number;
-    decimals: number;
-    description: string;
-    address: string;
-    heartbeat: number;
-    version: number;
+    deviation?: number;
+    decimals?: number;
+    description?: string;
+    address?: string;
+    heartbeat?: number;
+    version?: number;
 }>;
 export type ChainlinkFeedMetadata = z.infer<typeof ChainlinkFeedMetadataSchema>;
 /**
@@ -80,17 +80,17 @@ export declare const ChainlinkNetworkConfigSchema: z.ZodObject<{
     /** Whether this is a testnet */
     isTestnet: z.ZodBoolean;
 }, "strip", z.ZodTypeAny, {
-    name: string;
-    chainId: number;
-    rpcUrl: string;
-    isTestnet: boolean;
-    explorerUrl?: string | undefined;
+    name?: string;
+    chainId?: number;
+    rpcUrl?: string;
+    explorerUrl?: string;
+    isTestnet?: boolean;
 }, {
-    name: string;
-    chainId: number;
-    rpcUrl: string;
-    isTestnet: boolean;
-    explorerUrl?: string | undefined;
+    name?: string;
+    chainId?: number;
+    rpcUrl?: string;
+    explorerUrl?: string;
+    isTestnet?: boolean;
 }>;
 export type ChainlinkNetworkConfig = z.infer<typeof ChainlinkNetworkConfigSchema>;
 /**
@@ -110,19 +110,19 @@ export declare const ChainlinkFeedAddressesSchema: z.ZodObject<{
     /** Avalanche */
     avalanche: z.ZodRecord<z.ZodString, z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    ethereum: Record<string, string>;
-    polygon: Record<string, string>;
-    arbitrum: Record<string, string>;
-    optimism: Record<string, string>;
-    bsc: Record<string, string>;
-    avalanche: Record<string, string>;
+    ethereum?: Record<string, string>;
+    polygon?: Record<string, string>;
+    arbitrum?: Record<string, string>;
+    optimism?: Record<string, string>;
+    bsc?: Record<string, string>;
+    avalanche?: Record<string, string>;
 }, {
-    ethereum: Record<string, string>;
-    polygon: Record<string, string>;
-    arbitrum: Record<string, string>;
-    optimism: Record<string, string>;
-    bsc: Record<string, string>;
-    avalanche: Record<string, string>;
+    ethereum?: Record<string, string>;
+    polygon?: Record<string, string>;
+    arbitrum?: Record<string, string>;
+    optimism?: Record<string, string>;
+    bsc?: Record<string, string>;
+    avalanche?: Record<string, string>;
 }>;
 export type ChainlinkFeedAddresses = z.infer<typeof ChainlinkFeedAddressesSchema>;
 /**
@@ -143,19 +143,19 @@ export declare const ChainlinkFunctionRequestSchema: z.ZodObject<{
     /** Gas limit for the request */
     gasLimit: z.ZodOptional<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
-    source: string;
-    args?: string[] | undefined;
-    secretsLocation?: "inline" | "remote" | undefined;
-    secrets?: Record<string, string> | undefined;
-    donId?: string | undefined;
-    gasLimit?: number | undefined;
+    source?: string;
+    args?: string[];
+    secretsLocation?: "inline" | "remote";
+    secrets?: Record<string, string>;
+    donId?: string;
+    gasLimit?: number;
 }, {
-    source: string;
-    args?: string[] | undefined;
-    secretsLocation?: "inline" | "remote" | undefined;
-    secrets?: Record<string, string> | undefined;
-    donId?: string | undefined;
-    gasLimit?: number | undefined;
+    source?: string;
+    args?: string[];
+    secretsLocation?: "inline" | "remote";
+    secrets?: Record<string, string>;
+    donId?: string;
+    gasLimit?: number;
 }>;
 export type ChainlinkFunctionRequest = z.infer<typeof ChainlinkFunctionRequestSchema>;
 /** Chainlink Functions response */
@@ -171,17 +171,17 @@ export declare const ChainlinkFunctionResponseSchema: z.ZodObject<{
     /** Response timestamp */
     timestamp: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    timestamp: number;
-    requestId: string;
+    timestamp?: number;
     data?: unknown;
-    error?: string | undefined;
-    gasUsed?: number | undefined;
+    error?: string;
+    requestId?: string;
+    gasUsed?: number;
 }, {
-    timestamp: number;
-    requestId: string;
+    timestamp?: number;
     data?: unknown;
-    error?: string | undefined;
-    gasUsed?: number | undefined;
+    error?: string;
+    requestId?: string;
+    gasUsed?: number;
 }>;
 export type ChainlinkFunctionResponse = z.infer<typeof ChainlinkFunctionResponseSchema>;
 /**
@@ -196,15 +196,15 @@ export declare const AIRiskAssessmentRequestSchema: z.ZodObject<{
         marketCap: z.ZodOptional<z.ZodString>;
         volume24h: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        symbol: string;
-        address?: string | undefined;
-        marketCap?: string | undefined;
-        volume24h?: string | undefined;
+        symbol?: string;
+        address?: string;
+        marketCap?: string;
+        volume24h?: string;
     }, {
-        symbol: string;
-        address?: string | undefined;
-        marketCap?: string | undefined;
-        volume24h?: string | undefined;
+        symbol?: string;
+        address?: string;
+        marketCap?: string;
+        volume24h?: string;
     }>;
     /** Current position data */
     position: z.ZodObject<{
@@ -212,13 +212,13 @@ export declare const AIRiskAssessmentRequestSchema: z.ZodObject<{
         debtAmount: z.ZodString;
         collateralizationRatio: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        collateralAmount: string;
-        debtAmount: string;
-        collateralizationRatio: number;
+        collateralAmount?: string;
+        debtAmount?: string;
+        collateralizationRatio?: number;
     }, {
-        collateralAmount: string;
-        debtAmount: string;
-        collateralizationRatio: number;
+        collateralAmount?: string;
+        debtAmount?: string;
+        collateralizationRatio?: number;
     }>;
     /** Market context */
     market: z.ZodObject<{
@@ -227,15 +227,15 @@ export declare const AIRiskAssessmentRequestSchema: z.ZodObject<{
         liquidityScore: z.ZodOptional<z.ZodNumber>;
         correlationData: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>;
     }, "strip", z.ZodTypeAny, {
-        currentPrice: string;
-        volatility24h?: number | undefined;
-        liquidityScore?: number | undefined;
-        correlationData?: Record<string, number> | undefined;
+        currentPrice?: string;
+        volatility24h?: number;
+        liquidityScore?: number;
+        correlationData?: Record<string, number>;
     }, {
-        currentPrice: string;
-        volatility24h?: number | undefined;
-        liquidityScore?: number | undefined;
-        correlationData?: Record<string, number> | undefined;
+        currentPrice?: string;
+        volatility24h?: number;
+        liquidityScore?: number;
+        correlationData?: Record<string, number>;
     }>;
     /** Analysis parameters */
     parameters: z.ZodObject<{
@@ -243,59 +243,59 @@ export declare const AIRiskAssessmentRequestSchema: z.ZodObject<{
         confidenceLevel: z.ZodDefault<z.ZodNumber>;
         stressTestScenarios: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
-        timeHorizon: "1h" | "24h" | "7d" | "30d";
-        confidenceLevel: number;
-        stressTestScenarios?: string[] | undefined;
+        timeHorizon?: "1h" | "24h" | "7d" | "30d";
+        confidenceLevel?: number;
+        stressTestScenarios?: string[];
     }, {
-        timeHorizon?: "1h" | "24h" | "7d" | "30d" | undefined;
-        confidenceLevel?: number | undefined;
-        stressTestScenarios?: string[] | undefined;
+        timeHorizon?: "1h" | "24h" | "7d" | "30d";
+        confidenceLevel?: number;
+        stressTestScenarios?: string[];
     }>;
 }, "strip", z.ZodTypeAny, {
-    asset: {
-        symbol: string;
-        address?: string | undefined;
-        marketCap?: string | undefined;
-        volume24h?: string | undefined;
+    asset?: {
+        symbol?: string;
+        address?: string;
+        marketCap?: string;
+        volume24h?: string;
     };
-    position: {
-        collateralAmount: string;
-        debtAmount: string;
-        collateralizationRatio: number;
+    position?: {
+        collateralAmount?: string;
+        debtAmount?: string;
+        collateralizationRatio?: number;
     };
-    market: {
-        currentPrice: string;
-        volatility24h?: number | undefined;
-        liquidityScore?: number | undefined;
-        correlationData?: Record<string, number> | undefined;
+    market?: {
+        currentPrice?: string;
+        volatility24h?: number;
+        liquidityScore?: number;
+        correlationData?: Record<string, number>;
     };
-    parameters: {
-        timeHorizon: "1h" | "24h" | "7d" | "30d";
-        confidenceLevel: number;
-        stressTestScenarios?: string[] | undefined;
+    parameters?: {
+        timeHorizon?: "1h" | "24h" | "7d" | "30d";
+        confidenceLevel?: number;
+        stressTestScenarios?: string[];
     };
 }, {
-    asset: {
-        symbol: string;
-        address?: string | undefined;
-        marketCap?: string | undefined;
-        volume24h?: string | undefined;
+    asset?: {
+        symbol?: string;
+        address?: string;
+        marketCap?: string;
+        volume24h?: string;
     };
-    position: {
-        collateralAmount: string;
-        debtAmount: string;
-        collateralizationRatio: number;
+    position?: {
+        collateralAmount?: string;
+        debtAmount?: string;
+        collateralizationRatio?: number;
     };
-    market: {
-        currentPrice: string;
-        volatility24h?: number | undefined;
-        liquidityScore?: number | undefined;
-        correlationData?: Record<string, number> | undefined;
+    market?: {
+        currentPrice?: string;
+        volatility24h?: number;
+        liquidityScore?: number;
+        correlationData?: Record<string, number>;
     };
-    parameters: {
-        timeHorizon?: "1h" | "24h" | "7d" | "30d" | undefined;
-        confidenceLevel?: number | undefined;
-        stressTestScenarios?: string[] | undefined;
+    parameters?: {
+        timeHorizon?: "1h" | "24h" | "7d" | "30d";
+        confidenceLevel?: number;
+        stressTestScenarios?: string[];
     };
 }>;
 export type AIRiskAssessmentRequest = z.infer<typeof AIRiskAssessmentRequestSchema>;
@@ -312,15 +312,15 @@ export declare const AIRiskAssessmentResponseSchema: z.ZodObject<{
         probability: z.ZodNumber;
         description: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        description: string;
-        factor: string;
-        impact: "low" | "medium" | "high";
-        probability: number;
+        description?: string;
+        factor?: string;
+        impact?: "low" | "medium" | "high";
+        probability?: number;
     }, {
-        description: string;
-        factor: string;
-        impact: "low" | "medium" | "high";
-        probability: number;
+        description?: string;
+        factor?: string;
+        impact?: "low" | "medium" | "high";
+        probability?: number;
     }>, "many">;
     /** Recommended actions */
     recommendations: z.ZodArray<z.ZodObject<{
@@ -328,13 +328,13 @@ export declare const AIRiskAssessmentResponseSchema: z.ZodObject<{
         priority: z.ZodEnum<["low", "medium", "high"]>;
         rationale: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        priority: "low" | "medium" | "high";
-        action: string;
-        rationale: string;
+        priority?: "low" | "medium" | "high";
+        action?: string;
+        rationale?: string;
     }, {
-        priority: "low" | "medium" | "high";
-        action: string;
-        rationale: string;
+        priority?: "low" | "medium" | "high";
+        action?: string;
+        rationale?: string;
     }>, "many">;
     /** Market sentiment analysis */
     sentiment: z.ZodObject<{
@@ -342,13 +342,13 @@ export declare const AIRiskAssessmentResponseSchema: z.ZodObject<{
         score: z.ZodNumber;
         sources: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
-        score: number;
-        overall: "bearish" | "neutral" | "bullish";
-        sources?: string[] | undefined;
+        sources?: string[];
+        score?: number;
+        overall?: "bearish" | "neutral" | "bullish";
     }, {
-        score: number;
-        overall: "bearish" | "neutral" | "bullish";
-        sources?: string[] | undefined;
+        sources?: string[];
+        score?: number;
+        overall?: "bearish" | "neutral" | "bullish";
     }>;
     /** Liquidation probability */
     liquidationProbability: z.ZodObject<{
@@ -356,13 +356,13 @@ export declare const AIRiskAssessmentResponseSchema: z.ZodObject<{
         "24h": z.ZodNumber;
         "7d": z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        "1h": number;
-        "24h": number;
-        "7d": number;
+        "1h"?: number;
+        "24h"?: number;
+        "7d"?: number;
     }, {
-        "1h": number;
-        "24h": number;
-        "7d": number;
+        "1h"?: number;
+        "24h"?: number;
+        "7d"?: number;
     }>;
     /** Response metadata */
     metadata: z.ZodObject<{
@@ -371,75 +371,75 @@ export declare const AIRiskAssessmentResponseSchema: z.ZodObject<{
         timestamp: z.ZodNumber;
         dataQuality: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        timestamp: number;
-        model: string;
-        processingTime: number;
-        dataQuality: number;
+        timestamp?: number;
+        model?: string;
+        processingTime?: number;
+        dataQuality?: number;
     }, {
-        timestamp: number;
-        model: string;
-        processingTime: number;
-        dataQuality: number;
+        timestamp?: number;
+        model?: string;
+        processingTime?: number;
+        dataQuality?: number;
     }>;
 }, "strip", z.ZodTypeAny, {
-    confidence: number;
-    metadata: {
-        timestamp: number;
-        model: string;
-        processingTime: number;
-        dataQuality: number;
+    confidence?: number;
+    metadata?: {
+        timestamp?: number;
+        model?: string;
+        processingTime?: number;
+        dataQuality?: number;
     };
-    riskScore: number;
-    riskFactors: {
-        description: string;
-        factor: string;
-        impact: "low" | "medium" | "high";
-        probability: number;
+    riskScore?: number;
+    riskFactors?: {
+        description?: string;
+        factor?: string;
+        impact?: "low" | "medium" | "high";
+        probability?: number;
     }[];
-    recommendations: {
-        priority: "low" | "medium" | "high";
-        action: string;
-        rationale: string;
+    recommendations?: {
+        priority?: "low" | "medium" | "high";
+        action?: string;
+        rationale?: string;
     }[];
-    sentiment: {
-        score: number;
-        overall: "bearish" | "neutral" | "bullish";
-        sources?: string[] | undefined;
+    sentiment?: {
+        sources?: string[];
+        score?: number;
+        overall?: "bearish" | "neutral" | "bullish";
     };
-    liquidationProbability: {
-        "1h": number;
-        "24h": number;
-        "7d": number;
+    liquidationProbability?: {
+        "1h"?: number;
+        "24h"?: number;
+        "7d"?: number;
     };
 }, {
-    confidence: number;
-    metadata: {
-        timestamp: number;
-        model: string;
-        processingTime: number;
-        dataQuality: number;
+    confidence?: number;
+    metadata?: {
+        timestamp?: number;
+        model?: string;
+        processingTime?: number;
+        dataQuality?: number;
     };
-    riskScore: number;
-    riskFactors: {
-        description: string;
-        factor: string;
-        impact: "low" | "medium" | "high";
-        probability: number;
+    riskScore?: number;
+    riskFactors?: {
+        description?: string;
+        factor?: string;
+        impact?: "low" | "medium" | "high";
+        probability?: number;
     }[];
-    recommendations: {
-        priority: "low" | "medium" | "high";
-        action: string;
-        rationale: string;
+    recommendations?: {
+        priority?: "low" | "medium" | "high";
+        action?: string;
+        rationale?: string;
     }[];
-    sentiment: {
-        score: number;
-        overall: "bearish" | "neutral" | "bullish";
-        sources?: string[] | undefined;
+    sentiment?: {
+        sources?: string[];
+        score?: number;
+        overall?: "bearish" | "neutral" | "bullish";
     };
-    liquidationProbability: {
-        "1h": number;
-        "24h": number;
-        "7d": number;
+    liquidationProbability?: {
+        "1h"?: number;
+        "24h"?: number;
+        "7d"?: number;
     };
 }>;
 export type AIRiskAssessmentResponse = z.infer<typeof AIRiskAssessmentResponseSchema>;
@@ -463,29 +463,29 @@ export declare const MultiProviderConfigSchema: z.ZodObject<{
         /** Provider-specific settings */
         settings: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     }, "strip", z.ZodTypeAny, {
-        endpoint?: string | undefined;
-        apiKey?: string | undefined;
-        settings?: Record<string, unknown> | undefined;
+        endpoint?: string;
+        apiKey?: string;
+        settings?: Record<string, unknown>;
     }, {
-        endpoint?: string | undefined;
-        apiKey?: string | undefined;
-        settings?: Record<string, unknown> | undefined;
+        endpoint?: string;
+        apiKey?: string;
+        settings?: Record<string, unknown>;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    primary: "chainlink" | "band" | "dia" | "pyth" | "tellor" | "api3" | "switchboard";
-    fallbacks: ("chainlink" | "band" | "dia" | "pyth" | "tellor" | "api3" | "switchboard")[];
-    configs: Record<string, {
-        endpoint?: string | undefined;
-        apiKey?: string | undefined;
-        settings?: Record<string, unknown> | undefined;
+    primary?: "chainlink" | "band" | "dia" | "pyth" | "tellor" | "api3" | "switchboard";
+    fallbacks?: ("chainlink" | "band" | "dia" | "pyth" | "tellor" | "api3" | "switchboard")[];
+    configs?: Record<string, {
+        endpoint?: string;
+        apiKey?: string;
+        settings?: Record<string, unknown>;
     }>;
 }, {
-    primary: "chainlink" | "band" | "dia" | "pyth" | "tellor" | "api3" | "switchboard";
-    fallbacks: ("chainlink" | "band" | "dia" | "pyth" | "tellor" | "api3" | "switchboard")[];
-    configs: Record<string, {
-        endpoint?: string | undefined;
-        apiKey?: string | undefined;
-        settings?: Record<string, unknown> | undefined;
+    primary?: "chainlink" | "band" | "dia" | "pyth" | "tellor" | "api3" | "switchboard";
+    fallbacks?: ("chainlink" | "band" | "dia" | "pyth" | "tellor" | "api3" | "switchboard")[];
+    configs?: Record<string, {
+        endpoint?: string;
+        apiKey?: string;
+        settings?: Record<string, unknown>;
     }>;
 }>;
 export type MultiProviderConfig = z.infer<typeof MultiProviderConfigSchema>;
@@ -501,13 +501,13 @@ export declare const HistoricalPriceDataSchema: z.ZodObject<{
         price: z.ZodString;
         volume: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        timestamp: number;
-        price: string;
-        volume?: string | undefined;
+        timestamp?: number;
+        price?: string;
+        volume?: string;
     }, {
-        timestamp: number;
-        price: string;
-        volume?: string | undefined;
+        timestamp?: number;
+        price?: string;
+        volume?: string;
     }>, "many">;
     /** Time range */
     timeRange: z.ZodObject<{
@@ -515,37 +515,37 @@ export declare const HistoricalPriceDataSchema: z.ZodObject<{
         end: z.ZodNumber;
         interval: z.ZodEnum<["1m", "5m", "15m", "1h", "4h", "1d"]>;
     }, "strip", z.ZodTypeAny, {
-        start: number;
-        end: number;
-        interval: "1h" | "1m" | "5m" | "15m" | "4h" | "1d";
+        start?: number;
+        end?: number;
+        interval?: "1h" | "1m" | "5m" | "15m" | "4h" | "1d";
     }, {
-        start: number;
-        end: number;
-        interval: "1h" | "1m" | "5m" | "15m" | "4h" | "1d";
+        start?: number;
+        end?: number;
+        interval?: "1h" | "1m" | "5m" | "15m" | "4h" | "1d";
     }>;
 }, "strip", z.ZodTypeAny, {
-    feedId: string;
-    prices: {
-        timestamp: number;
-        price: string;
-        volume?: string | undefined;
+    feedId?: string;
+    prices?: {
+        timestamp?: number;
+        price?: string;
+        volume?: string;
     }[];
-    timeRange: {
-        start: number;
-        end: number;
-        interval: "1h" | "1m" | "5m" | "15m" | "4h" | "1d";
+    timeRange?: {
+        start?: number;
+        end?: number;
+        interval?: "1h" | "1m" | "5m" | "15m" | "4h" | "1d";
     };
 }, {
-    feedId: string;
-    prices: {
-        timestamp: number;
-        price: string;
-        volume?: string | undefined;
+    feedId?: string;
+    prices?: {
+        timestamp?: number;
+        price?: string;
+        volume?: string;
     }[];
-    timeRange: {
-        start: number;
-        end: number;
-        interval: "1h" | "1m" | "5m" | "15m" | "4h" | "1d";
+    timeRange?: {
+        start?: number;
+        end?: number;
+        interval?: "1h" | "1m" | "5m" | "15m" | "4h" | "1d";
     };
 }>;
 export type HistoricalPriceData = z.infer<typeof HistoricalPriceDataSchema>;
@@ -569,75 +569,75 @@ export declare const VolatilityAnalysisSchema: z.ZodObject<{
             "99%": z.ZodNumber;
             "99.9%": z.ZodNumber;
         }, "strip", z.ZodTypeAny, {
-            "95%": number;
-            "99%": number;
-            "99.9%": number;
+            "95%"?: number;
+            "99%"?: number;
+            "99.9%"?: number;
         }, {
-            "95%": number;
-            "99%": number;
-            "99.9%": number;
+            "95%"?: number;
+            "99%"?: number;
+            "99.9%"?: number;
         }>;
         /** Maximum drawdown */
         maxDrawdown: z.ZodNumber;
         /** Sharpe ratio */
         sharpeRatio: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
-        standardDeviation: number;
-        variance: number;
-        valueAtRisk: {
-            "95%": number;
-            "99%": number;
-            "99.9%": number;
+        standardDeviation?: number;
+        variance?: number;
+        valueAtRisk?: {
+            "95%"?: number;
+            "99%"?: number;
+            "99.9%"?: number;
         };
-        maxDrawdown: number;
-        sharpeRatio?: number | undefined;
+        maxDrawdown?: number;
+        sharpeRatio?: number;
     }, {
-        standardDeviation: number;
-        variance: number;
-        valueAtRisk: {
-            "95%": number;
-            "99%": number;
-            "99.9%": number;
+        standardDeviation?: number;
+        variance?: number;
+        valueAtRisk?: {
+            "95%"?: number;
+            "99%"?: number;
+            "99.9%"?: number;
         };
-        maxDrawdown: number;
-        sharpeRatio?: number | undefined;
+        maxDrawdown?: number;
+        sharpeRatio?: number;
     }>;
     /** Volatility classification */
     classification: z.ZodEnum<["low", "medium", "high", "extreme"]>;
     /** Analysis timestamp */
     timestamp: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    timestamp: number;
-    feedId: string;
-    metrics: {
-        standardDeviation: number;
-        variance: number;
-        valueAtRisk: {
-            "95%": number;
-            "99%": number;
-            "99.9%": number;
+    timestamp?: number;
+    feedId?: string;
+    metrics?: {
+        standardDeviation?: number;
+        variance?: number;
+        valueAtRisk?: {
+            "95%"?: number;
+            "99%"?: number;
+            "99.9%"?: number;
         };
-        maxDrawdown: number;
-        sharpeRatio?: number | undefined;
+        maxDrawdown?: number;
+        sharpeRatio?: number;
     };
-    period: "1h" | "24h" | "7d" | "30d";
-    classification: "low" | "medium" | "high" | "extreme";
+    period?: "1h" | "24h" | "7d" | "30d";
+    classification?: "low" | "medium" | "high" | "extreme";
 }, {
-    timestamp: number;
-    feedId: string;
-    metrics: {
-        standardDeviation: number;
-        variance: number;
-        valueAtRisk: {
-            "95%": number;
-            "99%": number;
-            "99.9%": number;
+    timestamp?: number;
+    feedId?: string;
+    metrics?: {
+        standardDeviation?: number;
+        variance?: number;
+        valueAtRisk?: {
+            "95%"?: number;
+            "99%"?: number;
+            "99.9%"?: number;
         };
-        maxDrawdown: number;
-        sharpeRatio?: number | undefined;
+        maxDrawdown?: number;
+        sharpeRatio?: number;
     };
-    period: "1h" | "24h" | "7d" | "30d";
-    classification: "low" | "medium" | "high" | "extreme";
+    period?: "1h" | "24h" | "7d" | "30d";
+    classification?: "low" | "medium" | "high" | "extreme";
 }>;
 export type VolatilityAnalysis = z.infer<typeof VolatilityAnalysisSchema>;
 /**
@@ -661,23 +661,23 @@ export declare const CorrelationAnalysisSchema: z.ZodObject<{
     /** Analysis timestamp */
     timestamp: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    timestamp: number;
-    period: "1h" | "24h" | "7d" | "30d" | "90d";
-    asset1: string;
-    asset2: string;
-    correlation: number;
-    pValue: number;
-    sampleSize: number;
-    strength: "none" | "weak" | "moderate" | "strong" | "very_strong";
+    timestamp?: number;
+    period?: "1h" | "24h" | "7d" | "30d" | "90d";
+    asset1?: string;
+    asset2?: string;
+    correlation?: number;
+    pValue?: number;
+    sampleSize?: number;
+    strength?: "none" | "weak" | "moderate" | "strong" | "very_strong";
 }, {
-    timestamp: number;
-    period: "1h" | "24h" | "7d" | "30d" | "90d";
-    asset1: string;
-    asset2: string;
-    correlation: number;
-    pValue: number;
-    sampleSize: number;
-    strength: "none" | "weak" | "moderate" | "strong" | "very_strong";
+    timestamp?: number;
+    period?: "1h" | "24h" | "7d" | "30d" | "90d";
+    asset1?: string;
+    asset2?: string;
+    correlation?: number;
+    pValue?: number;
+    sampleSize?: number;
+    strength?: "none" | "weak" | "moderate" | "strong" | "very_strong";
 }>;
 export type CorrelationAnalysis = z.infer<typeof CorrelationAnalysisSchema>;
 /**
@@ -697,15 +697,15 @@ export declare const LiquidityAnalysisSchema: z.ZodObject<{
         /** Liquidity score (0-100) */
         liquidityScore: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        liquidityScore: number;
-        bidAskSpread: number;
-        marketDepth: string;
-        avgDailyVolume: string;
+        liquidityScore?: number;
+        bidAskSpread?: number;
+        marketDepth?: string;
+        avgDailyVolume?: string;
     }, {
-        liquidityScore: number;
-        bidAskSpread: number;
-        marketDepth: string;
-        avgDailyVolume: string;
+        liquidityScore?: number;
+        bidAskSpread?: number;
+        marketDepth?: string;
+        avgDailyVolume?: string;
     }>;
     /** Liquidity classification */
     classification: z.ZodEnum<["very_low", "low", "medium", "high", "very_high"]>;
@@ -715,45 +715,45 @@ export declare const LiquidityAnalysisSchema: z.ZodObject<{
         volume: z.ZodString;
         liquidity: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        name: string;
-        volume: string;
-        liquidity: number;
+        name?: string;
+        volume?: string;
+        liquidity?: number;
     }, {
-        name: string;
-        volume: string;
-        liquidity: number;
+        name?: string;
+        volume?: string;
+        liquidity?: number;
     }>, "many">;
     /** Analysis timestamp */
     timestamp: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    timestamp: number;
-    feedId: string;
-    metrics: {
-        liquidityScore: number;
-        bidAskSpread: number;
-        marketDepth: string;
-        avgDailyVolume: string;
+    timestamp?: number;
+    feedId?: string;
+    metrics?: {
+        liquidityScore?: number;
+        bidAskSpread?: number;
+        marketDepth?: string;
+        avgDailyVolume?: string;
     };
-    classification: "low" | "medium" | "high" | "very_low" | "very_high";
-    exchanges: {
-        name: string;
-        volume: string;
-        liquidity: number;
+    classification?: "low" | "medium" | "high" | "very_low" | "very_high";
+    exchanges?: {
+        name?: string;
+        volume?: string;
+        liquidity?: number;
     }[];
 }, {
-    timestamp: number;
-    feedId: string;
-    metrics: {
-        liquidityScore: number;
-        bidAskSpread: number;
-        marketDepth: string;
-        avgDailyVolume: string;
+    timestamp?: number;
+    feedId?: string;
+    metrics?: {
+        liquidityScore?: number;
+        bidAskSpread?: number;
+        marketDepth?: string;
+        avgDailyVolume?: string;
     };
-    classification: "low" | "medium" | "high" | "very_low" | "very_high";
-    exchanges: {
-        name: string;
-        volume: string;
-        liquidity: number;
+    classification?: "low" | "medium" | "high" | "very_low" | "very_high";
+    exchanges?: {
+        name?: string;
+        volume?: string;
+        liquidity?: number;
     }[];
 }>;
 export type LiquidityAnalysis = z.infer<typeof LiquidityAnalysisSchema>;

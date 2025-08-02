@@ -290,7 +290,7 @@ What would you like to explore today?`,
               transition={{ duration: 0.3 }}
               className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              <div className={`max-w-[80%] ${message.role === "user" ? "order-2" : ""}`}>
+              <div className={`max-w-[85%] ${message.role === "user" ? "order-2" : ""}`}>
                 <ChatMessage message={message} />
                 
                 {/* Show metadata for crypto responses */}
@@ -324,7 +324,7 @@ What would you like to explore today?`,
             animate={{ opacity: 1, y: 0 }}
             className="flex justify-start"
           >
-            <div className="max-w-[80%]">
+            <div className="max-w-[85%]">
               <div className="p-3 bg-gray-800/50 rounded-lg">
                 <p className="text-gray-300 text-sm whitespace-pre-wrap">
                   {streamingContent}

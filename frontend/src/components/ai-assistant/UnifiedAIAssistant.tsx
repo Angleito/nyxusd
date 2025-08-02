@@ -54,7 +54,7 @@ export const UnifiedAIAssistant: React.FC<UnifiedAIAssistantProps> = ({
     if (isMaximized) {
       return "w-full h-full";
     }
-    return "w-[400px] h-[600px] max-w-[90vw] max-h-[80vh]";
+    return "w-[450px] h-[600px] max-w-[95vw] max-h-[85vh]";
   };
 
   return (

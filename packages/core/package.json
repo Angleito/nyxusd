@@ -29,6 +29,9 @@
   "license": "MIT",
   "dependencies": {
     "@nyxusd/fp-utils": "*",
+    "@nyxusd/cdp-core": "*",
+    "@nyxusd/cdp-adapters": "*",
+    "@nyxusd/cdp-sdk": "*",
     "fp-ts": "^2.16.0",
     "immutable": "^4.3.0",
     "io-ts": "^2.2.20"

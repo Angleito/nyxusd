@@ -71,7 +71,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       </motion.div>
 
       {/* Message Content */}
-      <div className="flex-1 space-y-2">
+      <div className="flex-1 space-y-2 min-w-0">
         <div className="flex items-center gap-2">
           <span
             className={clsx(
@@ -110,7 +110,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             </span>
           </motion.div>
         ) : (
-          <div className="text-gray-300 whitespace-pre-wrap break-words">
+          <div className="text-gray-300 whitespace-pre-wrap break-words overflow-wrap-anywhere chat-message-content">
             {message.content}
           </div>
         )}

@@ -6,6 +6,9 @@
     { "path": "./libs/midnight-utils" },
     { "path": "./packages/core" },
     { "path": "./packages/oracle-service" },
+    { "path": "./packages/cdp-core" },
+    { "path": "./packages/cdp-adapters" },
+    { "path": "./packages/cdp-sdk" },
     { "path": "./api" },
     { "path": "./frontend" }
   ]
