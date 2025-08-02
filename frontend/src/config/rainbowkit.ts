@@ -42,12 +42,35 @@ const baseWallets = [
 // Suppress Coinbase analytics errors in console
 if (typeof window !== 'undefined') {
   const originalError = console.error;
+  const originalWarn = console.warn;
+  
   console.error = (...args) => {
     // Filter out Coinbase analytics errors
-    if (args[0]?.toString?.().includes('cca-lite.coinbase.com')) {
+    const errorString = args[0]?.toString?.() || '';
+    if (errorString.includes('cca-lite.coinbase.com') || 
+        errorString.includes('Failed to load resource') && errorString.includes('coinbase')) {
       return;
     }
     originalError.apply(console, args);
+  };
+  
+  console.warn = (...args) => {
+    // Filter out network-related warnings for coinbase
+    const warnString = args[0]?.toString?.() || '';
+    if (warnString.includes('cca-lite.coinbase.com')) {
+      return;
+    }
+    originalWarn.apply(console, args);
+  };
+  
+  // Override fetch to intercept Coinbase analytics requests
+  const originalFetch = window.fetch;
+  window.fetch = async (...args) => {
+    const url = args[0]?.toString() || '';
+    if (url.includes('cca-lite.coinbase.com')) {
+      return Promise.reject(new Error('Analytics blocked'));
+    }
+    return originalFetch.apply(window, args);
   };
 }
 

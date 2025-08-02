@@ -47,7 +47,6 @@ const transports = {
 export const wagmiConfig = createConfig({
   chains,
   transports,
-  multiInjectedProviderDiscovery: false,
   connectors: [
     ...rainbowkitConnectors,
     // Add Midnight Protocol wallet connector
