@@ -10,6 +10,7 @@ import oracleRoutes from "./routes/oracle";
 import aiRoutes from "./routes/ai";
 import enhancedAIRoutes from "./routes/enhancedAI";
 import voiceRoutes from "./routes/voice";
+import memoryRoutes from "./routes/memory";
 
 // Import CDP operations
 import { NyxUSD_CDP_SDK, CDPCreationParams, CDP } from '@nyxusd/cdp-sdk';
@@ -371,6 +372,9 @@ app.use("/api/ai/enhanced", enhancedAIRoutes);
 
 // Voice routes for ElevenLabs integration
 app.use("/api/voice", voiceRoutes);
+
+// Memory routes for Vercel KV/Blob storage
+app.use("/api/memory", memoryRoutes);
 
 // System information endpoints
 app.get("/api/system", (req, res) => {
