@@ -30,6 +30,8 @@ import {
   PersonalizationProfile,
   PersonalizationContext,
   PersonalizationResult,
+  CareerStage,
+  FamilyStatus,
 } from "./personalizationEngine";
 import {
   PromptOptimizer,
@@ -85,10 +87,34 @@ const responseSchema = z.object({
     .optional()
     .describe("Whether to continue to the next step"),
   nextStep: z
-    .string()
+    .enum([
+      "initial",
+      "chat",
+      "strategy_choice",
+      "template_selection",
+      "wallet_prompt",
+      "wallet_scanning",
+      "wallet_analyzed",
+      "risk_assessment", 
+      "investment_goals",
+      "occupation",
+      "occupation_explanation",
+      "risk_tolerance",
+      "timeline",
+      "amount",
+      "experience_level",
+      "protocol_selection",
+      "strategy_builder",
+      "leverage_optimization",
+      "generating_recommendations",
+      "recommendations",
+      "complete",
+    ])
     .optional()
     .describe("The next conversation step to transition to"),
 });
+
+type ParsedAIResponse = z.infer<typeof responseSchema>;
 
 /**
  * Enhanced AI context with new personalization dimensions
@@ -127,7 +153,7 @@ export class LangChainAIService implements AIService {
   private config: AIServiceConfig;
   private llm: ChatOpenAI;
   private memory: ConversationSummaryMemory;
-  private outputParser: StructuredOutputParser<z.infer<typeof responseSchema>>;
+  private outputParser: StructuredOutputParser<ParsedAIResponse>;
   private isInitialized = false;
 
   // Enhanced prompt system components
@@ -346,7 +372,7 @@ export class LangChainAIService implements AIService {
         wallet_data: JSON.stringify(context.walletData || {}),
       });
 
-      let parsedResponse: z.infer<typeof responseSchema>;
+      let parsedResponse: ParsedAIResponse;
 
       try {
         parsedResponse = await this.outputParser.parse(result.text);
@@ -373,7 +399,7 @@ export class LangChainAIService implements AIService {
       // Update analytics with OpenRouter info
       this.updateAnalytics(startTime, systemPrompt, parsedResponse, queryType);
 
-      return parsedResponse;
+      return this.convertToAIResponse(parsedResponse);
     } catch (error: any) {
       console.error("AI service error:", error);
 
@@ -801,7 +827,7 @@ Always structure your response with:
       occupation: userProfile.occupation,
       industry: userProfile.industry,
       workStyle: userProfile.workStyle,
-      careerStage: userProfile.careerStage,
+      careerStage: this.mapCareerStage(userProfile.careerStage),
 
       // Personal dimension
       hobbies: userProfile.hobbies,
@@ -825,7 +851,7 @@ Always structure your response with:
       familyStatus:
         userProfile.familyStatus === "prefer_not_to_say"
           ? undefined
-          : userProfile.familyStatus,
+          : this.mapFamilyStatus(userProfile.familyStatus),
     };
   }
 
@@ -846,6 +872,42 @@ Always structure your response with:
         return "conversational";
       default:
         return "conversational";
+    }
+  }
+
+  /**
+   * Map career stage from UserProfile to PersonalizationProfile format
+   */
+  private mapCareerStage(careerStage?: string): CareerStage | undefined {
+    switch (careerStage) {
+      case "entry":
+        return "entry-level";
+      case "mid":
+        return "mid-level";
+      case "senior":
+        return "senior";
+      case "executive":
+        return "executive";
+      case "retired":
+        return "retired";
+      default:
+        return undefined;
+    }
+  }
+
+  /**
+   * Map family status from UserProfile to PersonalizationProfile format
+   */
+  private mapFamilyStatus(familyStatus?: string): FamilyStatus | undefined {
+    switch (familyStatus) {
+      case "single":
+        return "single";
+      case "married":
+        return "married";
+      case "family":
+        return "parent";
+      default:
+        return undefined;
     }
   }
 
@@ -936,7 +998,6 @@ Always structure your response with:
     let confidence = 0.5; // Base confidence
 
     if (context.userProfile.experienceLevel === "advanced") confidence += 0.3;
-    if (context.userProfile.experienceLevel === "expert") confidence += 0.4;
     if (context.userProfile.experienceLevel === "beginner") confidence -= 0.2;
 
     if (context.conversationHistory.length > 5) confidence += 0.1;
@@ -1135,7 +1196,7 @@ Always structure your response with:
       wallet_data: JSON.stringify(context.walletData || {}),
     });
 
-    let parsedResponse: z.infer<typeof responseSchema>;
+    let parsedResponse: ParsedAIResponse;
 
     try {
       parsedResponse = await this.outputParser.parse(result.text);
@@ -1155,7 +1216,7 @@ Always structure your response with:
       { output: parsedResponse.message },
     );
 
-    return parsedResponse;
+    return parsedResponse as AIResponse;
   }
 
   /**
