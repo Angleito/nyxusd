@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useAccount } from 'wagmi';
 import type { WalletClient, PublicClient, Address } from 'viem';
 import axios from 'axios';
@@ -30,9 +30,12 @@ export function useOdosSwap() {
   const [isExecuting, setIsExecuting] = useState(false);
   const [executionError, setExecutionError] = useState<string | null>(null);
 
-  const API_URL = process.env.NODE_ENV === 'production' 
-    ? 'https://nyxusd.vercel.app/api/swap'
-    : 'http://localhost:3000/api/swap';
+  const API_URL = useMemo(() => 
+    process.env.NODE_ENV === 'production' 
+      ? 'https://nyxusd.vercel.app/api/swap'
+      : 'http://localhost:3000/api/swap',
+    []
+  );
 
   const fetchQuote = useCallback(async (params: SwapQuoteParams) => {
     setIsLoadingQuote(true);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowDownUp, Loader2, AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { useAccount, useWalletClient, usePublicClient } from 'wagmi';
@@ -25,13 +25,6 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
   onCancel,
   embedded = false
 }) => {
-  // Debug logging
-  console.log('SwapInterface props:', {
-    initialInputToken,
-    initialOutputToken,
-    initialAmount
-  });
-  
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
@@ -71,29 +64,35 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
     fetchTokens();
   }, []);
 
+  // Memoize token details to prevent unnecessary re-calculations
+  const inputTokenDetails = useMemo(() => 
+    swapDetectionService.getTokenDetails(inputToken), 
+    [inputToken]
+  );
+  
+  const outputTokenDetails = useMemo(() => 
+    swapDetectionService.getTokenDetails(outputToken), 
+    [outputToken]
+  );
+
   // Fetch quote when inputs change
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      if (inputAmount && parseFloat(inputAmount) > 0 && address) {
-        const inputTokenDetails = swapDetectionService.getTokenDetails(inputToken);
-        const outputTokenDetails = swapDetectionService.getTokenDetails(outputToken);
+      if (inputAmount && parseFloat(inputAmount) > 0 && address && inputTokenDetails && outputTokenDetails) {
+        const amountInWei = parseUnits(inputAmount, inputTokenDetails.decimals);
         
-        if (inputTokenDetails && outputTokenDetails) {
-          const amountInWei = parseUnits(inputAmount, inputTokenDetails.decimals);
-          
-          fetchQuote({
-            inputToken: inputTokenDetails.address as `0x${string}`,
-            outputToken: outputTokenDetails.address as `0x${string}`,
-            inputAmount: amountInWei,
-            slippageTolerance: parseFloat(slippage) / 100,
-            userAddress: address
-          });
-        }
+        fetchQuote({
+          inputToken: inputTokenDetails.address as `0x${string}`,
+          outputToken: outputTokenDetails.address as `0x${string}`,
+          inputAmount: amountInWei,
+          slippageTolerance: parseFloat(slippage) / 100,
+          userAddress: address
+        });
       }
     }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [inputAmount, inputToken, outputToken, slippage, address, fetchQuote]);
+  }, [inputAmount, slippage, address, fetchQuote, inputTokenDetails, outputTokenDetails]);
 
   const handleSwap = async () => {
     if (!walletClient || !publicClient || !address) {
