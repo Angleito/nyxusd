@@ -40,6 +40,7 @@
     "@types/node": "^20.4.2",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "@vercel/node": "^5.3.10",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-functional": "^5.0.0",
@@ -55,12 +56,11 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@vercel/node": "^3.0.0",
     "fp-ts": "^2.16.1",
     "io-ts": "^2.2.20",
     "monocle-ts": "^2.3.13",
-    "rxjs": "^7.8.1",
     "ramda": "^0.29.0",
+    "rxjs": "^7.8.1",
     "sanctuary": "^3.1.0",
     "zod": "^3.22.0"
   },

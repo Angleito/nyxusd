@@ -2,14 +2,26 @@
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
   "framework": "vite",
+  "installCommand": "npm install",
   "functions": {
-    "api/*.ts": {
+    "api/chat.ts": {
+      "runtime": "@vercel/node@20",
       "maxDuration": 30
     },
-    "api/**/*.ts": {
+    "api/health.ts": {
+      "runtime": "@vercel/node@20",
+      "maxDuration": 30
+    },
+    "api/system.ts": {
+      "runtime": "@vercel/node@20",
+      "maxDuration": 30
+    },
+    "api/cdp.ts": {
+      "runtime": "@vercel/node@20",
       "maxDuration": 30
     },
     "api/defi_yields.py": {
+      "runtime": "python3.9",
       "maxDuration": 30
     }
   },
