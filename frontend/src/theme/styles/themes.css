@@ -1,0 +1,236 @@
+/**
+ * Blockchain-Specific Theme Styles
+ * Dynamic theme styles that change based on selected blockchain
+ */
+
+/* Base theme variables (fallback) */
+:root {
+  /* Dynamic theme variables - injected by ThemeContext */
+  --theme-transition-duration: 400ms;
+  --theme-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================
+   SUI THEME - Light Ocean Breeze
+   ========================================== */
+:root[data-theme="sui"] {
+  /* Override nyx variables with Sui theme */
+  --nyx-cosmic-black: #F8FBFF;
+  --nyx-cosmic-black-rgb: 248, 251, 255;
+  --nyx-void-90: #F0F8FF;
+  --nyx-void-80: #E6F3FF;
+  --nyx-void-70: #CCE7FF;
+  --nyx-void-60: #A3D5FF;
+  --nyx-void-50: #7BB8FF;
+  
+  --nyx-gleam-90: #0B2545;
+  --nyx-gleam-80: #2E5F8F;
+  --nyx-gleam-70: #5A89B8;
+  --nyx-gleam-60: #7FA5D1;
+  --nyx-gleam-50: #A3C2E0;
+  
+  --nyx-primary: #4DA2FF;
+  --nyx-primary-hover: #2E8FFF;
+  --nyx-primary-active: #1A7CE6;
+  
+  --nyx-success: #52C41A;
+  --nyx-warning: #FAAD14;
+  --nyx-error: #FF4D4F;
+  --nyx-info: #1890FF;
+  
+  --nyx-blur-sm: 4px;
+  --nyx-blur-md: 8px;
+  --nyx-blur-lg: 16px;
+}
+
+/* Sui-specific component overrides */
+[data-theme="sui"] .nyx-glass {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(77, 162, 255, 0.12) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+[data-theme="sui"] .nyx-glass-dark {
+  background: rgba(240, 248, 255, 0.98) !important;
+  border: 1px solid rgba(77, 162, 255, 0.2) !important;
+}
+
+[data-theme="sui"] .nyx-heading-1,
+[data-theme="sui"] .nyx-heading-2,
+[data-theme="sui"] .nyx-heading-3 {
+  color: #0B2545 !important;
+}
+
+[data-theme="sui"] .nyx-body,
+[data-theme="sui"] .nyx-body-small {
+  color: #2E5F8F !important;
+}
+
+[data-theme="sui"] .nyx-text-gradient {
+  background: linear-gradient(135deg, #4DA2FF 0%, #7BB8FF 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Sui wave animations */
+@keyframes sui-wave {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+[data-theme="sui"] .wave-animation {
+  animation: sui-wave 6s ease-in-out infinite;
+}
+
+/* ==========================================
+   BASE THEME - Deep Ocean
+   ========================================== */
+:root[data-theme="base"] {
+  /* Override nyx variables with Base theme */
+  --nyx-cosmic-black: #000814;
+  --nyx-cosmic-black-rgb: 0, 8, 20;
+  --nyx-void-90: #001122;
+  --nyx-void-80: #001933;
+  --nyx-void-70: #002244;
+  --nyx-void-60: #002D55;
+  --nyx-void-50: #003866;
+  
+  --nyx-gleam-90: #E6F3FF;
+  --nyx-gleam-80: #B3D9FF;
+  --nyx-gleam-70: #80BFFF;
+  --nyx-gleam-60: #4DA5FF;
+  --nyx-gleam-50: #1A8BFF;
+  
+  --nyx-primary: #0052FF;
+  --nyx-primary-hover: #0041CC;
+  --nyx-primary-active: #003199;
+  
+  --nyx-success: #00D97E;
+  --nyx-warning: #FFB94A;
+  --nyx-error: #FF6B6B;
+  --nyx-info: #4DD5FF;
+  
+  --nyx-blur-sm: 4px;
+  --nyx-blur-md: 8px;
+  --nyx-blur-lg: 16px;
+}
+
+/* Base-specific component overrides */
+[data-theme="base"] .nyx-glass {
+  background: rgba(0, 17, 34, 0.95) !important;
+  border: 1px solid rgba(0, 82, 255, 0.15) !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 8px 32px rgba(0, 82, 255, 0.2) !important;
+}
+
+[data-theme="base"] .nyx-glass-dark {
+  background: rgba(0, 25, 51, 0.98) !important;
+  border: 1px solid rgba(0, 82, 255, 0.25) !important;
+}
+
+[data-theme="base"] .nyx-heading-1,
+[data-theme="base"] .nyx-heading-2,
+[data-theme="base"] .nyx-heading-3 {
+  color: #E6F3FF !important;
+}
+
+[data-theme="base"] .nyx-body,
+[data-theme="base"] .nyx-body-small {
+  color: #B3D9FF !important;
+}
+
+[data-theme="base"] .nyx-text-gradient {
+  background: linear-gradient(135deg, #0052FF 0%, #00B8F0 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Base electric animations */
+@keyframes base-electric {
+  0%, 100% { 
+    filter: brightness(1) drop-shadow(0 0 10px rgba(0, 82, 255, 0.5));
+  }
+  50% { 
+    filter: brightness(1.2) drop-shadow(0 0 20px rgba(0, 82, 255, 0.8));
+  }
+}
+
+[data-theme="base"] .electric-glow {
+  animation: base-electric 2s ease-in-out infinite;
+}
+
+/* ==========================================
+   MIDNIGHT THEME - Cosmic Dark (Default)
+   ========================================== */
+:root[data-theme="midnight"] {
+  /* Default Midnight theme - already defined in original theme.css */
+}
+
+/* ==========================================
+   THEME TRANSITIONS
+   ========================================== */
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-easing),
+              border-color var(--theme-transition-duration) var(--theme-transition-easing),
+              color var(--theme-transition-duration) var(--theme-transition-easing);
+}
+
+/* Disable transitions during theme switch for instant feedback */
+.theme-transitioning * {
+  transition: none !important;
+}
+
+/* Theme-specific backgrounds */
+[data-theme="sui"] body {
+  background: linear-gradient(180deg, #F8FBFF 0%, #E6F3FF 50%, #CCE7FF 100%);
+  min-height: 100vh;
+}
+
+[data-theme="base"] body {
+  background: radial-gradient(ellipse at bottom, #001933 0%, #001122 40%, #000814 100%);
+  min-height: 100vh;
+}
+
+[data-theme="midnight"] body {
+  background: radial-gradient(ellipse at top, #1a1a2e 0%, #0a0a0f 40%, #000000 100%);
+  min-height: 100vh;
+}
+
+/* Theme-specific scrollbar */
+[data-theme="sui"]::-webkit-scrollbar-track {
+  background: #F0F8FF;
+}
+
+[data-theme="sui"]::-webkit-scrollbar-thumb {
+  background: #7BB8FF;
+}
+
+[data-theme="base"]::-webkit-scrollbar-track {
+  background: #001122;
+}
+
+[data-theme="base"]::-webkit-scrollbar-thumb {
+  background: #0052FF;
+}
+
+/* Theme-specific selection */
+[data-theme="sui"] ::selection {
+  background: rgba(77, 162, 255, 0.3);
+  color: #0B2545;
+}
+
+[data-theme="base"] ::selection {
+  background: rgba(0, 82, 255, 0.3);
+  color: #E6F3FF;
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

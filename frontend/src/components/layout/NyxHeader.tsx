@@ -5,19 +5,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { Navigation } from "./Navigation";
 import { NyxWalletConnectButton } from "../wallet/NyxWalletConnectButton";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface Chain {
+  id: string;
   name: string;
+  themeId: string;
   color: string;
   dotColor: string;
 }
 
 const chains: Chain[] = [
-  { name: "Midnight Protocol", color: "var(--nyx-success)", dotColor: "var(--nyx-success)" },
-  { name: "Sui", color: "#4DA2FF", dotColor: "#4DA2FF" },
-  { name: "Sei", color: "#DC2626", dotColor: "#DC2626" },
-  { name: "Ethereum", color: "#8B5CF6", dotColor: "#8B5CF6" },
-  { name: "Base", color: "#0052FF", dotColor: "#0052FF" },
+  { id: "midnight", name: "Midnight Protocol", themeId: "midnight", color: "var(--nyx-success)", dotColor: "var(--nyx-success)" },
+  { id: "sui", name: "Sui", themeId: "sui", color: "#4DA2FF", dotColor: "#4DA2FF" },
+  { id: "sei", name: "Sei", themeId: "midnight", color: "#DC2626", dotColor: "#DC2626" },
+  { id: "ethereum", name: "Ethereum", themeId: "midnight", color: "#8B5CF6", dotColor: "#8B5CF6" },
+  { id: "base", name: "Base", themeId: "base", color: "#0052FF", dotColor: "#0052FF" },
 ];
 
 export const NyxHeader: React.FC = () => {
@@ -25,6 +28,7 @@ export const NyxHeader: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [selectedChain, setSelectedChain] = useState(chains[0]);
   const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false);
+  const { setTheme, currentTheme, transitionState } = useTheme();
 
   // Handle scroll effect for backdrop blur
   useEffect(() => {
@@ -188,6 +192,10 @@ export const NyxHeader: React.FC = () => {
                           onClick={() => {
                             setSelectedChain(chain);
                             setIsChainDropdownOpen(false);
+                            // Trigger dramatic theme change
+                            if (chain.themeId !== currentTheme.id) {
+                              setTheme(chain.themeId);
+                            }
                           }}
                           className={clsx(
                             "w-full text-left px-4 py-3 flex items-center space-x-3 transition-all",
@@ -196,6 +204,7 @@ export const NyxHeader: React.FC = () => {
                           )}
                           whileHover={{ x: 2 }}
                           whileTap={{ scale: 0.98 }}
+                          disabled={transitionState.isTransitioning}
                         >
                           <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: chain.dotColor }} />
                           <span className="nyx-body-small whitespace-nowrap" style={{ color: 'var(--nyx-gleam-80)' }}>
@@ -336,12 +345,17 @@ export const NyxHeader: React.FC = () => {
                         onClick={() => {
                           setSelectedChain(chain);
                           closeMobileMenu();
+                          // Trigger dramatic theme change
+                          if (chain.themeId !== currentTheme.id) {
+                            setTheme(chain.themeId);
+                          }
                         }}
                         className={clsx(
                           "w-full text-left px-3 py-2.5 rounded-lg flex items-center space-x-3 transition-all",
                           "hover:nyx-glass",
                           selectedChain.name === chain.name && "nyx-glass border border-purple-500/30"
                         )}
+                        disabled={transitionState.isTransitioning}
                       >
                         <div className="w-2 h-2 rounded-full" style={{ background: chain.dotColor }} />
                         <span className="nyx-body-small" style={{ color: 'var(--nyx-gleam-80)' }}>

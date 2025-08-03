@@ -11,8 +11,11 @@ import { AboutPage } from "./components/about/AboutPage";
 import ContactPage from "./components/contact/ContactPage";
 import WhitepaperPage from "./pages/WhitepaperPage";
 import { DemoEnhancer } from "./components/demo/DemoEnhancer";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeTransition, ThemeBackground } from "./components/theme/ThemeTransition";
 import "./styles/nyx-global.css";
 import "./styles/App.css";
+import "./theme/styles/themes.css";
 import { useEffect } from "react";
 
 function App() {
@@ -56,20 +59,26 @@ function App() {
   };
 
   return (
-    <div className="nyx-page">
-      {/* Starfield Background */}
-      <div className="stars" id="app-starfield" />
-      <NyxHeader />
-      
-      {/* Global AI Assistant - Available on all pages */}
-      <UnifiedAIAssistant position="bottom-right" />
-      
-      {/* Demo Controller for Video Recording */}
-      <DemoEnhancer />
-      
-      <main>
-        <AnimatePresence mode="wait">
-          <Routes>
+    <ThemeProvider>
+      <ThemeTransition>
+        <div className="nyx-page">
+          {/* Theme-aware Background */}
+          <ThemeBackground />
+          
+          {/* Starfield Background (for Midnight theme) */}
+          <div className="stars" id="app-starfield" />
+          
+          <NyxHeader />
+          
+          {/* Global AI Assistant - Available on all pages */}
+          <UnifiedAIAssistant position="bottom-right" />
+          
+          {/* Demo Controller for Video Recording */}
+          <DemoEnhancer />
+          
+          <main>
+            <AnimatePresence mode="wait">
+              <Routes>
             <Route
               path="/"
               element={
@@ -179,6 +188,8 @@ function App() {
       </main>
       <Analytics />
     </div>
+      </ThemeTransition>
+    </ThemeProvider>
   );
 }
 

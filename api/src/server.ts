@@ -12,6 +12,7 @@ import enhancedAIRoutes from "./routes/enhancedAI";
 import voiceRoutes from "./routes/voice";
 import memoryRoutes from "./routes/memory";
 import subscriptionRoutes from "./routes/subscriptions";
+import whitepaperRoutes from "./routes/whitepaperRoutes";
 
 // Import CDP operations
 import { NyxUSD_CDP_SDK, CDPCreationParams, CDP } from '@nyxusd/cdp-sdk';
@@ -376,6 +377,9 @@ app.use("/api/voice", voiceRoutes);
 
 // Memory routes for Vercel KV/Blob storage
 app.use("/api/memory", memoryRoutes);
+
+// Whitepaper conversion routes
+app.use("/api/whitepaper", whitepaperRoutes);
 
 // Import token and swap services
 import { coingeckoService } from './services/coingeckoService';
