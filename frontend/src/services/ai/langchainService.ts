@@ -912,6 +912,22 @@ Always structure your response with:
   }
 
   /**
+   * Convert ParsedAIResponse to AIResponse with proper type validation
+   */
+  private convertToAIResponse(parsedResponse: ParsedAIResponse): AIResponse {
+    return {
+      message: parsedResponse.message,
+      intent: parsedResponse.intent ? {
+        action: parsedResponse.intent.action,
+        confidence: parsedResponse.intent.confidence,
+        extractedValue: parsedResponse.intent.extractedValue,
+      } : undefined,
+      shouldContinue: parsedResponse.shouldContinue,
+      nextStep: parsedResponse.nextStep,
+    };
+  }
+
+  /**
    * Extract main concept from user message
    */
   private extractConcept(userMessage: string): string {
@@ -1216,7 +1232,7 @@ Always structure your response with:
       { output: parsedResponse.message },
     );
 
-    return parsedResponse as AIResponse;
+    return this.convertToAIResponse(parsedResponse);
   }
 
   /**
