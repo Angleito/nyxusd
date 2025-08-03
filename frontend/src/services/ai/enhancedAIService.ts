@@ -61,7 +61,7 @@ export class EnhancedAIService {
     enableCryptoTools: boolean = true
   ): Promise<EnhancedAIResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/ai-assistant`, {
+      const response = await fetch(`${this.baseUrl}/ai/enhanced/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ export class EnhancedAIService {
     enableCryptoTools: boolean = true
   ): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/ai-assistant/stream`, {
+      const response = await fetch(`${this.baseUrl}/ai/enhanced/chat/stream`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -186,7 +186,7 @@ export class EnhancedAIService {
     params?: CryptoActionRequest['params']
   ): Promise<EnhancedAIResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/ai-assistant/crypto`, {
+      const response = await fetch(`${this.baseUrl}/ai/enhanced/crypto`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ export class EnhancedAIService {
     holdings: Array<{ symbol: string; amount: number; purchasePrice?: number }>
   ): Promise<EnhancedAIResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/ai-assistant/portfolio/analyze`, {
+      const response = await fetch(`${this.baseUrl}/ai/enhanced/portfolio/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -248,7 +248,7 @@ export class EnhancedAIService {
         ...(chain && { chain }),
       });
 
-      const response = await fetch(`${this.baseUrl}/ai-assistant/defi/opportunities?${params}`, {
+      const response = await fetch(`${this.baseUrl}/ai/enhanced/defi/opportunities?${params}`, {
         method: 'GET',
       });
 
@@ -272,7 +272,7 @@ export class EnhancedAIService {
         sessionId: this.sessionId,
       });
 
-      const response = await fetch(`${this.baseUrl}/ai-assistant/market/analysis?${params}`, {
+      const response = await fetch(`${this.baseUrl}/ai/enhanced/market/analysis?${params}`, {
         method: 'GET',
       });
 
@@ -292,7 +292,7 @@ export class EnhancedAIService {
 
   async resetSession(): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/ai-assistant/reset/${this.sessionId}`, {
+      const response = await fetch(`${this.baseUrl}/ai/enhanced/reset/${this.sessionId}`, {
         method: 'POST',
       });
 
@@ -312,7 +312,7 @@ export class EnhancedAIService {
     integrationTest: boolean;
   }> {
     try {
-      const response = await fetch(`${this.baseUrl}/ai-assistant/health`, {
+      const response = await fetch(`${this.baseUrl}/ai/enhanced/health`, {
         method: 'GET',
       });
 
@@ -345,7 +345,7 @@ export class EnhancedAIService {
     };
   }> {
     try {
-      const response = await fetch(`${this.baseUrl}/ai-assistant/tools`, {
+      const response = await fetch(`${this.baseUrl}/ai/enhanced/tools`, {
         method: 'GET',
       });
 
