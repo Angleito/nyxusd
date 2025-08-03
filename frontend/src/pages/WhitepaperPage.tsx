@@ -115,11 +115,15 @@ const WhitepaperPage: React.FC = () => {
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
+                    <span><strong>Custom Portfolio:</strong> 3% creation + 10% performance fee</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-purple-500">•</span>
                     <span><strong>Response Time:</strong> &lt;3 seconds for AI strategies</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span><strong>Cross-Chain Efficiency:</strong> 40-60% lower costs</span>
+                    <span><strong>Cross-Chain Efficiency:</strong> 40% lower gas costs</span>
                   </li>
                 </ul>
               </div>
@@ -176,7 +180,6 @@ const WhitepaperPage: React.FC = () => {
             className="grid grid-cols-2 md:grid-cols-4 gap-6"
           >
             {[
-              { label: 'Pages', value: '45+', icon: '📄' },
               { label: 'Sections', value: '11', icon: '📚' },
               { label: 'Reading Time', value: '~20 min', icon: '⏱️' },
               { label: 'Version', value: '2.0', icon: '🚀' },

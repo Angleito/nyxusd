@@ -5,14 +5,14 @@ import { FallbackAIService } from "./fallbackService";
 let aiServiceInstance: AIService | null = null;
 
 export function createAIService(config?: Partial<AIServiceConfig>): AIService {
-  const finalConfig = { ...DEFAULT_AI_CONFIG, ...config };
+  const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY || config?.apiKey;
+  const finalConfig = { ...DEFAULT_AI_CONFIG, ...config, apiKey };
 
-  // For this demo/mock implementation, always use fallback service
-  // In production, you would check for API keys and use LangChain service
+  // Check for API keys and use appropriate service
+  // Use mock only if explicitly set or no API key available
   if (
-    false &&
-    finalConfig.apiKey &&
-    process.env.REACT_APP_USE_MOCK_AI !== "true"
+    apiKey &&
+    import.meta.env.VITE_USE_MOCK_AI !== "true"
   ) {
     try {
       aiServiceInstance = new LangChainAIService(finalConfig);

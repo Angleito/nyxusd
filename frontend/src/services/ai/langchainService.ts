@@ -7,7 +7,7 @@ import {
 } from "@langchain/core/prompts";
 import { ConversationSummaryMemory } from "langchain/memory";
 import { LLMChain } from "langchain/chains";
-import { StructuredOutputParser } from "langchain/output_parsers";
+// import { StructuredOutputParser } from "langchain/output_parsers";
 import { z } from "zod";
 
 import {
@@ -114,8 +114,6 @@ const responseSchema = z.object({
     .describe("The next conversation step to transition to"),
 });
 
-type ParsedAIResponse = z.infer<typeof responseSchema>;
-
 /**
  * Enhanced AI context with new personalization dimensions
  */
@@ -153,7 +151,7 @@ export class LangChainAIService implements AIService {
   private config: AIServiceConfig;
   private llm: ChatOpenAI;
   private memory: ConversationSummaryMemory;
-  private outputParser: StructuredOutputParser<ParsedAIResponse>;
+  // private outputParser: StructuredOutputParser<unknown>;
   private isInitialized = false;
 
   // Enhanced prompt system components
@@ -173,7 +171,7 @@ export class LangChainAIService implements AIService {
 
   constructor(config: AIServiceConfig = DEFAULT_AI_CONFIG) {
     this.config = { ...DEFAULT_AI_CONFIG, ...config };
-    this.outputParser = StructuredOutputParser.fromZodSchema(responseSchema);
+    // this.outputParser = StructuredOutputParser.fromZodSchema(responseSchema);
     this.llm = this.createLLM();
     this.memory = this.createMemory();
 
@@ -350,7 +348,7 @@ export class LangChainAIService implements AIService {
         userMessage,
         context,
       );
-      const formatInstructions = this.outputParser.getFormatInstructions();
+      const formatInstructions = this.getJSONFormatInstructions();
 
       const prompt = ChatPromptTemplate.fromMessages([
         SystemMessagePromptTemplate.fromTemplate(systemPrompt),
@@ -372,10 +370,10 @@ export class LangChainAIService implements AIService {
         wallet_data: JSON.stringify(context.walletData || {}),
       });
 
-      let parsedResponse: ParsedAIResponse;
+      let parsedResponse: z.infer<typeof responseSchema>;
 
       try {
-        parsedResponse = await this.outputParser.parse(result.text);
+        parsedResponse = this.parseJSONResponse(result.text);
       } catch (parseError) {
         console.warn(
           "Failed to parse structured output, using fallback:",
@@ -912,9 +910,56 @@ Always structure your response with:
   }
 
   /**
+   * Get JSON format instructions for structured output
+   */
+  private getJSONFormatInstructions(): string {
+    return `You must respond with a valid JSON object matching this exact schema:
+{
+  "message": "string - The response message to show the user",
+  "intent": {
+    "action": "string - One of: connect_wallet, select_option, input_value, continue, skip, help, unclear",
+    "confidence": "number - Between 0 and 1",
+    "extractedValue": "string or number - Optional value extracted from user input"
+  },
+  "shouldContinue": "boolean - Whether to continue to the next step",
+  "nextStep": "string - Optional next conversation step"
+}
+
+Ensure the response is valid JSON without any markdown formatting or code blocks.`;
+  }
+
+  /**
+   * Parse JSON response from AI with proper validation
+   */
+  private parseJSONResponse(text: string): z.infer<typeof responseSchema> {
+    // Try to extract JSON from response if it's wrapped in code blocks
+    let jsonText = text.trim();
+    
+    // Remove markdown code blocks if present
+    if (jsonText.startsWith('```json')) {
+      jsonText = jsonText.replace(/```json\s*/, '').replace(/\s*```$/, '');
+    } else if (jsonText.startsWith('```')) {
+      jsonText = jsonText.replace(/```\s*/, '').replace(/\s*```$/, '');
+    }
+    
+    try {
+      const parsed = JSON.parse(jsonText);
+      return responseSchema.parse(parsed);
+    } catch (error) {
+      // If JSON parsing fails, try to find JSON in the text
+      const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return responseSchema.parse(parsed);
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Convert ParsedAIResponse to AIResponse with proper type validation
    */
-  private convertToAIResponse(parsedResponse: ParsedAIResponse): AIResponse {
+  private convertToAIResponse(parsedResponse: z.infer<typeof responseSchema>): AIResponse {
     return {
       message: parsedResponse.message,
       intent: parsedResponse.intent ? {
@@ -1190,7 +1235,7 @@ Always structure your response with:
     context: AIContext,
   ): Promise<AIResponse> {
     const systemPrompt = this.buildSystemPrompt(context, userMessage);
-    const formatInstructions = this.outputParser.getFormatInstructions();
+    const formatInstructions = this.getJSONFormatInstructions();
 
     const prompt = ChatPromptTemplate.fromMessages([
       SystemMessagePromptTemplate.fromTemplate(systemPrompt),
@@ -1212,10 +1257,10 @@ Always structure your response with:
       wallet_data: JSON.stringify(context.walletData || {}),
     });
 
-    let parsedResponse: ParsedAIResponse;
+    let parsedResponse: z.infer<typeof responseSchema>;
 
     try {
-      parsedResponse = await this.outputParser.parse(result.text);
+      parsedResponse = this.parseJSONResponse(result.text);
     } catch (parseError) {
       parsedResponse = {
         message: result.text,

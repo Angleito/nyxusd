@@ -24,7 +24,7 @@ export const KeyFeaturesGrid: React.FC = () => {
       title: "AI Contract Generation",
       description: "First protocol where AI creates custom smart contracts from natural language requests",
       gradient: "from-purple-500 to-pink-500",
-      stats: "<3s generation time"
+      stats: "3% creation + 10% performance"
     },
     {
       icon: <FiLayers className="text-3xl" />,
@@ -38,7 +38,7 @@ export const KeyFeaturesGrid: React.FC = () => {
       title: "Cross-Chain Native",
       description: "Seamless yield optimization across Base and Sui without manual bridging",
       gradient: "from-green-500 to-blue-500",
-      stats: "40-60% lower costs"
+      stats: "40% lower gas costs"
     },
     {
       icon: <FiMessageCircle className="text-3xl" />,

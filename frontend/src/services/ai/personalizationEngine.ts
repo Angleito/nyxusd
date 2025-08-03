@@ -11,7 +11,8 @@
 
 // Simple local implementations to avoid build issues
 const pipe = <T, U>(value: T, fn: (val: T) => U): U => fn(value);
-const curry = <A, B, C>(fn: (a: A, b: B) => C) => (a: A) => (b: B) => fn(a, b);
+const curry2 = <A, B, C>(fn: (a: A, b: B) => C) => (a: A) => (b: B) => fn(a, b);
+const curry3 = <A, B, C, D>(fn: (a: A, b: B, c: C) => D) => (a: A) => (b: B) => (c: C) => fn(a, b, c);
 import { ConversationStep } from "../../providers/AIAssistantProvider";
 
 // =====================================================================
@@ -139,7 +140,7 @@ export interface PersonalizationDimension {
   type: DimensionType;
   weight: number; // 0-1 scale
   confidence: number; // 0-1 scale
-  attributes: Record<string, any>;
+  attributes: Record<string, string | string[] | number | boolean | undefined>;
 }
 
 export type DimensionType =
@@ -389,7 +390,8 @@ export class PersonalizationEngine {
    * Analyzes a user profile across all dimensions
    */
   analyzeProfile(profile: PersonalizationProfile): PersonalizationAnalysis {
-    return pipe(profile, this.calculateCompleteness, (completeness) => ({
+    const completeness = this.calculateCompleteness(profile);
+    return {
       completeness,
       primaryDimensions: this.identifyPrimaryDimensions(profile),
       gaps: this.identifyGaps(profile),
@@ -399,7 +401,7 @@ export class PersonalizationEngine {
         profile,
         completeness,
       ),
-    }));
+    };
   }
 
   /**
@@ -434,11 +436,8 @@ export class PersonalizationEngine {
     personalization: string,
     profile: PersonalizationProfile,
   ): number {
-    return pipe(
-      personalization,
-      this.analyzePersonalizationContent,
-      (content) => this.calculateEffectivenessScore(content, profile),
-    );
+    const content = this.analyzePersonalizationContent(personalization);
+    return this.calculateEffectivenessScore(content, profile);
   }
 
   /**
@@ -1001,7 +1000,7 @@ export class PersonalizationEngine {
 /**
  * Curried function to create personalization analysis
  */
-export const analyzeUserProfile = curry(
+export const analyzeUserProfile = curry2(
   (
     engine: PersonalizationEngine,
     profile: PersonalizationProfile,
@@ -1011,7 +1010,7 @@ export const analyzeUserProfile = curry(
 /**
  * Curried function to select personalization strategy
  */
-export const selectPersonalizationStrategy = curry(
+export const selectPersonalizationStrategy = curry3(
   (
     engine: PersonalizationEngine,
     profile: PersonalizationProfile,
@@ -1022,7 +1021,7 @@ export const selectPersonalizationStrategy = curry(
 /**
  * Curried function to score personalization effectiveness
  */
-export const scorePersonalizationEffectiveness = curry(
+export const scorePersonalizationEffectiveness = curry3(
   (
     engine: PersonalizationEngine,
     profile: PersonalizationProfile,
