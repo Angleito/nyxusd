@@ -5,6 +5,7 @@ import { useAccount, useWalletClient, usePublicClient } from 'wagmi';
 import { formatUnits, parseUnits } from 'viem';
 import { useOdosSwap } from '../../hooks/useOdosSwap';
 import { swapDetectionService } from '../../services/swapDetectionService';
+import { tokenService, TokenInfo } from '../../services/tokenService';
 
 interface SwapInterfaceProps {
   initialInputToken?: string;
@@ -38,6 +39,8 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
   const [outputToken, setOutputToken] = useState(initialOutputToken);
   const [inputAmount, setInputAmount] = useState(initialAmount);
   const [slippage, setSlippage] = useState('0.5');
+  const [availableTokens, setAvailableTokens] = useState<TokenInfo[]>([]);
+  const [tokensLoading, setTokensLoading] = useState(true);
   
   const {
     quote: quoteData,
@@ -48,6 +51,24 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
     executionError,
     fetchQuote
   } = useOdosSwap();
+
+  // Fetch available tokens on component mount
+  useEffect(() => {
+    const fetchTokens = async () => {
+      try {
+        setTokensLoading(true);
+        const tokens = await tokenService.getPopularTokens();
+        setAvailableTokens(tokens);
+      } catch (error) {
+        console.error('Failed to fetch tokens:', error);
+        // Fallback to empty array - component will show loading state
+      } finally {
+        setTokensLoading(false);
+      }
+    };
+
+    fetchTokens();
+  }, []);
 
   // Fetch quote when inputs change
   useEffect(() => {
@@ -141,16 +162,17 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
             value={inputToken}
             onChange={(e) => setInputToken(e.target.value)}
             className="px-4 py-3 bg-gray-800/70 border border-purple-700/30 rounded-lg text-white focus:outline-none focus:border-purple-500"
+            disabled={tokensLoading}
           >
-            <option value="ETH">ETH</option>
-            <option value="WETH">WETH</option>
-            <option value="USDC">USDC</option>
-            <option value="USDT">USDT</option>
-            <option value="DAI">DAI</option>
-            <option value="AERO">AERO</option>
-            <option value="BRETT">BRETT</option>
-            <option value="DEGEN">DEGEN</option>
-            <option value="HIGHER">HIGHER</option>
+            {tokensLoading ? (
+              <option>Loading tokens...</option>
+            ) : (
+              availableTokens.map((token) => (
+                <option key={token.symbol} value={token.symbol}>
+                  {token.symbol}
+                </option>
+              ))
+            )}
           </select>
         </div>
       </div>
@@ -181,16 +203,17 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
             value={outputToken}
             onChange={(e) => setOutputToken(e.target.value)}
             className="px-4 py-3 bg-gray-800/70 border border-purple-700/30 rounded-lg text-white focus:outline-none focus:border-purple-500"
+            disabled={tokensLoading}
           >
-            <option value="ETH">ETH</option>
-            <option value="WETH">WETH</option>
-            <option value="USDC">USDC</option>
-            <option value="USDT">USDT</option>
-            <option value="DAI">DAI</option>
-            <option value="AERO">AERO</option>
-            <option value="BRETT">BRETT</option>
-            <option value="DEGEN">DEGEN</option>
-            <option value="HIGHER">HIGHER</option>
+            {tokensLoading ? (
+              <option>Loading tokens...</option>
+            ) : (
+              availableTokens.map((token) => (
+                <option key={token.symbol} value={token.symbol}>
+                  {token.symbol}
+                </option>
+              ))
+            )}
           </select>
         </div>
       </div>

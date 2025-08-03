@@ -14,6 +14,9 @@ interface TokenMapping {
   decimals: number;
 }
 
+// Import the token service for dynamic token fetching
+import { tokenService, TokenInfo } from './tokenService';
+
 // Common Base chain token mappings
 const BASE_TOKENS: Record<string, TokenMapping> = {
   'ETH': {
@@ -65,6 +68,11 @@ const BASE_TOKENS: Record<string, TokenMapping> = {
     symbol: 'HIGHER',
     address: '0x0578d8A44db98B23BF096A382e016e29a5Ce0ffe',
     decimals: 18
+  },
+  'MORPHO': {
+    symbol: 'MORPHO',
+    address: '0xbaa5cc21fd487b8fcc2f632f3f4e8d37262a0842',
+    decimals: 18
   }
 };
 
@@ -79,17 +87,27 @@ export class SwapDetectionService {
   }
 
   /**
-   * Detect swap intent from user message
+   * Detect swap intent from user message (async version with dynamic tokens)
    */
-  detectSwapIntent(message: string): SwapIntent {
+  async detectSwapIntentAsync(message: string): Promise<SwapIntent> {
     const lowerMessage = message.toLowerCase();
     
-    // Check for swap keywords - more aggressive detection
+    // Get available tokens dynamically
+    const availableTokens = await this.getAvailableTokens();
+    const tokenPattern = new RegExp(
+      `\\b(${availableTokens.join('|').toLowerCase()})\\b.*\\b(to|for|into|->|→)\\b.*\\b(${availableTokens.join('|').toLowerCase()})\\b`,
+      'i'
+    );
+    const swapPhrasePattern = new RegExp(
+      `\\b(${availableTokens.join('|').toLowerCase()})\\b`,
+      'i'
+    );
+    
+    // Check for swap keywords
     const swapKeywords = ['swap', 'exchange', 'convert', 'trade', 'buy', 'sell', 'change', 'switch'];
     const hasSwapKeyword = swapKeywords.some(keyword => lowerMessage.includes(keyword));
     
-    // Also check for token-to-token patterns even without explicit swap keywords
-    const tokenPattern = /\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher)\b.*\b(to|for|into|->|→)\b.*\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher)\b/i;
+    // Check for token-to-token patterns
     const hasTokenPattern = tokenPattern.test(lowerMessage);
     
     // Check for phrases that imply swapping
@@ -102,7 +120,72 @@ export class SwapDetectionService {
       'i need'
     ];
     const hasSwapPhrase = swapPhrases.some(phrase => 
-      lowerMessage.includes(phrase) && /\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher)\b/i.test(lowerMessage)
+      lowerMessage.includes(phrase) && swapPhrasePattern.test(lowerMessage)
+    );
+    
+    if (!hasSwapKeyword && !hasTokenPattern && !hasSwapPhrase) {
+      return { isSwapIntent: false, confidence: 0 };
+    }
+
+    // Extract tokens and amounts using dynamic token list
+    const result = await this.extractSwapParametersAsync(message, availableTokens);
+    
+    // For simple "I want to swap" or "swap tokens", use defaults
+    if (hasSwapKeyword && !result.inputToken && !result.outputToken) {
+      result.inputToken = 'ETH';
+      result.outputToken = 'USDC';
+      result.amount = '';
+    }
+    
+    // Calculate confidence based on completeness
+    let confidence = 0.5;
+    
+    if (result.inputToken) confidence += 0.15;
+    if (result.outputToken) confidence += 0.15;
+    if (result.amount) confidence += 0.2;
+    
+    if (result.inputToken || result.outputToken) {
+      confidence = Math.max(confidence, 0.7);
+    }
+    
+    const missingParams: string[] = [];
+    if (!result.inputToken && !result.outputToken) {
+      missingParams.push('tokens');
+    }
+    
+    return {
+      isSwapIntent: true,
+      confidence,
+      ...result,
+      missingParams: missingParams.length > 0 ? missingParams : undefined
+    };
+  }
+
+  /**
+   * Detect swap intent from user message (original sync version for backward compatibility)
+   */
+  detectSwapIntent(message: string): SwapIntent {
+    const lowerMessage = message.toLowerCase();
+    
+    // Check for swap keywords - more aggressive detection
+    const swapKeywords = ['swap', 'exchange', 'convert', 'trade', 'buy', 'sell', 'change', 'switch'];
+    const hasSwapKeyword = swapKeywords.some(keyword => lowerMessage.includes(keyword));
+    
+    // Also check for token-to-token patterns even without explicit swap keywords
+    const tokenPattern = /\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher|morpho)\b.*\b(to|for|into|->|→)\b.*\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher|morpho)\b/i;
+    const hasTokenPattern = tokenPattern.test(lowerMessage);
+    
+    // Check for phrases that imply swapping
+    const swapPhrases = [
+      'want to get',
+      'need some',
+      'looking to acquire',
+      'want some',
+      'get me',
+      'i need'
+    ];
+    const hasSwapPhrase = swapPhrases.some(phrase => 
+      lowerMessage.includes(phrase) && /\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher|morpho)\b/i.test(lowerMessage)
     );
     
     if (!hasSwapKeyword && !hasTokenPattern && !hasSwapPhrase) {
@@ -148,7 +231,102 @@ export class SwapDetectionService {
   }
 
   /**
-   * Extract swap parameters from message
+   * Extract swap parameters from message (async version with dynamic tokens)
+   */
+  private async extractSwapParametersAsync(message: string, availableTokens: string[]): Promise<Partial<SwapIntent>> {
+    const result: Partial<SwapIntent> = {};
+    
+    // Create dynamic patterns using available tokens
+    const tokenList = availableTokens.join('|');
+    const patterns = [
+      // "I want to swap tokens AERO and ETH" or "swap tokens X and Y"
+      new RegExp(`(?:want\\s+to\\s+)?swap\\s+(?:tokens\\s+)?(${tokenList})\\s+(?:and|for|to|with)\\s+(${tokenList})`, 'i'),
+      // "swap USDC for AERO" or "swap USDC to AERO"
+      new RegExp(`swap\\s+(${tokenList})\\s+(?:for|to|into)\\s+(${tokenList})`, 'i'),
+      // "swap 1 ETH for USDC"
+      new RegExp(`swap\\s+(\\d+(?:\\.\\d+)?)\\s+(${tokenList})\\s+(?:for|to|into)\\s+(${tokenList})`, 'i'),
+      // "buy USDC with 1 ETH"
+      new RegExp(`buy\\s+(${tokenList})\\s+with\\s+(\\d+(?:\\.\\d+)?)\\s+(${tokenList})`, 'i'),
+      // "sell 1 ETH for USDC"
+      new RegExp(`sell\\s+(\\d+(?:\\.\\d+)?)\\s+(${tokenList})\\s+(?:for|to|into)\\s+(${tokenList})`, 'i'),
+      // "convert 1 ETH to USDC"
+      new RegExp(`convert\\s+(\\d+(?:\\.\\d+)?)\\s+(${tokenList})\\s+to\\s+(${tokenList})`, 'i'),
+      // "exchange 1 ETH for USDC"
+      new RegExp(`exchange\\s+(\\d+(?:\\.\\d+)?)\\s+(${tokenList})\\s+(?:for|to|into)\\s+(${tokenList})`, 'i'),
+      // "trade 1 ETH for USDC"
+      new RegExp(`trade\\s+(\\d+(?:\\.\\d+)?)\\s+(${tokenList})\\s+(?:for|to|into)\\s+(${tokenList})`, 'i'),
+      // "1 ETH to USDC"
+      new RegExp(`(\\d+(?:\\.\\d+)?)\\s+(${tokenList})\\s+(?:to|for|into)\\s+(${tokenList})`, 'i'),
+      // "ETH to USDC" or "ETH for USDC"
+      new RegExp(`(${tokenList})\\s+(?:to|for|into|->|→)\\s+(${tokenList})`, 'i'),
+      // "I want USDC" or "I need USDC" - moved to end for lower priority
+      new RegExp(`(?:want|need|get)\\s+(?:some\\s+)?(${tokenList})$`, 'i'),
+      // "switch to USDC"
+      new RegExp(`switch\\s+to\\s+(${tokenList})`, 'i'),
+    ];
+
+    for (const pattern of patterns) {
+      const match = message.match(pattern);
+      if (match) {
+        // Handle different pattern types based on the pattern structure
+        if (pattern.source.includes('want\\s+to\\s+)?swap')) {
+          result.inputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[2]);
+        } else if (pattern.source.includes('buy')) {
+          result.outputToken = this.normalizeToken(match[1]);
+          result.amount = match[2];
+          result.inputToken = this.normalizeToken(match[3]);
+        } else if (pattern.source.includes('want|need|get')) {
+          result.outputToken = this.normalizeToken(match[1]);
+          if (!result.inputToken) {
+            result.inputToken = 'ETH';
+          }
+        } else if (pattern.source.includes('switch\\s+to')) {
+          result.outputToken = this.normalizeToken(match[1]);
+          if (!result.inputToken) {
+            result.inputToken = 'ETH';
+          }
+        } else if (pattern.source.startsWith('swap\\s+') && match.length === 3) {
+          result.inputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[2]);
+        } else if (match.length === 2) {
+          result.outputToken = this.normalizeToken(match[1]);
+          if (!result.inputToken) {
+            result.inputToken = 'ETH';
+          }
+        } else if (match.length === 3) {
+          result.inputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[2]);
+        } else if (match.length === 4) {
+          result.amount = match[1];
+          result.inputToken = this.normalizeToken(match[2]);
+          result.outputToken = this.normalizeToken(match[3]);
+        }
+        break;
+      }
+    }
+
+    // Check for percentage amounts
+    const percentMatch = message.match(new RegExp(`(\\d+)%\\s+(?:of\\s+)?(${tokenList})`, 'i'));
+    if (percentMatch) {
+      result.amount = percentMatch[1];
+      result.isPercentage = true;
+      if (!result.inputToken) {
+        result.inputToken = this.normalizeToken(percentMatch[2]);
+      }
+    }
+
+    // Check for "all" keyword
+    if (message.toLowerCase().includes('all')) {
+      result.amount = '100';
+      result.isPercentage = true;
+    }
+
+    return result;
+  }
+
+  /**
+   * Extract swap parameters from message (original static version)
    */
   private extractSwapParameters(message: string): Partial<SwapIntent> {
     const result: Partial<SwapIntent> = {};
@@ -276,10 +454,58 @@ export class SwapDetectionService {
   }
 
   /**
-   * Get token details
+   * Get token details (with fallback to dynamic tokens)
    */
   getTokenDetails(symbol: string): TokenMapping | null {
-    return BASE_TOKENS[symbol.toUpperCase()] || null;
+    // First check static mapping
+    const staticToken = BASE_TOKENS[symbol.toUpperCase()];
+    if (staticToken) {
+      return staticToken;
+    }
+    
+    // This is a synchronous method, so we can't await the dynamic token service
+    // Return null and let the calling code handle the dynamic lookup
+    return null;
+  }
+
+  /**
+   * Get token details asynchronously using dynamic token service
+   */
+  async getTokenDetailsAsync(symbol: string): Promise<TokenMapping | null> {
+    // First check static mapping
+    const staticToken = BASE_TOKENS[symbol.toUpperCase()];
+    if (staticToken) {
+      return staticToken;
+    }
+
+    try {
+      // Try dynamic token service
+      const dynamicToken = await tokenService.getTokenBySymbol(symbol);
+      if (dynamicToken && dynamicToken.address) {
+        return {
+          symbol: dynamicToken.symbol,
+          address: dynamicToken.address,
+          decimals: dynamicToken.decimals || 18
+        };
+      }
+    } catch (error) {
+      console.warn(`Failed to fetch token details for ${symbol}:`, error);
+    }
+
+    return null;
+  }
+
+  /**
+   * Get all available token symbols
+   */
+  async getAvailableTokens(): Promise<string[]> {
+    try {
+      const tokens = await tokenService.getPopularTokens();
+      return tokens.map(token => token.symbol);
+    } catch (error) {
+      console.warn('Failed to fetch available tokens:', error);
+      return Object.keys(BASE_TOKENS);
+    }
   }
 
   /**
