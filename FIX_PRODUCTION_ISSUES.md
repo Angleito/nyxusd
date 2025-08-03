@@ -28,11 +28,10 @@ Add these **REQUIRED** variables:
 
 | Variable | Value | Description |
 |----------|-------|-------------|
-| `VITE_OPENROUTER_API_KEY` | Your API key from [OpenRouter](https://openrouter.ai) | Required for AI features |
-| `VITE_OPENROUTER_API_URL` | `https://openrouter.ai/api/v1` | OpenRouter endpoint |
-| `VITE_APP_NAME` | `NyxUSD` | Application name |
-| `VITE_APP_URL` | `https://nyxusd.com` | Production URL |
-| `VITE_USE_MOCK_AI` | `false` | Disable mock mode |
+| `OPENROUTER_API_KEY` | Your API key from [OpenRouter](https://openrouter.ai) | Required for AI features (backend) |
+| `APP_NAME` | `NyxUSD` | Application name |
+| `APP_URL` | `https://nyxusd.com` | Production URL |
+| `USE_MOCK_AI` | `false` | Disable mock mode |
 
 **Optional but recommended:**
 
@@ -60,16 +59,15 @@ To test fixes locally before deploying:
 
 ```bash
 # 1. Set up environment
-cd frontend
 cp .env.example .env
 
-# 2. Edit .env and add your VITE_OPENROUTER_API_KEY
+# 2. Edit .env and add your OPENROUTER_API_KEY (backend)
 
 # 3. Install dependencies
 npm install
 
 # 4. Run development server
-npm run dev
+cd frontend && npm run dev
 
 # 5. Open http://localhost:5173
 ```

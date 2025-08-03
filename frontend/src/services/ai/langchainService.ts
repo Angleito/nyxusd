@@ -172,7 +172,7 @@ export class LangChainAIService implements AIService {
   constructor(config: AIServiceConfig = DEFAULT_AI_CONFIG) {
     this.config = { ...DEFAULT_AI_CONFIG, ...config };
     // this.outputParser = StructuredOutputParser.fromZodSchema(responseSchema);
-    this.llm = this.createLLM();
+    // Skip LLM creation - we use backend API instead
     this.memory = this.createMemory();
 
     // Initialize enhanced prompt system components
@@ -210,39 +210,27 @@ export class LangChainAIService implements AIService {
   }
 
   private createLLM(queryType?: "simple" | "complex" | "crypto" | "reasoning"): ChatOpenAI {
-    const modelName = this.selectModelByQueryType(
-      queryType || "simple",
-      this.config.model
-    );
+    // This method is no longer used - we use backend API instead
+    // Keeping for compatibility but throwing error to prevent direct usage
+    throw new Error("Direct LLM usage disabled. Use backend API instead.");
+  }
+
+  private async buildMemoryContext(context: AIContext): Promise<string> {
+    const parts: string[] = [];
     
-    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY || this.config.apiKey;
-    
-    if (!apiKey) {
-      throw new Error("OpenRouter API key is required. Please set VITE_OPENROUTER_API_KEY in your environment.");
+    if (context.userProfile) {
+      parts.push(`User: ${JSON.stringify(context.userProfile)}`);
     }
     
-    return new ChatOpenAI({
-      openAIApiKey: apiKey,
-      modelName: modelName,
-      temperature: this.config.temperature || 0.7,
-      maxTokens: this.config.maxTokens || 128000, // Default to higher limit for Gemini
-      streaming: this.config.streamResponse,
-      configuration: {
-        baseURL: this.openRouterConfig.baseURL,
-        defaultHeaders: {
-          "HTTP-Referer": this.openRouterConfig.appUrl,
-          "X-Title": this.openRouterConfig.appName,
-          "Authorization": `Bearer ${apiKey}`,
-        },
-      },
-      modelKwargs: {
-        provider: {
-          order: ["Google", "DeepSeek", "Qwen", "OpenAI"],
-          allow_fallbacks: true,
-        },
-        transforms: ["middle-out"],
-      },
-    });
+    if (context.walletData) {
+      parts.push(`Wallet: ${JSON.stringify(context.walletData)}`);
+    }
+    
+    if (context.conversationStep) {
+      parts.push(`Step: ${context.conversationStep}`);
+    }
+    
+    return parts.join(' | ');
   }
   
   private selectModelByQueryType(
@@ -308,15 +296,24 @@ export class LangChainAIService implements AIService {
 
   async validateConfiguration(): Promise<boolean> {
     try {
-      const testResponse = await this.llm.call([
-        {
-          role: "system",
-          content: 'You are a test. Reply with "OK".',
+      // Test backend API connection instead of direct LLM
+      const apiUrl = import.meta.env.MODE === 'production' 
+        ? '/api/ai/chat' 
+        : 'http://localhost:8080/api/ai/chat';
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      ]);
+        body: JSON.stringify({
+          message: 'test',
+          context: {},
+        }),
+      });
 
-      this.isInitialized = true;
-      return true;
+      this.isInitialized = response.ok;
+      return response.ok;
     } catch (error) {
       console.error("AI configuration validation failed:", error);
       this.isInitialized = false;
@@ -331,78 +328,64 @@ export class LangChainAIService implements AIService {
     const startTime = Date.now();
 
     try {
-      if (!this.isInitialized) {
-        const isValid = await this.validateConfiguration();
-        if (!isValid) {
-          throw new AIServiceError(
-            "AI service configuration is invalid",
-            "INVALID_CONFIG",
-          );
-        }
-      }
-      
       // Determine query type for model selection
       const queryType = this.analyzeQueryType(userMessage, context);
-      this.llm = this.createLLM(queryType);
       
-      // Track costs if using generation endpoint
-      if (this.config.trackCosts) {
-        await this.trackGeneration(userMessage, queryType);
-      }
-
-      // Build enhanced system prompt
-      const systemPrompt = await this.buildEnhancedSystemPrompt(
-        userMessage,
-        context,
-      );
-      const formatInstructions = this.getJSONFormatInstructions();
-
-      const prompt = ChatPromptTemplate.fromMessages([
-        SystemMessagePromptTemplate.fromTemplate(systemPrompt),
-        HumanMessagePromptTemplate.fromTemplate(
-          `User message: {input}\n\nFormat your response according to these instructions:\n${formatInstructions}`,
-        ),
-      ]);
-
-      const chain = new LLMChain({
-        llm: this.llm,
-        prompt,
-        memory: this.memory,
+      // Build enhanced system prompt for context
+      const memoryContext = await this.buildMemoryContext(context);
+      const conversationSummary = await this.memory.buffer;
+      
+      // Get selected model
+      const model = this.selectModelByQueryType(queryType);
+      
+      // Call backend API
+      const apiUrl = import.meta.env.MODE === 'production' 
+        ? '/api/ai/chat' 
+        : 'http://localhost:8080/api/ai/chat';
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          context,
+          memoryContext,
+          conversationSummary,
+          model
+        }),
       });
 
-      const result = await chain.call({
-        input: userMessage,
-        conversation_step: context.conversationStep,
-        user_profile: JSON.stringify(context.userProfile),
-        wallet_data: JSON.stringify(context.walletData || {}),
-      });
-
-      let parsedResponse: z.infer<typeof responseSchema>;
-
-      try {
-        parsedResponse = this.parseJSONResponse(result.text);
-      } catch (parseError) {
-        console.warn(
-          "Failed to parse structured output, using fallback:",
-          parseError,
-        );
-        parsedResponse = {
-          message: result.text,
-          intent: {
-            action: "unclear",
-            confidence: 0.5,
-          },
-          shouldContinue: false,
-        };
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API error: ${response.status}`);
       }
 
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'API request failed');
+      }
+
+      // Save to memory
       await this.memory.saveContext(
         { input: userMessage },
-        { output: parsedResponse.message },
+        { output: data.message },
       );
 
-      // Update analytics with OpenRouter info
-      this.updateAnalytics(startTime, systemPrompt, parsedResponse, queryType);
+      // Create structured response
+      const parsedResponse = {
+        message: data.message,
+        intent: {
+          action: "continue" as const,
+          confidence: 0.8,
+        },
+        shouldContinue: false,
+      };
+
+      // Update analytics
+      this.updateAnalytics(startTime, userMessage, parsedResponse, queryType);
 
       return this.convertToAIResponse(parsedResponse);
     } catch (error: any) {
@@ -415,13 +398,12 @@ export class LangChainAIService implements AIService {
         return this.generateLegacyResponse(userMessage, context);
       }
 
-      if (error.response?.status === 429) {
+      if (error.status === 429) {
         throw new AIServiceError(
           "Rate limit exceeded. Please try again later.",
           "RATE_LIMIT",
-          error.response.data,
         );
-      } else if (error.response?.status >= 500) {
+      } else if (error.status >= 500) {
         throw new AIServiceError(
           "AI service is temporarily unavailable.",
           "API_ERROR",
