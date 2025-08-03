@@ -1,61 +1,23 @@
 {
-  "buildCommand": "cd frontend && npm install && npm run build",
+  "buildCommand": "npm install && cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
   "framework": "vite",
-  "installCommand": "npm install",
   "functions": {
-    "api/chat.ts": {
-      "runtime": "@vercel/node@20",
-      "maxDuration": 30
+    "api/*.ts": {
+      "runtime": "@vercel/node@20"
     },
-    "api/health.ts": {
-      "runtime": "@vercel/node@20",
-      "maxDuration": 30
-    },
-    "api/system.ts": {
-      "runtime": "@vercel/node@20",
-      "maxDuration": 30
-    },
-    "api/cdp.ts": {
-      "runtime": "@vercel/node@20",
-      "maxDuration": 30
-    },
-    "api/defi_yields.py": {
-      "runtime": "python3.9",
-      "maxDuration": 30
+    "api/*.py": {
+      "runtime": "python3.9"
     }
   },
-  "env": {
-    "KV_REST_API_URL": "@kv-rest-api-url",
-    "KV_REST_API_TOKEN": "@kv-rest-api-token",
-    "BLOB_READ_WRITE_TOKEN": "@blob-read-write-token",
-    "EDGE_CONFIG": "@edge-config"
-  },
-  "crons": [
-    {
-      "path": "/api/memory/cleanup",
-      "schedule": "0 2 * * *"
-    }
-  ],
   "rewrites": [
     {
-      "source": "/api/defi-yields",
-      "destination": "/api/defi_yields.py"
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     },
     {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
-        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
-      ]
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
