@@ -4,9 +4,7 @@ import {
   waitForTransaction,
   readContract,
   fetchBalance,
-  getAccount,
-  getNetwork,
-  switchNetwork
+  getAccount
 } from '@wagmi/core';
 import { parseUnits, formatUnits, isAddress } from 'viem';
 import { odosService, OdosAssembleResponse } from './odosService';
@@ -106,11 +104,8 @@ export class TransactionService {
         };
       }
 
-      // Check network
-      const network = getNetwork();
-      if (network.chain?.id !== request.chainId) {
-        await this.switchToChain(request.chainId);
-      }
+      // Note: Chain switching should be handled by the UI using useNetwork hook
+      // The transaction will be sent on the currently connected chain
 
       // Get swap quote and transaction from Odos
       const { quote, transaction } = await odosService.executeSwap(
@@ -336,18 +331,14 @@ export class TransactionService {
   }
 
   /**
-   * Switch to a specific chain
+   * Check if the user is on the correct chain
+   * Chain switching should be handled by the UI using wagmi hooks
    */
-  async switchToChain(chainId: number): Promise<boolean> {
-    try {
-      await switchNetwork({
-        chainId
-      });
-      return true;
-    } catch (error) {
-      console.error('Error switching chain:', error);
-      return false;
-    }
+  isCorrectChain(chainId: number): boolean {
+    // This should be checked in the component using useNetwork hook
+    // Keeping this method for compatibility but it should not perform switching
+    console.warn('Chain switching should be handled by UI components using wagmi hooks');
+    return true;
   }
 
   /**

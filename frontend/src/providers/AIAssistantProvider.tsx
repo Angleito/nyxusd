@@ -8,7 +8,7 @@ import React, {
 import { useAIService } from "../hooks/useAIService";
 import { swapDetectionService } from "../services/swapDetectionService";
 import { transactionService } from "../services/defi/transactionService";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 
 export type ConversationStep =
   | "initial"
@@ -680,7 +680,7 @@ export function AIAssistantProvider({
 }) {
   const [state, dispatch] = useReducer(aiAssistantReducer, initialState);
   const { address: walletAddress } = useAccount();
-  const { chain } = useNetwork();
+  const chainId = useChainId();
   const {
     sendMessage: sendAIMessage,
     reset: resetAI,
@@ -818,7 +818,7 @@ export function AIAssistantProvider({
         const swapRequest = await transactionService.parseAndPrepareSwap(
           message,
           walletAddress,
-          chain?.id || 8453 // Default to Base
+          chainId || 8453 // Default to Base
         );
 
         if (!swapRequest) {
@@ -893,7 +893,7 @@ export function AIAssistantProvider({
 
       return false;
     },
-    [walletAddress, chain, state.pendingSwap, updateMessage, dispatch]
+    [walletAddress, chainId, state.pendingSwap, updateMessage, dispatch]
   );
 
   const sendMessage = useCallback(
