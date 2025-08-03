@@ -133,7 +133,34 @@ export class SecureVoiceClient {
       return data;
     } catch (error) {
       console.error('Error getting voice config:', error);
-      throw error;
+      // Return a default config that indicates voice is not configured
+      this.config = {
+        success: false,
+        configured: false,
+        config: {
+          defaultVoiceId: 'EXAVITQu4vr4xnSDxMaL',
+          modelId: 'eleven_turbo_v2_5',
+          availableVoices: [],
+          voiceSettings: {
+            stability: 0.5,
+            similarity_boost: 0.75,
+            style: 0,
+            use_speaker_boost: true,
+          },
+          limits: {
+            maxCharactersPerRequest: 5000,
+            maxRequestsPerMinute: 20,
+            sessionTimeout: 300000,
+          },
+          features: {
+            textToSpeech: false,
+            conversationalMode: false,
+            streaming: false,
+            voiceCloning: false,
+          }
+        }
+      };
+      return this.config;
     }
   }
 

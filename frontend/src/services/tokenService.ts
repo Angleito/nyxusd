@@ -260,7 +260,14 @@ class TokenService {
       const response = await fetch(`${this.baseApiUrl}/odos/tokens/${this.baseChainId}`);
       
       if (!response.ok) {
-        throw new Error(`Odos API error: ${response.status}`);
+        console.warn(`⚠️ Odos token fetch failed: API returned ${response.status}`);
+        return [];
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.warn('⚠️ Odos token fetch failed: Response is not JSON');
+        return [];
       }
       
       const tokens = await response.json();
@@ -276,11 +283,16 @@ class TokenService {
           chainId: this.baseChainId,
           tags: this.inferTokenTags(token)
         }));
+      } else {
+        console.warn('⚠️ Odos token fetch failed: No tokens returned');
+        return [];
       }
-      
-      return [];
     } catch (error) {
-      console.warn('Odos token fetch failed:', error);
+      if (error instanceof SyntaxError && error.message.includes('JSON')) {
+        console.warn('⚠️ Odos token fetch failed: Invalid JSON response (likely HTML error page)');
+      } else {
+        console.warn('⚠️ Odos token fetch failed:', error);
+      }
       return [];
     }
   }

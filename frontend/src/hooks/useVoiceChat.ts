@@ -148,8 +148,10 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
         // Check if voice service is configured on server
         const isConfigured = await secureVoiceClient.isConfigured();
         if (!isConfigured) {
-          setError('Voice service not configured');
-          onErrorRef.current?.({ message: 'Voice service not configured' });
+          const errorMsg = 'Voice service not configured on server (ElevenLabs API key missing)';
+          setError(errorMsg);
+          console.warn('Voice chat initialization failed:', errorMsg);
+          onErrorRef.current?.({ message: errorMsg });
           return;
         }
 

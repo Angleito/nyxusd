@@ -835,7 +835,8 @@ export function AIAssistantProvider({
         const balanceCheck = await transactionService.validateBalance(
           swapRequest.inputToken,
           swapRequest.amount,
-          swapRequest.userAddress
+          swapRequest.userAddress,
+          swapRequest.chainId
         );
 
         if (!balanceCheck.valid) {

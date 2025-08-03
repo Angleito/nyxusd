@@ -9,6 +9,7 @@ import { parseUnits, formatUnits, isAddress } from 'viem';
 import { odosService, OdosAssembleResponse } from './odosService';
 import { swapDetectionService } from '../swapDetectionService';
 import { tokenService } from '../tokenService';
+import { wagmiConfig } from '../../config/wagmi';
 
 export interface TransactionRequest {
   to: string;
@@ -277,13 +278,23 @@ export class TransactionService {
    */
   async getTokenBalance(
     token: string,
-    address: string
+    address: string,
+    chainId?: number
   ): Promise<{ balance: string; formatted: string }> {
     try {
+      // Get current account and chain if not provided
+      const account = getAccount(wagmiConfig);
+      const currentChainId = chainId || account.chainId;
+      
+      if (!currentChainId) {
+        throw new Error('No chain ID available. Please connect wallet first.');
+      }
+
       if (token === '0x0000000000000000000000000000000000000000') {
         // Native token (ETH)
-        const balance = await getBalance({
-          address: address as `0x${string}`
+        const balance = await getBalance(wagmiConfig, {
+          address: address as `0x${string}`,
+          chainId: currentChainId
         });
         return {
           balance: balance.value.toString(),
@@ -291,11 +302,12 @@ export class TransactionService {
         };
       } else {
         // ERC20 token
-        const balance = await readContract({
+        const balance = await readContract(wagmiConfig, {
           address: token as `0x${string}`,
           abi: ERC20_ABI,
           functionName: 'balanceOf',
-          args: [address as `0x${string}`]
+          args: [address as `0x${string}`],
+          chainId: currentChainId
         });
 
         // Get token info for decimals
@@ -399,9 +411,10 @@ export class TransactionService {
   async validateBalance(
     token: string,
     amount: string,
-    userAddress: string
+    userAddress: string,
+    chainId?: number
   ): Promise<{ valid: boolean; error?: string }> {
-    const balance = await this.getTokenBalance(token, userAddress);
+    const balance = await this.getTokenBalance(token, userAddress, chainId);
     
     if (BigInt(balance.balance) < BigInt(amount)) {
       return {
