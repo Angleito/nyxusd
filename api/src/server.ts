@@ -376,6 +376,129 @@ app.use("/api/voice", voiceRoutes);
 // Memory routes for Vercel KV/Blob storage
 app.use("/api/memory", memoryRoutes);
 
+// Import token and swap services
+import { coingeckoService } from './services/coingeckoService';
+import { getOdosSwapService } from './services/odosSwapService';
+
+// Token API endpoints
+app.get("/api/tokens/base", async (req, res) => {
+  try {
+    const { limit = '100' } = req.query;
+    const tokenLimit = Math.min(parseInt(limit as string, 10) || 100, 500);
+
+    console.log(`🔍 Fetching comprehensive Base chain tokens (limit: ${tokenLimit})...`);
+    
+    // Get multiple pages of market data to capture more tokens
+    const pages = Math.ceil(tokenLimit / 250); // CoinGecko max per page is 250
+    const allTokenPromises = [];
+    
+    for (let page = 1; page <= pages; page++) {
+      allTokenPromises.push(coingeckoService.getMarketData(page, Math.min(250, tokenLimit - (page - 1) * 250)));
+    }
+    
+    const allTokenPages = await Promise.allSettled(allTokenPromises);
+    let allMarketTokens: any[] = [];
+    
+    allTokenPages.forEach((page, index) => {
+      if (page.status === 'fulfilled' && Array.isArray(page.value)) {
+        allMarketTokens.push(...page.value);
+        console.log(`✅ Page ${index + 1}: Found ${page.value.length} tokens`);
+      } else {
+        console.warn(`⚠️ Page ${index + 1} failed:`, page.status === 'rejected' ? page.reason : 'No data');
+      }
+    });
+
+    console.log(`📊 Total market tokens fetched: ${allMarketTokens.length}`);
+
+    // Essential Base tokens (always include these)
+    const essentialBaseTokens = [
+      { symbol: 'ETH', id: 'ethereum', address: '0x0000000000000000000000000000000000000000', decimals: 18, name: 'Ethereum' },
+      { symbol: 'WETH', id: 'weth', address: '0x4200000000000000000000000000000000000006', decimals: 18, name: 'Wrapped Ether' },
+      { symbol: 'USDC', id: 'usd-coin', address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', decimals: 6, name: 'USD Coin' },
+      { symbol: 'USDT', id: 'tether', address: '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb', decimals: 6, name: 'Tether USD' },
+      { symbol: 'DAI', id: 'dai', address: '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb', decimals: 18, name: 'Dai Stablecoin' },
+      { symbol: 'AERO', id: 'aerodrome-finance', address: '0x940181a94A35A4569E4529A3CDfB74e38FD98631', decimals: 18, name: 'Aerodrome Finance' },
+      { symbol: 'MORPHO', id: 'morpho', address: '0xbaa5cc21fd487b8fcc2f632f3f4e8d37262a0842', decimals: 18, name: 'Morpho' },
+      { symbol: 'BRETT', id: 'brett', address: '0x532f27101965dd16442E59d40670FaF5ebb142E4', decimals: 18, name: 'Brett' },
+      { symbol: 'DEGEN', id: 'degen-base', address: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', decimals: 18, name: 'Degen' },
+      { symbol: 'HIGHER', id: 'higher', address: '0x0578d8A44db98B23BF096A382e016e29a5Ce0ffe', decimals: 18, name: 'Higher' },
+      { symbol: 'HYUSD', id: 'high-yield-usd', address: '0x4f5fbc1ce8b23c6ae46c26bbb0c43e68a425bdc1', decimals: 18, name: 'High Yield USD' },
+      { symbol: 'CBETH', id: 'coinbase-wrapped-staked-eth', address: '0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22', decimals: 18, name: 'Coinbase Wrapped Staked ETH' },
+      { symbol: 'WSTETH', id: 'wrapped-steth', address: '0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452', decimals: 18, name: 'Wrapped liquid staked Ether 2.0' },
+    ];
+
+    // Combine essential tokens with market data
+    const tokens = essentialBaseTokens.map(token => ({
+      id: token.id,
+      symbol: token.symbol,
+      name: token.name,
+      platforms: { base: token.address },
+      decimals: token.decimals,
+      current_price: 0,
+      market_cap: 0,
+      market_cap_rank: 999
+    }));
+
+    // Add additional market tokens if available
+    const existingSymbols = new Set(essentialBaseTokens.map(t => t.symbol.toLowerCase()));
+    allMarketTokens.slice(0, Math.max(0, tokenLimit - tokens.length)).forEach(token => {
+      if (!existingSymbols.has(token.symbol.toLowerCase())) {
+        tokens.push({
+          ...token,
+          platforms: { base: '0x0000000000000000000000000000000000000000' }, // Placeholder
+          decimals: 18
+        });
+      }
+    });
+
+    console.log(`✅ Returning ${tokens.length} Base tokens`);
+
+    return res.status(200).json({
+      success: true,
+      tokens: tokens.slice(0, tokenLimit)
+    });
+
+  } catch (error) {
+    console.error('Error fetching Base tokens:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch Base tokens'
+    });
+  }
+});
+
+// Odos API endpoints
+app.get("/api/odos/tokens/:chainId", async (req, res) => {
+  try {
+    const { chainId } = req.params;
+    const parsedChainId = chainId ? parseInt(chainId as string, 10) : 8453;
+
+    console.log(`🔍 Fetching Odos tokens for chain ${parsedChainId}...`);
+
+    const odosService = getOdosSwapService(parsedChainId);
+    
+    // Check if Odos is available for this chain
+    const isAvailable = await odosService.isAvailable();
+    if (!isAvailable) {
+      console.warn(`⚠️ Odos not available for chain ${parsedChainId}`);
+      return res.status(200).json([]);
+    }
+
+    // Get supported tokens
+    const tokens = await odosService.getSupportedTokens();
+    
+    console.log(`✅ Odos returned ${tokens.length} tokens for chain ${parsedChainId}`);
+    
+    return res.status(200).json(tokens);
+
+  } catch (error) {
+    console.error('Error fetching Odos tokens:', error);
+    return res.status(500).json({ 
+      error: error instanceof Error ? error.message : 'Failed to fetch Odos tokens' 
+    });
+  }
+});
+
 // System information endpoints
 app.get("/api/system", (req, res) => {
   res.json({
