@@ -66,7 +66,7 @@ export class EnhancedAIService {
     try {
       // Use different endpoints for production (Vercel) vs local development
       const endpoint = this.isProduction 
-        ? `${this.baseUrl}/ai-assistant/chat`
+        ? `${this.baseUrl}/chat`
         : `${this.baseUrl}/ai/enhanced/chat`;
       
       const response = await fetch(endpoint, {
@@ -109,7 +109,7 @@ export class EnhancedAIService {
       // For production, use the regular endpoint (no streaming support in Vercel functions)
       // For local, use the streaming endpoint
       const endpoint = this.isProduction
-        ? `${this.baseUrl}/ai-assistant/chat`
+        ? `${this.baseUrl}/chat`
         : `${this.baseUrl}/ai/enhanced/chat/stream`;
       
       const response = await fetch(endpoint, {
