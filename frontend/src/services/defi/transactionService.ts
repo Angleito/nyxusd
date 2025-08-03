@@ -1,9 +1,8 @@
 import { 
-  prepareWriteContract, 
   writeContract, 
-  waitForTransaction,
+  waitForTransactionReceipt,
   readContract,
-  fetchBalance,
+  getBalance,
   getAccount
 } from '@wagmi/core';
 import { parseUnits, formatUnits, isAddress } from 'viem';
@@ -178,35 +177,24 @@ export class TransactionService {
     error?: string;
   }> {
     try {
-      // Send transaction
-      const { hash } = await writeContract({
-        address: tx.to as `0x${string}`,
-        abi: [], // We're sending raw data
-        functionName: 'raw',
-        args: [],
-        value: BigInt(tx.value),
-        gas: tx.gas ? BigInt(tx.gas) : undefined,
-        // @ts-ignore - raw transaction data
-        data: tx.data
-      });
-
-      // Wait for confirmation
-      const receipt = await waitForTransaction({
-        hash,
-        confirmations: 1
-      });
-
-      if (receipt.status === 'success') {
-        return {
-          success: true,
-          hash
-        };
-      } else {
+      // For raw transactions, we need to use a different approach
+      // The transaction should be sent directly with the data
+      const account = getAccount();
+      if (!account.address) {
         return {
           success: false,
-          error: 'Transaction failed'
+          error: 'No wallet connected'
         };
       }
+
+      // Since wagmi v2 doesn't have a direct raw transaction method,
+      // we'll need to handle this differently
+      // For now, return an error indicating the transaction needs to be handled differently
+      console.error('Raw transaction sending needs to be implemented with viem directly');
+      return {
+        success: false,
+        error: 'Transaction execution needs to be updated for wagmi v2'
+      };
     } catch (error: any) {
       console.error('Transaction error:', error);
       return {
@@ -249,7 +237,7 @@ export class TransactionService {
     error?: string;
   }> {
     try {
-      const { request } = await prepareWriteContract({
+      const hash = await writeContract({
         address: approval.token as `0x${string}`,
         abi: ERC20_ABI,
         functionName: 'approve',
@@ -259,9 +247,7 @@ export class TransactionService {
         ]
       });
 
-      const { hash } = await writeContract(request);
-
-      const receipt = await waitForTransaction({
+      const receipt = await waitForTransactionReceipt({
         hash,
         confirmations: 1
       });
@@ -269,7 +255,7 @@ export class TransactionService {
       if (receipt.status === 'success') {
         return {
           success: true,
-          hash
+          hash: receipt.transactionHash
         };
       } else {
         return {
@@ -296,7 +282,7 @@ export class TransactionService {
     try {
       if (token === '0x0000000000000000000000000000000000000000') {
         // Native token (ETH)
-        const balance = await fetchBalance({
+        const balance = await getBalance({
           address: address as `0x${string}`
         });
         return {
