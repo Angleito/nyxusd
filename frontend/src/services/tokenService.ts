@@ -25,7 +25,7 @@ interface CoinGeckoAssetPlatform {
 
 class TokenService {
   private static instance: TokenService;
-  private baseApiUrl = process.env['NODE_ENV'] === 'production' 
+  private baseApiUrl = import.meta.env.MODE === 'production' 
     ? '/api' 
     : 'http://localhost:8080/api'; // Backend API endpoint
   private cache: Map<string, { data: TokenInfo[]; timestamp: number }> = new Map();

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Maximize2, Minimize2 } from "lucide-react";
-import { EnhancedChatInterface } from "./EnhancedChatInterface";
-import { EnhancedAIProvider } from "../../providers/EnhancedAIProvider";
+import { ChatInterface } from "./ChatInterface";
+import { AIAssistantProvider } from "../../providers/AIAssistantProvider";
 
 interface UnifiedAIAssistantProps {
   defaultOpen?: boolean;
@@ -58,7 +58,7 @@ export const UnifiedAIAssistant: React.FC<UnifiedAIAssistantProps> = ({
   };
 
   return (
-    <EnhancedAIProvider>
+    <AIAssistantProvider>
       <>
         {/* Floating Action Button */}
         <AnimatePresence>
@@ -134,7 +134,7 @@ export const UnifiedAIAssistant: React.FC<UnifiedAIAssistantProps> = ({
                 </div>
 
                 {/* Chat component */}
-                <EnhancedChatInterface />
+                <ChatInterface />
               </div>
             </motion.div>
           )}
@@ -153,17 +153,17 @@ export const UnifiedAIAssistant: React.FC<UnifiedAIAssistantProps> = ({
           )}
         </AnimatePresence>
       </>
-    </EnhancedAIProvider>
+    </AIAssistantProvider>
   );
 };
 
 // Standalone version for full-page usage
 export const StandaloneAIAssistant: React.FC = () => {
   return (
-    <EnhancedAIProvider>
+    <AIAssistantProvider>
       <div className="w-full h-full">
-        <EnhancedChatInterface />
+        <ChatInterface />
       </div>
-    </EnhancedAIProvider>
+    </AIAssistantProvider>
   );
 };
