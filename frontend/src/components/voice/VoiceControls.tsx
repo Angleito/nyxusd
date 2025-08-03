@@ -15,7 +15,6 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
   onTranscription,
   onError,
   onStatusChange,
-  apiKey,
   className = '',
 }) => {
   const [isListening, setIsListening] = useState(false);
