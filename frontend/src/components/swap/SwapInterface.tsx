@@ -23,6 +23,13 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
   onCancel,
   embedded = false
 }) => {
+  // Debug logging
+  console.log('SwapInterface props:', {
+    initialInputToken,
+    initialOutputToken,
+    initialAmount
+  });
+  
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();

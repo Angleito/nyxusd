@@ -171,6 +171,14 @@ What would you like to explore today?`,
     // Check for swap intent
     const swapIntent = swapDetectionService.detectSwapIntent(userMessage.content);
     
+    // Debug logging
+    console.log('Swap Detection Debug:', {
+      message: userMessage.content,
+      swapIntent,
+      inputToken: swapIntent.inputToken,
+      outputToken: swapIntent.outputToken
+    });
+    
     if (swapIntent.isSwapIntent && swapIntent.confidence > 0.5) {
       // Always show swap interface immediately for better UX
       // Don't ask for clarification - let user fill in the interface
