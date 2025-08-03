@@ -4,9 +4,28 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  // Enable CORS
+  // Enable CORS with proper origin handling
+  const isDevelopment = process.env['NODE_ENV'] === 'development' || 
+                       process.env['VERCEL_ENV'] === 'development';
+  
+  const allowedOrigins = [
+    'https://nyxusd.com',
+    'https://www.nyxusd.com',
+    ...(isDevelopment ? [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:8080'
+    ] : [])
+  ];
+  
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else if (isDevelopment) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', process.env['FRONTEND_URL'] || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
   
@@ -21,11 +40,39 @@ export default async function handler(
 
   try {
     // Check if voice service is configured
-    const isConfigured = !!process.env['ELEVENLABS_API_KEY'];
+    const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
+    const isConfigured = !!elevenLabsApiKey;
+    
+    let apiStatus = 'not_configured';
+    let errorDetails = null;
+
+    if (isConfigured) {
+      try {
+        // Test ElevenLabs API connection
+        const testResponse = await fetch('https://api.elevenlabs.io/v1/user', {
+          headers: {
+            'xi-api-key': elevenLabsApiKey,
+          },
+        });
+
+        if (testResponse.ok) {
+          apiStatus = 'connected';
+        } else {
+          apiStatus = 'error';
+          errorDetails = `API returned ${testResponse.status}`;
+        }
+      } catch (error) {
+        console.error('ElevenLabs API test failed:', error);
+        apiStatus = 'error';
+        errorDetails = error instanceof Error ? error.message : 'Connection failed';
+      }
+    }
     
     res.status(200).json({
       success: true,
       configured: isConfigured,
+      apiStatus,
+      errorDetails,
       config: {
         defaultVoiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
         modelId: process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5',
@@ -50,18 +97,28 @@ export default async function handler(
           sessionTimeout: 300000, // 5 minutes
         },
         features: {
-          textToSpeech: true,
-          conversationalMode: isConfigured, // Only if API key is configured
+          textToSpeech: isConfigured && apiStatus === 'connected',
+          conversationalMode: isConfigured && apiStatus === 'connected',
           streaming: true,
           voiceCloning: false, // Requires higher tier
+        },
+        endpoints: {
+          session: '/api/voice/session',
+          tts: '/api/voice/tts',
+          config: '/api/voice/config',
+          health: '/api/voice-health',
+          token: '/api/voice-token'
         }
       },
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error('Error getting voice config:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to get voice configuration',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
     });
   }
 }

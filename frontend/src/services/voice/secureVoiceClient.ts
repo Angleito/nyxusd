@@ -22,6 +22,8 @@ export interface VoiceToken {
 
 export interface VoiceConfig {
   configured: boolean;
+  apiStatus?: string;
+  errorDetails?: string;
   config: {
     defaultVoiceId: string;
     modelId: string;
@@ -46,6 +48,13 @@ export interface VoiceConfig {
       conversationalMode: boolean;
       streaming: boolean;
       voiceCloning: boolean;
+    };
+    endpoints?: {
+      session: string;
+      tts: string;
+      config: string;
+      health: string;
+      token: string;
     };
   };
 }
@@ -198,16 +207,16 @@ export class SecureVoiceClient {
     const tokenData = await this.getToken();
     
     try {
-      const response = await fetch(`${this.baseUrl}/api/voice-tts`, {
+      const response = await fetch(`${this.baseUrl}/api/voice/tts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenData.token}`,
         },
         body: JSON.stringify({
           text,
           voiceId: voiceId || tokenData.config.voiceId,
           modelId: modelId || tokenData.config.modelId,
-          token: tokenData.token,
         }),
       });
 
@@ -256,6 +265,77 @@ export class SecureVoiceClient {
   }
 
   /**
+   * Start a voice session with context
+   */
+  async startSession(context?: any): Promise<{ sessionId: string; token: string }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/voice/session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'start',
+          sessionId: this.sessionId,
+          context,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Failed to start session' }));
+        throw new Error(error.error || `Failed to start session: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to start session');
+      }
+
+      this.sessionId = data.sessionId;
+      this.token = data.token;
+      this.tokenExpiry = Date.now() + (29 * 60 * 1000); // 29 minutes
+
+      return {
+        sessionId: data.sessionId,
+        token: data.token,
+      };
+    } catch (error) {
+      console.error('Error starting voice session:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * End the current voice session
+   */
+  async endSession(): Promise<void> {
+    if (!this.sessionId) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/api/voice/session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'end',
+          sessionId: this.sessionId,
+        }),
+      });
+
+      if (!response.ok) {
+        console.warn('Failed to properly end session:', response.statusText);
+      }
+    } catch (error) {
+      console.warn('Error ending voice session:', error);
+    } finally {
+      this.clearSession();
+    }
+  }
+
+  /**
    * Clear session
    */
   clearSession(): void {
@@ -269,7 +349,7 @@ export class SecureVoiceClient {
    */
   async isConfigured(): Promise<boolean> {
     const config = await this.getConfig();
-    return config.configured;
+    return config.configured && config.apiStatus === 'connected';
   }
 }
 

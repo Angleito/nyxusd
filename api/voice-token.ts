@@ -5,9 +5,28 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  // Enable CORS
+  // Enable CORS with proper origin handling
+  const isDevelopment = process.env['NODE_ENV'] === 'development' || 
+                       process.env['VERCEL_ENV'] === 'development';
+  
+  const allowedOrigins = [
+    'https://nyxusd.com',
+    'https://www.nyxusd.com',
+    ...(isDevelopment ? [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:8080'
+    ] : [])
+  ];
+  
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else if (isDevelopment) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', process.env['FRONTEND_URL'] || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
   
