@@ -215,8 +215,14 @@ export class LangChainAIService implements AIService {
       this.config.model
     );
     
+    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY || this.config.apiKey;
+    
+    if (!apiKey) {
+      throw new Error("OpenRouter API key is required. Please set VITE_OPENROUTER_API_KEY in your environment.");
+    }
+    
     return new ChatOpenAI({
-      openAIApiKey: import.meta.env.VITE_OPENROUTER_API_KEY || this.config.apiKey,
+      openAIApiKey: apiKey,
       modelName: modelName,
       temperature: this.config.temperature || 0.7,
       maxTokens: this.config.maxTokens || 128000, // Default to higher limit for Gemini
@@ -226,6 +232,7 @@ export class LangChainAIService implements AIService {
         defaultHeaders: {
           "HTTP-Referer": this.openRouterConfig.appUrl,
           "X-Title": this.openRouterConfig.appName,
+          "Authorization": `Bearer ${apiKey}`,
         },
       },
       modelKwargs: {
