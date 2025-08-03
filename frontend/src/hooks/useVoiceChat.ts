@@ -1,16 +1,29 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { voiceService } from '../services/voice/voiceService';
 import { elevenLabsClient } from '../services/voice/elevenLabsClient';
+import { ConversationContext } from '../services/voice/conversationalAgent';
 
 export interface UseVoiceChatOptions {
   apiKey?: string;
   autoStart?: boolean;
   voiceId?: string;
+  conversationalMode?: boolean;
   onTranscription?: (text: string, isFinal: boolean) => void;
+  onUserTranscript?: (transcript: { text: string; isFinal: boolean; timestamp: Date }) => void;
+  onAgentResponse?: (response: { text: string; timestamp: Date }) => void;
+  onAgentSpeaking?: (data: { isFinal: boolean }) => void;
+  onAgentFinishedSpeaking?: () => void;
   onError?: (error: any) => void;
   onStatusChange?: (status: string) => void;
   onSessionStart?: (sessionId: string) => void;
   onSessionEnd?: () => void;
+  onConversationStarted?: (session: any) => void;
+  onConversationEnded?: (data: any) => void;
+  // Fallback and recovery callbacks
+  onFallbackAttempt?: (data: { mode: string; retry: number; reason: string }) => void;
+  onModeChanged?: (data: { from: string; to: string; reason: string }) => void;
+  onConnectionRecovered?: () => void;
+  onUserMessage?: (message: { type: string; message: string; canRetry?: boolean }) => void;
 }
 
 export interface UseVoiceChatReturn {
@@ -19,13 +32,14 @@ export interface UseVoiceChatReturn {
   isSessionActive: boolean;
   isListening: boolean;
   isSpeaking: boolean;
-  status: 'idle' | 'listening' | 'processing' | 'speaking' | 'error';
+  status: 'idle' | 'listening' | 'processing' | 'speaking' | 'error' | 'connecting' | 'connected' | 'thinking';
   error: string | null;
   transcript: string;
   sessionId: string | null;
+  isConversationalMode: boolean;
   
   // Actions
-  startSession: () => Promise<void>;
+  startSession: (context?: ConversationContext) => Promise<void>;
   endSession: () => Promise<void>;
   startListening: () => Promise<void>;
   stopListening: () => void;
@@ -34,9 +48,18 @@ export interface UseVoiceChatReturn {
   toggleListening: () => Promise<void>;
   clearTranscript: () => void;
   
+  // Conversational mode
+  enableConversationalMode: (context?: ConversationContext) => Promise<void>;
+  disableConversationalMode: () => Promise<void>;
+  updateConversationContext: (context: Partial<ConversationContext>) => void;
+  
   // Configuration
   setVoiceId: (voiceId: string) => void;
   getAvailableVoices: () => Promise<any[]>;
+  
+  // Fallback and health monitoring
+  getConnectionHealth: () => { state: string; mode: string; fallbackMode: string | null; retryCount: number };
+  triggerFallback: (mode: 'tts' | 'conversational', reason?: string) => Promise<void>;
 }
 
 export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatReturn {
@@ -44,11 +67,22 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
     apiKey,
     autoStart = false,
     voiceId,
+    conversationalMode = false,
     onTranscription,
+    onUserTranscript,
+    onAgentResponse,
+    onAgentSpeaking,
+    onAgentFinishedSpeaking,
     onError,
     onStatusChange,
     onSessionStart,
     onSessionEnd,
+    onConversationStarted,
+    onConversationEnded,
+    onFallbackAttempt,
+    onModeChanged,
+    onConnectionRecovered,
+    onUserMessage,
   } = options;
 
   // State
@@ -56,35 +90,73 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'listening' | 'processing' | 'speaking' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'listening' | 'processing' | 'speaking' | 'error' | 'connecting' | 'connected' | 'thinking'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [transcript, setTranscript] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [availableVoices, setAvailableVoices] = useState<any[]>([]);
+  const [isConversationalMode, setIsConversationalMode] = useState(conversationalMode);
 
   // Refs for callbacks to avoid recreating event listeners
   const onTranscriptionRef = useRef(onTranscription);
+  const onUserTranscriptRef = useRef(onUserTranscript);
+  const onAgentResponseRef = useRef(onAgentResponse);
+  const onAgentSpeakingRef = useRef(onAgentSpeaking);
+  const onAgentFinishedSpeakingRef = useRef(onAgentFinishedSpeaking);
   const onErrorRef = useRef(onError);
   const onStatusChangeRef = useRef(onStatusChange);
+  const onConversationStartedRef = useRef(onConversationStarted);
+  const onConversationEndedRef = useRef(onConversationEnded);
+  const onFallbackAttemptRef = useRef(onFallbackAttempt);
+  const onModeChangedRef = useRef(onModeChanged);
+  const onConnectionRecoveredRef = useRef(onConnectionRecovered);
+  const onUserMessageRef = useRef(onUserMessage);
 
   // Update refs when callbacks change
   useEffect(() => {
     onTranscriptionRef.current = onTranscription;
+    onUserTranscriptRef.current = onUserTranscript;
+    onAgentResponseRef.current = onAgentResponse;
+    onAgentSpeakingRef.current = onAgentSpeaking;
+    onAgentFinishedSpeakingRef.current = onAgentFinishedSpeaking;
     onErrorRef.current = onError;
     onStatusChangeRef.current = onStatusChange;
-  }, [onTranscription, onError, onStatusChange]);
+    onConversationStartedRef.current = onConversationStarted;
+    onConversationEndedRef.current = onConversationEnded;
+    onFallbackAttemptRef.current = onFallbackAttempt;
+    onModeChangedRef.current = onModeChanged;
+    onConnectionRecoveredRef.current = onConnectionRecovered;
+    onUserMessageRef.current = onUserMessage;
+  }, [
+    onTranscription, 
+    onUserTranscript, 
+    onAgentResponse, 
+    onAgentSpeaking, 
+    onAgentFinishedSpeaking, 
+    onError, 
+    onStatusChange,
+    onConversationStarted,
+    onConversationEnded,
+    onFallbackAttempt,
+    onModeChanged,
+    onConnectionRecovered,
+    onUserMessage
+  ]);
 
   // Initialize voice services
   useEffect(() => {
     const initialize = async () => {
       try {
         if (apiKey) {
+          // Set voice config including conversational mode
+          const config = { 
+            voiceId: voiceId || 'EXAVITQu4vr4xnSDxMaL',
+            conversationalMode: isConversationalMode
+          };
+          voiceService.setVoiceConfig(config);
+          
           await voiceService.initialize(apiKey);
           await elevenLabsClient.initialize(apiKey);
-          
-          if (voiceId) {
-            voiceService.setVoiceConfig({ voiceId });
-          }
           
           setIsInitialized(true);
           
@@ -108,7 +180,7 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
     };
 
     initialize();
-  }, [apiKey, voiceId, autoStart]);
+  }, [apiKey, voiceId, autoStart, isConversationalMode]);
 
   // Set up event listeners
   useEffect(() => {
@@ -173,7 +245,68 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
       }
     };
 
-    // Add event listeners
+    // Conversational AI event handlers
+    const handleUserTranscript = (transcript: any) => {
+      onUserTranscriptRef.current?.(transcript);
+    };
+
+    const handleAgentResponse = (response: any) => {
+      onAgentResponseRef.current?.(response);
+    };
+
+    const handleAgentSpeaking = (data: any) => {
+      setIsSpeaking(true);
+      onAgentSpeakingRef.current?.(data);
+    };
+
+    const handleAgentFinishedSpeaking = () => {
+      setIsSpeaking(false);
+      onAgentFinishedSpeakingRef.current?.();
+    };
+
+    const handleConversationStarted = (session: any) => {
+      setIsSessionActive(true);
+      setSessionId(session.sessionId);
+      setStatus('connected');
+      onConversationStartedRef.current?.(session);
+    };
+
+    const handleConversationEnded = (data: any) => {
+      setIsSessionActive(false);
+      setIsListening(false);
+      setIsSpeaking(false);
+      setStatus('idle');
+      setSessionId(null);
+      onConversationEndedRef.current?.(data);
+    };
+
+    // Fallback and recovery event handlers
+    const handleFallbackAttempt = (data: any) => {
+      console.log('Fallback attempt:', data);
+      onFallbackAttemptRef.current?.(data);
+    };
+
+    const handleModeChanged = (data: any) => {
+      console.log('Voice mode changed:', data);
+      setIsConversationalMode(data.to === 'conversational');
+      onModeChangedRef.current?.(data);
+    };
+
+    const handleConnectionRecovered = () => {
+      console.log('Connection recovered');
+      setError(null);
+      onConnectionRecoveredRef.current?.();
+    };
+
+    const handleUserMessage = (message: any) => {
+      console.log('User message:', message);
+      if (message.type === 'error') {
+        setError(message.message);
+      }
+      onUserMessageRef.current?.(message);
+    };
+
+    // Add regular event listeners
     voiceService.on('transcription', handleTranscription);
     voiceService.on('error', handleError);
     voiceService.on('sessionStarted', handleSessionStarted);
@@ -182,6 +315,20 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
     voiceService.on('listeningStopped', handleListeningStopped);
     voiceService.on('speakingStarted', handleSpeakingStarted);
     voiceService.on('speakingFinished', handleSpeakingFinished);
+
+    // Add conversational AI event listeners
+    voiceService.on('userTranscript', handleUserTranscript);
+    voiceService.on('agentResponse', handleAgentResponse);
+    voiceService.on('agentSpeaking', handleAgentSpeaking);
+    voiceService.on('agentFinishedSpeaking', handleAgentFinishedSpeaking);
+    voiceService.on('conversationStarted', handleConversationStarted);
+    voiceService.on('conversationEnded', handleConversationEnded);
+
+    // Add fallback and recovery event listeners
+    voiceService.on('fallbackAttempt', handleFallbackAttempt);
+    voiceService.on('modeChanged', handleModeChanged);
+    voiceService.on('connectionRecovered', handleConnectionRecovered);
+    voiceService.on('userMessage', handleUserMessage);
 
     // Cleanup
     return () => {
@@ -193,17 +340,31 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
       voiceService.off('listeningStopped', handleListeningStopped);
       voiceService.off('speakingStarted', handleSpeakingStarted);
       voiceService.off('speakingFinished', handleSpeakingFinished);
+      
+      // Cleanup conversational AI listeners
+      voiceService.off('userTranscript', handleUserTranscript);
+      voiceService.off('agentResponse', handleAgentResponse);
+      voiceService.off('agentSpeaking', handleAgentSpeaking);
+      voiceService.off('agentFinishedSpeaking', handleAgentFinishedSpeaking);
+      voiceService.off('conversationStarted', handleConversationStarted);
+      voiceService.off('conversationEnded', handleConversationEnded);
+      
+      // Cleanup fallback and recovery listeners
+      voiceService.off('fallbackAttempt', handleFallbackAttempt);
+      voiceService.off('modeChanged', handleModeChanged);
+      voiceService.off('connectionRecovered', handleConnectionRecovered);
+      voiceService.off('userMessage', handleUserMessage);
     };
   }, [isSpeaking, onSessionStart, onSessionEnd]);
 
   // Actions
-  const startSession = useCallback(async () => {
+  const startSession = useCallback(async (context?: ConversationContext) => {
     if (!isInitialized) {
       throw new Error('Voice services not initialized');
     }
     
     try {
-      const id = await voiceService.startSession();
+      const id = await voiceService.startSession(context);
       setSessionId(id);
     } catch (err: any) {
       setError(err.message);
@@ -285,6 +446,44 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
     }
   }, [isInitialized, availableVoices]);
 
+  // Conversational mode methods
+  const enableConversationalMode = useCallback(async (context?: ConversationContext) => {
+    if (isConversationalMode) return;
+    
+    try {
+      await voiceService.enableConversationalMode(context);
+      setIsConversationalMode(true);
+    } catch (err: any) {
+      setError(err.message);
+      throw err;
+    }
+  }, [isConversationalMode]);
+
+  const disableConversationalMode = useCallback(async () => {
+    if (!isConversationalMode) return;
+    
+    try {
+      await voiceService.disableConversationalMode();
+      setIsConversationalMode(false);
+    } catch (err: any) {
+      setError(err.message);
+      throw err;
+    }
+  }, [isConversationalMode]);
+
+  const updateConversationContext = useCallback((context: Partial<ConversationContext>) => {
+    voiceService.updateConversationContext(context);
+  }, []);
+
+  // Fallback and health monitoring methods
+  const getConnectionHealth = useCallback(() => {
+    return voiceService.getConnectionHealth();
+  }, []);
+
+  const triggerFallback = useCallback(async (mode: 'tts' | 'conversational', reason: string = 'manual') => {
+    await voiceService.triggerFallback(mode, reason);
+  }, []);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -304,6 +503,7 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
     error,
     transcript,
     sessionId,
+    isConversationalMode,
     
     // Actions
     startSession,
@@ -315,8 +515,17 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
     toggleListening,
     clearTranscript,
     
+    // Conversational mode
+    enableConversationalMode,
+    disableConversationalMode,
+    updateConversationContext,
+    
     // Configuration
     setVoiceId,
     getAvailableVoices,
+    
+    // Fallback and health monitoring
+    getConnectionHealth,
+    triggerFallback,
   };
 }
