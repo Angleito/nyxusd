@@ -215,8 +215,33 @@ export class LangChainAIService implements AIService {
     throw new Error("Direct LLM usage disabled. Use backend API instead.");
   }
 
+  // Simple conversation history storage
+  private conversationHistory: Array<{user: string, assistant: string, timestamp: Date}> = [];
+  private maxHistoryLength = 10; // Keep last 10 exchanges
+
+  private storeConversationLocally(userMessage: string, assistantMessage: string): void {
+    this.conversationHistory.push({
+      user: userMessage,
+      assistant: assistantMessage,
+      timestamp: new Date()
+    });
+
+    // Keep only the last N exchanges
+    if (this.conversationHistory.length > this.maxHistoryLength) {
+      this.conversationHistory = this.conversationHistory.slice(-this.maxHistoryLength);
+    }
+  }
+
   private buildSimpleMemoryContext(context: AIContext): string {
     const parts: string[] = [];
+    
+    // Add conversation history context
+    if (this.conversationHistory.length > 0) {
+      const recentHistory = this.conversationHistory.slice(-3).map(exchange => 
+        `User: ${exchange.user} | Assistant: ${exchange.assistant}`
+      ).join(' || ');
+      parts.push(`Recent conversation: ${recentHistory}`);
+    }
     
     if (context.userProfile) {
       parts.push(`User: ${JSON.stringify(context.userProfile)}`);
@@ -231,6 +256,16 @@ export class LangChainAIService implements AIService {
     }
     
     return parts.join(' | ');
+  }
+
+  private buildConversationSummary(): string {
+    if (this.conversationHistory.length === 0) return "";
+    
+    // Create a simple summary of the conversation
+    const lastFewExchanges = this.conversationHistory.slice(-5);
+    return lastFewExchanges.map(exchange => 
+      `Q: ${exchange.user.substring(0, 100)} A: ${exchange.assistant.substring(0, 100)}`
+    ).join(' | ');
   }
   
   private selectModelByQueryType(
@@ -333,7 +368,7 @@ export class LangChainAIService implements AIService {
       
       // Build simple context for backend API
       const memoryContext = this.buildSimpleMemoryContext(context);
-      const conversationSummary = ""; // Skip memory buffer to avoid LLM calls
+      const conversationSummary = this.buildConversationSummary();
       
       // Get selected model
       const model = this.selectModelByQueryType(queryType);
@@ -368,8 +403,8 @@ export class LangChainAIService implements AIService {
         throw new Error(data.error || 'API request failed');
       }
 
-      // Skip memory saving to avoid LLM calls
-      // TODO: Implement simple memory storage without LangChain dependency
+      // Store conversation in simple memory (without LangChain)
+      this.storeConversationLocally(userMessage, data.message);
 
       // Create structured response
       const parsedResponse = {
@@ -1206,5 +1241,15 @@ Ensure the response is valid JSON without any markdown formatting or code blocks
     
     // Use the same streaming method as the main method
     return this.streamResponse(userMessage, context, onChunk);
+  }
+
+  /**
+   * Reset the service state and clear conversation history
+   */
+  reset(): void {
+    this.conversationHistory = [];
+    this.isInitialized = false;
+    this.fallbackMode = false;
+    console.log("AI service reset - conversation history cleared");
   }
 }
