@@ -747,7 +747,9 @@ Always structure your response with:
 
   reset(): void {
     this.memory = this.createMemory();
+    this.conversationHistory = [];
     this.isInitialized = false;
+    this.fallbackMode = false;
 
     // Reset analytics
     this.analytics = {
@@ -761,6 +763,8 @@ Always structure your response with:
         effectivenessScore: 0,
       },
     };
+
+    console.log("LangChain AI service reset - conversation history cleared");
   }
 
   /**
@@ -1243,13 +1247,4 @@ Ensure the response is valid JSON without any markdown formatting or code blocks
     return this.streamResponse(userMessage, context, onChunk);
   }
 
-  /**
-   * Reset the service state and clear conversation history
-   */
-  reset(): void {
-    this.conversationHistory = [];
-    this.isInitialized = false;
-    this.fallbackMode = false;
-    console.log("AI service reset - conversation history cleared");
-  }
 }

@@ -40,6 +40,8 @@ export interface Message {
   content: string;
   timestamp: Date;
   typing?: boolean;
+  component?: 'swap' | 'portfolio' | 'chart';
+  componentProps?: any;
 }
 
 export interface WalletData {
@@ -797,14 +799,7 @@ export function AIAssistantProvider({
       const swapIntent = await swapDetectionService.detectSwapIntentAsync(message);
       
       if (swapIntent.isSwapIntent && swapIntent.confidence > 0.6) {
-        // Check wallet connection
-        if (!walletAddress) {
-          updateMessage(aiMessageId, {
-            content: "Please connect your wallet first to execute swaps. Click the 'Connect Wallet' button in the top right.",
-            typing: false,
-          });
-          return true;
-        }
+        // Note: Removed wallet check - SwapInterface component handles wallet connection requirements
 
         // Check for missing parameters
         if (swapIntent.missingParams && swapIntent.missingParams.length > 0) {
@@ -816,83 +811,22 @@ export function AIAssistantProvider({
           return true;
         }
 
-        // Prepare swap request
-        const swapRequest = await transactionService.parseAndPrepareSwap(
-          message,
-          walletAddress,
-          chainId || 8453 // Default to Base
-        );
-
-        if (!swapRequest) {
-          updateMessage(aiMessageId, {
-            content: "I couldn't parse your swap request. Please specify the tokens and amount clearly, like 'swap 1 ETH for USDC'.",
-            typing: false,
-          });
-          return true;
-        }
-
-        // Validate balance
-        const balanceCheck = await transactionService.validateBalance(
-          swapRequest.inputToken,
-          swapRequest.amount,
-          swapRequest.userAddress,
-          swapRequest.chainId
-        );
-
-        if (!balanceCheck.valid) {
-          updateMessage(aiMessageId, {
-            content: `❌ ${balanceCheck.error}\n\nWould you like to swap a smaller amount?`,
-            typing: false,
-          });
-          return true;
-        }
-
-        // Show swap confirmation
-        const confirmMessage = swapDetectionService.formatSwapConfirmation(
-          swapIntent.inputToken!,
-          swapIntent.outputToken!,
-          swapIntent.amount || '1'
-        );
-
+        // Show swap UI component with detected tokens
         updateMessage(aiMessageId, {
-          content: `${confirmMessage}\n\n⚠️ **Ready to execute this swap?**\n\nType "confirm" to proceed or "cancel" to abort.`,
+          content: `I'll help you swap ${swapIntent.inputToken} to ${swapIntent.outputToken}. ${!walletAddress ? 'You\'ll need to connect your wallet to execute the swap.' : 'Here\'s the swap interface:'}`,
           typing: false,
-        });
-
-        // Store pending swap in state for confirmation
-        dispatch({
-          type: "SET_PENDING_SWAP",
-          payload: swapRequest,
+          component: 'swap',
+          componentProps: {
+            inputToken: swapIntent.inputToken!,
+            outputToken: swapIntent.outputToken!,
+            amount: swapIntent.amount || ''
+          }
         });
 
         return true;
       }
 
-      // Check for swap confirmation
-      if (message.toLowerCase().includes('confirm') && state.pendingSwap) {
-        updateMessage(aiMessageId, {
-          content: "🔄 Executing swap...",
-          typing: true,
-        });
-
-        const result = await transactionService.executeSwap(state.pendingSwap);
-
-        if (result.success) {
-          updateMessage(aiMessageId, {
-            content: `✅ **Swap Successful!**\n\n🔗 Transaction: ${result.txHash}\n📥 Received: ${result.outputAmount}\n📊 Price Impact: ${result.priceImpact}\n\nYour swap has been completed successfully!`,
-            typing: false,
-          });
-        } else {
-          updateMessage(aiMessageId, {
-            content: `❌ **Swap Failed**\n\n${result.error}\n\nPlease try again or adjust your parameters.`,
-            typing: false,
-          });
-        }
-
-        // Clear pending swap
-        dispatch({ type: "CLEAR_PENDING_SWAP" });
-        return true;
-      }
+      // Note: Swap execution is now handled directly by the SwapInterface component
 
       return false;
     },

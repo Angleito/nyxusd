@@ -20,6 +20,19 @@ export default defineConfig({
     outDir: "dist",
     sourcemap: true,
     target: "esnext",
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks
+          'react-vendor': ['react', 'react-dom'],
+          'wallet-vendor': ['@rainbow-me/rainbowkit', 'wagmi', 'viem'],
+          'ui-vendor': ['framer-motion', 'lucide-react'],
+          // Split large individual libraries
+          'metamask-sdk': ['@metamask/sdk']
+        }
+      }
+    }
   },
   optimizeDeps: {
     esbuildOptions: {

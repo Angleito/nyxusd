@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { clsx } from "clsx";
 import { SparklesIcon, UserIcon } from "@heroicons/react/24/outline";
 import { Message } from "../../providers/AIAssistantProvider";
+import { SwapInterface } from "../swap/SwapInterface";
 
 interface ChatMessageProps {
   message: Message;
@@ -110,9 +111,31 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             </span>
           </motion.div>
         ) : (
-          <div className="text-gray-300 whitespace-pre-wrap break-words overflow-wrap-anywhere chat-message-content">
-            {message.content}
-          </div>
+          <>
+            {message.content && (
+              <div className="text-gray-300 whitespace-pre-wrap break-words overflow-wrap-anywhere chat-message-content">
+                {message.content}
+              </div>
+            )}
+            {message.component === 'swap' && (
+              <div className="mt-4">
+                <SwapInterface
+                  embedded={true}
+                  initialInputToken={message.componentProps?.inputToken}
+                  initialOutputToken={message.componentProps?.outputToken}
+                  initialAmount={message.componentProps?.amount}
+                  onSwapComplete={(txHash) => {
+                    console.log('Swap completed:', txHash);
+                    // The SwapInterface already provides feedback
+                  }}
+                  onCancel={() => {
+                    console.log('Swap cancelled');
+                    // The SwapInterface handles this internally
+                  }}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </motion.div>
