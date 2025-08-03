@@ -39,7 +39,7 @@ const loadPreferences = (): ThemePreferences => {
   }
   
   return {
-    selectedThemeId: 'midnight',
+    selectedThemeId: 'base', // Default to Base theme
     reducedMotion: false,
     highContrast: false,
     particlesEnabled: true,

@@ -26,9 +26,16 @@ const chains: Chain[] = [
 export const NyxHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [selectedChain, setSelectedChain] = useState(chains[0]);
+  const [selectedChain, setSelectedChain] = useState(chains[4]); // Default to Base (index 4)
   const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false);
   const { setTheme, currentTheme, transitionState } = useTheme();
+
+  // Set initial theme to Base on mount
+  useEffect(() => {
+    if (currentTheme.id !== 'base') {
+      setTheme('base');
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle scroll effect for backdrop blur
   useEffect(() => {

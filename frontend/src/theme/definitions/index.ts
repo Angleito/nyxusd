@@ -18,4 +18,4 @@ export const themes: Record<string, BlockchainTheme> = {
   base: baseTheme,
 };
 
-export const defaultTheme = midnightTheme;
+export const defaultTheme = baseTheme; // Default to Base theme

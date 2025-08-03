@@ -114,6 +114,7 @@ interface ThemeBackgroundProps {
 export const ThemeBackground: React.FC<ThemeBackgroundProps> = ({ className = '' }) => {
   const { currentTheme } = useTheme();
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([]);
+  const [gridNodes, setGridNodes] = useState<Array<{ id: number; x: number; y: number }>>([]);
   
   useEffect(() => {
     if (currentTheme.animations.particles.enabled) {
@@ -124,6 +125,21 @@ export const ThemeBackground: React.FC<ThemeBackgroundProps> = ({ className = ''
         delay: Math.random() * 5,
       }));
       setParticles(newParticles);
+    }
+    
+    // Create blockchain grid for Base theme
+    if (currentTheme.id === 'base') {
+      const nodes = [];
+      for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 6; j++) {
+          nodes.push({
+            id: i * 6 + j,
+            x: (i + 1) * 12.5,
+            y: (j + 1) * 16.66,
+          });
+        }
+      }
+      setGridNodes(nodes);
     }
   }, [currentTheme]);
   
@@ -140,6 +156,59 @@ export const ThemeBackground: React.FC<ThemeBackgroundProps> = ({ className = ''
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       />
+      
+      {/* Blockchain grid for Base theme */}
+      {currentTheme.id === 'base' && (
+        <div className="absolute inset-0">
+          <svg className="w-full h-full" style={{ opacity: 0.1 }}>
+            {gridNodes.map((node, i) => (
+              <g key={node.id}>
+                {/* Connect to neighboring nodes */}
+                {gridNodes.map((otherNode, j) => {
+                  const distance = Math.sqrt(
+                    Math.pow(node.x - otherNode.x, 2) + Math.pow(node.y - otherNode.y, 2)
+                  );
+                  if (distance < 20 && i < j) {
+                    return (
+                      <motion.line
+                        key={`${node.id}-${otherNode.id}`}
+                        x1={`${node.x}%`}
+                        y1={`${node.y}%`}
+                        x2={`${otherNode.x}%`}
+                        y2={`${otherNode.y}%`}
+                        stroke="#0052FF"
+                        strokeWidth="1"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: [0.2, 0.5, 0.2] }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          delay: Math.random() * 2,
+                        }}
+                      />
+                    );
+                  }
+                  return null;
+                })}
+                {/* Node circles */}
+                <motion.circle
+                  cx={`${node.x}%`}
+                  cy={`${node.y}%`}
+                  r="3"
+                  fill="#0052FF"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: node.id * 0.1,
+                  }}
+                />
+              </g>
+            ))}
+          </svg>
+        </div>
+      )}
       
       {/* Particles for all themes */}
       {currentTheme.animations.particles.enabled && (

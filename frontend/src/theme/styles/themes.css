@@ -83,32 +83,32 @@
 }
 
 /* ==========================================
-   BASE THEME - Deep Ocean
+   BASE THEME - Ethereum L2 Modern
    ========================================== */
 :root[data-theme="base"] {
   /* Override nyx variables with Base theme */
-  --nyx-cosmic-black: #000814;
-  --nyx-cosmic-black-rgb: 0, 8, 20;
-  --nyx-void-90: #001122;
-  --nyx-void-80: #001933;
-  --nyx-void-70: #002244;
-  --nyx-void-60: #002D55;
-  --nyx-void-50: #003866;
+  --nyx-cosmic-black: #0A0B0F;
+  --nyx-cosmic-black-rgb: 10, 11, 15;
+  --nyx-void-90: #12141A;
+  --nyx-void-80: #1A1C24;
+  --nyx-void-70: #22242E;
+  --nyx-void-60: #2A2D38;
+  --nyx-void-50: #323542;
   
-  --nyx-gleam-90: #E6F3FF;
-  --nyx-gleam-80: #B3D9FF;
-  --nyx-gleam-70: #80BFFF;
-  --nyx-gleam-60: #4DA5FF;
-  --nyx-gleam-50: #1A8BFF;
+  --nyx-gleam-90: #FFFFFF;
+  --nyx-gleam-80: #C1C7D0;
+  --nyx-gleam-70: #8B95A6;
+  --nyx-gleam-60: #697D9B;
+  --nyx-gleam-50: #546382;
   
   --nyx-primary: #0052FF;
-  --nyx-primary-hover: #0041CC;
-  --nyx-primary-active: #003199;
+  --nyx-primary-hover: #0047E0;
+  --nyx-primary-active: #003BB8;
   
   --nyx-success: #00D97E;
   --nyx-warning: #FFB94A;
   --nyx-error: #FF6B6B;
-  --nyx-info: #4DD5FF;
+  --nyx-info: #29B7FF;
   
   --nyx-blur-sm: 4px;
   --nyx-blur-md: 8px;
@@ -117,46 +117,48 @@
 
 /* Base-specific component overrides */
 [data-theme="base"] .nyx-glass {
-  background: rgba(0, 17, 34, 0.95) !important;
+  background: rgba(18, 20, 26, 0.85) !important;
   border: 1px solid rgba(0, 82, 255, 0.15) !important;
-  backdrop-filter: blur(12px) !important;
-  box-shadow: 0 8px 32px rgba(0, 82, 255, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3) !important;
 }
 
 [data-theme="base"] .nyx-glass-dark {
-  background: rgba(0, 25, 51, 0.98) !important;
-  border: 1px solid rgba(0, 82, 255, 0.25) !important;
+  background: rgba(26, 28, 36, 0.95) !important;
+  border: 1px solid rgba(0, 82, 255, 0.2) !important;
 }
 
 [data-theme="base"] .nyx-heading-1,
 [data-theme="base"] .nyx-heading-2,
 [data-theme="base"] .nyx-heading-3 {
-  color: #E6F3FF !important;
+  color: #FFFFFF !important;
 }
 
 [data-theme="base"] .nyx-body,
 [data-theme="base"] .nyx-body-small {
-  color: #B3D9FF !important;
+  color: #C1C7D0 !important;
 }
 
 [data-theme="base"] .nyx-text-gradient {
-  background: linear-gradient(135deg, #0052FF 0%, #00B8F0 100%) !important;
+  background: linear-gradient(90deg, #0052FF 0%, #0047E0 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
 
-/* Base electric animations */
-@keyframes base-electric {
+/* Base blockchain grid animation */
+@keyframes base-grid-pulse {
   0%, 100% { 
-    filter: brightness(1) drop-shadow(0 0 10px rgba(0, 82, 255, 0.5));
+    opacity: 0.3;
+    transform: scale(1);
   }
   50% { 
-    filter: brightness(1.2) drop-shadow(0 0 20px rgba(0, 82, 255, 0.8));
+    opacity: 0.6;
+    transform: scale(1.05);
   }
 }
 
-[data-theme="base"] .electric-glow {
-  animation: base-electric 2s ease-in-out infinite;
+[data-theme="base"] .blockchain-grid {
+  animation: base-grid-pulse 4s ease-in-out infinite;
 }
 
 /* ==========================================
@@ -189,7 +191,7 @@
 }
 
 [data-theme="base"] body {
-  background: radial-gradient(ellipse at bottom, #001933 0%, #001122 40%, #000814 100%);
+  background: linear-gradient(135deg, #0A0B0F 0%, #12141A 50%, #1A1C24 100%);
   min-height: 100vh;
 }
 
