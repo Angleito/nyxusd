@@ -153,8 +153,12 @@ export class SwapDetectionService {
   private extractSwapParameters(message: string): Partial<SwapIntent> {
     const result: Partial<SwapIntent> = {};
     
-    // Pattern variations for swap detection - expanded
+    // Pattern variations for swap detection - expanded and ordered by specificity
     const patterns = [
+      // "I want to swap USDC and AERO" or "swap USDC and AERO"
+      /(?:want\s+to\s+)?swap\s+(\w+)\s+(?:and|for|to|with)\s+(\w+)/i,
+      // "swap USDC for AERO" or "swap USDC to AERO"
+      /swap\s+(\w+)\s+(?:for|to|into)\s+(\w+)/i,
       // "swap 1 ETH for USDC"
       /swap\s+(\d+(?:\.\d+)?)\s+(\w+)\s+(?:for|to|into)\s+(\w+)/i,
       // "buy USDC with 1 ETH"
@@ -171,10 +175,8 @@ export class SwapDetectionService {
       /(\d+(?:\.\d+)?)\s+(\w+)\s+(?:to|for|into)\s+(\w+)/i,
       // "ETH to USDC" or "ETH for USDC"
       /(\w+)\s+(?:to|for|into|->|→)\s+(\w+)/i,
-      // "swap ETH to USDC" (no amount)
-      /swap\s+(\w+)\s+(?:to|for|into)\s+(\w+)/i,
-      // "I want USDC" or "I need USDC"
-      /(?:want|need|get)\s+(?:some\s+)?(\w+)/i,
+      // "I want USDC" or "I need USDC" - moved to end for lower priority
+      /(?:want|need|get)\s+(?:some\s+)?(\w+)$/i,
       // "switch to USDC"
       /switch\s+to\s+(\w+)/i,
     ];
@@ -182,7 +184,12 @@ export class SwapDetectionService {
     for (const pattern of patterns) {
       const match = message.match(pattern);
       if (match) {
-        if (pattern.source.includes('buy')) {
+        // Check for specific patterns first
+        if (pattern.source.includes('want\\s+to\\s+)?swap')) {
+          // "I want to swap USDC and AERO" pattern
+          result.inputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[2]);
+        } else if (pattern.source.includes('buy')) {
           // Buy pattern: buy [output] with [amount] [input]
           result.outputToken = this.normalizeToken(match[1]);
           result.amount = match[2];
@@ -201,7 +208,7 @@ export class SwapDetectionService {
           if (!result.inputToken) {
             result.inputToken = 'ETH';
           }
-        } else if (pattern.source.startsWith('/swap\\s+') && match.length === 3) {
+        } else if (pattern.source.startsWith('swap\\s+') && match.length === 3) {
           // Swap pattern without amount: swap [input] to [output]
           result.inputToken = this.normalizeToken(match[1]);
           result.outputToken = this.normalizeToken(match[2]);

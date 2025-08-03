@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinGecko API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+        .price-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #333;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .positive { color: #4CAF50; }
+        .negative { color: #f44336; }
+        .loading {
+            text-align: center;
+            color: #888;
+        }
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 CoinGecko API Test</h1>
+        
+        <div style="text-align: center;">
+            <button onclick="fetchPrices(['bitcoin', 'ethereum', 'solana'])">Get Top Coins</button>
+            <button onclick="fetchPrices(['usd-coin', 'tether', 'dai'])">Get Stablecoins</button>
+            <button onclick="fetchTrending()">Get Trending</button>
+            <button onclick="testChat()">Test Chat API</button>
+        </div>
+        
+        <div id="results">
+            <p style="text-align: center; color: #888;">Click a button to fetch data...</p>
+        </div>
+    </div>
+
+    <script>
+        const COINGECKO_API = 'https://api.coingecko.com/api/v3';
+        const resultsDiv = document.getElementById('results');
+
+        async function fetchPrices(coins) {
+            resultsDiv.innerHTML = '<div class="loading">Loading prices...</div>';
+            
+            try {
+                const ids = coins.join(',');
+                const response = await fetch(
+                    `${COINGECKO_API}/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`
+                );
+                const data = await response.json();
+                
+                let html = '<h3>Current Prices:</h3>';
+                for (const [coin, info] of Object.entries(data)) {
+                    const change = info.usd_24h_change || 0;
+                    const changeClass = change >= 0 ? 'positive' : 'negative';
+                    const changeSymbol = change >= 0 ? '▲' : '▼';
+                    
+                    html += `
+                        <div class="price-item">
+                            <div>
+                                <strong>${coin.toUpperCase()}</strong>
+                            </div>
+                            <div>
+                                $${info.usd.toLocaleString()}
+                                <span class="${changeClass}">
+                                    ${changeSymbol} ${Math.abs(change).toFixed(2)}%
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                resultsDiv.innerHTML = html;
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: #f44336;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function fetchTrending() {
+            resultsDiv.innerHTML = '<div class="loading">Loading trending coins...</div>';
+            
+            try {
+                const response = await fetch(`${COINGECKO_API}/search/trending`);
+                const data = await response.json();
+                
+                let html = '<h3>🔥 Trending Coins (24h):</h3>';
+                data.coins.slice(0, 10).forEach((item, index) => {
+                    const coin = item.item;
+                    html += `
+                        <div class="price-item">
+                            <div>
+                                ${index + 1}. <strong>${coin.name}</strong> (${coin.symbol})
+                            </div>
+                            <div>
+                                Rank #${coin.market_cap_rank || 'N/A'}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML = html;
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: #f44336;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testChat() {
+            resultsDiv.innerHTML = '<div class="loading">Testing chat API endpoint...</div>';
+            
+            try {
+                // Test against local API
+                const response = await fetch('http://localhost:8080/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'What is the current price of Bitcoin and Ethereum?',
+                        sessionId: 'test-' + Date.now(),
+                        context: {}
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}`);
+                }
+                
+                const data = await response.json();
+                resultsDiv.innerHTML = `
+                    <h3>Chat API Response:</h3>
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 5px;">
+                        <pre style="white-space: pre-wrap; word-wrap: break-word;">${data.message}</pre>
+                    </div>
+                    ${data.toolsUsed ? `<p>Tools used: ${data.toolsUsed.join(', ')}</p>` : ''}
+                `;
+            } catch (error) {
+                // If local API fails, show direct CoinGecko test
+                resultsDiv.innerHTML = `
+                    <p style="color: #f44336;">Local API not running. Testing CoinGecko directly...</p>
+                `;
+                fetchPrices(['bitcoin', 'ethereum']);
+            }
+        }
+
+        // Auto-fetch top coins on load
+        window.onload = () => {
+            fetchPrices(['bitcoin', 'ethereum', 'solana']);
+        };
+    </script>
+</body>
+</html>
