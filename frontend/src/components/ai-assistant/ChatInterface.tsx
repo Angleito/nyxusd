@@ -129,6 +129,9 @@ export const ChatInterface: React.FC = () => {
         const userProfile = address ? chatMemoryService.getUserProfile(address) : null;
         const memoryContext = address ? chatMemoryService.getMemoryPromptContext(address) : '';
         
+        // Get available tokens for DeFi operations
+        const availableTokens = ['ETH', 'USDC', 'USDT', 'DAI', 'WETH', 'AERO', 'BRETT', 'DEGEN', 'HIGHER', 'MORPHO'];
+        
         const context: ConversationContext = {
           userProfile: {
             walletAddress: address || state.walletData?.address,
@@ -150,6 +153,11 @@ export const ChatInterface: React.FC = () => {
           })),
           currentStep: state.currentStep,
           memoryContext: memoryContext || (getEnhancedAIContext() ? JSON.stringify(getEnhancedAIContext()) : undefined),
+          defiCapabilities: {
+            canExecuteSwaps: !!address,
+            connectedChain: 8453, // Base chain
+            availableTokens: availableTokens,
+          },
         };
 
         await voiceChat.enableConversationalMode(context);
@@ -187,13 +195,15 @@ export const ChatInterface: React.FC = () => {
     }
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputValue.trim() && !state.isTyping) {
+      const message = inputValue.trim();
+      
       // Add to memory service
       const userMessage = {
         id: `msg-${Date.now()}`,
         role: 'user' as const,
-        content: inputValue.trim(),
+        content: message,
         timestamp: new Date(),
       };
       chatMemoryService.addMessage(userMessage);
@@ -203,8 +213,8 @@ export const ChatInterface: React.FC = () => {
         chatMemoryService.createOrUpdateUserProfile(address);
       }
       
-      // Send through regular AI assistant
-      sendMessage(inputValue.trim());
+      // Send through regular AI assistant (now with DeFi support)
+      await sendMessage(message);
       setInputValue("");
       inputRef.current?.focus();
     }

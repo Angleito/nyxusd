@@ -14,17 +14,24 @@ import {
   PRESET_CONFIGS,
   OPTIMIZED_TEMPLATES,
 } from "./promptBuilder";
-// Simple local implementation to avoid build issues
-class Err<T, E> {
-  constructor(public readonly value: E) {}
-  isOk(): this is Ok<T, E> { return false; }
-  isErr(): this is Err<T, E> { return true; }
-}
+// Simple local implementations to avoid build issues - match promptBuilder.ts structure
 class Ok<T, E> {
   constructor(public readonly value: T) {}
   isOk(): this is Ok<T, E> { return true; }
   isErr(): this is Err<T, E> { return false; }
+  map<U>(fn: (value: T) => U): Result<U, E> {
+    return new Ok(fn(this.value));
+  }
 }
+class Err<T, E> {
+  constructor(public readonly error: E) {}
+  isOk(): this is Ok<T, E> { return false; }
+  isErr(): this is Err<T, E> { return true; }
+  map<U>(fn: (value: T) => U): Result<U, E> {
+    return new Err(this.error);
+  }
+}
+type Result<T, E> = Ok<T, E> | Err<T, E>;
 import {
   ConversationStep,
   UserProfile,
@@ -97,7 +104,7 @@ export function demonstrateBasicUsage() {
     console.log(`Build Time: ${promptData.metadata.buildTime}ms`);
     console.log(`Truncated: ${promptData.truncated ? "Yes" : "No"}\n`);
   } else {
-    console.error("Error building prompt:", (result as Err<any, string>).value);
+    console.error("Error building prompt:", result.error);
   }
 }
 

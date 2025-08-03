@@ -8,24 +8,37 @@ export function createAIService(config?: Partial<AIServiceConfig>): AIService {
   const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY || config?.apiKey;
   const finalConfig = { ...DEFAULT_AI_CONFIG, ...config, apiKey };
 
+  // Detect if we're in production (Vercel deployment)
+  const isProduction = 
+    import.meta.env.PROD || 
+    import.meta.env.MODE === 'production' ||
+    (typeof window !== 'undefined' && window.location.hostname !== 'localhost');
+
   // Check for API keys and use appropriate service
-  // Use mock only if explicitly set or no API key available
+  // In production, assume API keys are configured in Vercel
+  // Use mock only if explicitly set or in local dev without API key
   if (
-    apiKey &&
+    (apiKey || isProduction) &&
     import.meta.env.VITE_USE_MOCK_AI !== "true"
   ) {
     try {
       aiServiceInstance = new LangChainAIService(finalConfig);
-      console.log("Using LangChain AI service");
+      console.log("Using LangChain AI service (real AI)");
     } catch (error) {
       console.warn(
         "Failed to initialize LangChain service, falling back:",
         error,
       );
-      aiServiceInstance = new FallbackAIService(finalConfig);
+      // Only fall back to mock in development
+      if (!isProduction) {
+        aiServiceInstance = new FallbackAIService(finalConfig);
+      } else {
+        // In production, throw error if real AI fails
+        throw new Error("AI service initialization failed in production");
+      }
     }
   } else {
-    console.log("Using fallback AI service (mock implementation)");
+    console.log("Using fallback AI service (mock implementation for local dev)");
     aiServiceInstance = new FallbackAIService(finalConfig);
   }
 

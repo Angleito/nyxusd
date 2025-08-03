@@ -6,6 +6,9 @@ import React, {
   useEffect,
 } from "react";
 import { useAIService } from "../hooks/useAIService";
+import { swapDetectionService } from "../services/swapDetectionService";
+import { transactionService } from "../services/defi/transactionService";
+import { useAccount, useNetwork } from "wagmi";
 
 export type ConversationStep =
   | "initial"
@@ -138,6 +141,7 @@ interface AIAssistantState {
   profileCompleteness?: ProfileCompleteness;
   personalizationCapabilities?: PersonalizationCapabilities;
   personalizationLevel?: "basic" | "enhanced" | "advanced";
+  pendingSwap?: any; // Stores pending swap transaction for confirmation
 }
 
 type AIAssistantAction =
@@ -157,6 +161,8 @@ type AIAssistantAction =
       type: "SET_PERSONALIZATION_LEVEL";
       payload: "basic" | "enhanced" | "advanced";
     }
+  | { type: "SET_PENDING_SWAP"; payload: any }
+  | { type: "CLEAR_PENDING_SWAP" }
   | { type: "RESET" };
 
 // Profile analysis and validation functions
@@ -625,6 +631,18 @@ function aiAssistantReducer(
         personalizationLevel: action.payload,
       };
 
+    case "SET_PENDING_SWAP":
+      return {
+        ...state,
+        pendingSwap: action.payload,
+      };
+
+    case "CLEAR_PENDING_SWAP":
+      return {
+        ...state,
+        pendingSwap: undefined,
+      };
+
     case "RESET":
       return initialState;
 
@@ -661,6 +679,8 @@ export function AIAssistantProvider({
   children: React.ReactNode;
 }) {
   const [state, dispatch] = useReducer(aiAssistantReducer, initialState);
+  const { address: walletAddress } = useAccount();
+  const { chain } = useNetwork();
   const {
     sendMessage: sendAIMessage,
     reset: resetAI,
@@ -768,6 +788,114 @@ export function AIAssistantProvider({
     resetAI();
   }, [resetAI]);
 
+  // Handle DeFi actions detected in messages
+  const handleDeFiAction = useCallback(
+    async (message: string, aiMessageId: string) => {
+      // Check for swap intent
+      const swapIntent = await swapDetectionService.detectSwapIntentAsync(message);
+      
+      if (swapIntent.isSwapIntent && swapIntent.confidence > 0.6) {
+        // Check wallet connection
+        if (!walletAddress) {
+          updateMessage(aiMessageId, {
+            content: "Please connect your wallet first to execute swaps. Click the 'Connect Wallet' button in the top right.",
+            typing: false,
+          });
+          return true;
+        }
+
+        // Check for missing parameters
+        if (swapIntent.missingParams && swapIntent.missingParams.length > 0) {
+          const question = swapDetectionService.generateClarifyingQuestion(swapIntent.missingParams);
+          updateMessage(aiMessageId, {
+            content: question,
+            typing: false,
+          });
+          return true;
+        }
+
+        // Prepare swap request
+        const swapRequest = await transactionService.parseAndPrepareSwap(
+          message,
+          walletAddress,
+          chain?.id || 8453 // Default to Base
+        );
+
+        if (!swapRequest) {
+          updateMessage(aiMessageId, {
+            content: "I couldn't parse your swap request. Please specify the tokens and amount clearly, like 'swap 1 ETH for USDC'.",
+            typing: false,
+          });
+          return true;
+        }
+
+        // Validate balance
+        const balanceCheck = await transactionService.validateBalance(
+          swapRequest.inputToken,
+          swapRequest.amount,
+          swapRequest.userAddress
+        );
+
+        if (!balanceCheck.valid) {
+          updateMessage(aiMessageId, {
+            content: `❌ ${balanceCheck.error}\n\nWould you like to swap a smaller amount?`,
+            typing: false,
+          });
+          return true;
+        }
+
+        // Show swap confirmation
+        const confirmMessage = swapDetectionService.formatSwapConfirmation(
+          swapIntent.inputToken!,
+          swapIntent.outputToken!,
+          swapIntent.amount || '1'
+        );
+
+        updateMessage(aiMessageId, {
+          content: `${confirmMessage}\n\n⚠️ **Ready to execute this swap?**\n\nType "confirm" to proceed or "cancel" to abort.`,
+          typing: false,
+        });
+
+        // Store pending swap in state for confirmation
+        dispatch({
+          type: "SET_PENDING_SWAP",
+          payload: swapRequest,
+        });
+
+        return true;
+      }
+
+      // Check for swap confirmation
+      if (message.toLowerCase().includes('confirm') && state.pendingSwap) {
+        updateMessage(aiMessageId, {
+          content: "🔄 Executing swap...",
+          typing: true,
+        });
+
+        const result = await transactionService.executeSwap(state.pendingSwap);
+
+        if (result.success) {
+          updateMessage(aiMessageId, {
+            content: `✅ **Swap Successful!**\n\n🔗 Transaction: ${result.txHash}\n📥 Received: ${result.outputAmount}\n📊 Price Impact: ${result.priceImpact}\n\nYour swap has been completed successfully!`,
+            typing: false,
+          });
+        } else {
+          updateMessage(aiMessageId, {
+            content: `❌ **Swap Failed**\n\n${result.error}\n\nPlease try again or adjust your parameters.`,
+            typing: false,
+          });
+        }
+
+        // Clear pending swap
+        dispatch({ type: "CLEAR_PENDING_SWAP" });
+        return true;
+      }
+
+      return false;
+    },
+    [walletAddress, chain, state.pendingSwap, updateMessage, dispatch]
+  );
+
   const sendMessage = useCallback(
     async (content: string) => {
       // Add user message
@@ -778,6 +906,14 @@ export function AIAssistantProvider({
       const aiMessageId = addMessage("", "ai");
 
       try {
+        // First check for DeFi actions
+        const handledByDeFi = await handleDeFiAction(content, aiMessageId);
+        
+        if (handledByDeFi) {
+          setTyping(false);
+          return;
+        }
+
         const response = await sendAIMessage(
           content,
           state.currentStep,
@@ -816,6 +952,11 @@ export function AIAssistantProvider({
           if (response.intent) {
             handleIntentAction(response.intent);
           }
+
+          // Check if AI response mentions swapping
+          if (response.message.toLowerCase().includes('swap')) {
+            await handleDeFiAction(response.message, aiMessageId);
+          }
         } else {
           // Fallback message if AI fails
           updateMessage(aiMessageId, {
@@ -843,6 +984,8 @@ export function AIAssistantProvider({
       setTyping,
       setStep,
       dispatch,
+      handleDeFiAction,
+      handleIntentAction,
     ],
   );
 

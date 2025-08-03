@@ -49,6 +49,11 @@ export interface ConversationContext {
   }>;
   currentStep?: string;
   memoryContext?: string;
+  defiCapabilities?: {
+    canExecuteSwaps: boolean;
+    connectedChain?: number;
+    availableTokens?: string[];
+  };
 }
 
 export interface AudioChunk {
@@ -195,6 +200,29 @@ Key traits:
 
       if (profile.walletAddress) {
         contextualPrompt += `\n- Connected wallet: ${profile.walletAddress.slice(0, 6)}...${profile.walletAddress.slice(-4)}`;
+      }
+    }
+
+    // Add DeFi capabilities context
+    if (this.conversationContext.defiCapabilities) {
+      const defi = this.conversationContext.defiCapabilities;
+      contextualPrompt += `\n\nDeFi Capabilities:`;
+      
+      if (defi.canExecuteSwaps) {
+        contextualPrompt += `\n- Can execute token swaps via Odos`;
+        contextualPrompt += `\n- Connected to chain ID: ${defi.connectedChain || 'Base (8453)'}`;
+        
+        if (defi.availableTokens?.length) {
+          contextualPrompt += `\n- Available tokens: ${defi.availableTokens.slice(0, 5).join(', ')}${defi.availableTokens.length > 5 ? '...' : ''}`;
+        }
+        
+        contextualPrompt += `\n\nWhen users mention swapping tokens:
+- Help them specify the tokens and amounts
+- Confirm the swap details before execution
+- Explain gas costs and price impact
+- Guide them through the confirmation process`;
+      } else {
+        contextualPrompt += `\n- Wallet not connected for swaps. Inform users to connect their wallet to execute trades.`;
       }
     }
 
