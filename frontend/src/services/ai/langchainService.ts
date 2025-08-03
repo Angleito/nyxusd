@@ -215,7 +215,7 @@ export class LangChainAIService implements AIService {
     throw new Error("Direct LLM usage disabled. Use backend API instead.");
   }
 
-  private async buildMemoryContext(context: AIContext): Promise<string> {
+  private buildSimpleMemoryContext(context: AIContext): string {
     const parts: string[] = [];
     
     if (context.userProfile) {
@@ -331,9 +331,9 @@ export class LangChainAIService implements AIService {
       // Determine query type for model selection
       const queryType = this.analyzeQueryType(userMessage, context);
       
-      // Build enhanced system prompt for context
-      const memoryContext = await this.buildMemoryContext(context);
-      const conversationSummary = await this.memory.buffer;
+      // Build simple context for backend API
+      const memoryContext = this.buildSimpleMemoryContext(context);
+      const conversationSummary = ""; // Skip memory buffer to avoid LLM calls
       
       // Get selected model
       const model = this.selectModelByQueryType(queryType);
@@ -368,11 +368,8 @@ export class LangChainAIService implements AIService {
         throw new Error(data.error || 'API request failed');
       }
 
-      // Save to memory
-      await this.memory.saveContext(
-        { input: userMessage },
-        { output: data.message },
-      );
+      // Skip memory saving to avoid LLM calls
+      // TODO: Implement simple memory storage without LangChain dependency
 
       // Create structured response
       const parsedResponse = {

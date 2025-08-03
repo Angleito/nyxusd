@@ -247,4 +247,17 @@ export class SecureVoiceClient {
 }
 
 // Export singleton instance
-export const secureVoiceClient = new SecureVoiceClient();
+// Determine base URL based on environment
+const getBaseUrl = () => {
+  if (typeof window === 'undefined') return ''; // SSR
+  
+  // In production (Vercel), API routes are served from the same origin
+  if (import.meta.env.MODE === 'production') {
+    return '';
+  }
+  
+  // In development, API might be on different port
+  return '';
+};
+
+export const secureVoiceClient = new SecureVoiceClient(getBaseUrl());

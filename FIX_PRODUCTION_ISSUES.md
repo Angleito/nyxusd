@@ -29,6 +29,7 @@ Add these **REQUIRED** variables:
 | Variable | Value | Description |
 |----------|-------|-------------|
 | `OPENROUTER_API_KEY` | Your API key from [OpenRouter](https://openrouter.ai) | Required for AI features (backend) |
+| `ELEVENLABS_API_KEY` | Your API key from [ElevenLabs](https://elevenlabs.io) | Required for voice chat features |
 | `APP_NAME` | `NyxUSD` | Application name |
 | `APP_URL` | `https://nyxusd.com` | Production URL |
 | `USE_MOCK_AI` | `false` | Disable mock mode |
