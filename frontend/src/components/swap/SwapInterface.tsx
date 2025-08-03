@@ -16,8 +16,8 @@ interface SwapInterfaceProps {
 }
 
 export const SwapInterface: React.FC<SwapInterfaceProps> = ({
-  initialInputToken = 'ETH',
-  initialOutputToken = 'USDC',
+  initialInputToken = 'AERO',
+  initialOutputToken = 'ETH',
   initialAmount = '',
   onSwapComplete,
   onCancel,
@@ -143,10 +143,14 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
             className="px-4 py-3 bg-gray-800/70 border border-purple-700/30 rounded-lg text-white focus:outline-none focus:border-purple-500"
           >
             <option value="ETH">ETH</option>
+            <option value="WETH">WETH</option>
             <option value="USDC">USDC</option>
             <option value="USDT">USDT</option>
             <option value="DAI">DAI</option>
-            <option value="WETH">WETH</option>
+            <option value="AERO">AERO</option>
+            <option value="BRETT">BRETT</option>
+            <option value="DEGEN">DEGEN</option>
+            <option value="HIGHER">HIGHER</option>
           </select>
         </div>
       </div>
@@ -179,10 +183,14 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
             className="px-4 py-3 bg-gray-800/70 border border-purple-700/30 rounded-lg text-white focus:outline-none focus:border-purple-500"
           >
             <option value="ETH">ETH</option>
+            <option value="WETH">WETH</option>
             <option value="USDC">USDC</option>
             <option value="USDT">USDT</option>
             <option value="DAI">DAI</option>
-            <option value="WETH">WETH</option>
+            <option value="AERO">AERO</option>
+            <option value="BRETT">BRETT</option>
+            <option value="DEGEN">DEGEN</option>
+            <option value="HIGHER">HIGHER</option>
           </select>
         </div>
       </div>
