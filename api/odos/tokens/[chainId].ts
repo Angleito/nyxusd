@@ -67,6 +67,12 @@ const baseTokens: OdosToken[] = [
     name: 'Higher',
     address: '0x0578d8A44db98B23BF096A382e016e29a5Ce0ffe',
     decimals: 18
+  },
+  {
+    symbol: 'HYUSD',
+    name: 'HYUSD Stablecoin',
+    address: '0xCc7FF230365bD730eE4B352cC2492CEdAC49383e',
+    decimals: 18
   }
 ];
 

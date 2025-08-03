@@ -270,37 +270,37 @@ export class SwapDetectionService {
       if (match) {
         // Handle different pattern types based on the pattern structure
         if (pattern.source.includes('want\\s+to\\s+)?swap')) {
-          result.inputToken = this.normalizeToken(match[1]);
-          result.outputToken = this.normalizeToken(match[2]);
+          result.inputToken = this.normalizeToken(match[1], availableTokens);
+          result.outputToken = this.normalizeToken(match[2], availableTokens);
         } else if (pattern.source.includes('buy')) {
-          result.outputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[1], availableTokens);
           result.amount = match[2];
-          result.inputToken = this.normalizeToken(match[3]);
+          result.inputToken = this.normalizeToken(match[3], availableTokens);
         } else if (pattern.source.includes('want|need|get')) {
-          result.outputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[1], availableTokens);
           if (!result.inputToken) {
             result.inputToken = 'ETH';
           }
         } else if (pattern.source.includes('switch\\s+to')) {
-          result.outputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[1], availableTokens);
           if (!result.inputToken) {
             result.inputToken = 'ETH';
           }
         } else if (pattern.source.startsWith('swap\\s+') && match.length === 3) {
-          result.inputToken = this.normalizeToken(match[1]);
-          result.outputToken = this.normalizeToken(match[2]);
+          result.inputToken = this.normalizeToken(match[1], availableTokens);
+          result.outputToken = this.normalizeToken(match[2], availableTokens);
         } else if (match.length === 2) {
-          result.outputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[1], availableTokens);
           if (!result.inputToken) {
             result.inputToken = 'ETH';
           }
         } else if (match.length === 3) {
-          result.inputToken = this.normalizeToken(match[1]);
-          result.outputToken = this.normalizeToken(match[2]);
+          result.inputToken = this.normalizeToken(match[1], availableTokens);
+          result.outputToken = this.normalizeToken(match[2], availableTokens);
         } else if (match.length === 4) {
           result.amount = match[1];
-          result.inputToken = this.normalizeToken(match[2]);
-          result.outputToken = this.normalizeToken(match[3]);
+          result.inputToken = this.normalizeToken(match[2], availableTokens);
+          result.outputToken = this.normalizeToken(match[3], availableTokens);
         }
         break;
       }
@@ -365,46 +365,46 @@ export class SwapDetectionService {
         // Check for specific patterns first
         if (pattern.source.includes('want\\s+to\\s+)?swap')) {
           // "I want to swap USDC and AERO" pattern
-          result.inputToken = this.normalizeToken(match[1]);
-          result.outputToken = this.normalizeToken(match[2]);
+          result.inputToken = this.normalizeToken(match[1], availableTokens);
+          result.outputToken = this.normalizeToken(match[2], availableTokens);
         } else if (pattern.source.includes('buy')) {
           // Buy pattern: buy [output] with [amount] [input]
-          result.outputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[1], availableTokens);
           result.amount = match[2];
-          result.inputToken = this.normalizeToken(match[3]);
+          result.inputToken = this.normalizeToken(match[3], availableTokens);
         } else if (pattern.source.includes('want|need|get')) {
           // Want/need pattern: just output token
-          result.outputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[1], availableTokens);
           // Default input token to ETH if not specified
           if (!result.inputToken) {
             result.inputToken = 'ETH';
           }
         } else if (pattern.source.includes('switch\\s+to')) {
           // Switch pattern: switch to [output]
-          result.outputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[1], availableTokens);
           // Default input token to ETH if not specified
           if (!result.inputToken) {
             result.inputToken = 'ETH';
           }
         } else if (pattern.source.startsWith('swap\\s+') && match.length === 3) {
           // Swap pattern without amount: swap [input] to [output]
-          result.inputToken = this.normalizeToken(match[1]);
-          result.outputToken = this.normalizeToken(match[2]);
+          result.inputToken = this.normalizeToken(match[1], availableTokens);
+          result.outputToken = this.normalizeToken(match[2], availableTokens);
         } else if (match.length === 2) {
           // Single token pattern - assume it's the output
-          result.outputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[1], availableTokens);
           if (!result.inputToken) {
             result.inputToken = 'ETH';
           }
         } else if (match.length === 3) {
           // Token to token pattern without amount
-          result.inputToken = this.normalizeToken(match[1]);
-          result.outputToken = this.normalizeToken(match[2]);
+          result.inputToken = this.normalizeToken(match[1], availableTokens);
+          result.outputToken = this.normalizeToken(match[2], availableTokens);
         } else if (match.length === 4) {
           // Standard pattern with amount
           result.amount = match[1];
-          result.inputToken = this.normalizeToken(match[2]);
-          result.outputToken = this.normalizeToken(match[3]);
+          result.inputToken = this.normalizeToken(match[2], availableTokens);
+          result.outputToken = this.normalizeToken(match[3], availableTokens);
         }
         break;
       }
@@ -432,10 +432,18 @@ export class SwapDetectionService {
   /**
    * Normalize token symbol
    */
-  private normalizeToken(token: string): string {
+  private normalizeToken(token: string, availableTokens?: string[]): string {
     const upper = token.toUpperCase();
     
-    // Check if it's a known token
+    // If available tokens list is provided, check against it first
+    if (availableTokens) {
+      const matchingToken = availableTokens.find(t => t.toUpperCase() === upper);
+      if (matchingToken) {
+        return matchingToken.toUpperCase();
+      }
+    }
+    
+    // Check if it's a known token in hardcoded list
     if (BASE_TOKENS[upper]) {
       return upper;
     }

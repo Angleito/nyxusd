@@ -812,8 +812,15 @@ export function AIAssistantProvider({
         }
 
         // Show swap UI component with detected tokens
+        const hasAmount = swapIntent.amount && parseFloat(swapIntent.amount) > 0;
+        const instructionText = !walletAddress 
+          ? 'Connect your wallet first, then enter the amount and hit the Swap button!' 
+          : hasAmount 
+          ? 'Perfect! Everything is set up - just hit the Swap button to execute!'
+          : 'Enter your desired amount and hit the Swap button when ready!';
+        
         updateMessage(aiMessageId, {
-          content: `I'll help you swap ${swapIntent.inputToken} to ${swapIntent.outputToken}. ${!walletAddress ? 'You\'ll need to connect your wallet to execute the swap.' : 'Here\'s the swap interface:'}`,
+          content: `I'll help you swap ${swapIntent.inputToken} for ${swapIntent.outputToken}. ${instructionText}`,
           typing: false,
           component: 'swap',
           componentProps: {
