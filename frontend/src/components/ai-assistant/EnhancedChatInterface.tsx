@@ -171,35 +171,35 @@ What would you like to explore today?`,
     // Check for swap intent
     const swapIntent = swapDetectionService.detectSwapIntent(userMessage.content);
     
-    if (swapIntent.isSwapIntent && swapIntent.confidence > 0.6) {
-      // Handle swap intent
-      if (swapIntent.missingParams && swapIntent.missingParams.length > 0) {
-        // Ask for missing parameters
-        const clarifyingQuestion = swapDetectionService.generateClarifyingQuestion(swapIntent.missingParams);
-        const assistantMessage: Message = {
-          id: `msg_${Date.now()}_assistant`,
-          role: "assistant",
-          content: clarifyingQuestion,
-          timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-        chatMemoryService.addMessage(assistantMessage);
-        setIsTyping(false);
-        return;
+    if (swapIntent.isSwapIntent && swapIntent.confidence > 0.5) {
+      // Always show swap interface immediately for better UX
+      // Don't ask for clarification - let user fill in the interface
+      
+      // Create a contextual message based on what was detected
+      let contextMessage = "I'll help you swap tokens. ";
+      
+      if (swapIntent.inputToken && swapIntent.outputToken && swapIntent.amount) {
+        contextMessage = `Perfect! Let's swap ${swapIntent.amount} ${swapIntent.inputToken} to ${swapIntent.outputToken}.`;
+      } else if (swapIntent.inputToken && swapIntent.outputToken) {
+        contextMessage = `Great! Let's set up your ${swapIntent.inputToken} to ${swapIntent.outputToken} swap. Just enter the amount you'd like to swap.`;
+      } else if (swapIntent.outputToken) {
+        contextMessage = `I'll help you get some ${swapIntent.outputToken}. You can adjust the tokens and amount below.`;
+      } else {
+        contextMessage = "Here's the swap interface. You can select your tokens and enter the amount.";
       }
       
-      // Create swap interface
+      // Create swap interface message
       const swapMessage: Message = {
         id: `msg_${Date.now()}_swap`,
         role: "assistant",
-        content: "I'll help you swap tokens. Here's the swap interface:",
+        content: contextMessage,
         timestamp: new Date(),
         metadata: {
           isSwap: true,
           swapParams: {
-            inputToken: swapIntent.inputToken,
-            outputToken: swapIntent.outputToken,
-            amount: swapIntent.amount,
+            inputToken: swapIntent.inputToken || 'ETH',
+            outputToken: swapIntent.outputToken || 'USDC',
+            amount: swapIntent.amount || '',
           }
         }
       };
@@ -207,12 +207,16 @@ What would you like to explore today?`,
       setMessages(prev => [...prev, swapMessage]);
       chatMemoryService.addMessage(swapMessage);
       setActiveSwap({
-        inputToken: swapIntent.inputToken,
-        outputToken: swapIntent.outputToken,
-        amount: swapIntent.amount,
+        inputToken: swapIntent.inputToken || 'ETH',
+        outputToken: swapIntent.outputToken || 'USDC',
+        amount: swapIntent.amount || '',
         messageId: swapMessage.id,
       });
       setIsTyping(false);
+      
+      // Speak the response if voice is enabled
+      await speakResponse(contextMessage);
+      
       return;
     }
 
