@@ -21,7 +21,7 @@ export const ChatInterface: React.FC = () => {
 
   // Voice chat integration
   const voiceChat = useVoiceChat({
-    apiKey: process.env['REACT_APP_ELEVENLABS_API_KEY'],
+    apiKey: import.meta.env.VITE_ELEVENLABS_API_KEY,
     voiceId: 'EXAVITQu4vr4xnSDxMaL', // Default voice
     conversationalMode: isConversationalMode,
     onTranscription: (text, isFinal) => {
