@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { voiceService } from '../services/voice/voiceService';
-import { elevenLabsClient } from '../services/voice/elevenLabsClient';
+import { secureVoiceClient } from '../services/voice/secureVoiceClient';
 import { ConversationContext } from '../services/voice/conversationalAgent';
 
 export interface UseVoiceChatOptions {
-  apiKey?: string;
   autoStart?: boolean;
   voiceId?: string;
   conversationalMode?: boolean;
@@ -64,7 +63,6 @@ export interface UseVoiceChatReturn {
 
 export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatReturn {
   const {
-    apiKey,
     autoStart = false,
     voiceId,
     conversationalMode = false,
@@ -147,30 +145,35 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
   useEffect(() => {
     const initialize = async () => {
       try {
-        if (apiKey) {
-          // Set voice config including conversational mode
-          const config = { 
-            voiceId: voiceId || 'EXAVITQu4vr4xnSDxMaL',
-            conversationalMode: isConversationalMode
-          };
-          voiceService.setVoiceConfig(config);
-          
-          await voiceService.initialize(apiKey);
-          await elevenLabsClient.initialize(apiKey);
-          
-          setIsInitialized(true);
-          
-          // Fetch available voices
-          try {
-            const voices = await elevenLabsClient.getVoices();
-            setAvailableVoices(voices);
-          } catch (err) {
-            console.warn('Failed to fetch voices:', err);
-          }
-          
-          if (autoStart) {
-            await startSession();
-          }
+        // Check if voice service is configured on server
+        const isConfigured = await secureVoiceClient.isConfigured();
+        if (!isConfigured) {
+          setError('Voice service not configured');
+          onErrorRef.current?.({ message: 'Voice service not configured' });
+          return;
+        }
+
+        // Get configuration from secure endpoint
+        const configData = await secureVoiceClient.getConfig();
+        
+        // Set voice config including conversational mode
+        const config = { 
+          voiceId: voiceId || configData.config.defaultVoiceId,
+          conversationalMode: isConversationalMode,
+          ...configData.config.voiceSettings
+        };
+        voiceService.setVoiceConfig(config);
+        
+        // Initialize with secure token (not API key)
+        await voiceService.initialize('secure-token');
+        
+        setIsInitialized(true);
+        
+        // Set available voices from config
+        setAvailableVoices(configData.config.availableVoices);
+        
+        if (autoStart) {
+          await startSession();
         }
       } catch (err) {
         console.error('Failed to initialize voice services:', err);
@@ -180,7 +183,7 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
     };
 
     initialize();
-  }, [apiKey, voiceId, autoStart, isConversationalMode]);
+  }, [voiceId, autoStart, isConversationalMode]);
 
   // Set up event listeners
   useEffect(() => {
@@ -437,7 +440,7 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
     }
     
     try {
-      const voices = await elevenLabsClient.getVoices();
+      const voices = await secureVoiceClient.getVoices();
       setAvailableVoices(voices);
       return voices;
     } catch (err) {

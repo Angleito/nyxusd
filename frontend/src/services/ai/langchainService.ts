@@ -131,9 +131,9 @@ export class LangChainAIService implements AIService {
   private isInitialized = false;
 
   // Enhanced prompt system components
-  private personalizationEngine: PersonalizationEngine;
-  private promptOptimizer: PromptOptimizer;
-  private analytics: AIServiceAnalytics;
+  private personalizationEngine!: PersonalizationEngine;
+  private promptOptimizer!: PromptOptimizer;
+  private analytics!: AIServiceAnalytics;
 
   // Fallback system for backward compatibility
   private fallbackMode = false;
@@ -528,7 +528,7 @@ export class LangChainAIService implements AIService {
       // Build prompt using new system
       const promptResult = new PromptBuilder({
         maxTokens: this.config.maxTokens || 128000, // Default to higher limit for Gemini
-        compressionLevel: "balanced",
+        compressionLevel: "basic",
         personalizeWith: ["occupation", "riskTolerance", "timeline"],
         includeHistory: true,
         maxHistoryItems: 3,

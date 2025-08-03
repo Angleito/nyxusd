@@ -2,7 +2,7 @@
 
 import { pipe } from 'fp-ts/function';
 import * as TE from 'fp-ts/TaskEither';
-import { convertMainWhitepaper } from '../services/whitepaperConversionService';
+import { convertMainWhitepaper } from '../services/simpleWhitepaperConverter';
 
 /**
  * Standalone script to generate PDF and DOCX files from the whitepaper markdown

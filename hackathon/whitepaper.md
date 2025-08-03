@@ -43,7 +43,7 @@ Perfect For: Experienced users comfortable with volatility
 🤖 Custom AI Portfolios (Variable APY)
 Strategy: AI creates personalized strategies based on your goals
 Smart Contract Generation: AI writes and deploys custom contracts
-Cost: 3% of total portfolio value
+Cost: 3% one-time fee + 10% performance fee on profits
 Perfect For: Users wanting tailored strategies without coding
 How It Works
 Deposit Assets: Users can either:

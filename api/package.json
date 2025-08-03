@@ -34,6 +34,7 @@
     "langchain": "^0.3.29",
     "mammoth": "^1.10.0",
     "markdown-it": "^14.1.0",
+    "markdown-pdf": "^11.0.0",
     "marked": "^16.1.1",
     "md-to-pdf": "^5.2.4",
     "morgan": "^1.10.0",

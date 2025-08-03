@@ -17,11 +17,9 @@
     "dist"
   ],
   "references": [
-    {
-      "path": "../cdp-core"
-    },
-    {
-      "path": "../cdp-adapters"
-    }
+    { "path": "../cdp-core" },
+    { "path": "../core" },
+    { "path": "../cdp-adapters" },
+    { "path": "../../libs/fp-utils" }
   ]
 }

@@ -16,13 +16,25 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "strict": false,
-    "noImplicitAny": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "exactOptionalPropertyTypes": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+    "noPropertyAccessFromIndexSignature": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*", "chat.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts"],
+  "references": [
+    { "path": "../libs/fp-utils" },
+    { "path": "../libs/validators" },
+    { "path": "../libs/midnight-utils" },
+    { "path": "../packages/cdp-core" },
+    { "path": "../packages/core" },
+    { "path": "../packages/oracle-service" }
+  ]
 }

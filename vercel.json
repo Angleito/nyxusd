@@ -2,7 +2,28 @@
   "buildCommand": "npm install && cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
   "framework": "vite",
+  "functions": {
+    "api-functions/*.ts": {
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
+    {
+      "source": "/api/voice-token",
+      "destination": "/api-functions/voice-token"
+    },
+    {
+      "source": "/api/voice-tts",
+      "destination": "/api-functions/voice-tts"
+    },
+    {
+      "source": "/api/voice-config",
+      "destination": "/api-functions/voice-config"
+    },
+    {
+      "source": "/api/voice-health",
+      "destination": "/api-functions/voice-health"
+    },
     {
       "source": "/api/(.*)",
       "destination": "/api/$1"

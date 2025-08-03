@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { pipe } from 'fp-ts/function';
 import * as TE from 'fp-ts/TaskEither';
-import { convertMainWhitepaper } from '../services/whitepaperConversionService';
+import { convertMainWhitepaper } from '../services/simpleWhitepaperConverter';
 
 const router = Router();
 

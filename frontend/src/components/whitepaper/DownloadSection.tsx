@@ -30,12 +30,35 @@ export const DownloadSection: React.FC = () => {
     }
   ];
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
-    if (email) {
-      // Handle subscription logic here
-      setIsSubscribed(true);
-      setTimeout(() => setIsSubscribed(false), 3000);
+    if (!email) return;
+
+    try {
+      const response = await fetch('/api/subscriptions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          source: 'whitepaper-page'
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsSubscribed(true);
+        setEmail(''); // Clear the form
+        setTimeout(() => setIsSubscribed(false), 3000);
+      } else {
+        console.error('Subscription failed:', data.error);
+        // You could add error state handling here
+      }
+    } catch (error) {
+      console.error('Network error during subscription:', error);
+      // You could add error state handling here
     }
   };
 

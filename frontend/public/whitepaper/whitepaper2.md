@@ -32,7 +32,7 @@ We've built the first protocol where artificial intelligence doesn't just optimi
 - **Response Time**: <3 seconds for AI strategy generation
 - **Cross-Chain Efficiency**: 40% lower gas costs through intelligent routing
 - **Revenue Multiplier**: 2.46x more revenue per CDP than MakerDAO
-- **Custom Portfolio Fee**: 3% one-time for unlimited AI management
+- **Custom Portfolio Fee**: 3% one-time for custom contracts + 10% performance fee for AI monitoring
 
 ---
 
@@ -133,7 +133,13 @@ When a user says "I have $100k, want 20% returns, can handle some risk but need 
 - 10% in high-risk plays for additional upside
 - Custom smart contracts that automatically rebalance and optimize
 
-The AI generates and deploys these contracts autonomously, handling all complexity behind the scenes. Users pay a one-time 3% fee on their portfolio value for this personalized service.
+The AI generates and deploys these contracts autonomously, handling all complexity behind the scenes. Users pay a one-time 3% fee for custom contract creation, plus a 10% performance fee on profits generated through AI monitoring and automation.
+
+**Fee Structure Breakdown:**
+- **Contract Creation Fee (3%)**: One-time fee charged when the AI generates and deploys your custom smart contracts
+- **Performance Fee (10%)**: Ongoing fee on profits generated through continuous AI monitoring and automated strategy adjustments
+
+This dual fee structure ensures alignment—we only succeed when you do. The initial fee covers the sophisticated contract generation, while the performance fee funds ongoing optimization and 24/7 monitoring.
 
 ### The Magic: AI-Generated Smart Contracts
 
@@ -337,7 +343,7 @@ NYX serves as the governance and value accrual token of the NyxUSD ecosystem:
 
 **Governance Rights**: NYX holders vote on critical protocol decisions including risk parameters, fee structures, and treasury allocation. The decentralized governance ensures community control over protocol evolution.
 
-**Fee Discounts**: Staking NYX provides up to 50% reduction on custom portfolio creation fees, making personalized AI strategies more accessible to committed users.
+**Fee Discounts**: Staking NYX provides up to 50% reduction on both custom portfolio creation fees and performance fees, making personalized AI strategies more accessible to committed users.
 
 **Revenue Sharing**: NYX stakers earn a portion of protocol revenues, aligning token holder interests with protocol growth and creating sustainable value accrual.
 
@@ -355,10 +361,10 @@ The distribution prioritizes community ownership and protocol sustainability:
   - Airdrops and incentives: 15%
   - Grants and partnerships: 10%
   - DAO treasury: 5%
-- 25% to Team & Advisors (250M NYX)
+- 20% to Team (250M NYX)
   - 4-year vesting with 1-year cliff
   - Performance-based unlocks
-- 25% to Protocol Treasury (250M NYX)
+- 20% to Protocol Treasury (250M NYX)
   - Development funding
   - Marketing and growth
   - Emergency reserves
@@ -378,8 +384,8 @@ NyxUSD generates revenue from multiple innovative streams:
 |--------|------|---------------------------------------|
 | CDP Stability Fees | 5% | $25M |
 | CDP Deployment Yields | 3-8% | $50M |
-| Performance Fees | 10% of profits | $15M |
-| Custom Portfolio Creation | 3% one-time | $10M |
+| AI Performance Fees | 10% of profits from AI monitoring | $15M |
+| Custom Contract Creation | 3% one-time fee | $10M |
 | Premium Features | Subscription | $5M |
 | **Total** | | **$105M** |
 

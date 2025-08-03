@@ -2,13 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Volume2, VolumeX, Settings, Loader2, AlertCircle } from 'lucide-react';
 import { voiceService } from '../../services/voice/voiceService';
-import { elevenLabsClient } from '../../services/voice/elevenLabsClient';
+import { secureVoiceClient } from '../../services/voice/secureVoiceClient';
 
 interface VoiceControlsProps {
   onTranscription?: (text: string, isFinal: boolean) => void;
   onError?: (error: any) => void;
   onStatusChange?: (status: string) => void;
-  apiKey?: string;
   className?: string;
 }
 
@@ -39,9 +38,18 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
     // Initialize voice services
     const initializeServices = async () => {
       try {
-        if (apiKey) {
-          await voiceService.initialize(apiKey);
-          await elevenLabsClient.initialize(apiKey);
+        // Check if voice service is configured on the server
+        const isConfigured = await secureVoiceClient.isConfigured();
+        if (!isConfigured) {
+          setError('Voice service not configured');
+          return;
+        }
+
+        // Get token from server (no API key needed on frontend)
+        const tokenData = await secureVoiceClient.getConfig();
+        if (tokenData.configured) {
+          // Initialize voice service with secure configuration
+          await voiceService.initialize('secure-token'); // Placeholder, actual auth via server
           setIsInitialized(true);
         }
       } catch (err) {

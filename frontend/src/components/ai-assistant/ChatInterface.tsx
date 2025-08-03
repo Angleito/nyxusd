@@ -19,9 +19,8 @@ export const ChatInterface: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  // Voice chat integration
+  // Voice chat integration (no API key needed - uses secure server endpoint)
   const voiceChat = useVoiceChat({
-    apiKey: import.meta.env.VITE_ELEVENLABS_API_KEY,
     voiceId: 'EXAVITQu4vr4xnSDxMaL', // Default voice
     conversationalMode: isConversationalMode,
     onTranscription: (text, isFinal) => {

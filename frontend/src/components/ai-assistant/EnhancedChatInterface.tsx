@@ -10,6 +10,7 @@ import { ConversationStep } from "../../providers/AIAssistantProvider";
 import { swapDetectionService } from "../../services/swapDetectionService";
 import { SwapInterface } from "../swap/SwapInterface";
 import { VoiceControls } from "../voice/VoiceControls";
+import { VoiceErrorBoundary } from "../voice/VoiceErrorBoundary";
 import { voiceService } from "../../services/voice/voiceService";
 
 interface Message extends MemoryMessage {}
@@ -396,14 +397,15 @@ What would you like to explore today?`,
           </div>
           
           <div className="flex items-center space-x-2">
-            {/* Voice Controls */}
-            <VoiceControls
-              onTranscription={handleVoiceTranscription}
-              onError={handleVoiceError}
-              onStatusChange={handleVoiceStatusChange}
-              apiKey={process.env.REACT_APP_ELEVENLABS_API_KEY}
-              className="mr-2"
-            />
+            {/* Voice Controls with Error Boundary - No API key needed, uses secure server endpoint */}
+            <VoiceErrorBoundary onError={(error) => console.error('Voice error:', error)}>
+              <VoiceControls
+                onTranscription={handleVoiceTranscription}
+                onError={handleVoiceError}
+                onStatusChange={handleVoiceStatusChange}
+                className="mr-2"
+              />
+            </VoiceErrorBoundary>
             
             {isConnected && (
               <div className="flex items-center space-x-2 text-sm">

@@ -24,28 +24,14 @@
     "noPropertyAccessFromIndexSignature": true,
     "baseUrl": ".",
     "paths": {
-      "@nyxusd/core": ["libs/core/src/index.ts"],
-      "@nyxusd/types": ["libs/types/src/index.ts"],
-      "@nyxusd/utils": ["libs/utils/src/index.ts"],
-      "@nyxusd/validators": ["libs/validators/src/index.ts"],
-      "@nyxusd/crypto": ["libs/crypto/src/index.ts"],
-      "@nyxusd/contracts": ["libs/contracts/src/index.ts"],
-      "@nyxusd/midnight-integration": [
-        "libs/midnight-integration/src/index.ts"
-      ],
-      "@nyxusd/functional-utils": ["libs/functional-utils/src/index.ts"],
       "@nyxusd/fp-utils": ["libs/fp-utils/src/index.ts"],
-      "@nyxusd/cdp-engine": ["packages/cdp-engine/src/index.ts"],
-"@nyxusd/cdp-core": ["packages/cdp-core/src/index.ts"],
-"@nyxusd/cdp-adapters": ["packages/cdp-adapters/src/index.ts"],
-"@nyxusd/cdp-sdk": ["packages/cdp-sdk/src/index.ts"],
-      "@nyxusd/oracle-service": ["packages/oracle-service/src/index.ts"],
-      "@nyxusd/liquidation-engine": [
-        "packages/liquidation-engine/src/index.ts"
-      ],
-      "@nyxusd/governance": ["packages/governance/src/index.ts"],
-      "@nyxusd/api": ["packages/api/src/index.ts"],
-      "@nyxusd/cli": ["packages/cli/src/index.ts"]
+      "@nyxusd/validators": ["libs/validators/src/index.ts"],
+      "@nyxusd/midnight-utils": ["libs/midnight-utils/src/index.ts"],
+      "@nyxusd/core": ["packages/core/src/index.ts"],
+      "@nyxusd/cdp-core": ["packages/cdp-core/src/index.ts"],
+      "@nyxusd/cdp-adapters": ["packages/cdp-adapters/src/index.ts"],
+      "@nyxusd/cdp-sdk": ["packages/cdp-sdk/src/index.ts"],
+      "@nyxusd/oracle-service": ["packages/oracle-service/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
