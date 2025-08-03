@@ -155,8 +155,8 @@ export class SwapDetectionService {
     
     // Pattern variations for swap detection - expanded and ordered by specificity
     const patterns = [
-      // "I want to swap USDC and AERO" or "swap USDC and AERO"
-      /(?:want\s+to\s+)?swap\s+(\w+)\s+(?:and|for|to|with)\s+(\w+)/i,
+      // "I want to swap tokens AERO and ETH" or "swap tokens X and Y"
+      /(?:want\s+to\s+)?swap\s+(?:tokens\s+)?(\w+)\s+(?:and|for|to|with)\s+(\w+)/i,
       // "swap USDC for AERO" or "swap USDC to AERO"
       /swap\s+(\w+)\s+(?:for|to|into)\s+(\w+)/i,
       // "swap 1 ETH for USDC"
