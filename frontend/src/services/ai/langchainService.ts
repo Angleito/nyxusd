@@ -433,59 +433,27 @@ export class LangChainAIService implements AIService {
     const startTime = Date.now();
 
     try {
-      if (!this.isInitialized) {
-        await this.validateConfiguration();
+      // For now, fall back to non-streaming response since our backend API doesn't support streaming yet
+      // TODO: Implement Server-Sent Events (SSE) streaming in the backend API
+      console.warn("Streaming not yet implemented with backend API, falling back to regular response");
+      
+      const response = await this.generateResponse(userMessage, context);
+      
+      // Simulate streaming by chunking the response
+      const message = response.message;
+      const words = message.split(' ');
+      const chunkSize = 3; // Send 3 words at a time
+      
+      for (let i = 0; i < words.length; i += chunkSize) {
+        const chunk = words.slice(i, i + chunkSize).join(' ');
+        onChunk(chunk + (i + chunkSize < words.length ? ' ' : ''));
+        
+        // Small delay to simulate streaming
+        await new Promise(resolve => setTimeout(resolve, 50));
       }
       
-      // Determine query type for model selection
-      const queryType = this.analyzeQueryType(userMessage, context);
-      this.llm = this.createLLM(queryType);
+      return response;
 
-      // Build enhanced system prompt for streaming
-      const systemPrompt = await this.buildEnhancedSystemPrompt(
-        userMessage,
-        context,
-      );
-      let fullResponse = "";
-
-      const prompt = ChatPromptTemplate.fromMessages([
-        SystemMessagePromptTemplate.fromTemplate(systemPrompt),
-        HumanMessagePromptTemplate.fromTemplate("{input}"),
-      ]);
-
-      const chain = new LLMChain({
-        llm: this.llm,
-        prompt,
-      });
-
-      const stream = await chain.stream({
-        input: userMessage,
-        conversation_step: context.conversationStep,
-        user_profile: JSON.stringify(context.userProfile),
-        wallet_data: JSON.stringify(context.walletData || {}),
-      });
-
-      for await (const chunk of stream) {
-        const text = chunk.text || "";
-        fullResponse += text;
-        onChunk(text);
-      }
-
-      await this.memory.saveContext(
-        { input: userMessage },
-        { output: fullResponse },
-      );
-
-      // Update analytics for streaming with OpenRouter info
-      this.updateAnalytics(startTime, systemPrompt, { message: fullResponse }, queryType);
-
-      return {
-        message: fullResponse,
-        intent: {
-          action: "unclear",
-          confidence: 0.5,
-        },
-      };
     } catch (error) {
       console.error("Streaming error:", error);
 
@@ -1217,103 +1185,29 @@ Ensure the response is valid JSON without any markdown formatting or code blocks
   }
 
   /**
-   * Legacy response generation for fallback
+   * Legacy response generation for fallback - now uses backend API
    */
   private async generateLegacyResponse(
     userMessage: string,
     context: AIContext,
   ): Promise<AIResponse> {
-    const systemPrompt = this.buildSystemPrompt(context, userMessage);
-    const formatInstructions = this.getJSONFormatInstructions();
-
-    const prompt = ChatPromptTemplate.fromMessages([
-      SystemMessagePromptTemplate.fromTemplate(systemPrompt),
-      HumanMessagePromptTemplate.fromTemplate(
-        `User message: {input}\n\nFormat your response according to these instructions:\n${formatInstructions}`,
-      ),
-    ]);
-
-    const chain = new LLMChain({
-      llm: this.llm,
-      prompt,
-      memory: this.memory,
-    });
-
-    const result = await chain.call({
-      input: userMessage,
-      conversation_step: context.conversationStep,
-      user_profile: JSON.stringify(context.userProfile),
-      wallet_data: JSON.stringify(context.walletData || {}),
-    });
-
-    let parsedResponse: z.infer<typeof responseSchema>;
-
-    try {
-      parsedResponse = this.parseJSONResponse(result.text);
-    } catch (parseError) {
-      parsedResponse = {
-        message: result.text,
-        intent: {
-          action: "unclear",
-          confidence: 0.5,
-        },
-        shouldContinue: false,
-      };
-    }
-
-    await this.memory.saveContext(
-      { input: userMessage },
-      { output: parsedResponse.message },
-    );
-
-    return this.convertToAIResponse(parsedResponse);
+    console.warn("Using legacy fallback mode, calling backend API");
+    
+    // Use the same backend API call as the main method
+    return this.generateResponse(userMessage, context);
   }
 
   /**
-   * Legacy streaming response for fallback
+   * Legacy streaming response for fallback - now uses backend API
    */
   private async streamLegacyResponse(
     userMessage: string,
     context: AIContext,
     onChunk: (chunk: string) => void,
   ): Promise<AIResponse> {
-    const systemPrompt = this.buildSystemPrompt(context, userMessage);
-    let fullResponse = "";
-
-    const prompt = ChatPromptTemplate.fromMessages([
-      SystemMessagePromptTemplate.fromTemplate(systemPrompt),
-      HumanMessagePromptTemplate.fromTemplate("{input}"),
-    ]);
-
-    const chain = new LLMChain({
-      llm: this.llm,
-      prompt,
-    });
-
-    const stream = await chain.stream({
-      input: userMessage,
-      conversation_step: context.conversationStep,
-      user_profile: JSON.stringify(context.userProfile),
-      wallet_data: JSON.stringify(context.walletData || {}),
-    });
-
-    for await (const chunk of stream) {
-      const text = chunk.text || "";
-      fullResponse += text;
-      onChunk(text);
-    }
-
-    await this.memory.saveContext(
-      { input: userMessage },
-      { output: fullResponse },
-    );
-
-    return {
-      message: fullResponse,
-      intent: {
-        action: "unclear",
-        confidence: 0.5,
-      },
-    };
+    console.warn("Using legacy streaming fallback mode, calling backend API");
+    
+    // Use the same streaming method as the main method
+    return this.streamResponse(userMessage, context, onChunk);
   }
 }
