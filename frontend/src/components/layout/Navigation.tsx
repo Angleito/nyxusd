@@ -45,9 +45,8 @@ const mainNavItems: NavItem[] = [
   },
   {
     label: "White Paper",
-    href: "https://nyxusd.com/whitepaper",
+    href: "/whitepaper",
     description: "Read our comprehensive technical documentation",
-    external: true,
   },
   {
     label: "About Us",
