@@ -24,4 +24,4 @@ export const midnightTestnet = defineChain({
 })
 
 // Re-export common chains for convenience
-export { mainnet, sepolia, polygon, polygonMumbai, arbitrum, arbitrumSepolia } from 'viem/chains'
+export { mainnet, sepolia, arbitrum, arbitrumSepolia, optimism, base, baseSepolia } from 'viem/chains'

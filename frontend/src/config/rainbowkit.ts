@@ -8,21 +8,22 @@ import {
 } from '@rainbow-me/rainbowkit/wallets';
 import { 
   mainnet, 
-  sepolia, 
-  polygon, 
-  polygonMumbai, 
+  sepolia,
   arbitrum, 
   arbitrumSepolia,
-  midnightTestnet 
-} from './chains';
+  optimism,
+  base,
+  baseSepolia
+} from 'viem/chains';
+import { midnightTestnet } from './chains';
 
 const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 const enableTestnets = import.meta.env.VITE_ENABLE_TESTNETS === 'true';
 
 // Define chains based on environment
 const chains = enableTestnets 
-  ? [mainnet, sepolia, polygon, polygonMumbai, arbitrum, arbitrumSepolia, midnightTestnet] as const
-  : [mainnet, polygon, arbitrum] as const;
+  ? [mainnet, base, arbitrum, optimism, sepolia, baseSepolia, arbitrumSepolia, midnightTestnet] as const
+  : [mainnet, base, arbitrum, optimism] as const;
 
 // Validate WalletConnect Project ID
 const hasValidProjectId = walletConnectProjectId && walletConnectProjectId !== 'your_walletconnect_project_id_here';
