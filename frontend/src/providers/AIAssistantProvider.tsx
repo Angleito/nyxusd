@@ -4,6 +4,7 @@ import React, {
   useReducer,
   useCallback,
   useEffect,
+  useRef,
 } from "react";
 import { useAIService } from "../hooks/useAIService";
 import { swapDetectionService } from "../services/swapDetectionService";
@@ -681,6 +682,7 @@ export function AIAssistantProvider({
   const [state, dispatch] = useReducer(aiAssistantReducer, initialState);
   const { address: walletAddress } = useAccount();
   const chainId = useChainId();
+  const handleIntentActionRef = useRef<((intent: any) => void) | null>(null);
   const {
     sendMessage: sendAIMessage,
     reset: resetAI,
@@ -950,7 +952,12 @@ export function AIAssistantProvider({
 
           // Handle intent-based actions
           if (response.intent) {
-            handleIntentAction(response.intent);
+            // Defer execution to avoid initialization error
+            setTimeout(() => {
+              if (handleIntentActionRef.current) {
+                handleIntentActionRef.current(response.intent);
+              }
+            }, 0);
           }
 
           // Check if AI response mentions swapping
@@ -985,7 +992,6 @@ export function AIAssistantProvider({
       setStep,
       dispatch,
       handleDeFiAction,
-      handleIntentAction,
     ],
   );
 
@@ -1106,6 +1112,11 @@ export function AIAssistantProvider({
     },
     [state.currentStep, updateUserProfile],
   );
+
+  // Set the ref after handleIntentAction is defined
+  useEffect(() => {
+    handleIntentActionRef.current = handleIntentAction;
+  }, [handleIntentAction]);
 
   const value: AIAssistantContextValue = {
     state,
