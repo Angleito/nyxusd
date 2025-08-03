@@ -84,29 +84,60 @@ export class SwapDetectionService {
   detectSwapIntent(message: string): SwapIntent {
     const lowerMessage = message.toLowerCase();
     
-    // Check for swap keywords
-    const swapKeywords = ['swap', 'exchange', 'convert', 'trade', 'buy', 'sell', 'change'];
+    // Check for swap keywords - more aggressive detection
+    const swapKeywords = ['swap', 'exchange', 'convert', 'trade', 'buy', 'sell', 'change', 'switch'];
     const hasSwapKeyword = swapKeywords.some(keyword => lowerMessage.includes(keyword));
     
-    if (!hasSwapKeyword) {
+    // Also check for token-to-token patterns even without explicit swap keywords
+    const tokenPattern = /\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher)\b.*\b(to|for|into|->|→)\b.*\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher)\b/i;
+    const hasTokenPattern = tokenPattern.test(lowerMessage);
+    
+    // Check for phrases that imply swapping
+    const swapPhrases = [
+      'want to get',
+      'need some',
+      'looking to acquire',
+      'want some',
+      'get me',
+      'i need'
+    ];
+    const hasSwapPhrase = swapPhrases.some(phrase => 
+      lowerMessage.includes(phrase) && /\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher)\b/i.test(lowerMessage)
+    );
+    
+    if (!hasSwapKeyword && !hasTokenPattern && !hasSwapPhrase) {
       return { isSwapIntent: false, confidence: 0 };
     }
 
     // Extract tokens and amounts
     const result = this.extractSwapParameters(message);
     
+    // For simple "I want to swap" or "swap tokens", use defaults
+    if (hasSwapKeyword && !result.inputToken && !result.outputToken) {
+      // Set reasonable defaults to show UI immediately
+      result.inputToken = 'ETH';
+      result.outputToken = 'USDC';
+      result.amount = '';
+    }
+    
     // Calculate confidence based on completeness
-    let confidence = 0.3; // Base confidence for having swap keyword
+    let confidence = 0.5; // Higher base confidence for having swap intent
     
-    if (result.inputToken) confidence += 0.2;
-    if (result.outputToken) confidence += 0.2;
-    if (result.amount) confidence += 0.3;
+    if (result.inputToken) confidence += 0.15;
+    if (result.outputToken) confidence += 0.15;
+    if (result.amount) confidence += 0.2;
     
-    // Check for missing parameters
+    // If we have at least one token mentioned, boost confidence
+    if (result.inputToken || result.outputToken) {
+      confidence = Math.max(confidence, 0.7);
+    }
+    
+    // Check for missing parameters but don't block UI
     const missingParams: string[] = [];
-    if (!result.inputToken) missingParams.push('input token');
-    if (!result.outputToken) missingParams.push('output token');
-    if (!result.amount) missingParams.push('amount');
+    // Only mark as missing if we truly need them
+    if (!result.inputToken && !result.outputToken) {
+      missingParams.push('tokens');
+    }
     
     return {
       isSwapIntent: true,
@@ -122,7 +153,7 @@ export class SwapDetectionService {
   private extractSwapParameters(message: string): Partial<SwapIntent> {
     const result: Partial<SwapIntent> = {};
     
-    // Pattern variations for swap detection
+    // Pattern variations for swap detection - expanded
     const patterns = [
       // "swap 1 ETH for USDC"
       /swap\s+(\d+(?:\.\d+)?)\s+(\w+)\s+(?:for|to|into)\s+(\w+)/i,
@@ -137,9 +168,15 @@ export class SwapDetectionService {
       // "trade 1 ETH for USDC"
       /trade\s+(\d+(?:\.\d+)?)\s+(\w+)\s+(?:for|to|into)\s+(\w+)/i,
       // "1 ETH to USDC"
-      /(\d+(?:\.\d+)?)\s+(\w+)\s+to\s+(\w+)/i,
-      // "ETH to USDC"
-      /^(\w+)\s+to\s+(\w+)$/i,
+      /(\d+(?:\.\d+)?)\s+(\w+)\s+(?:to|for|into)\s+(\w+)/i,
+      // "ETH to USDC" or "ETH for USDC"
+      /(\w+)\s+(?:to|for|into|->|→)\s+(\w+)/i,
+      // "swap ETH to USDC" (no amount)
+      /swap\s+(\w+)\s+(?:to|for|into)\s+(\w+)/i,
+      // "I want USDC" or "I need USDC"
+      /(?:want|need|get)\s+(?:some\s+)?(\w+)/i,
+      // "switch to USDC"
+      /switch\s+to\s+(\w+)/i,
     ];
 
     for (const pattern of patterns) {
@@ -150,6 +187,30 @@ export class SwapDetectionService {
           result.outputToken = this.normalizeToken(match[1]);
           result.amount = match[2];
           result.inputToken = this.normalizeToken(match[3]);
+        } else if (pattern.source.includes('want|need|get')) {
+          // Want/need pattern: just output token
+          result.outputToken = this.normalizeToken(match[1]);
+          // Default input token to ETH if not specified
+          if (!result.inputToken) {
+            result.inputToken = 'ETH';
+          }
+        } else if (pattern.source.includes('switch\\s+to')) {
+          // Switch pattern: switch to [output]
+          result.outputToken = this.normalizeToken(match[1]);
+          // Default input token to ETH if not specified
+          if (!result.inputToken) {
+            result.inputToken = 'ETH';
+          }
+        } else if (pattern.source.startsWith('/swap\\s+') && match.length === 3) {
+          // Swap pattern without amount: swap [input] to [output]
+          result.inputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[2]);
+        } else if (match.length === 2) {
+          // Single token pattern - assume it's the output
+          result.outputToken = this.normalizeToken(match[1]);
+          if (!result.inputToken) {
+            result.inputToken = 'ETH';
+          }
         } else if (match.length === 3) {
           // Token to token pattern without amount
           result.inputToken = this.normalizeToken(match[1]);

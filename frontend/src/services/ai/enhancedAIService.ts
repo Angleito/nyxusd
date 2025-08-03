@@ -45,10 +45,13 @@ export interface CryptoActionRequest {
 export class EnhancedAIService {
   private baseUrl: string;
   private sessionId: string;
+  private isProduction: boolean;
 
   constructor(baseUrl: string = '/api') {
     this.baseUrl = baseUrl;
     this.sessionId = this.generateSessionId();
+    // Check if we're in production (Vercel) or local development
+    this.isProduction = process.env.NODE_ENV === 'production' || window.location.hostname !== 'localhost';
   }
 
   private generateSessionId(): string {
@@ -61,7 +64,12 @@ export class EnhancedAIService {
     enableCryptoTools: boolean = true
   ): Promise<EnhancedAIResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/ai/enhanced/chat`, {
+      // Use different endpoints for production (Vercel) vs local development
+      const endpoint = this.isProduction 
+        ? `${this.baseUrl}/ai-assistant`
+        : `${this.baseUrl}/ai/enhanced/chat`;
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +106,13 @@ export class EnhancedAIService {
     enableCryptoTools: boolean = true
   ): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/ai/enhanced/chat/stream`, {
+      // For production, use the regular endpoint (no streaming support in Vercel functions)
+      // For local, use the streaming endpoint
+      const endpoint = this.isProduction
+        ? `${this.baseUrl}/ai-assistant`
+        : `${this.baseUrl}/ai/enhanced/chat/stream`;
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,6 +129,16 @@ export class EnhancedAIService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      // For production, just get the full response and call onChunk once
+      if (this.isProduction) {
+        const data = await response.json();
+        if (data.message) {
+          onChunk(data.message);
+        }
+        return;
+      }
+
+      // For local development, use streaming
       const reader = response.body?.getReader();
       if (!reader) {
         throw new Error('No response body');
