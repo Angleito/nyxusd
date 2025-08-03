@@ -1,59 +1,65 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from './utils/cors';
+import type { 
+  VoiceHealthResponse, 
+  ApiErrorResponse, 
+  ElevenLabsUser,
+  ElevenLabsSubscription 
+} from './types/voice';
+import { validateVoiceEnvironment } from './types/voice';
 
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
-) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', process.env['FRONTEND_URL'] || '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+): Promise<void> {
+  // Set CORS headers
+  setCorsHeaders(res, { methods: 'GET,OPTIONS' });
   
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
+    handleOptions(res);
     return;
   }
 
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (!validateMethod(req.method, ['GET'])) {
+    sendMethodNotAllowed(res, ['GET']);
+    return;
   }
 
   try {
-    const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
-    const isConfigured = !!elevenLabsApiKey;
+    // Validate environment configuration
+    const envValidation = validateVoiceEnvironment();
+    const isConfigured = envValidation.isValid;
     
-    let apiStatus = 'not_configured';
-    let subscription = null;
+    let apiStatus: 'not_configured' | 'connected' | 'error' = 'not_configured';
+    let subscription: ElevenLabsSubscription | null = null;
     
-    if (isConfigured) {
+    if (isConfigured && envValidation.env.ELEVENLABS_API_KEY) {
       try {
-        // Check ElevenLabs API status
+        // Check ElevenLabs API status with proper typing
         const response = await fetch('https://api.elevenlabs.io/v1/user', {
           headers: {
-            'xi-api-key': elevenLabsApiKey,
+            'xi-api-key': envValidation.env.ELEVENLABS_API_KEY,
           },
         });
         
         if (response.ok) {
           apiStatus = 'connected';
-          const userData = await response.json();
+          const userData: ElevenLabsUser = await response.json();
           
-          // Get subscription info
-          const subResponse = await fetch('https://api.elevenlabs.io/v1/user/subscription', {
-            headers: {
-              'xi-api-key': elevenLabsApiKey,
-            },
-          });
-          
-          if (subResponse.ok) {
-            const subData = await subResponse.json();
-            subscription = {
-              tier: subData.tier || 'free',
-              character_count: subData.character_count || 0,
-              character_limit: subData.character_limit || 10000,
-              remaining_characters: (subData.character_limit || 10000) - (subData.character_count || 0),
-            };
+          // Get subscription info from user data first
+          if (userData.subscription) {
+            subscription = userData.subscription;
+          } else {
+            // Fallback to subscription endpoint if not in user data
+            const subResponse = await fetch('https://api.elevenlabs.io/v1/user/subscription', {
+              headers: {
+                'xi-api-key': envValidation.env.ELEVENLABS_API_KEY,
+              },
+            });
+            
+            if (subResponse.ok) {
+              subscription = await subResponse.json();
+            }
           }
         } else {
           apiStatus = 'error';
@@ -64,7 +70,7 @@ export default async function handler(
       }
     }
     
-    res.status(200).json({
+    const response: VoiceHealthResponse = {
       success: true,
       status: 'healthy',
       elevenLabs: {
@@ -78,14 +84,17 @@ export default async function handler(
         environment: process.env['VERCEL_ENV'] || 'development',
       },
       timestamp: new Date().toISOString(),
-    });
+    };
+    
+    res.status(200).json(response);
   } catch (error) {
     console.error('Health check error:', error);
-    res.status(500).json({
+    const errorResponse: ApiErrorResponse = {
       success: false,
-      status: 'error',
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Health check failed',
+      details: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString(),
-    });
+    };
+    res.status(500).json(errorResponse);
   }
 }

@@ -9,7 +9,6 @@ import { Either, left, right, fold } from "fp-ts/Either";
 import { Option, some, none, isSome } from "fp-ts/Option";
 import * as IO from "fp-ts/IO";
 import { TaskEither, tryCatch } from "fp-ts/TaskEither";
-import * as TE from "fp-ts/TaskEither";
 // Mock ethers types since package not properly installed in workspace
 interface Contract {
   latestRoundData(): Promise<{
@@ -347,7 +346,7 @@ export class ChainlinkOracleService implements IOracleService {
    */
   private fetchPriceWithRetry = (
     query: OracleQueryData,
-  ): TaskEitherType<OracleError, OraclePriceData> => {
+  ): TaskEither<OracleError, OraclePriceData> => {
     return tryCatch(
       async () => {
         const feedAddress = getFeedAddress(this.config.network, query.feedId);

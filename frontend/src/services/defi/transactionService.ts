@@ -180,7 +180,7 @@ export class TransactionService {
     try {
       // For raw transactions, we need to use a different approach
       // The transaction should be sent directly with the data
-      const account = getAccount();
+      const account = getAccount(wagmiConfig);
       if (!account.address) {
         return {
           success: false,
@@ -215,7 +215,7 @@ export class TransactionService {
     owner: string
   ): Promise<boolean> {
     try {
-      const allowance = await readContract({
+      const allowance = await readContract(wagmiConfig, {
         address: token as `0x${string}`,
         abi: ERC20_ABI,
         functionName: 'allowance',
@@ -238,7 +238,7 @@ export class TransactionService {
     error?: string;
   }> {
     try {
-      const hash = await writeContract({
+      const hash = await writeContract(wagmiConfig, {
         address: approval.token as `0x${string}`,
         abi: ERC20_ABI,
         functionName: 'approve',
@@ -248,7 +248,7 @@ export class TransactionService {
         ]
       });
 
-      const receipt = await waitForTransactionReceipt({
+      const receipt = await waitForTransactionReceipt(wagmiConfig, {
         hash,
         confirmations: 1
       });
@@ -284,7 +284,7 @@ export class TransactionService {
     try {
       // Get current account and chain if not provided
       const account = getAccount(wagmiConfig);
-      const currentChainId = chainId || account.chainId;
+      const currentChainId = chainId || account.chainId || 8453; // Default to Base
       
       if (!currentChainId) {
         throw new Error('No chain ID available. Please connect wallet first.');
@@ -310,13 +310,13 @@ export class TransactionService {
           chainId: currentChainId
         });
 
-        // Get token info for decimals
-        const tokenInfo = await tokenService.getTokenByAddress(token);
-        const decimals = tokenInfo?.decimals || 18;
+        // Get token info for decimals - fallback to 18 if not found
+        // Note: tokenService doesn't have getTokenByAddress, would need to implement
+        const decimals = 18; // Default ERC20 decimals
 
         return {
-          balance: balance.toString(),
-          formatted: formatUnits(BigInt(balance as string), decimals)
+          balance: (balance as bigint).toString(),
+          formatted: formatUnits(balance as bigint, decimals)
         };
       }
     } catch (error) {

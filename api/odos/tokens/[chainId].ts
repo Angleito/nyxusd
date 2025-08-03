@@ -1,101 +1,65 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { BaseToken, ApiResponse } from '../../types/shared';
+import { BASE_CORE_TOKENS, BASE_CHAIN_ID } from '../../constants/tokens';
+import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from '../../utils/cors';
 
-interface OdosToken {
-  symbol: string;
-  name: string;
-  address: string;
-  decimals: number;
+// Odos API response type for token data
+interface OdosTokenResponse {
+  readonly address: string;
+  readonly symbol: string;
+  readonly name: string;
+  readonly decimals: number;
+  readonly logoURI?: string;
 }
 
-const baseTokens: OdosToken[] = [
-  {
-    symbol: 'ETH',
-    name: 'Ethereum',
-    address: '0x0000000000000000000000000000000000000000',
-    decimals: 18
-  },
-  {
-    symbol: 'WETH',
-    name: 'Wrapped Ethereum',
-    address: '0x4200000000000000000000000000000000000006',
-    decimals: 18
-  },
-  {
-    symbol: 'USDC',
-    name: 'USD Coin', 
-    address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-    decimals: 6
-  },
-  {
-    symbol: 'DAI',
-    name: 'Dai Stablecoin',
-    address: '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb',
-    decimals: 18
-  },
-  {
-    symbol: 'USDT',
-    name: 'Tether USD',
-    address: '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2',
-    decimals: 6
-  },
-  {
-    symbol: 'AERO',
-    name: 'Aerodrome Finance',
-    address: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
-    decimals: 18
-  },
-  {
-    symbol: 'MORPHO',
-    name: 'Morpho',
-    address: '0xBa661B0c4D2c5BE456F7D625c3Ae34C18411f821',
-    decimals: 18
-  },
-  {
-    symbol: 'BRETT',
-    name: 'Brett',
-    address: '0x532f27101965dd16442E59d40670FaF4eBB142Bd',
-    decimals: 18
-  },
-  {
-    symbol: 'DEGEN',
-    name: 'Degen',
-    address: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed',
-    decimals: 18
-  },
-  {
-    symbol: 'HIGHER',
-    name: 'Higher',
-    address: '0x0578d8A44db98B23BF096A382e016e29a5Ce0ffe',
-    decimals: 18
-  },
-  {
-    symbol: 'HYUSD',
-    name: 'HYUSD Stablecoin',
-    address: '0xCc7FF230365bD730eE4B352cC2492CEdAC49383e',
-    decimals: 18
-  }
-];
+type OdosApiResponse = ReadonlyArray<OdosTokenResponse>;
+
+// Transform Odos token to our BaseToken format
+function transformOdosToken(token: OdosTokenResponse): BaseToken {
+  return {
+    symbol: token.symbol,
+    name: token.name,
+    address: token.address,
+    decimals: token.decimals
+  };
+}
+
+// Validate chainId parameter
+function validateChainId(chainId: string | string[] | undefined): chainId is string {
+  return typeof chainId === 'string' && /^\d+$/.test(chainId);
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Enable CORS for nyxusd.com
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', 'https://nyxusd.com');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+  setCorsHeaders(res, { methods: 'GET,OPTIONS' });
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return handleOptions(res);
   }
 
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (!validateMethod(req.method, ['GET'])) {
+    return sendMethodNotAllowed(res, ['GET']);
   }
 
-  const chainId = req.query.chainId as string;
+  const { chainId } = req.query;
   
-  // Only support Base chain (8453) for now
-  if (chainId !== '8453') {
-    return res.status(200).json([]);
+  // Validate chainId parameter
+  if (!validateChainId(chainId)) {
+    const errorResponse: ApiResponse = {
+      success: false,
+      error: 'Invalid chainId parameter. Must be a numeric string.',
+      timestamp: new Date().toISOString()
+    };
+    return res.status(400).json(errorResponse);
+  }
+  
+  // Only support Base chain for now
+  if (chainId !== BASE_CHAIN_ID.toString()) {
+    const emptyResponse: ApiResponse<ReadonlyArray<BaseToken>> = {
+      success: true,
+      data: [],
+      timestamp: new Date().toISOString()
+    };
+    return res.status(200).json(emptyResponse);
   }
 
   try {
@@ -107,26 +71,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         headers: {
           'Accept': 'application/json',
           'User-Agent': 'NyxUSD/1.0'
-        }
+        },
+signal: AbortSignal.timeout(10000) // 10 second timeout
       });
       
       if (response.ok) {
-        const data = await response.json();
+        const data: OdosApiResponse = await response.json();
+        
         if (Array.isArray(data) && data.length > 0) {
-          return res.status(200).json(data);
+          const tokens = data.map(transformOdosToken);
+          const successResponse: ApiResponse<ReadonlyArray<BaseToken>> = {
+            success: true,
+            data: tokens,
+            timestamp: new Date().toISOString()
+          };
+          return res.status(200).json(successResponse);
         }
       }
     } catch (error) {
-      console.error('Odos API error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown Odos API error';
+      console.error('Odos API error:', errorMessage);
     }
     
-    // Fallback to static list
-    return res.status(200).json(baseTokens);
+    // Fallback to static list when external API fails
+    const fallbackResponse: ApiResponse<ReadonlyArray<BaseToken>> = {
+      success: true,
+      data: BASE_CORE_TOKENS,
+      timestamp: new Date().toISOString()
+    };
+    return res.status(200).json(fallbackResponse);
     
   } catch (error) {
-    console.error('Odos token API error:', error);
-    return res.status(500).json({
-      error: 'Failed to fetch tokens'
-    });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('Odos token API error:', errorMessage);
+    
+    const errorResponse: ApiResponse = {
+      success: false,
+      error: 'Failed to fetch tokens',
+      timestamp: new Date().toISOString()
+    };
+    return res.status(500).json(errorResponse);
   }
 }

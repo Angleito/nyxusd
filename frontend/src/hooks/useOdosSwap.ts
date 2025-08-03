@@ -3,23 +3,33 @@ import { useAccount } from 'wagmi';
 import type { WalletClient, PublicClient, Address } from 'viem';
 import axios from 'axios';
 
+// Import shared API types
 interface SwapQuoteParams {
-  inputToken: Address;
-  outputToken: Address;
-  inputAmount: bigint;
-  slippageTolerance: number;
-  userAddress: Address;
+  readonly inputToken: Address;
+  readonly outputToken: Address;
+  readonly inputAmount: bigint;
+  readonly slippageTolerance: number;
+  readonly userAddress: Address;
 }
 
+// Updated to match API shared types
 interface SwapQuote {
-  inputAmount: string;
-  outputAmount: string;
-  priceImpact: number;
-  gasEstimate: string;
-  pathId: string;
-  routerAddress: Address;
-  callData: `0x${string}`;
-  value: string;
+  readonly inputAmount: string;
+  readonly outputAmount: string;
+  readonly priceImpact: number;
+  readonly gasEstimate: string;
+  readonly pathId: string;
+  readonly routerAddress: string;
+  readonly callData: string;
+  readonly value: string;
+}
+
+// API Response type matching shared types
+interface ApiResponse<T = unknown> {
+  readonly success: boolean;
+  readonly data?: T;
+  readonly error?: string;
+  readonly timestamp?: string;
 }
 
 export function useOdosSwap() {
@@ -31,7 +41,7 @@ export function useOdosSwap() {
   const [executionError, setExecutionError] = useState<string | null>(null);
 
   const API_URL = useMemo(() => 
-    process.env.NODE_ENV === 'production' 
+    process.env['NODE_ENV'] === 'production' 
       ? 'https://nyxusd.vercel.app/api/swap'
       : 'http://localhost:3000/api/swap',
     []
@@ -43,7 +53,7 @@ export function useOdosSwap() {
     setQuote(null);
 
     try {
-      const response = await axios.post(`${API_URL}?action=quote`, {
+      const response = await axios.post<ApiResponse<SwapQuote>>(`${API_URL}?action=quote`, {
         inputToken: params.inputToken,
         outputToken: params.outputToken,
         inputAmount: params.inputAmount.toString(),
@@ -51,7 +61,7 @@ export function useOdosSwap() {
         userAddress: params.userAddress,
       });
 
-      if (response.data.success) {
+      if (response.data.success && response.data.data) {
         setQuote(response.data.data);
       } else {
         setQuoteError(response.data.error || 'Failed to fetch quote');
@@ -59,7 +69,10 @@ export function useOdosSwap() {
     } catch (error) {
       console.error('Error fetching quote:', error);
       if (axios.isAxiosError(error)) {
-        setQuoteError(error.response?.data?.details || error.message);
+        const errorMessage = error.response?.data?.error || error.response?.data?.details || error.message;
+        setQuoteError(errorMessage);
+      } else if (error instanceof Error) {
+        setQuoteError(error.message);
       } else {
         setQuoteError('Failed to fetch swap quote');
       }
@@ -83,8 +96,8 @@ export function useOdosSwap() {
     try {
       // Send transaction through wallet
       const hash = await walletClient.sendTransaction({
-        to: quote.routerAddress,
-        data: quote.callData,
+        to: quote.routerAddress as Address,
+        data: quote.callData as `0x${string}`,
         value: BigInt(quote.value),
         account: address,
         chain: walletClient.chain,
@@ -116,10 +129,10 @@ export function useOdosSwap() {
     }
   }, [quote, address]);
 
-  const getSupportedTokens = useCallback(async () => {
+  const getSupportedTokens = useCallback(async (): Promise<unknown[]> => {
     try {
-      const response = await axios.get(`${API_URL}?action=tokens`);
-      if (response.data.success) {
+      const response = await axios.get<ApiResponse<unknown[]>>(`${API_URL}?action=tokens`);
+      if (response.data.success && response.data.data) {
         return response.data.data;
       }
       return [];
@@ -134,11 +147,11 @@ export function useOdosSwap() {
     outputToken: Address
   ): Promise<boolean> => {
     try {
-      const response = await axios.post(`${API_URL}?action=validate`, {
+      const response = await axios.post<ApiResponse<{ readonly isSupported: boolean }>>(`${API_URL}?action=validate`, {
         inputToken,
         outputToken,
       });
-      return response.data.success && response.data.data.isSupported;
+      return response.data.success && response.data.data?.isSupported === true;
     } catch (error) {
       console.error('Error validating token pair:', error);
       return false;

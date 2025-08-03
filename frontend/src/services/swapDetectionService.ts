@@ -365,46 +365,46 @@ export class SwapDetectionService {
         // Check for specific patterns first
         if (pattern.source.includes('want\\s+to\\s+)?swap')) {
           // "I want to swap USDC and AERO" pattern
-          result.inputToken = this.normalizeToken(match[1], availableTokens);
-          result.outputToken = this.normalizeToken(match[2], availableTokens);
+          result.inputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[2]);
         } else if (pattern.source.includes('buy')) {
           // Buy pattern: buy [output] with [amount] [input]
-          result.outputToken = this.normalizeToken(match[1], availableTokens);
+          result.outputToken = this.normalizeToken(match[1]);
           result.amount = match[2];
-          result.inputToken = this.normalizeToken(match[3], availableTokens);
+          result.inputToken = this.normalizeToken(match[3]);
         } else if (pattern.source.includes('want|need|get')) {
           // Want/need pattern: just output token
-          result.outputToken = this.normalizeToken(match[1], availableTokens);
+          result.outputToken = this.normalizeToken(match[1]);
           // Default input token to ETH if not specified
           if (!result.inputToken) {
             result.inputToken = 'ETH';
           }
         } else if (pattern.source.includes('switch\\s+to')) {
           // Switch pattern: switch to [output]
-          result.outputToken = this.normalizeToken(match[1], availableTokens);
+          result.outputToken = this.normalizeToken(match[1]);
           // Default input token to ETH if not specified
           if (!result.inputToken) {
             result.inputToken = 'ETH';
           }
         } else if (pattern.source.startsWith('swap\\s+') && match.length === 3) {
           // Swap pattern without amount: swap [input] to [output]
-          result.inputToken = this.normalizeToken(match[1], availableTokens);
-          result.outputToken = this.normalizeToken(match[2], availableTokens);
+          result.inputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[2]);
         } else if (match.length === 2) {
           // Single token pattern - assume it's the output
-          result.outputToken = this.normalizeToken(match[1], availableTokens);
+          result.outputToken = this.normalizeToken(match[1]);
           if (!result.inputToken) {
             result.inputToken = 'ETH';
           }
         } else if (match.length === 3) {
           // Token to token pattern without amount
-          result.inputToken = this.normalizeToken(match[1], availableTokens);
-          result.outputToken = this.normalizeToken(match[2], availableTokens);
+          result.inputToken = this.normalizeToken(match[1]);
+          result.outputToken = this.normalizeToken(match[2]);
         } else if (match.length === 4) {
           // Standard pattern with amount
           result.amount = match[1];
-          result.inputToken = this.normalizeToken(match[2], availableTokens);
-          result.outputToken = this.normalizeToken(match[3], availableTokens);
+          result.inputToken = this.normalizeToken(match[2]);
+          result.outputToken = this.normalizeToken(match[3]);
         }
         break;
       }

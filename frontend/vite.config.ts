@@ -6,15 +6,14 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-    // Proxy disabled for Vercel deployment
-    // Uncomment for local development with separate backend
-    // proxy: {
-    //   "/api": {
-    //     target: "http://localhost:8080",
-    //     changeOrigin: true,
-    //     secure: false,
-    //   },
-    // },
+    // Proxy for local development
+    proxy: {
+      "/api": {
+        target: "http://localhost:8081",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   build: {
     outDir: "dist",

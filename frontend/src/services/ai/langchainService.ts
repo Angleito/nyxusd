@@ -149,7 +149,7 @@ interface AIServiceAnalytics {
 
 export class LangChainAIService implements AIService {
   private config: AIServiceConfig;
-  private llm: ChatOpenAI;
+  private llm!: ChatOpenAI;
   private memory: ConversationSummaryMemory;
   // private outputParser: StructuredOutputParser<unknown>;
   private isInitialized = false;

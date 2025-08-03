@@ -1,78 +1,109 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
-
-interface TTSRequest {
-  text: string;
-  voiceId?: string;
-  modelId?: string;
-  token: string;
-}
+import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from './utils/cors';
+import type { 
+  TTSRequestBody, 
+  ApiErrorResponse, 
+  VoiceTokenPayload 
+} from './types/voice';
+import { validateVoiceEnvironment, isValidTTSRequest } from './types/voice';
 
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
-) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', process.env['FRONTEND_URL'] || '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+): Promise<void> {
+  // Set CORS headers
+  setCorsHeaders(res, { methods: 'POST,OPTIONS' });
   
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
+    handleOptions(res);
     return;
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (!validateMethod(req.method, ['POST'])) {
+    sendMethodNotAllowed(res, ['POST']);
+    return;
   }
 
   try {
-    const { text, voiceId, modelId, token } = req.body as TTSRequest;
+    // Validate environment configuration
+    const envValidation = validateVoiceEnvironment();
+    if (!envValidation.isValid) {
+      const errorResponse: ApiErrorResponse = {
+        success: false,
+        error: 'Voice service not configured',
+        details: envValidation.errors.join(', '),
+        timestamp: new Date().toISOString(),
+      };
+      res.status(500).json(errorResponse);
+      return;
+    }
     
-    // Verify token
-    if (!token) {
-      return res.status(401).json({ 
+    // Validate request body structure
+    if (!isValidTTSRequest(req.body)) {
+      const errorResponse: ApiErrorResponse = {
         success: false,
-        error: 'Authentication required' 
-      });
+        error: 'Invalid request format',
+        details: 'Request must include valid text (1-5000 chars) and token',
+        timestamp: new Date().toISOString(),
+      };
+      res.status(400).json(errorResponse);
+      return;
     }
-
+    
+    const { text, voiceId, modelId, token } = req.body as TTSRequestBody;
+    
+    // Comprehensive JWT token validation with proper typing
+    let tokenPayload: VoiceTokenPayload;
     try {
-      jwt.verify(token, process.env['JWT_SECRET'] || 'default-secret-change-in-production');
+      const decoded = jwt.verify(token, envValidation.env.JWT_SECRET!);
+      
+      // Ensure decoded token has the expected structure
+      if (typeof decoded === 'object' && decoded !== null && 
+          'sessionId' in decoded && 'voiceId' in decoded && 'type' in decoded) {
+        tokenPayload = decoded as VoiceTokenPayload;
+        
+        // Verify token type
+        if (tokenPayload.type !== 'voice_session') {
+          const errorResponse: ApiErrorResponse = {
+            success: false,
+            error: 'Invalid token type',
+            timestamp: new Date().toISOString(),
+          };
+          res.status(401).json(errorResponse);
+          return;
+        }
+      } else {
+        const errorResponse: ApiErrorResponse = {
+          success: false,
+          error: 'Malformed token payload',
+          timestamp: new Date().toISOString(),
+        };
+        res.status(401).json(errorResponse);
+        return;
+      }
     } catch (err) {
-      return res.status(401).json({ 
+      const errorResponse: ApiErrorResponse = {
         success: false,
-        error: 'Invalid or expired token' 
-      });
+        error: 'Invalid or expired token',
+        details: err instanceof Error ? err.message : 'Token verification failed',
+        timestamp: new Date().toISOString(),
+      };
+      res.status(401).json(errorResponse);
+      return;
     }
 
-    // Validate input
-    if (!text || text.length > 5000) {
-      return res.status(400).json({ 
-        success: false,
-        error: 'Invalid text input' 
-      });
-    }
+    // Use validated environment values and token payload for voice selection
+    const selectedVoiceId = voiceId || tokenPayload.voiceId || envValidation.env.ELEVENLABS_DEFAULT_VOICE_ID!;
+    const selectedModelId = modelId || envValidation.env.ELEVENLABS_MODEL_ID!;
 
-    const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
-    if (!elevenLabsApiKey) {
-      return res.status(500).json({ 
-        success: false,
-        error: 'Voice service not configured' 
-      });
-    }
-
-    const selectedVoiceId = voiceId || process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL';
-    const selectedModelId = modelId || process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5';
-
-    // Make request to ElevenLabs API
+    // Make request to ElevenLabs API with validated parameters
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${selectedVoiceId}?optimize_streaming_latency=2&output_format=mp3_44100_128`,
       {
         method: 'POST',
         headers: {
-          'xi-api-key': elevenLabsApiKey,
+          'xi-api-key': envValidation.env.ELEVENLABS_API_KEY!,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -89,25 +120,42 @@ export default async function handler(
     );
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('ElevenLabs API error:', error);
-      return res.status(response.status).json({
+      const errorText = await response.text();
+      console.error('ElevenLabs API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+        sessionId: tokenPayload.sessionId
+      });
+      
+      const errorResponse: ApiErrorResponse = {
         success: false,
         error: 'Failed to generate speech',
-      });
+        details: `ElevenLabs API returned ${response.status}: ${response.statusText}`,
+        timestamp: new Date().toISOString(),
+      };
+      res.status(response.status).json(errorResponse);
+      return;
     }
 
     // Stream the audio response back to the client
     const audioBuffer = await response.arrayBuffer();
     
+    // Set proper audio headers
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('Content-Length', audioBuffer.byteLength.toString());
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    
     res.status(200).send(Buffer.from(audioBuffer));
   } catch (error) {
     console.error('Error in TTS endpoint:', error);
-    res.status(500).json({ 
+    const errorResponse: ApiErrorResponse = {
       success: false,
-      error: 'Failed to process text-to-speech request' 
-    });
+      error: 'Failed to process text-to-speech request',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    };
+    res.status(500).json(errorResponse);
   }
 }

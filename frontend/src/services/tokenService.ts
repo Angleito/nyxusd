@@ -1,31 +1,31 @@
 interface TokenInfo {
-  id: string;
-  symbol: string;
-  name: string;
-  address?: string;
-  decimals?: number;
-  logoURI?: string;
-  chainId: number;
-  tags?: string[];
+  readonly id: string;
+  readonly symbol: string;
+  readonly name: string;
+  readonly address?: string;
+  readonly decimals?: number;
+  readonly logoURI?: string;
+  readonly chainId: number;
+  readonly tags?: ReadonlyArray<string>;
 }
 
 interface CoinGeckoToken {
-  id: string;
-  symbol: string;
-  name: string;
-  platforms: Record<string, string>;
+  readonly id: string;
+  readonly symbol: string;
+  readonly name: string;
+  readonly platforms: Record<string, string>;
 }
 
 interface CoinGeckoAssetPlatform {
-  id: string;
-  chain_identifier: number | null;
-  name: string;
-  shortname: string;
+  readonly id: string;
+  readonly chain_identifier: number | null;
+  readonly name: string;
+  readonly shortname: string;
 }
 
 class TokenService {
   private static instance: TokenService;
-  private baseApiUrl = import.meta.env.MODE === 'production' 
+  private baseApiUrl = (import.meta.env['MODE'] === 'production') 
     ? '/api' 
     : 'http://localhost:8080/api'; // Backend API endpoint
   private cache: Map<string, { data: TokenInfo[]; timestamp: number }> = new Map();
@@ -40,7 +40,7 @@ class TokenService {
   }
 
   // Fallback token list for Base chain (used if API fails)
-  private fallbackTokens: TokenInfo[] = [
+  private readonly fallbackTokens: ReadonlyArray<TokenInfo> = [
     {
       id: 'ethereum',
       symbol: 'ETH',
@@ -131,7 +131,7 @@ class TokenService {
     }
   ];
 
-  private getFromCache(key: string): TokenInfo[] | null {
+  private getFromCache(key: string): ReadonlyArray<TokenInfo> | null {
     const cached = this.cache.get(key);
     if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
       return cached.data;
@@ -139,14 +139,14 @@ class TokenService {
     return null;
   }
 
-  private setCache(key: string, data: TokenInfo[]): void {
+  private setCache(key: string, data: ReadonlyArray<TokenInfo>): void {
     this.cache.set(key, { data, timestamp: Date.now() });
   }
 
   /**
    * Get comprehensive token list from multiple sources (CoinGecko + Odos)
    */
-  async getBaseChainTokens(limit = 500): Promise<TokenInfo[]> {
+  async getBaseChainTokens(limit = 500): Promise<ReadonlyArray<TokenInfo>> {
     const cacheKey = `comprehensive-base-tokens-${limit}`;
     
     // Check cache first
@@ -227,7 +227,7 @@ class TokenService {
   /**
    * Fetch tokens from CoinGecko via backend API
    */
-  private async fetchCoinGeckoTokens(limit: number): Promise<TokenInfo[]> {
+  private async fetchCoinGeckoTokens(limit: number): Promise<ReadonlyArray<TokenInfo>> {
     const response = await fetch(`${this.baseApiUrl}/tokens/base?limit=${limit}`);
     
     if (!response.ok) {
@@ -237,7 +237,7 @@ class TokenService {
     const data = await response.json();
     
     if (data.success && Array.isArray(data.tokens)) {
-      return data.tokens.map((token: any) => ({
+      return data.tokens.map((token: CoinGeckoToken) => ({
         id: token.id,
         symbol: token.symbol.toUpperCase(),
         name: token.name,
@@ -255,7 +255,7 @@ class TokenService {
   /**
    * Fetch tokens directly from Odos API
    */
-  private async fetchOdosTokens(): Promise<TokenInfo[]> {
+  private async fetchOdosTokens(): Promise<ReadonlyArray<TokenInfo>> {
     try {
       const response = await fetch(`${this.baseApiUrl}/odos/tokens/${this.baseChainId}`);
       
@@ -273,7 +273,7 @@ class TokenService {
       const tokens = await response.json();
       
       if (Array.isArray(tokens)) {
-        return tokens.map((token: any) => ({
+        return tokens.map((token: { symbol?: string; name?: string; address?: string; decimals?: number }) => ({
           id: token.symbol?.toLowerCase() || 'unknown',
           symbol: token.symbol?.toUpperCase() || 'UNKNOWN',
           name: token.name || token.symbol || 'Unknown Token',
@@ -320,7 +320,7 @@ class TokenService {
   /**
    * Search for tokens by name or symbol
    */
-  async searchTokens(query: string): Promise<TokenInfo[]> {
+  async searchTokens(query: string): Promise<ReadonlyArray<TokenInfo>> {
     const allTokens = await this.getBaseChainTokens();
     const lowerQuery = query.toLowerCase();
     
@@ -343,7 +343,7 @@ class TokenService {
   /**
    * Get popular tokens for trading
    */
-  async getPopularTokens(): Promise<TokenInfo[]> {
+  async getPopularTokens(): Promise<ReadonlyArray<TokenInfo>> {
     const allTokens = await this.getBaseChainTokens();
     
     // Prioritize tokens by category
@@ -364,7 +364,7 @@ class TokenService {
   /**
    * Infer token tags based on token data
    */
-  private inferTokenTags(token: any): string[] {
+  private inferTokenTags(token: { readonly name?: string; readonly symbol?: string }): ReadonlyArray<string> {
     const tags: string[] = [];
     const name = token.name?.toLowerCase() || '';
     const symbol = token.symbol?.toLowerCase() || '';

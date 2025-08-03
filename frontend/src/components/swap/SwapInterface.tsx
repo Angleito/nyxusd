@@ -9,12 +9,12 @@ import { tokenService, TokenInfo } from '../../services/tokenService';
 import { TokenSearch } from './TokenSearch';
 
 interface SwapInterfaceProps {
-  initialInputToken?: string;
-  initialOutputToken?: string;
-  initialAmount?: string;
-  onSwapComplete?: (txHash: string) => void;
-  onCancel?: () => void;
-  embedded?: boolean;
+  readonly initialInputToken?: string;
+  readonly initialOutputToken?: string;
+  readonly initialAmount?: string;
+  readonly onSwapComplete?: (txHash: string) => void;
+  readonly onCancel?: () => void;
+  readonly embedded?: boolean;
 }
 
 export const SwapInterface: React.FC<SwapInterfaceProps> = ({
@@ -65,15 +65,37 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
   }, []);
 
   // Memoize token details to prevent unnecessary re-calculations
-  const inputTokenDetails = useMemo(() => 
-    swapDetectionService.getTokenDetails(inputToken), 
-    [inputToken]
-  );
+  const inputTokenDetails = useMemo(() => {
+    const details = swapDetectionService.getTokenDetails(inputToken);
+    if (!details) {
+      // Try to find from available tokens as fallback
+      const tokenInfo = availableTokens.find(t => t.symbol === inputToken);
+      if (tokenInfo && tokenInfo.address && tokenInfo.decimals) {
+        return {
+          symbol: tokenInfo.symbol,
+          address: tokenInfo.address,
+          decimals: tokenInfo.decimals
+        };
+      }
+    }
+    return details;
+  }, [inputToken, availableTokens]);
   
-  const outputTokenDetails = useMemo(() => 
-    swapDetectionService.getTokenDetails(outputToken), 
-    [outputToken]
-  );
+  const outputTokenDetails = useMemo(() => {
+    const details = swapDetectionService.getTokenDetails(outputToken);
+    if (!details) {
+      // Try to find from available tokens as fallback
+      const tokenInfo = availableTokens.find(t => t.symbol === outputToken);
+      if (tokenInfo && tokenInfo.address && tokenInfo.decimals) {
+        return {
+          symbol: tokenInfo.symbol,
+          address: tokenInfo.address,
+          decimals: tokenInfo.decimals
+        };
+      }
+    }
+    return details;
+  }, [outputToken, availableTokens]);
 
   // Fetch quote when inputs change
   useEffect(() => {
@@ -94,9 +116,14 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
     return () => clearTimeout(delayDebounce);
   }, [inputAmount, slippage, address, fetchQuote, inputTokenDetails, outputTokenDetails]);
 
-  const handleSwap = async () => {
+  const handleSwap = useCallback(async (): Promise<void> => {
     if (!walletClient || !publicClient || !address) {
       console.error('Wallet not connected');
+      return;
+    }
+
+    if (!quoteData) {
+      console.error('No quote available');
       return;
     }
 
@@ -108,21 +135,27 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
     } catch (error) {
       console.error('Swap execution failed:', error);
     }
-  };
+  }, [walletClient, publicClient, address, quoteData, executeSwap, onSwapComplete]);
 
-  const switchTokens = () => {
+  const switchTokens = useCallback((): void => {
     setInputToken(outputToken);
     setOutputToken(inputToken);
     setInputAmount('');
-  };
+  }, [inputToken, outputToken]);
 
-  const formatOutputAmount = () => {
+  const formatOutputAmount = useCallback((): string => {
     if (!quoteData) return '0.00';
-    const outputTokenDetails = swapDetectionService.getTokenDetails(outputToken);
-    if (!outputTokenDetails) return '0.00';
     
-    return formatUnits(BigInt(quoteData.outputAmount), outputTokenDetails.decimals);
-  };
+    const details = outputTokenDetails;
+    if (!details) return '0.00';
+    
+    try {
+      return formatUnits(BigInt(quoteData.outputAmount), details.decimals);
+    } catch (error) {
+      console.error('Error formatting output amount:', error);
+      return '0.00';
+    }
+  }, [quoteData, outputTokenDetails]);
 
   const containerClass = embedded 
     ? "bg-gray-900/50 rounded-lg p-4 border border-purple-800/30"
@@ -221,7 +254,14 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
             <div className="flex justify-between">
               <span className="text-gray-400">Est. Gas</span>
               <span className="text-gray-300">
-                {formatUnits(BigInt(quoteData.gasEstimate), 9)} ETH
+                {(() => {
+                  try {
+                    return formatUnits(BigInt(quoteData.gasEstimate), 9) + ' ETH';
+                  } catch (error) {
+                    console.error('Error formatting gas estimate:', error);
+                    return 'N/A';
+                  }
+                })()}
               </span>
             </div>
             <div className="flex justify-between">

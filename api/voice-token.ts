@@ -1,77 +1,69 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
+import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from './utils/cors';
+import type { 
+  VoiceTokenResponse, 
+  ApiErrorResponse, 
+  VoiceTokenPayload 
+} from './types/voice';
+import { validateVoiceEnvironment, isValidSessionId } from './types/voice';
 
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
-) {
-  // Enable CORS with proper origin handling
-  const isDevelopment = process.env['NODE_ENV'] === 'development' || 
-                       process.env['VERCEL_ENV'] === 'development';
-  
-  const allowedOrigins = [
-    'https://nyxusd.com',
-    'https://www.nyxusd.com',
-    ...(isDevelopment ? [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'http://localhost:8080'
-    ] : [])
-  ];
-  
-  const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else if (isDevelopment) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
-
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+): Promise<void> {
+  // Set CORS headers
+  setCorsHeaders(res, { methods: 'GET,OPTIONS' });
   
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
+    handleOptions(res);
     return;
   }
 
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (!validateMethod(req.method, ['GET'])) {
+    sendMethodNotAllowed(res, ['GET']);
+    return;
   }
 
   try {
-    // Get session ID from query or generate new one
-    const sessionId = (req.query.sessionId as string) || `voice_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    // Check if ElevenLabs API key is configured
-    const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
-    if (!elevenLabsApiKey) {
-      return res.status(500).json({ 
+    // Validate environment configuration
+    const envValidation = validateVoiceEnvironment();
+    if (!envValidation.isValid) {
+      const errorResponse: ApiErrorResponse = {
         success: false,
-        error: 'Voice service not configured' 
-      });
+        error: 'Voice service not configured',
+        details: envValidation.errors.join(', '),
+        timestamp: new Date().toISOString(),
+      };
+      res.status(500).json(errorResponse);
+      return;
     }
+    
+    // Get session ID from query or generate new one using bracket notation
+    const querySessionId = req.query['sessionId'];
+    const sessionId = (isValidSessionId(querySessionId) ? querySessionId : null) || 
+                     `voice_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
     // Generate a short-lived token with session info
-    const token = jwt.sign(
-      {
-        sessionId,
-        voiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
-        type: 'voice_session',
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + (5 * 60), // 5 minutes expiry
-      },
-      process.env['JWT_SECRET'] || 'default-secret-change-in-production'
-    );
+    const now = Math.floor(Date.now() / 1000);
+    const tokenPayload: VoiceTokenPayload = {
+      sessionId,
+      voiceId: envValidation.env.ELEVENLABS_DEFAULT_VOICE_ID!,
+      type: 'voice_session',
+      iat: now,
+      exp: now + (5 * 60), // 5 minutes expiry
+    };
+    
+    const token = jwt.sign(tokenPayload, envValidation.env.JWT_SECRET!);
 
     // Return token and configuration (but NOT the actual API key)
-    res.status(200).json({
+    const response: VoiceTokenResponse = {
       success: true,
       token,
       sessionId,
       config: {
-        voiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
-        modelId: process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5',
+        voiceId: envValidation.env.ELEVENLABS_DEFAULT_VOICE_ID!,
+        modelId: envValidation.env.ELEVENLABS_MODEL_ID!,
         wsUrl: 'wss://api.elevenlabs.io/v1',
         optimizeStreamingLatency: 2,
         voiceSettings: {
@@ -81,12 +73,17 @@ export default async function handler(
           use_speaker_boost: true,
         },
       },
-    });
+    };
+    
+    res.status(200).json(response);
   } catch (error) {
     console.error('Error generating voice token:', error);
-    res.status(500).json({ 
+    const errorResponse: ApiErrorResponse = {
       success: false,
-      error: 'Failed to generate voice token' 
-    });
+      error: 'Failed to generate voice token',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    };
+    res.status(500).json(errorResponse);
   }
 }

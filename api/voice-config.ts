@@ -1,65 +1,55 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from './utils/cors';
+import type { 
+  VoiceConfigResponse, 
+  ApiErrorResponse, 
+  ElevenLabsUser
+} from './types/voice';
+import { validateVoiceEnvironment } from './types/voice';
 
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
-) {
-  // Enable CORS with proper origin handling
-  const isDevelopment = process.env['NODE_ENV'] === 'development' || 
-                       process.env['VERCEL_ENV'] === 'development';
-  
-  const allowedOrigins = [
-    'https://nyxusd.com',
-    'https://www.nyxusd.com',
-    ...(isDevelopment ? [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'http://localhost:8080'
-    ] : [])
-  ];
-  
-  const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else if (isDevelopment) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
-
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+): Promise<void> {
+  // Set CORS headers
+  setCorsHeaders(res, { methods: 'GET,OPTIONS' });
   
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
+    handleOptions(res);
     return;
   }
 
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (!validateMethod(req.method, ['GET'])) {
+    sendMethodNotAllowed(res, ['GET']);
+    return;
   }
 
   try {
-    // Check if voice service is configured
-    const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
-    const isConfigured = !!elevenLabsApiKey;
+    // Validate environment configuration
+    const envValidation = validateVoiceEnvironment();
+    const isConfigured = envValidation.isValid;
     
-    let apiStatus = 'not_configured';
-    let errorDetails = null;
+    let apiStatus: 'not_configured' | 'connected' | 'error' = 'not_configured';
+    let errorDetails: string | null = null;
 
-    if (isConfigured) {
+    if (!isConfigured) {
+      errorDetails = envValidation.errors.join(', ');
+    } else {
       try {
-        // Test ElevenLabs API connection
+        // Test ElevenLabs API connection with proper types
         const testResponse = await fetch('https://api.elevenlabs.io/v1/user', {
           headers: {
-            'xi-api-key': elevenLabsApiKey,
+            'xi-api-key': envValidation.env.ELEVENLABS_API_KEY!,
           },
         });
 
         if (testResponse.ok) {
           apiStatus = 'connected';
+          // Validate response structure 
+          await testResponse.json() as ElevenLabsUser;
         } else {
           apiStatus = 'error';
-          errorDetails = `API returned ${testResponse.status}`;
+          errorDetails = `API returned ${testResponse.status}: ${testResponse.statusText}`;
         }
       } catch (error) {
         console.error('ElevenLabs API test failed:', error);
@@ -68,14 +58,14 @@ export default async function handler(
       }
     }
     
-    res.status(200).json({
+    const response: VoiceConfigResponse = {
       success: true,
       configured: isConfigured,
       apiStatus,
       errorDetails,
       config: {
-        defaultVoiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
-        modelId: process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5',
+        defaultVoiceId: envValidation.env.ELEVENLABS_DEFAULT_VOICE_ID!,
+        modelId: envValidation.env.ELEVENLABS_MODEL_ID!,
         availableVoices: [
           { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah', description: 'Young female voice' },
           { id: 'ErXwobaYiN019PkySvjV', name: 'Antoni', description: 'Young male voice' },
@@ -111,14 +101,17 @@ export default async function handler(
         }
       },
       timestamp: new Date().toISOString(),
-    });
+    };
+    
+    res.status(200).json(response);
   } catch (error) {
     console.error('Error getting voice config:', error);
-    res.status(500).json({
+    const errorResponse: ApiErrorResponse = {
       success: false,
       error: 'Failed to get voice configuration',
       details: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString(),
-    });
+    };
+    res.status(500).json(errorResponse);
   }
 }
