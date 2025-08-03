@@ -605,11 +605,33 @@ Diversified approach across multiple channels:
 - Target: $10M TVL, 1,000 users
 
 #### Q2 2026: Full Launch
-- 5+ blockchain support
+- Midnight chain integration (following Base and Sui)
+- Cardano chain integration
+- Additional blockchain support (5+ total chains)
 - Mobile application release
 - Advanced AI strategies live
 - Institutional features
 - Target: $100M TVL, 10,000 users
+
+### Blockchain Integration Sequence
+
+NyxUSD follows a strategic multi-chain expansion roadmap designed to maximize yield opportunities while maintaining security and user experience:
+
+**Phase 1: Foundation Chains (Q3 2025 - Q1 2026)**
+- **Base Network**: Core deployment and initial yield strategies
+- **Sui Network**: Cross-chain native architecture and enhanced scalability
+
+**Phase 2: Extended Ecosystem (Q2 2026)**
+- **Midnight Protocol**: Privacy-focused DeFi integration, leveraging advanced zero-knowledge capabilities for enhanced user privacy in yield strategies
+- **Cardano Network**: Robust smart contract platform with strong institutional adoption, providing additional yield opportunities through native Cardano DeFi protocols
+
+**Integration Rationale**:
+- Base provides the foundation for our CDP engine and initial user base
+- Sui enables high-performance cross-chain operations and native BTC access
+- Midnight adds privacy-preserving yield strategies for institutional users
+- Cardano expands our reach into academic and institutional DeFi markets
+
+Each new chain integration undergoes rigorous security audits and gradual rollout to ensure user fund safety while expanding yield opportunities.
 
 ### Long-Term Vision (2026-2028)
 
