@@ -142,10 +142,10 @@ class TokenService {
   }
 
   /**
-   * Get Base chain tokens from CoinGecko via backend API
+   * Get comprehensive token list from multiple sources (CoinGecko + Odos)
    */
-  async getBaseChainTokens(limit = 100): Promise<TokenInfo[]> {
-    const cacheKey = `base-tokens-${limit}`;
+  async getBaseChainTokens(limit = 500): Promise<TokenInfo[]> {
+    const cacheKey = `comprehensive-base-tokens-${limit}`;
     
     // Check cache first
     const cached = this.getFromCache(cacheKey);
@@ -153,37 +153,154 @@ class TokenService {
       return cached;
     }
 
+    console.log('🔍 Fetching comprehensive token list from multiple sources...');
+
     try {
-      // Try to fetch from backend API that calls CoinGecko
-      const response = await fetch(`${this.baseApiUrl}/tokens/base?limit=${limit}`);
+      // Fetch from multiple sources in parallel
+      const [coingeckoTokens, odosTokens] = await Promise.allSettled([
+        this.fetchCoinGeckoTokens(limit),
+        this.fetchOdosTokens()
+      ]);
+
+      let allTokens = [...this.fallbackTokens]; // Start with fallback
+      const addressSet = new Set<string>();
+      
+      // Add tokens to set to avoid duplicates
+      this.fallbackTokens.forEach(token => {
+        if (token.address) {
+          addressSet.add(token.address.toLowerCase());
+        }
+      });
+
+      // Process CoinGecko tokens
+      if (coingeckoTokens.status === 'fulfilled' && coingeckoTokens.value.length > 0) {
+        console.log(`✅ Found ${coingeckoTokens.value.length} tokens from CoinGecko`);
+        coingeckoTokens.value.forEach(token => {
+          const address = token.address?.toLowerCase();
+          if (address && !addressSet.has(address)) {
+            allTokens.push(token);
+            addressSet.add(address);
+          }
+        });
+      } else {
+        console.warn('⚠️ CoinGecko token fetch failed:', coingeckoTokens.status === 'rejected' ? coingeckoTokens.reason : 'No tokens returned');
+      }
+
+      // Process Odos tokens
+      if (odosTokens.status === 'fulfilled' && odosTokens.value.length > 0) {
+        console.log(`✅ Found ${odosTokens.value.length} tokens from Odos`);
+        odosTokens.value.forEach(token => {
+          const address = token.address?.toLowerCase();
+          if (address && !addressSet.has(address)) {
+            allTokens.push(token);
+            addressSet.add(address);
+          }
+        });
+      } else {
+        console.warn('⚠️ Odos token fetch failed:', odosTokens.status === 'rejected' ? odosTokens.reason : 'No tokens returned');
+      }
+
+      // Sort by popularity (market cap, then alphabetically)
+      allTokens.sort((a, b) => {
+        // Priority tokens first
+        const priorityA = this.getTokenPriority(a.symbol);
+        const priorityB = this.getTokenPriority(b.symbol);
+        if (priorityA !== priorityB) return priorityA - priorityB;
+        
+        // Then alphabetically
+        return a.symbol.localeCompare(b.symbol);
+      });
+
+      console.log(`🚀 Total unique tokens found: ${allTokens.length}`);
+      
+      this.setCache(cacheKey, allTokens);
+      return allTokens;
+
+    } catch (error) {
+      console.error('❌ Failed to fetch comprehensive token list:', error);
+      return this.fallbackTokens;
+    }
+  }
+
+  /**
+   * Fetch tokens from CoinGecko via backend API
+   */
+  private async fetchCoinGeckoTokens(limit: number): Promise<TokenInfo[]> {
+    const response = await fetch(`${this.baseApiUrl}/tokens/base?limit=${limit}`);
+    
+    if (!response.ok) {
+      throw new Error(`CoinGecko API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (data.success && Array.isArray(data.tokens)) {
+      return data.tokens.map((token: any) => ({
+        id: token.id,
+        symbol: token.symbol.toUpperCase(),
+        name: token.name,
+        address: token.platforms?.base || token.address,
+        decimals: token.decimals || 18,
+        logoURI: token.image,
+        chainId: this.baseChainId,
+        tags: this.inferTokenTags(token)
+      }));
+    }
+    
+    return [];
+  }
+
+  /**
+   * Fetch tokens directly from Odos API
+   */
+  private async fetchOdosTokens(): Promise<TokenInfo[]> {
+    try {
+      const response = await fetch(`${this.baseApiUrl}/odos/tokens/${this.baseChainId}`);
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Odos API error: ${response.status}`);
       }
       
-      const data = await response.json();
+      const tokens = await response.json();
       
-      if (data.success && Array.isArray(data.tokens)) {
-        const tokens: TokenInfo[] = data.tokens.map((token: any) => ({
-          id: token.id,
-          symbol: token.symbol.toUpperCase(),
-          name: token.name,
-          address: token.platforms?.base || token.address,
+      if (Array.isArray(tokens)) {
+        return tokens.map((token: any) => ({
+          id: token.symbol?.toLowerCase() || 'unknown',
+          symbol: token.symbol?.toUpperCase() || 'UNKNOWN',
+          name: token.name || token.symbol || 'Unknown Token',
+          address: token.address,
           decimals: token.decimals || 18,
-          logoURI: token.image,
+          logoURI: undefined,
           chainId: this.baseChainId,
           tags: this.inferTokenTags(token)
         }));
-        
-        this.setCache(cacheKey, tokens);
-        return tokens;
       }
+      
+      return [];
     } catch (error) {
-      console.warn('Failed to fetch tokens from CoinGecko API, using fallback:', error);
+      console.warn('Odos token fetch failed:', error);
+      return [];
     }
+  }
 
-    // Return fallback tokens if API fails
-    return this.fallbackTokens;
+  /**
+   * Get token priority for sorting (lower = higher priority)
+   */
+  private getTokenPriority(symbol: string): number {
+    const priorities: Record<string, number> = {
+      'ETH': 1,
+      'WETH': 2,
+      'USDC': 3,
+      'USDT': 4,
+      'DAI': 5,
+      'AERO': 6,
+      'MORPHO': 7,
+      'BRETT': 8,
+      'DEGEN': 9,
+      'HIGHER': 10
+    };
+    
+    return priorities[symbol] || 100;
   }
 
   /**

@@ -6,6 +6,7 @@ import { formatUnits, parseUnits } from 'viem';
 import { useOdosSwap } from '../../hooks/useOdosSwap';
 import { swapDetectionService } from '../../services/swapDetectionService';
 import { tokenService, TokenInfo } from '../../services/tokenService';
+import { TokenSearch } from './TokenSearch';
 
 interface SwapInterfaceProps {
   initialInputToken?: string;
@@ -158,22 +159,15 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
             placeholder="0.00"
             className="flex-1 px-4 py-3 bg-gray-800/70 border border-purple-700/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
           />
-          <select
-            value={inputToken}
-            onChange={(e) => setInputToken(e.target.value)}
-            className="px-4 py-3 bg-gray-800/70 border border-purple-700/30 rounded-lg text-white focus:outline-none focus:border-purple-500"
-            disabled={tokensLoading}
-          >
-            {tokensLoading ? (
-              <option>Loading tokens...</option>
-            ) : (
-              availableTokens.map((token) => (
-                <option key={token.symbol} value={token.symbol}>
-                  {token.symbol}
-                </option>
-              ))
-            )}
-          </select>
+          <div className="min-w-48">
+            <TokenSearch
+              selectedToken={inputToken}
+              onTokenSelect={setInputToken}
+              availableTokens={availableTokens}
+              tokensLoading={tokensLoading}
+              placeholder="Search input token..."
+            />
+          </div>
         </div>
       </div>
 
@@ -199,22 +193,15 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
             readOnly
             className="flex-1 px-4 py-3 bg-gray-800/50 border border-purple-700/30 rounded-lg text-white placeholder-gray-500"
           />
-          <select
-            value={outputToken}
-            onChange={(e) => setOutputToken(e.target.value)}
-            className="px-4 py-3 bg-gray-800/70 border border-purple-700/30 rounded-lg text-white focus:outline-none focus:border-purple-500"
-            disabled={tokensLoading}
-          >
-            {tokensLoading ? (
-              <option>Loading tokens...</option>
-            ) : (
-              availableTokens.map((token) => (
-                <option key={token.symbol} value={token.symbol}>
-                  {token.symbol}
-                </option>
-              ))
-            )}
-          </select>
+          <div className="min-w-48">
+            <TokenSearch
+              selectedToken={outputToken}
+              onTokenSelect={setOutputToken}
+              availableTokens={availableTokens}
+              tokensLoading={tokensLoading}
+              placeholder="Search output token..."
+            />
+          </div>
         </div>
       </div>
 
