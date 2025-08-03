@@ -9,6 +9,7 @@ import NyxHeroSection from "./components/dashboard/NyxHeroSection";
 import { UnifiedAIAssistant, StandaloneAIAssistant } from "./components/ai-assistant/UnifiedAIAssistant";
 import { AboutPage } from "./components/about/AboutPage";
 import ContactPage from "./components/contact/ContactPage";
+import WhitepaperPage from "./pages/WhitepaperPage";
 import "./styles/nyx-global.css";
 import "./styles/App.css";
 import { useEffect } from "react";
@@ -152,6 +153,20 @@ function App() {
                   transition={pageTransition}
                 >
                   <ContactPage />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/whitepaper"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={pageTransition}
+                >
+                  <WhitepaperPage />
                 </motion.div>
               }
             />

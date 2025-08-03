@@ -355,10 +355,10 @@ The distribution prioritizes community ownership and protocol sustainability:
   - Airdrops and incentives: 15%
   - Grants and partnerships: 10%
   - DAO treasury: 5%
-- 20% to Team (250M NYX)
+- 25% to Team & Advisors (250M NYX)
   - 4-year vesting with 1-year cliff
   - Performance-based unlocks
-- 20% to Protocol Treasury (250M NYX)
+- 25% to Protocol Treasury (250M NYX)
   - Development funding
   - Marketing and growth
   - Emergency reserves

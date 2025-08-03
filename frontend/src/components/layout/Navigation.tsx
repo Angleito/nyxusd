@@ -43,6 +43,11 @@ const mainNavItems: NavItem[] = [
     description: "AI-adapted strategies tailored to your unique financial journey",
   },
   {
+    label: "White Paper",
+    href: "/whitepaper",
+    description: "Read our comprehensive technical documentation",
+  },
+  {
     label: "About Us",
     href: "/about",
     description: "Learn more about our platform and team",
