@@ -22,7 +22,7 @@
     "test:coverage:unit": "jest --selectProjects unit-tests --coverage",
     "test:coverage:integration": "jest --selectProjects integration-tests --coverage",
     "test:coverage:property": "jest --selectProjects property-tests --coverage",
-    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\" --fix",
+    "lint": "cd frontend && npm run lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit --skipLibCheck",

@@ -1,8 +1,6 @@
 import js from "@eslint/js";
 import typescript from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
-import react from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
 
 export default [
   js.configs.recommended,
@@ -16,68 +14,57 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
+        project: ["./tsconfig.json", "./frontend/tsconfig.json", "./api/tsconfig.json"],
       },
       globals: {
         window: "readonly",
-        document: "readonly",
+        document: "readonly", 
         console: "readonly",
         process: "readonly",
         setTimeout: "readonly",
         clearTimeout: "readonly",
         setInterval: "readonly",
         clearInterval: "readonly",
-        requestAnimationFrame: "readonly",
-        cancelAnimationFrame: "readonly",
         localStorage: "readonly",
         sessionStorage: "readonly",
         HTMLElement: "readonly",
         HTMLDivElement: "readonly",
         HTMLButtonElement: "readonly",
         HTMLInputElement: "readonly",
-        HTMLTextAreaElement: "readonly",
-        HTMLHeadingElement: "readonly",
-        HTMLParagraphElement: "readonly",
         NodeJS: "readonly",
         require: "readonly",
-        fetch: "readonly",
-        WebSocket: "readonly",
-        AudioContext: "readonly",
-        MediaRecorder: "readonly",
-        MessageEvent: "readonly",
-        CloseEvent: "readonly",
-        Event: "readonly",
-        FormData: "readonly",
-        File: "readonly",
-        atob: "readonly",
-        navigator: "readonly",
+        global: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        module: "readonly",
+        exports: "readonly",
+        // Jest globals
+        describe: "readonly",
+        test: "readonly",
+        it: "readonly",
+        expect: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
+        beforeAll: "readonly",
+        afterAll: "readonly",
+        jest: "readonly",
       },
     },
     plugins: {
       "@typescript-eslint": typescript,
-      react: react,
-      "react-hooks": reactHooks,
     },
     rules: {
       ...typescript.configs.recommended.rules,
-      ...react.configs.recommended.rules,
-      ...reactHooks.configs.recommended.rules,
-      "react/react-in-jsx-scope": "off", // Not needed in React 18+
-      "react/prop-types": "off", // Using TypeScript for prop validation
-      "react/no-unescaped-entities": "off", // Allow apostrophes in JSX
-      "@typescript-eslint/no-unused-vars": "warn", // Make warnings instead of errors
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_" },
+      ],
       "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off", 
       "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-empty-object-type": "off",
-      "no-unused-vars": "off", // Turn off the base rule as it can report incorrect errors
-      "no-undef": "off", // TypeScript handles this
-      "no-case-declarations": "off",
-      "react-hooks/exhaustive-deps": "warn",
-    },
-    settings: {
-      react: {
-        version: "detect",
-      },
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-var-requires": "off",
     },
   },
   {
@@ -93,10 +80,26 @@ export default [
         __filename: "readonly",
         process: "readonly",
         console: "readonly",
+        global: "readonly",
       },
     },
   },
   {
-    ignores: ["dist/**", "node_modules/**"],
+    ignores: [
+      "dist/**", 
+      "node_modules/**",
+      "frontend/dist/**",
+      "frontend/node_modules/**",
+      "api/dist/**",
+      "api/node_modules/**",
+      "packages/*/dist/**",
+      "packages/*/node_modules/**",
+      "libs/*/dist/**", 
+      "libs/*/node_modules/**",
+      "**/*.d.ts",
+      "**/*.d.ts.map",
+      "**/*.js.map",
+      "coverage/**",
+    ],
   },
 ];

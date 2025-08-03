@@ -10,6 +10,7 @@ import { UnifiedAIAssistant, StandaloneAIAssistant } from "./components/ai-assis
 import { AboutPage } from "./components/about/AboutPage";
 import ContactPage from "./components/contact/ContactPage";
 import WhitepaperPage from "./pages/WhitepaperPage";
+import { DemoEnhancer } from "./components/demo/DemoEnhancer";
 import "./styles/nyx-global.css";
 import "./styles/App.css";
 import { useEffect } from "react";
@@ -62,6 +63,9 @@ function App() {
       
       {/* Global AI Assistant - Available on all pages */}
       <UnifiedAIAssistant position="bottom-right" />
+      
+      {/* Demo Controller for Video Recording */}
+      <DemoEnhancer />
       
       <main>
         <AnimatePresence mode="wait">

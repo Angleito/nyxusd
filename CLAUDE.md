@@ -24,6 +24,34 @@ The application includes a sophisticated chat memory system:
 
 NYXUSD is a chain-agnostic AI-powered stablecoin protocol with functional programming architecture. The codebase follows strict functional patterns with pure functions, immutable data, and comprehensive type safety.
 
+## Hackathon Information
+
+### Event: JoinPond Arena
+**Arena ID**: 52a56b81-b5fb-459d-a007-0ce6b52961e3
+**Platform**: https://cryptopond.xyz
+
+### Project Submission
+NYXUSD is being developed for the JoinPond hackathon with focus on:
+- **AI-Powered DeFi**: Natural language interface for complex DeFi operations
+- **Voice Integration**: ElevenLabs voice chat for accessibility
+- **Cross-chain Swaps**: Odos integration for optimal routing
+- **Memory System**: Persistent user context and preferences
+- **Yield Discovery**: Automated yield finding on Base network
+
+### Key Features for Demo
+1. **Voice-Controlled DeFi**: Execute swaps and CDP operations via voice
+2. **Intelligent Memory**: System remembers user preferences and past interactions
+3. **Multi-chain Support**: Seamless operations across Ethereum, Base, and other chains
+4. **Real-time Yield Discovery**: AI-powered yield opportunity identification
+5. **Portfolio Analytics**: Natural language portfolio analysis and recommendations
+
+### Judges' Focus Areas
+- **Innovation**: Novel use of AI in DeFi operations
+- **Technical Implementation**: Clean functional programming architecture
+- **User Experience**: Voice interface and memory system
+- **Cross-chain Capabilities**: Seamless multi-chain operations
+- **Security**: No mock implementations, production-ready code
+
 ## Build & Development Commands
 
 ### Core Commands

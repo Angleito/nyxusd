@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ChevronDoubleDownIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { DemoStats } from "../demo/DemoStats";
 
 const NyxHeroSection: React.FC = () => {
   const scrollToContent = () => {
@@ -182,32 +183,8 @@ const NyxHeroSection: React.FC = () => {
             </Link>
           </motion.div>
 
-          {/* Stats */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-          >
-            <div className="nyx-glass rounded-lg p-6">
-              <p className="nyx-body-small mb-2" style={{ color: 'var(--nyx-gleam-60)' }}>
-                Total Value Locked
-              </p>
-              <p className="nyx-heading-1 nyx-text-gradient">$0.00</p>
-            </div>
-            <div className="nyx-glass rounded-lg p-6">
-              <p className="nyx-body-small mb-2" style={{ color: 'var(--nyx-gleam-60)' }}>
-                NyxUSD Minted
-              </p>
-              <p className="nyx-heading-1 nyx-text-gradient">0</p>
-            </div>
-            <div className="nyx-glass rounded-lg p-6">
-              <p className="nyx-body-small mb-2" style={{ color: 'var(--nyx-gleam-60)' }}>
-                Active CDPs
-              </p>
-              <p className="nyx-heading-1 nyx-text-gradient">0</p>
-            </div>
-          </motion.div>
+          {/* Enhanced Demo Stats */}
+          <DemoStats />
         </motion.div>
       </div>
 

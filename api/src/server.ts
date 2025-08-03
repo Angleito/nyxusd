@@ -11,6 +11,7 @@ import aiRoutes from "./routes/ai";
 import enhancedAIRoutes from "./routes/enhancedAI";
 import voiceRoutes from "./routes/voice";
 import memoryRoutes from "./routes/memory";
+import subscriptionRoutes from "./routes/subscriptions";
 
 // Import CDP operations
 import { NyxUSD_CDP_SDK, CDPCreationParams, CDP } from '@nyxusd/cdp-sdk';
