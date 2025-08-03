@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, X, Sparkles, Mic, MicOff, Volume2, MessageCircle } from "lucide-react";
+import { Send, X, Sparkles, Mic, MicOff, Volume2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ChatMessage } from "./ChatMessage";
 import { TypingIndicator } from "./TypingIndicator";
@@ -272,13 +272,13 @@ export const ChatInterface: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            {/* Voice Mode Toggle */}
+            {/* Voice Chat Toggle - More Prominent */}
             <motion.button
               onClick={handleConversationalModeToggle}
-              className={`p-2 rounded-lg transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 font-medium ${
                 isConversationalMode 
-                  ? 'bg-green-600 text-white hover:bg-green-700' 
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg' 
+                  : 'bg-purple-600/20 text-purple-300 hover:text-white hover:bg-purple-600/40 border border-purple-500/30'
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -286,9 +286,15 @@ export const ChatInterface: React.FC = () => {
               disabled={voiceChat.status === 'connecting'}
             >
               {isConversationalMode ? (
-                <Volume2 className="w-5 h-5" />
+                <>
+                  <Volume2 className="w-4 h-4" />
+                  <span className="text-sm hidden sm:inline">Voice On</span>
+                </>
               ) : (
-                <MessageCircle className="w-5 h-5" />
+                <>
+                  <Mic className="w-4 h-4" />
+                  <span className="text-sm hidden sm:inline">Voice Chat</span>
+                </>
               )}
             </motion.button>
 
