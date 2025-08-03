@@ -223,12 +223,20 @@ const WhitepaperPage: React.FC = () => {
                 Start Reading
               </button>
               <a
-                href="https://github.com/nyxusd"
+                href="https://nyxusd.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-8 py-3 bg-gray-700 text-white font-semibold rounded-xl hover:bg-gray-600 transition-all duration-300"
               >
-                View on GitHub
+                Visit Website
+              </a>
+              <a
+                href="https://twitter.com/nyx_usd"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-3 bg-gray-700 text-white font-semibold rounded-xl hover:bg-gray-600 transition-all duration-300"
+              >
+                Follow on X
               </a>
             </div>
           </motion.div>

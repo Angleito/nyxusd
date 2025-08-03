@@ -274,14 +274,17 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                 </p>
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { name: "Discord", gradient: "from-purple-600 to-indigo-600", icon: "💬" },
-                    { name: "GitHub", gradient: "from-gray-700 to-gray-800", icon: "🛠️" },
-                    { name: "Twitter", gradient: "from-blue-500 to-cyan-500", icon: "🐦" },
-                    { name: "Docs", gradient: "from-orange-500 to-red-500", icon: "📚" }
+                    { name: "Discord", gradient: "from-purple-600 to-indigo-600", icon: "💬", link: "https://discord.com/users/angleito" },
+                    { name: "Website", gradient: "from-gray-700 to-gray-800", icon: "🌐", link: "https://nyxusd.com" },
+                    { name: "Twitter", gradient: "from-blue-500 to-cyan-500", icon: "🐦", link: "https://twitter.com/nyx_usd" },
+                    { name: "Docs", gradient: "from-orange-500 to-red-500", icon: "📚", link: "https://nyxusd.com/whitepaper" }
                   ].map((platform, index) => (
-                    <motion.button
+                    <motion.a
                       key={platform.name}
-                      className={`group px-6 py-4 bg-gradient-to-r ${platform.gradient} text-white rounded-xl hover:scale-105 transition-all duration-300 font-medium shadow-lg hover:shadow-xl`}
+                      href={platform.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`group px-6 py-4 bg-gradient-to-r ${platform.gradient} text-white rounded-xl hover:scale-105 transition-all duration-300 font-medium shadow-lg hover:shadow-xl block`}
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       initial={{ opacity: 0, y: 20 }}
@@ -292,7 +295,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                         <span className="text-lg group-hover:scale-110 transition-transform">{platform.icon}</span>
                         <span>{platform.name}</span>
                       </div>
-                    </motion.button>
+                    </motion.a>
                   ))}
                 </div>
               </motion.div>

@@ -14,6 +14,7 @@ interface NavItem {
   label: string;
   href: string;
   description?: string;
+  external?: boolean;
 }
 
 interface NavSection {
@@ -44,8 +45,9 @@ const mainNavItems: NavItem[] = [
   },
   {
     label: "White Paper",
-    href: "/whitepaper",
+    href: "https://nyxusd.com/whitepaper",
     description: "Read our comprehensive technical documentation",
+    external: true,
   },
   {
     label: "About Us",
@@ -107,24 +109,44 @@ export const Navigation: React.FC<NavigationProps> = ({
         role="navigation"
         aria-label="Main navigation"
       >
-        {mainNavItems.map((item) => (
-          <Link
-            key={item.href}
-            to={item.href}
-            className={mobileNavItemClass(item.href)}
-            onClick={handleNavClick}
-            aria-current={isActive(item.href) ? "page" : undefined}
-          >
-            <div>
-              <div className="font-medium">{item.label}</div>
-              {item.description && (
-                <div className="text-xs text-gray-400 mt-1">
-                  {item.description}
-                </div>
-              )}
-            </div>
-          </Link>
-        ))}
+        {mainNavItems.map((item) =>
+          item.external ? (
+            <a
+              key={item.href}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={mobileNavItemClass(item.href)}
+              onClick={handleNavClick}
+            >
+              <div>
+                <div className="font-medium">{item.label}</div>
+                {item.description && (
+                  <div className="text-xs text-gray-400 mt-1">
+                    {item.description}
+                  </div>
+                )}
+              </div>
+            </a>
+          ) : (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={mobileNavItemClass(item.href)}
+              onClick={handleNavClick}
+              aria-current={isActive(item.href) ? "page" : undefined}
+            >
+              <div>
+                <div className="font-medium">{item.label}</div>
+                {item.description && (
+                  <div className="text-xs text-gray-400 mt-1">
+                    {item.description}
+                  </div>
+                )}
+              </div>
+            </Link>
+          )
+        )}
 
         {/* Mobile Additional Sections */}
         {additionalNavSections.map((section) => (
@@ -172,25 +194,36 @@ export const Navigation: React.FC<NavigationProps> = ({
           whileTap={{ scale: 0.98 }}
           className="inline-block"
         >
-          <Link
-            to={item.href}
-            className={navItemClass(item.href)}
-            aria-current={isActive(item.href) ? "page" : undefined}
-          >
-            <span className="relative z-10">{item.label}</span>
-            {isActive(item.href) && (
-              <motion.div
-                className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-600/20 to-purple-400/20"
-                layoutId="activeNavItem"
-                initial={false}
-                transition={{
-                  type: "spring",
+          {item.external ? (
+            <a
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={navItemClass(item.href)}
+            >
+              <span className="relative z-10">{item.label}</span>
+            </a>
+          ) : (
+            <Link
+              to={item.href}
+              className={navItemClass(item.href)}
+              aria-current={isActive(item.href) ? "page" : undefined}
+            >
+              <span className="relative z-10">{item.label}</span>
+              {isActive(item.href) && (
+                <motion.div
+                  className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-600/20 to-purple-400/20"
+                  layoutId="activeNavItem"
+                  initial={false}
+                  transition={{
+                    type: "spring",
                   stiffness: 500,
                   damping: 30,
                 }}
               />
-            )}
-          </Link>
+              )}
+            </Link>
+          )}
         </motion.div>
       ))}
 
