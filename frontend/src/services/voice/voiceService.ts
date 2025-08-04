@@ -170,6 +170,14 @@ export class VoiceService extends EventEmitter {
     this.fallbackMode = 'tts';
     this.connectionState = 'degraded';
     
+    // Emit user-friendly status message
+    const friendlyMessage = this.getUserFriendlyFallbackMessage(reason);
+    this.emit('statusMessage', {
+      type: 'fallback',
+      message: friendlyMessage,
+      level: 'warning'
+    });
+    
     try {
       // Disable conversational mode temporarily
       const originalMode = this.config.conversationalMode;
@@ -292,17 +300,68 @@ export class VoiceService extends EventEmitter {
     this.connectionState = 'degraded';
     console.error('Voice service error:', error);
     
+    // Convert technical error to user-friendly message
+    const userFriendlyError = this.getUserFriendlyErrorMessage(error);
+    
     // Try to determine the best fallback based on the error
     if (error.message.includes('conversational') || error.message.includes('agent')) {
       this.handleConversationalModeFailure(error.message);
     } else if (error.message.includes('websocket') || error.message.includes('tts')) {
       this.handleTTSConnectionFailure(error.message);
     } else {
-      this.emit('error', error);
+      // Emit user-friendly error instead of technical error
+      const friendlyError = new Error(userFriendlyError);
+      friendlyError.name = 'VoiceServiceError';
+      this.emit('error', friendlyError);
     }
   }
 
-  private getUserFriendlyErrorMessage(reason: string): string {
+  private getUserFriendlyErrorMessage(error: Error): string {
+    const message = error.message.toLowerCase();
+    
+    // Environment/Configuration errors
+    if (message.includes('elevenlabs_api_key') || message.includes('not configured')) {
+      return 'Voice service is not configured. Please check your settings.';
+    }
+    
+    // Permission errors
+    if (message.includes('microphone permission') || message.includes('getUserMedia')) {
+      return 'Microphone permission is required for voice chat. Please allow microphone access and try again.';
+    }
+    
+    // Network/Connection errors
+    if (message.includes('websocket') || message.includes('connection')) {
+      return 'Voice connection lost. Trying to reconnect...';
+    }
+    
+    // API errors
+    if (message.includes('405') || message.includes('method not allowed')) {
+      return 'Voice service temporarily unavailable. Trying alternative mode...';
+    }
+    
+    if (message.includes('401') || message.includes('unauthorized')) {
+      return 'Voice service authentication failed. Please refresh the page.';
+    }
+    
+    if (message.includes('500') || message.includes('internal server error')) {
+      return 'Voice service is experiencing issues. Attempting to recover...';
+    }
+    
+    // Conversational mode specific errors
+    if (message.includes('conversational') || message.includes('agent')) {
+      return 'Advanced voice chat unavailable. Switching to basic voice mode...';
+    }
+    
+    // Speech recognition errors
+    if (message.includes('speech recognition') || message.includes('not-allowed')) {
+      return 'Speech recognition unavailable. Please check microphone permissions.';
+    }
+    
+    // Generic fallback
+    return 'Voice chat encountered an issue. Trying to recover...';
+  }
+
+  private getUserFriendlyFallbackMessage(reason: string): string {
     switch (reason) {
       case 'websocket_disconnected':
         return 'Voice connection lost. Trying to reconnect...';
@@ -420,7 +479,7 @@ export class VoiceService extends EventEmitter {
 
   async initialize(apiKey: string): Promise<void> {
     this.apiKey = apiKey;
-    await this.requestMicrophonePermission();
+    // Note: Microphone permission is now requested when user starts voice chat
     
     // Initialize conversational agent if in conversational mode
     if (this.config.conversationalMode) {
@@ -553,6 +612,14 @@ export class VoiceService extends EventEmitter {
   async startSession(context?: ConversationContext): Promise<string> {
     if (this.currentSession?.isActive) {
       throw new Error('Voice session already active');
+    }
+
+    // Request microphone permission when user actually starts voice chat
+    try {
+      await this.requestMicrophonePermission();
+    } catch (error) {
+      console.error('🎤 VoiceService: Microphone permission denied:', error);
+      throw new Error('Microphone permission required for voice chat');
     }
 
     const sessionId = `voice_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;

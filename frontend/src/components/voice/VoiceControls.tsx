@@ -161,9 +161,28 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
 
   const startAudioAnalysis = async () => {
     try {
+      // Check if we already have permission before requesting again
+      // This avoids duplicate permission prompts since voiceService already handles permissions
+      if (micStreamRef.current) {
+        // Reuse existing stream
+        setupAudioAnalyzer(micStreamRef.current);
+        return;
+      }
+
+      // Only request microphone if not already available
+      // Note: This should rarely happen since voiceService.startSession() handles permissions
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       micStreamRef.current = stream;
-      
+      setupAudioAnalyzer(stream);
+    } catch (err) {
+      console.error('Failed to start audio analysis:', err);
+      // Don't fail voice chat if audio visualization fails
+      console.warn('Audio level visualization disabled due to permission/access issue');
+    }
+  };
+
+  const setupAudioAnalyzer = (stream: MediaStream) => {
+    try {
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       analyserRef.current = audioContextRef.current.createAnalyser();
       const source = audioContextRef.current.createMediaStreamSource(stream);
@@ -184,7 +203,7 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
       
       updateLevel();
     } catch (err) {
-      console.error('Failed to start audio analysis:', err);
+      console.error('Failed to setup audio analyzer:', err);
     }
   };
 
