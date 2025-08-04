@@ -380,7 +380,7 @@ NyxUSD generates revenue from multiple innovative streams:
 
 #### Revenue Streams Breakdown
 
-| Source | Rate | Estimated Annual Revenue (at $1B TVL) |
+| Source | Rate | Estimated Annual Revenue |
 |--------|------|---------------------------------------|
 | CDP Stability Fees | 5% | $25M |
 | CDP Deployment Yields | 3-8% | $50M |
@@ -393,7 +393,7 @@ The dual CDP revenue model is particularly innovative—while users pay standard
 
 #### The Flywheel Effect
 
-The protocol creates a powerful growth flywheel: More users generate more TVL, which produces higher revenue, enabling NYX buybacks and token appreciation, attracting more users to restart the cycle.
+The protocol creates a powerful growth flywheel: More users generate more assets under management, which produces higher revenue, enabling NYX buybacks and token appreciation, attracting more users to restart the cycle.
 
 ### Fee Distribution Model
 
@@ -420,7 +420,7 @@ This treasury growth enables sustained development, marketing, and user acquisit
 
 #### Insurance Fund
 
-The insurance fund targets 10% of TVL to protect users against:
+The insurance fund targets 10% of assets under management to protect users against:
 - Smart contract exploits (up to $10M coverage)
 - Oracle failures (up to $5M coverage)
 - Bridge security issues (up to $5M coverage)
@@ -460,7 +460,7 @@ NyxUSD eliminates this complexity through conversational AI that understands use
 
 MakerDAO pioneered CDPs but only generates revenue from stability fees. Users must actively manage positions and receive no yield on their minted DAI.
 
-NyxUSD's dual revenue model generates 2.46x more revenue per dollar of TVL while the AI handles all position management. Users' minted stablecoins automatically earn yield, creating value instead of sitting idle.
+NyxUSD's dual revenue model generates 2.46x more revenue per dollar of assets under management while the AI handles all position management. Users' minted stablecoins automatically earn yield, creating value instead of sitting idle.
 
 #### Against AI Trading Bots
 
@@ -486,7 +486,7 @@ Our security approach implements defense in depth across four critical layers:
 
 **Layer 3 - Active Risk Management**: Real-time monitoring systems track all positions 24/7, with automatic circuit breakers that pause operations during abnormal conditions. Position limits prevent overexposure to any single protocol or strategy.
 
-**Layer 4 - Economic Protection**: The insurance fund, targeting 10% of TVL, provides coverage for various failure scenarios. Combined with gradual feature rollout and a comprehensive bug bounty program, this creates multiple backstops against potential losses.
+**Layer 4 - Economic Protection**: The insurance fund, targeting 10% of assets under management, provides coverage for various failure scenarios. Combined with gradual feature rollout and a comprehensive bug bounty program, this creates multiple backstops against potential losses.
 
 ### Risk Mitigation Strategies
 
@@ -510,7 +510,7 @@ The AI system includes multiple safety mechanisms to prevent errors:
 #### Economic Safeguards
 
 The insurance fund provides crucial protection for users:
-- Target size of 10% of TVL funded by 25% of protocol fees
+- Target size of 10% of assets under management funded by 25% of protocol fees
 - Coverage for smart contract exploits, oracle failures, bridge hacks, and AI errors
 - Claims processed through transparent DAO governance
 - Regular third-party audits ensure fund adequacy
@@ -534,13 +534,13 @@ The insurance fund provides crucial protection for users:
 Building MVP with core CDP engine, three-pool yield system, and AI chat interface. Focus on demonstrating key innovations: AI contract generation, dual revenue model, and cross-chain architecture. Seeking early feedback from hackathon judges and participants.
 
 #### Phase 2: Testnet Alpha (Q4 2025 - Planned)
-Deploy to Base testnet with 100 early access users. Implement real yield integrations with Aave and Compound. Begin AI training on actual DeFi data. Launch bug bounty program and initiate security audits. Target: $1M TVL commitment from early supporters.
+Deploy to Base testnet with 100 early access users. Implement real yield integrations with Aave and Compound. Begin AI training on actual DeFi data. Launch bug bounty program and initiate security audits.
 
 #### Phase 3: Mainnet Beta (Q1 2026 - Planned)
 Launch on Base mainnet with initial $100k protocol-owned liquidity. Activate Sui integration and native BTC functionality via IKA Protocol. Open to 1,000 beta users with yield caps for safety. Begin partnerships with wallets and DEXs.
 
 #### Phase 4: Public Launch (Q2 2026 - Planned)
-Remove TVL caps and open to all users. Launch mobile apps and voice interface. Activate institutional features and advanced AI strategies. Target $100M TVL through aggressive growth campaign and strategic partnerships.
+Remove yield caps and open to all users. Launch mobile apps and voice interface. Activate institutional features and advanced AI strategies.
 
 ### User Acquisition Strategy
 
@@ -595,14 +595,21 @@ Diversified approach across multiple channels:
 - Integrate first yield protocols (Aave, Compound)
 - Launch AI contract generation beta
 - Begin security audits
-- Target: $1M TVL, 100 early users
+- Target: 100 early users
 
-#### Q1 2026: Beta Expansion
+#### Q1 2026: Beta Expansion & Real-World Integration
 - Mainnet deployment on Base
 - Sui chain integration
 - Native BTC via IKA Protocol's 2MPC network
 - Voice interface beta
-- Target: $10M TVL, 1,000 users
+- **Brahma Protocol Integration**: Launch tap-to-pay functionality using CDP positions
+  - Partner with Brahma's Swype Card infrastructure for real-world spending
+  - Enable users to spend against CDP collateral without liquidating positions
+  - Integrate Visa payment rails for access to 100M+ merchants globally
+  - Support Apple Pay and Google Pay for seamless mobile payments
+  - Implement voice-controlled payment authorization through AI assistant
+  - Deploy automated risk management for collateral-backed spending
+- Target: 1,000 users, 100+ merchants accepting NyxUSD CDP payments
 
 #### Q2 2026: Full Launch
 - Midnight chain integration (following Base and Sui)
@@ -611,7 +618,7 @@ Diversified approach across multiple channels:
 - Mobile application release
 - Advanced AI strategies live
 - Institutional features
-- Target: $100M TVL, 10,000 users
+- Target: 10,000 users
 
 ### Blockchain Integration Sequence
 
@@ -633,89 +640,155 @@ NyxUSD follows a strategic multi-chain expansion roadmap designed to maximize yi
 
 Each new chain integration undergoes rigorous security audits and gradual rollout to ensure user fund safety while expanding yield opportunities.
 
+### Real-World Payment Integration: Brahma Partnership
+
+**Strategic Partnership**: NyxUSD will integrate with Brahma Protocol's proven payment infrastructure to bridge DeFi yields with real-world spending capabilities.
+
+**Technical Architecture**:
+- **Brahma Swype Card Integration**: Leverage Brahma's battle-tested payment infrastructure built on Gnosis Safe (securing $91B+ in assets)
+- **Voice-Controlled Authorization**: Combine NyxUSD's AI assistant with Brahma's programmable execution policies for seamless payment approval
+- **CDP-Backed Spending**: Users can spend against their collateralized positions without liquidating yield-generating assets
+- **Automated Risk Management**: Smart contract-based collateral monitoring and liquidation protection during spending
+
+**Payment Flow**:
+1. User initiates payment via voice command or mobile tap
+2. NyxUSD AI assistant verifies spending against user-defined policies
+3. Brahma infrastructure automatically borrows USDC against CDP collateral
+4. Payment settles through Visa rails to merchant
+5. System automatically manages loan repayment and collateral ratios
+6. All transactions maintain DeFi position integrity
+
+**Key Benefits**:
+- **Capital Efficiency**: Maintain yield-generating positions while accessing liquidity
+- **Global Reach**: Access to 100M+ Visa merchants worldwide
+- **Security**: Built on proven Gnosis Safe multi-signature infrastructure
+- **Programmable Controls**: Set spending limits, approved merchants, and risk parameters
+- **Multi-Chain Support**: Seamless payments across Base, Sui, and future integrated chains
+
+**Launch Timeline**: Q1 2026 beta with select merchants, expanding to full integration by Q2 2026.
+
 ### Long-Term Vision (2026-2028)
 
 **Late 2026 Goals**:
 - 10,000+ active users
-- $500M+ total value locked
 - 10+ integrated protocols
 - Native iOS and Android applications
 - Native BTC integration fully operational
 
 **2027 Targets**:
 - 100,000+ active users
-- $5B+ total value locked  
 - 25+ integrated protocols
 - Regulatory compliance in 5+ jurisdictions
 - Institutional partnerships established
 
 **2028 Vision**:
 - 1 million+ users globally
-- $50B+ TVL across all chains
 - Become leading AI-powered DeFi interface
 - Enable sovereign wealth fund participation
-- Launch NyxCard for real-world spending
+- Scale Brahma integration to support global payment infrastructure
+- Achieve regulatory approval for CDP-backed payments in major jurisdictions
 
 ### Success Metrics (Post-Launch)
 
 | Metric | 3 Months | 6 Months | 12 Months | 24 Months |
 |--------|----------|----------|-----------|-----------|
-| TVL | $1M | $10M | $100M | $500M |
 | Users | 100 | 1,000 | 10,000 | 50,000 |
 | Custom Portfolios | 10 | 100 | 1,000 | 10,000 |
-| Daily Transactions | 50 | 500 | 5,000 | 25,000 |
+| Daily DeFi Transactions | 50 | 500 | 5,000 | 25,000 |
+| Daily Payment Transactions | - | 50 | 1,000 | 10,000 |
+| Merchant Partners | - | 10 | 100 | 1,000 |
+| CDP-Backed Payment Volume | - | $100k | $5M | $50M |
 | Protocol Revenue | $5k | $50k | $500k | $2.5M |
 
 ---
 
-## Team & Governance {#team}
+## Philosophy & Community {#team}
 
-### Core Team
+### The Builder's Story
 
-#### Leadership
+I'm a Finance Major turned self-taught developer. A pleb like everyone else, watching crypto slowly sink into VC-ran and Wall Street-owned garbage.
 
-**CEO/Founder**: Bringing experience from building and managing $500M+ in TVL across multiple DeFi protocols, with a dual background in computer science and finance. Track record includes two successful protocol launches and deep understanding of both technical and market dynamics.
+I studied finance because I wanted to understand money and markets. What I found was a system designed to extract wealth from regular people and funnel it to the already wealthy. So I taught myself to code, thinking I could build something better.
 
-**CTO/AI Lead**: Former ML Engineer at Jump Trading with a PhD in Machine Learning from MIT. Built and operated trading systems managing over $1 billion in assets, bringing institutional-grade AI expertise to DeFi.
+Then I discovered something revolutionary: **AI writes better code than I do. And I've fully embraced it.**
 
-**Head of Product**: Previously led product development at a major DeFi protocol, shipping features used by 100,000+ users. Focused on simplifying complex financial operations into intuitive user experiences.
+Why fight the future? Why pretend my human limitations are somehow noble when AI can build more secure, more efficient, more innovative solutions? The old guard wants to gatekeep development behind years of computer science degrees and coding bootcamps. But AI democratizes creation itself.
 
-**Smart Contract Lead**: Former security auditor at Trail of Bits who has audited over $2 billion in TVL. Specializes in cross-chain security and formal verification of financial protocols.
+I remember when crypto was about **freedom**. When it was about giving power back to the people. When a kid in their garage could compete with Goldman Sachs. When "be your own bank" wasn't just a marketing slogan, but a revolution.
 
-### Advisory Board
+Now? We've got protocols that raise $100M before they even write a line of code. VCs dumping on retail while preaching "decentralization." Wall Street suits in $5,000 jackets explaining how they're going to "fix" DeFi. The same system that crashed in 2008 now owns the thing that was supposed to replace it.
 
-- Former Maker Foundation member providing CDP expertise
-- AI researcher from OpenAI guiding advanced model development
-- Sui ecosystem lead facilitating chain integration
-- Former SEC regulatory expert ensuring compliance readiness
+**This isn't why I got into crypto. And I know you didn't either.**
+
+### Every Man A King
+
+Huey Long had it right: **"Every Man A King."** 
+
+Not every man a subject to some VC fund. Not every man a liquidity provider for some Wall Street trading desk. Not every man a exit liquidity for some influencer's pump and dump.
+
+**Every man a king of his own financial destiny.**
+
+NyxUSD is built on this principle. No VCs. No institutional investors getting better terms than you. No complex financial instruments designed to extract value from regular people. Just a protocol that works for everyone who uses it.
+
+When you mint NyxUSD, you're not just another number in some fund's portfolio. You're a sovereign individual using sovereign money in a sovereign way.
+
+### Community-First, Always
+
+**The Only Team That Matters Is the Community**
+
+There's no "core team" here with magical credentials from fancy institutions. There's no advisory board of ex-regulators and Wall Street executives. There's just a developer who believes crypto can still change the world, and a community that refuses to let the suits take it over.
+
+Every line of code is open source. Every decision is transparent. Every improvement comes from the people who actually use the protocol, not some boardroom in Silicon Valley.
+
+The AI doesn't belong to me - it belongs to all of us. And honestly? It's better at this than I am. I'm not threatened by that, I'm liberated by it. Instead of spending months debugging smart contracts, I can focus on what matters: building something that serves real people.
+
+The protocol doesn't serve institutional investors - it serves people who want to earn yield on their assets without getting rekt by some fund manager's bad decisions.
+
+### Taking Back DeFi
+
+**This is Our Declaration of Independence from VC-Fi**
+
+We're not raising $50M from Andreessen Horowitz to build "the future of finance." We're building it ourselves, with our own hands, for our own communities.
+
+We're not partnering with JPMorgan to bring "institutional adoption." We're proving that regular people can build better financial infrastructure than the institutions.
+
+We're not optimizing for the next bull market exit. We're building something that lasts, something that serves the people who use it instead of the people who fund it.
+
+**Because when everyone is a king, no one is a peasant.**
 
 ### Governance Structure
 
-#### Progressive Decentralization
+#### True Decentralization, Not VC-Controlled "Decentralization"
 
-The protocol follows a careful path toward full decentralization:
+Real decentralization doesn't mean a few VCs control 60% of the tokens and call it "governance." It means the community actually has power.
 
-**Phase 1 (Months 0-6)**: Team control enables rapid iteration, bug fixes, and parameter tuning based on real-world usage.
+**Phase 1 (Months 0-6)**: Minimal necessary centralization for security and iteration. No pre-mining for VCs, no "strategic investor" rounds, no backdoors.
 
-**Phase 2 (Months 6-12)**: Community input through Snapshot voting on parameter proposals and treasury allocation, with team retaining veto for security.
+**Phase 2 (Months 6-12)**: Community Snapshot voting on all major decisions. No developer "veto power" - if the community decides, that's what happens.
 
-**Phase 3 (Month 12+)**: Full DAO governance with on-chain voting controlling all aspects including smart contract upgrades, treasury management, and protocol parameters.
+**Phase 3 (Month 12+)**: Full on-chain DAO governance. The code is the law, and the community writes the law.
 
-#### Governance Powers
+#### Community Power
 
-NYX holders vote on critical decisions:
-- Risk parameters and pool configurations
-- New protocol and chain integrations
-- Fee structure modifications
-- Treasury allocation and spending
-- AI strategy constraints and safety limits
+Every NYX holder gets a real voice in:
+- Risk parameters and yield strategies
+- New protocol integrations and chain expansions
+- Fee structures (no "dev tax" nonsense)
+- Treasury allocation (community-first spending)
+- AI safety parameters and constraints
 - Insurance claim approvals and payouts
 
-### The AI as a Stakeholder
+**No special voting classes. No founder tokens with 10x voting power. One token, one vote. Period.**
 
-In a revolutionary governance innovation, the AI itself holds 1 million NYX tokens and participates in protocol decisions. The AI evaluates proposals based on data-driven analysis, publishes its reasoning transparently, and votes according to calculated benefit scores. This creates a unique dynamic where human and artificial intelligence collaborate on protocol evolution.
+### The People's AI
 
-Community members can engage with the AI directly through Discord and Twitter, asking questions about its voting decisions and suggesting improvements to its analysis framework.
+The AI doesn't belong to some corporation or VC fund - it belongs to the community. And here's the thing: **it's legitimately better at managing DeFi protocols than humans are.**
+
+It doesn't get emotional. It doesn't have ego. It doesn't make decisions based on what will pump the token price this quarter. It optimizes for long-term protocol health and user benefit because that's what it was designed to do.
+
+I'm not trying to compete with it - I'm trying to harness it for the community's benefit. The AI holds NYX tokens just like everyone else and votes based on data, not politics. Its reasoning is completely transparent. Its code is open source. Its decisions can be questioned, challenged, and improved by anyone.
+
+**This is the future: humans and AI working together to build better financial infrastructure. Not AI serving Wall Street, but AI serving the people.**
 
 ---
 
