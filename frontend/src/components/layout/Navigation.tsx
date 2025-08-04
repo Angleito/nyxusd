@@ -29,6 +29,16 @@ const mainNavItems: NavItem[] = [
     description: "Overview of your CDPs and system status",
   },
   {
+    label: "Pools",
+    href: "/pools",
+    description: "Choose Safe, Medium, or High Risk pool",
+  },
+  {
+    label: "Pools",
+    href: "/pools",
+    description: "Choose Safe, Medium, or High Risk pool",
+  },
+  {
     label: "My CDPs",
     href: "/cdp",
     description: "Manage your Collateralized Debt Positions",
@@ -39,9 +49,9 @@ const mainNavItems: NavItem[] = [
     description: "System-wide statistics and health metrics",
   },
   {
-    label: "Personalized Investing",
+    label: "Ape In",
     href: "/ai-assistant",
-    description: "AI-adapted strategies tailored to your unique financial journey",
+    description: "Chat with Nyx-chan to get started",
   },
   {
     label: "White Paper",

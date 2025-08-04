@@ -16,7 +16,7 @@ import {
 
 export const NyxDashboard: React.FC = () => {
   const {
-    data: systemStats,
+    data: systemStatsResp,
     isLoading: statsLoading,
     error: statsError,
   } = useQuery({
@@ -25,6 +25,9 @@ export const NyxDashboard: React.FC = () => {
     refetchInterval: 30000,
     staleTime: 20000,
   });
+
+  // Normalize API response shape (ApiResponse<SystemMetrics> | AxiosResponse)
+  const systemStats = (systemStatsResp as any)?.data ?? systemStatsResp;
 
   const {
     data: prices,
@@ -113,14 +116,19 @@ export const NyxDashboard: React.FC = () => {
                 Nyx-chan has been watching your bags 👀 • Let's pump those numbers
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link to="/cdp">
-                  <NyxButton variant="primary" icon={<CurrencyDollarIcon className="w-5 h-5" />}>
+                <Link to="/ai-assistant">
+                  <NyxButton variant="primary" icon={<UserCircleIcon className="w-5 h-5" />}>
                     Ape In
                   </NyxButton>
                 </Link>
-                <Link to="/ai-assistant">
-                  <NyxButton variant="secondary" icon={<UserCircleIcon className="w-5 h-5" />}>
-                    Ask Nyx-chan
+                <Link to="/cdp">
+                  <NyxButton variant="secondary" icon={<CurrencyDollarIcon className="w-5 h-5" />}>
+                    Manage CDPs
+                  </NyxButton>
+                </Link>
+                <Link to="/pools">
+                  <NyxButton variant="ghost" icon={<SparklesIcon className="w-5 h-5" />}>
+                    Choose Pool
                   </NyxButton>
                 </Link>
               </div>
@@ -144,7 +152,7 @@ export const NyxDashboard: React.FC = () => {
               <ShieldCheckIcon className="w-5 h-5" style={{ color: 'var(--nyx-neon-cyan)' }} />
             </div>
             <p className="nyx-heading-2 nyx-text-gradient">
-              ${systemStats?.totalValueLocked?.toLocaleString() || "0"}
+              ${systemStats?.totalValueLocked?.toLocaleString?.() || systemStats?.metrics?.totalValueLocked?.toLocaleString?.() || "0"}
             </p>
           </NyxCardContent>
         </NyxCard>
@@ -159,7 +167,7 @@ export const NyxDashboard: React.FC = () => {
               <CurrencyDollarIcon className="w-5 h-5" style={{ color: 'var(--nyx-gold-circuit)' }} />
             </div>
             <p className="nyx-heading-2 nyx-text-gradient">
-              {systemStats?.totalDebt?.toLocaleString() || "0"}
+              {(systemStats as any)?.totalDebt?.toLocaleString?.() || "0"}
             </p>
           </NyxCardContent>
         </NyxCard>
@@ -174,7 +182,7 @@ export const NyxDashboard: React.FC = () => {
               <ChartBarIcon className="w-5 h-5" style={{ color: 'var(--nyx-plasma-pink)' }} />
             </div>
             <p className="nyx-heading-2 nyx-text-gradient">
-              {systemStats?.activeCDPs || "0"}
+              {(systemStats as any)?.activeCDPs || "0"}
             </p>
           </NyxCardContent>
         </NyxCard>
@@ -197,9 +205,10 @@ export const NyxDashboard: React.FC = () => {
               </div>
             </div>
             <p className="nyx-heading-2 nyx-text-gradient">
-              {systemStats?.averageCollateralRatio 
-                ? `${(systemStats.averageCollateralRatio * 100).toFixed(0)}%`
-                : "0%"}
+              {(() => {
+                const ratio = (systemStats as any)?.averageCollateralRatio ?? (systemStats as any)?.metrics?.averageCollateralization;
+                return typeof ratio === 'number' ? `${(ratio * 100).toFixed(0)}%` : "0%";
+              })()}
             </p>
           </NyxCardContent>
         </NyxCard>
