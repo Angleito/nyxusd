@@ -13,6 +13,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **ALWAYS implement complete functionality**, not placeholders
 - **ALWAYS follow functional programming patterns** in this codebase
 
+### Coding Standards
+- **REUSE FIRST** - Always check existing code/utilities before writing new ones
+- **MINIMAL CODE** - Write the shortest, most efficient solution
+- **MODULAR DESIGN** - Create small, reusable functions and components
+- **PERFORMANCE FOCUSED** - Optimize for efficiency and speed
+- **ESSENTIAL DOCS ONLY** - Document only critical business logic and edge cases
+- **DRY PRINCIPLE** - Never duplicate code, extract common patterns
+- **SINGLE RESPONSIBILITY** - Each function/module should do one thing well
+
 ### Memory System Architecture
 The application includes a sophisticated chat memory system:
 - **Session Memory**: Tracks conversation history within sessions

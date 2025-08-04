@@ -13,7 +13,10 @@ interface CoinGeckoToken {
   readonly id: string;
   readonly symbol: string;
   readonly name: string;
-  readonly platforms: Record<string, string>;
+  readonly platforms?: Record<string, string>;
+  readonly address?: string;
+  readonly decimals?: number;
+  readonly image?: string;
 }
 
 interface CoinGeckoAssetPlatform {
@@ -28,7 +31,7 @@ class TokenService {
   private baseApiUrl = (import.meta.env['MODE'] === 'production') 
     ? '/api' 
     : 'http://localhost:8080/api'; // Backend API endpoint
-  private cache: Map<string, { data: TokenInfo[]; timestamp: number }> = new Map();
+  private cache: Map<string, { data: ReadonlyArray<TokenInfo>; timestamp: number }> = new Map();
   private cacheTimeout = 5 * 60 * 1000; // 5 minutes cache
   private baseChainId = 8453; // Base mainnet chain ID
 
@@ -237,16 +240,24 @@ class TokenService {
     const data = await response.json();
     
     if (data.success && Array.isArray(data.tokens)) {
-      return data.tokens.map((token: CoinGeckoToken) => ({
-        id: token.id,
-        symbol: token.symbol.toUpperCase(),
-        name: token.name,
-        address: token.platforms?.base || token.address,
-        decimals: token.decimals || 18,
-        logoURI: token.image,
-        chainId: this.baseChainId,
-        tags: this.inferTokenTags(token)
-      }));
+      return data.tokens
+        .map((token: CoinGeckoToken) => {
+          const address = token.platforms?.['base'] || token.address;
+          const decimals = token.decimals;
+          const logoURI = token.image;
+          
+          return {
+            id: token.id,
+            symbol: token.symbol.toUpperCase(),
+            name: token.name,
+            ...(address && { address }),
+            ...(decimals && { decimals }),
+            ...(logoURI && { logoURI }),
+            chainId: this.baseChainId,
+            tags: this.inferTokenTags(token)
+          } satisfies TokenInfo;
+        })
+        .filter((token): token is TokenInfo => Boolean(token.address)); // Filter out tokens without addresses
     }
     
     return [];

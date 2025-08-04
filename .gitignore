@@ -228,3 +228,4 @@ CLAUDE.md
 .claude/
 claude-*
 .cursor/
+.vercel

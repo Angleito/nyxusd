@@ -284,11 +284,7 @@ Key traits:
     const wsUrl = `wss://api.elevenlabs.io/v1/convai/agents/${agentId}/conversation`;
 
     return new Promise((resolve, reject) => {
-      this.ws = new WebSocket(wsUrl, [], {
-        headers: {
-          'xi-api-key': this.apiKey,
-        },
-      });
+      this.ws = new WebSocket(wsUrl);
 
       this.ws.onopen = () => {
         console.log('Conversational AI WebSocket connected');
@@ -562,12 +558,20 @@ Key traits:
   }
 
   getConnectionInfo(): { status: string; isActive: boolean; agentId?: string; sessionId?: string } {
-    return {
+    const result: { status: string; isActive: boolean; agentId?: string; sessionId?: string } = {
       status: this.getConversationStatus(),
       isActive: this.currentSession?.isActive || false,
-      agentId: this.currentSession?.agentId,
-      sessionId: this.currentSession?.sessionId,
     };
+    
+    if (this.currentSession?.agentId) {
+      result.agentId = this.currentSession.agentId;
+    }
+    
+    if (this.currentSession?.sessionId) {
+      result.sessionId = this.currentSession.sessionId;
+    }
+    
+    return result;
   }
 
   dispose(): void {

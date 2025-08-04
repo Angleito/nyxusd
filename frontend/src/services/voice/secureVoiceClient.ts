@@ -117,7 +117,7 @@ export class SecureVoiceClient {
    */
   async getConfig(): Promise<VoiceConfig> {
     if (this.config) {
-      return this.config;
+      return this.config!; // Safe because we checked it exists
     }
 
     try {
@@ -144,7 +144,6 @@ export class SecureVoiceClient {
       console.error('Error getting voice config:', error);
       // Return a default config that indicates voice is not configured
       this.config = {
-        success: false,
         configured: false,
         config: {
           defaultVoiceId: 'EXAVITQu4vr4xnSDxMaL',

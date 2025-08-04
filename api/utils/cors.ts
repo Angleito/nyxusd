@@ -7,10 +7,13 @@
 
 import type { VercelResponse } from '@vercel/node';
 
-// Standard CORS headers for nyxusd.com
+// Standard CORS headers with development support
+const isDevelopment = process.env['NODE_ENV'] === 'development' || 
+                     process.env['VERCEL_ENV'] === 'development';
+
 const CORS_HEADERS = {
   'Access-Control-Allow-Credentials': 'true',
-  'Access-Control-Allow-Origin': 'https://nyxusd.com',
+  'Access-Control-Allow-Origin': isDevelopment ? '*' : 'https://nyxusd.com',
   'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
   'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
 } as const;

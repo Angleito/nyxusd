@@ -407,8 +407,8 @@ export class VoiceService extends EventEmitter {
         voiceSettings: {
           stability: this.config.stability || 0.5,
           similarity_boost: this.config.similarityBoost || 0.75,
-          style: this.config.style,
-          use_speaker_boost: this.config.useSpeakerBoost,
+          ...(this.config.style !== undefined && { style: this.config.style }),
+          ...(this.config.useSpeakerBoost !== undefined && { use_speaker_boost: this.config.useSpeakerBoost }),
         },
         model: this.config.modelId,
       },
