@@ -1,6 +1,6 @@
 # NyxUSD: AI-Powered Cross-Chain Yield Optimization
 ## Making DeFi Simple Through Intelligent Automation
-### Hackathon Submission - August 2025
+### Community-Judged Hackathon Submission - August 2025
 
 ---
 
@@ -27,7 +27,7 @@ We've built the first protocol where artificial intelligence doesn't just optimi
 5. **Conversational DeFi**: Transform complex strategies into simple conversations
 6. **Self-Improving AI**: Machine learning models that evolve with market conditions
 
-### Key Features (Hackathon POC)
+### Core Innovation
 - **Multiple Risk Tiers**: Safe, Medium, and High-risk yield strategies
 - **AI Strategy Generation**: Fast response times for custom contract creation
 - **Cross-Chain Architecture**: Efficient routing across multiple blockchains
@@ -628,12 +628,12 @@ We partner with protocols and platforms that share our values:
 
 ### 2025-2026 Development Timeline
 
-#### Q3 2025: Hackathon MVP (Current - August 2025)
+#### Q3 2025: Community-Judged Hackathon (Current - August 2025)
 - Build core CDP engine for Base
 - Implement basic three-pool yield system
 - Create AI chat interface prototype
 - Develop smart contract factory proof-of-concept
-- Target: Hackathon demo completion
+- Goal: Demonstrate value to community judges for funding consideration
 
 #### Q4 2025: Alpha Launch
 - Deploy contracts to Base testnet
@@ -742,7 +742,7 @@ Each new chain integration undergoes rigorous security audits and gradual rollou
 - **Merchant Network**: Payment acceptance growth
 - **Protocol Sustainability**: Revenue and treasury health
 
-**Note**: All metrics are conceptual projections for a hackathon POC. Actual performance will depend on market conditions, adoption, and successful implementation.
+**Note**: This community-judged hackathon presents a working concept ready for community funding and development. Success metrics will be refined based on community feedback and market validation.
 
 ---
 
