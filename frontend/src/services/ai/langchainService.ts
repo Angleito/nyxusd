@@ -450,12 +450,16 @@ export class LangChainAIService implements AIService {
         throw new Error(data.error || 'API request failed');
       }
 
+      // Extract the actual message from the response
+      const aiMessage = data.data || data.message;
+      console.log('🤖 AI Service: Extracted AI message:', aiMessage ? aiMessage.substring(0, 100) + '...' : 'none');
+      
       // Store conversation in simple memory (without LangChain)
-      this.storeConversationLocally(userMessage, data.message);
+      this.storeConversationLocally(userMessage, aiMessage);
 
       // Create structured response
       const parsedResponse = {
-        message: data.message,
+        message: aiMessage,
         intent: {
           action: "continue" as const,
           confidence: 0.8,
