@@ -16,12 +16,12 @@ const CDPHub: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'positions' | 'collateral' | 'liquidations'>('dashboard');
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'positions', label: 'Manage Positions', icon: Briefcase },
-    { id: 'collateral', label: 'Collateral Markets', icon: Search },
-    { id: 'liquidations', label: 'Liquidation Monitor', icon: AlertTriangle }
-  ];
+  const tabs: Array<{ id: 'dashboard' | 'positions' | 'collateral' | 'liquidations'; label: string; icon: any }> = [
+      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { id: 'positions', label: 'Manage Positions', icon: Briefcase },
+      { id: 'collateral', label: 'Collateral Markets', icon: Search },
+      { id: 'liquidations', label: 'Liquidation Monitor', icon: AlertTriangle }
+    ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/10 to-gray-900">
@@ -53,7 +53,7 @@ const CDPHub: React.FC = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id)}
                   className={`px-6 py-3 rounded-lg font-medium whitespace-nowrap transition-all flex items-center gap-2 ${
                     activeTab === tab.id
                       ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
@@ -99,7 +99,14 @@ const CDPHub: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
             >
-              <CollateralSelector />
+              <CollateralSelector
+                              onSelect={(asset) => {
+                                console.log('Selected asset:', asset);
+                                // In a real implementation, this would trigger some action
+                                // For now, we're just satisfying the prop requirement
+                              }}
+                              selectedAsset={undefined}
+                            />
             </motion.div>
           )}
 

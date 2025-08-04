@@ -16,7 +16,6 @@ export function useWallet() {
   
   const { data: balance, isLoading: isBalanceLoading, error: balanceError } = useBalance({
     address,
-    watch: true, // Auto-refresh balance
   });
 
   // Combined error state
@@ -40,7 +39,7 @@ export function useWallet() {
   }, [error]);
 
   // Safe connect with error handling
-  const safeConnect = useCallback(async (connector: any) => {
+  const safeConnect = useCallback(async (connector: typeof connectors[number]) => {
     try {
       setError(null);
       await connect({ connector });

@@ -130,6 +130,7 @@ const RiskIndicatorCard: React.FC<RiskIndicatorCardProps> = ({
 const CDPDashboard: React.FC = () => {
   const [showCreateWizard, setShowCreateWizard] = useState(false);
   const [expandedActions, setExpandedActions] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState<any>(null);
 
   const { data: cdpData, isLoading } = useQuery({
     queryKey: ["cdps"],

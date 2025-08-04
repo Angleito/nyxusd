@@ -5,11 +5,11 @@ import { TokenInfo } from '../../services/tokenService';
 
 interface TokenSearchProps {
   selectedToken: string;
-  onTokenSelect: (token: string) => void;
-  availableTokens: TokenInfo[];
-  tokensLoading: boolean;
-  placeholder?: string;
-  disabled?: boolean;
+ onTokenSelect: (token: string) => void;
+ availableTokens: readonly TokenInfo[];
+ tokensLoading: boolean;
+ placeholder?: string;
+ disabled?: boolean;
 }
 
 export const TokenSearch: React.FC<TokenSearchProps> = ({
@@ -29,15 +29,15 @@ export const TokenSearch: React.FC<TokenSearchProps> = ({
   // Filter tokens based on search query
   useEffect(() => {
     if (!searchQuery.trim()) {
-      setFilteredTokens(availableTokens.slice(0, 20)); // Show top 20 by default
-    } else {
-      const query = searchQuery.toLowerCase();
-      const filtered = availableTokens.filter(token =>
-        token.symbol.toLowerCase().includes(query) ||
-        token.name.toLowerCase().includes(query)
-      );
-      setFilteredTokens(filtered.slice(0, 50)); // Limit to 50 results
-    }
+     setFilteredTokens([...availableTokens.slice(0, 20)]); // Show top 20 by default
+   } else {
+     const query = searchQuery.toLowerCase();
+     const filtered = availableTokens.filter(token =>
+       token.symbol.toLowerCase().includes(query) ||
+       token.name.toLowerCase().includes(query)
+     );
+     setFilteredTokens([...filtered.slice(0, 50)]); // Limit to 50 results
+   }
   }, [searchQuery, availableTokens]);
 
   // Close dropdown when clicking outside

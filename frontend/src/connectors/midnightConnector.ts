@@ -63,6 +63,18 @@ export function midnightConnector(options: MidnightConnectorOptions = {}) {
       type: 'midnight' as const,
       icon: 'https://docs.midnight.network/img/midnight-icon.svg',
       
+      // Added missing onConnect property
+      onConnect() {
+        // No specific implementation needed for Midnight connector
+        return Promise.resolve()
+      },
+      
+      // Added missing getProvider property
+      async getProvider() {
+        // For injected connectors like Lace wallet, return the window provider
+        return typeof window !== 'undefined' ? window.midnight : undefined
+      },
+      
       async connect(parameters) {
         try {
           // Check if Lace wallet with Midnight support is available
@@ -129,7 +141,7 @@ export function midnightConnector(options: MidnightConnectorOptions = {}) {
         if (chainId !== midnightTestnet.id) {
           throw new Error('Midnight wallet only supports Midnight network')
         }
-        return { id: midnightTestnet.id }
+        return midnightTestnet
       },
 
       onAccountsChanged(accounts) {

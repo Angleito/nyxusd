@@ -1,9 +1,9 @@
 import React from "react";
 import clsx from "clsx";
-import { motion } from "framer-motion";
+import { motion, type MotionProps } from "framer-motion";
 
-interface NyxButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost" | "glow";
+interface NyxButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag' | 'whileHover' | 'whileTap' | 'transition'> {
+  variant?: "sanitized" | "primary" | "secondary" | "ghost" | "glow";
   size?: "small" | "default" | "large";
   loading?: boolean;
   icon?: React.ReactNode;
@@ -12,6 +12,13 @@ interface NyxButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asLink?: boolean;
   href?: string;
   to?: string;
+  whileHover?: any;
+  whileTap?: any;
+  transition?: any;
+  onAnimationStart?: any;
+  onDragStart?: any;
+  onDragEnd?: any;
+  onDrag?: any;
 }
 
 export const NyxButton = React.forwardRef<HTMLButtonElement, NyxButtonProps>(

@@ -52,7 +52,7 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
       try {
         setTokensLoading(true);
         const tokens = await tokenService.getPopularTokens();
-        setAvailableTokens(tokens);
+       setAvailableTokens([...tokens]);
       } catch (error) {
         console.error('Failed to fetch tokens:', error);
         // Fallback to empty array - component will show loading state

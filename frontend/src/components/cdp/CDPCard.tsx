@@ -43,31 +43,27 @@ export const CDPCard: React.FC<CDPCardProps> = ({ cdp }) => {
   } = useForm<CDPActionForm>();
 
   // Mutations for CDP actions
-  const depositMutation = useMutation(
-    ({ cdpId, amount }: { cdpId: string; amount: string }) =>
-      depositCollateral(cdpId, amount),
-    {
+  const depositMutation = useMutation({
+      mutationFn: ({ cdpId, amount }: { cdpId: string; amount: string }) =>
+        depositCollateral(cdpId, amount),
       onSuccess: () => {
-        queryClient.invalidateQueries(["cdps"]);
+        queryClient.invalidateQueries({ queryKey: ["cdps"] });
         setShowActionModal(false);
         setActionType(null);
         reset();
       },
-    },
-  );
+    });
 
-  const withdrawMutation = useMutation(
-    ({ cdpId, amount }: { cdpId: string; amount: string }) =>
-      withdrawCollateral(cdpId, amount),
-    {
+  const withdrawMutation = useMutation({
+      mutationFn: ({ cdpId, amount }: { cdpId: string; amount: string }) =>
+        withdrawCollateral(cdpId, amount),
       onSuccess: () => {
-        queryClient.invalidateQueries(["cdps"]);
+        queryClient.invalidateQueries({ queryKey: ["cdps"] });
         setShowActionModal(false);
         setActionType(null);
         reset();
       },
-    },
-  );
+    });
 
   const mintMutation = useMutation({
     mutationFn: ({ cdpId, amount }: { cdpId: string; amount: string }) =>

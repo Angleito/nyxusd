@@ -46,12 +46,13 @@ export const CreateCDPWizard: React.FC<CreateCDPWizardProps> = ({
     defaultValues: formData,
   });
 
-  const createCDPMutation = useMutation(createCDP, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(["cdps"]);
-      onClose();
-    },
-  });
+  const createCDPMutation = useMutation({
+      mutationFn: createCDP,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["cdps"] });
+        onClose();
+      },
+    });
 
   const nextStep = () => {
     if (currentStep < steps.length) {

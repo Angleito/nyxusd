@@ -23,3 +23,8 @@ export type {
   AgentMessageEvent,
   UIEvent,
 } from '../services/voice/voiceService';
+
+// Occupation data types
+export type {
+  default as OccupationData
+} from '../data/occupationSuggestions.json';

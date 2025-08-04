@@ -20,7 +20,7 @@ export const NyxWalletConnectButton: React.FC<NyxWalletConnectButtonProps> = ({
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
 
-  const handleConnect = async (connector: any) => {
+  const handleConnect = async (connector: typeof connectors[number]) => {
     try {
       await connect({ connector });
       setShowConnectors(false);

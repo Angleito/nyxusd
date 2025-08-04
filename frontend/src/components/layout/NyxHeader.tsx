@@ -25,9 +25,9 @@ const chains: Chain[] = [
 
 export const NyxHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [selectedChain, setSelectedChain] = useState(chains[4]); // Default to Base (index 4)
-  const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false);
+ const [isScrolled, setIsScrolled] = useState(false);
+ const [selectedChain, setSelectedChain] = useState<Chain>(chains[4] as Chain); // Default to Base (index 4)
+ const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false);
   const { setTheme, currentTheme, transitionState } = useTheme();
 
   // Set initial theme to Base on mount
@@ -49,8 +49,8 @@ export const NyxHeader: React.FC = () => {
 
   // Close mobile menu on escape key
   useEffect(() => {
-    const handleEscape = (e: Event) => {
-      if ((e as KeyboardEvent).key === "Escape" && isMobileMenuOpen) {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isMobileMenuOpen) {
         setIsMobileMenuOpen(false);
       }
     };

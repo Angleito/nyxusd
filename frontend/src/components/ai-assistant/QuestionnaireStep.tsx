@@ -11,6 +11,7 @@ import {
   Search,
 } from "lucide-react";
 import occupationData from "../../data/occupationSuggestions.json";
+import type { OccupationData } from "../../types";
 
 interface QuestionnaireStepProps {
   step: string;
@@ -69,7 +70,7 @@ export const QuestionnaireStep: React.FC<QuestionnaireStepProps> = ({
     } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
       e.preventDefault();
       const selected = filteredOccupations[selectedSuggestionIndex];
-      setLocalValue(selected);
+      setLocalValue(selected || "");
       setShowSuggestions(false);
       setSelectedSuggestionIndex(-1);
     } else if (e.key === 'Escape') {
