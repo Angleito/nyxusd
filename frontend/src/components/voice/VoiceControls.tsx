@@ -267,35 +267,51 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
 
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
-      {/* Main microphone button */}
-      <motion.button
-        onClick={toggleListening}
-        disabled={!isInitialized || status === 'processing'}
-        className={`relative p-3 rounded-full transition-all duration-200 ${
-          isListening
-            ? 'bg-red-600 hover:bg-red-700'
-            : 'bg-purple-600 hover:bg-purple-700'
-        } disabled:opacity-50 disabled:cursor-not-allowed`}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        {/* Audio level indicator */}
-        {isListening && (
-          <motion.div
-            className="absolute inset-0 rounded-full bg-red-400 opacity-30"
-            animate={{ scale: 1 + audioLevel * 0.5 }}
-            transition={{ duration: 0.1 }}
+      {/* Voice Chat Toggle Switch */}
+      <div className="flex items-center space-x-2">
+        <span className="text-xs text-gray-400">Voice</span>
+        <motion.button
+          onClick={toggleListening}
+          disabled={!isInitialized || status === 'processing'}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
+            isListening 
+              ? 'bg-red-600 hover:bg-red-700' 
+              : 'bg-gray-600 hover:bg-gray-500'
+          }`}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          {/* Toggle slider */}
+          <motion.span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-200 ${
+              isListening ? 'translate-x-6' : 'translate-x-1'
+            }`}
+            layout
           />
-        )}
-        
-        {status === 'processing' ? (
-          <Loader2 className="w-5 h-5 text-white animate-spin" />
-        ) : isListening ? (
-          <Mic className="w-5 h-5 text-white" />
-        ) : (
-          <MicOff className="w-5 h-5 text-white" />
-        )}
-      </motion.button>
+          
+          {/* Audio level indicator when listening */}
+          {isListening && (
+            <motion.div
+              className="absolute inset-0 rounded-full bg-red-400 opacity-20"
+              animate={{ scale: 1 + audioLevel * 0.3 }}
+              transition={{ duration: 0.1 }}
+            />
+          )}
+          
+          {/* Status icon */}
+          <div className={`absolute inset-0 flex items-center justify-center ${
+            isListening ? 'text-white' : 'text-gray-400'
+          }`}>
+            {status === 'processing' ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : isListening ? (
+              <Mic className="w-3 h-3" />
+            ) : (
+              <MicOff className="w-3 h-3" />
+            )}
+          </div>
+        </motion.button>
+      </div>
 
       {/* Volume control */}
       <motion.button
