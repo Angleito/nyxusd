@@ -266,12 +266,23 @@ class TokenService {
 
   /**
    * Fetch tokens directly from Odos API
+   * Note: This is currently disabled as the backend endpoint is not implemented
    */
   private async fetchOdosTokens(): Promise<ReadonlyArray<TokenInfo>> {
     try {
-      const response = await fetch(`${this.baseApiUrl}/odos/tokens/${this.baseChainId}`);
+      const response = await fetch(`${this.baseApiUrl}/odos/tokens/${this.baseChainId}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
       
       if (!response.ok) {
+        if (response.status === 404) {
+          console.warn('⚠️ Odos token endpoint not implemented on backend, skipping');
+          return [];
+        }
         console.warn(`⚠️ Odos token fetch failed: API returned ${response.status}`);
         return [];
       }
@@ -300,7 +311,9 @@ class TokenService {
         return [];
       }
     } catch (error) {
-      if (error instanceof SyntaxError && error.message.includes('JSON')) {
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.warn('⚠️ Odos token fetch failed: Network error or endpoint not available');
+      } else if (error instanceof SyntaxError && error.message.includes('JSON')) {
         console.warn('⚠️ Odos token fetch failed: Invalid JSON response (likely HTML error page)');
       } else {
         console.warn('⚠️ Odos token fetch failed:', error);

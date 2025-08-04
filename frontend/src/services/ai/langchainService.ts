@@ -432,6 +432,22 @@ export class LangChainAIService implements AIService {
         } catch {
           errorData = { error: errorText };
         }
+        
+        // Handle validation errors with user-friendly messages
+        if (response.status === 400 && errorData.validationErrors) {
+          const validationError = errorData.validationErrors.find((err: any) => 
+            err.field === 'memoryContext' && err.message.includes('2000 characters')
+          );
+          if (validationError) {
+            throw new Error('Your conversation history is too long. Let me clear some context and try again.');
+          }
+        }
+        
+        // Handle other validation errors
+        if (response.status === 400 && errorData.error === 'Validation failed') {
+          throw new Error('Invalid request format. Please try again with a different message.');
+        }
+        
         throw new Error(errorData.error || `API error: ${response.status} - ${errorText}`);
       }
 
@@ -560,6 +576,26 @@ export class LangChainAIService implements AIService {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('🤖 AI Service: Streaming error response:', errorText);
+        
+        // Handle validation errors with user-friendly messages
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+          if (response.status === 400 && errorData.validationErrors) {
+            const validationError = errorData.validationErrors.find((err: any) => 
+              err.field === 'memoryContext' && err.message.includes('2000 characters')
+            );
+            if (validationError) {
+              throw new Error('Your conversation history is too long. Let me clear some context and try again.');
+            }
+          }
+          if (response.status === 400 && errorData.error === 'Validation failed') {
+            throw new Error('Invalid request format. Please try again with a different message.');
+          }
+        } catch (parseError) {
+          // If we can't parse the error, use the original text
+        }
+        
         throw new Error(`Streaming API error: ${response.status} - ${errorText}`);
       }
 

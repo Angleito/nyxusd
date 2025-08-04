@@ -77,6 +77,10 @@ export class ConversationalAgent extends EventEmitter {
   private audioQueue: ArrayBuffer[] = [];
   private isPlaying: boolean = false;
   private conversationContext: ConversationContext = {};
+  private agentId: string | null = null;
+  private sessionId: string | null = null;
+  private userId: string | null = null;
+  private websocketUrl: string | null = null;
 
   constructor(config: ConversationalAgentConfig) {
     super();
@@ -116,57 +120,71 @@ export class ConversationalAgent extends EventEmitter {
   }
 
   async createAgent(context?: ConversationContext): Promise<string> {
-    if (!this.apiKey) {
-      throw new Error('API key not initialized');
-    }
-
-    // Note: Direct ElevenLabs API calls from frontend are not secure
-    // This should be implemented via backend API endpoints
-    throw new Error('Conversational agent creation should be handled by backend API');
-
     this.conversationContext = context || {};
 
-    // Build agent prompt with context
-    const agentPrompt = this.buildAgentPrompt();
+    // Call backend API to create conversational agent securely
+    const baseUrl = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
+    const apiUrl = `${baseUrl}/api/voice/conversational-agent`;
 
-    const agentConfig = {
-      conversation_config: {
-        agent: {
-          prompt: {
-            prompt: agentPrompt,
-          },
-          first_message: this.config.firstMessage || "Hello! I'm your AI crypto assistant. How can I help you today?",
-          language: this.config.language,
-          max_duration_seconds: this.config.maxDurationSeconds,
-          llm: this.config.llmConfig,
-          tts: {
-            voice_id: this.config.voiceId,
-            model: this.config.ttsConfig?.model,
-            voice_settings: this.config.ttsConfig?.voiceSettings,
-          },
-          stt: this.config.transcriptionConfig,
-        },
+    const requestPayload = {
+      sessionId: this.sessionId,
+      userId: this.userId,
+      context: {
+        userProfile: context?.userProfile,
+        conversationHistory: context?.conversationHistory,
+        memoryContext: context?.memoryContext,
+        defiCapabilities: context?.defiCapabilities,
+      },
+      config: {
+        voiceId: this.config.voiceId,
+        modelId: this.config.ttsConfig?.model,
+        language: this.config.language,
+        firstMessage: this.config.firstMessage || "Hello! I'm NyxUSD, your AI crypto assistant. How can I help you with DeFi today?",
       },
     };
 
     try {
-      const response = await fetch('https://api.elevenlabs.io/v1/convai/agents/create', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'xi-api-key': this.apiKey,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(agentConfig),
+        body: JSON.stringify(requestPayload),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Failed to create agent: ${response.statusText} - ${JSON.stringify(errorData)}`);
+        throw new Error(`Failed to create conversational agent: ${response.statusText} - ${errorData.details || 'Unknown error'}`);
       }
 
       const data = await response.json();
-      this.emit('agentCreated', { agentId: data.agent_id });
-      return data.agent_id;
+      
+      if (!data.success) {
+        throw new Error(`Backend error: ${data.error || 'Unknown error'}`);
+      }
+
+      // Store agent information
+      this.agentId = data.agentId;
+      this.sessionId = data.sessionId;
+      this.websocketUrl = data.websocketUrl;
+      
+      // Initialize session for reconnection capability
+      this.currentSession = {
+        agentId: data.agentId,
+        sessionId: data.sessionId,
+        status: 'idle',
+        isActive: false,
+        startTime: new Date(),
+      };
+      
+      this.emit('agentCreated', { 
+        agentId: data.agentId,
+        sessionId: data.sessionId,
+        websocketUrl: data.websocketUrl,
+        config: data.config
+      });
+      
+      return data.agentId;
     } catch (error) {
       console.error('Error creating conversational agent:', error);
       this.emit('error', { type: 'agent_creation', error });
@@ -258,21 +276,28 @@ Key traits:
       this.conversationContext = { ...this.conversationContext, ...context };
     }
 
-    const sessionId = `convai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    this.currentSession = {
-      agentId,
-      sessionId,
-      status: 'connecting',
-      isActive: true,
-      startTime: new Date(),
-    };
+    // If we have an existing session from agent creation, use it
+    if (this.currentSession && this.currentSession.agentId === agentId) {
+      this.currentSession.status = 'connecting';
+      this.currentSession.isActive = true;
+    } else {
+      // Create new session if none exists
+      const sessionId = `convai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      this.currentSession = {
+        agentId,
+        sessionId,
+        status: 'connecting',
+        isActive: true,
+        startTime: new Date(),
+      };
+    }
 
     try {
       await this.connectWebSocket(agentId);
       this.currentSession.status = 'connected';
       this.emit('conversationStarted', this.currentSession);
-      return sessionId;
+      return this.currentSession.sessionId;
     } catch (error) {
       this.currentSession.status = 'error';
       this.emit('error', { type: 'connection', error });
@@ -281,11 +306,8 @@ Key traits:
   }
 
   private async connectWebSocket(agentId: string): Promise<void> {
-    if (!this.apiKey) {
-      throw new Error('API key not initialized');
-    }
-
-    const wsUrl = `wss://api.elevenlabs.io/v1/convai/agents/${agentId}/conversation`;
+    // Use websocket URL from backend API response if available
+    const wsUrl = this.websocketUrl || `wss://api.elevenlabs.io/v1/convai/agents/${agentId}/conversation`;
 
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(wsUrl);

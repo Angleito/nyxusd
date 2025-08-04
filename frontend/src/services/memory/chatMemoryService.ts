@@ -251,15 +251,19 @@ class ChatMemoryService {
       return '';
     }
 
-    const recentMessages = this.getRecentMessages(5);
+    const recentMessages = this.getRecentMessages(3);
     const context = recentMessages
-      .map(msg => `${msg.role}: ${msg.content.substring(0, 200)}`)
+      .map(msg => `${msg.role}: ${msg.content.substring(0, 150)}${msg.content.length > 150 ? '...' : ''}`)
       .join('\n');
 
-    const topics = this.currentSession.context.topics.join(', ');
-    const tokens = Array.from(this.currentSession.context.mentionedTokens).join(', ');
+    const topics = this.currentSession.context.topics.slice(0, 5).join(', ');
+    const tokens = Array.from(this.currentSession.context.mentionedTokens).slice(0, 8).join(', ');
 
-    return `Recent conversation:\n${context}\n\nTopics discussed: ${topics}\nTokens mentioned: ${tokens}`;
+    let result = `Recent conversation:\n${context}`;
+    if (topics) result += `\n\nTopics discussed: ${topics}`;
+    if (tokens) result += `\nTokens mentioned: ${tokens}`;
+    
+    return result;
   }
 
   public createOrUpdateUserProfile(walletAddress: string, updates?: Partial<UserProfile>): UserProfile {
@@ -337,26 +341,40 @@ class ChatMemoryService {
   }
 
   public getMemoryPromptContext(walletAddress?: string): string {
+    const MAX_CONTEXT_LENGTH = 2000;
     const sessionContext = this.getConversationContext();
     
     let userContext = '';
     if (walletAddress) {
       const profile = this.getUserProfile(walletAddress);
       if (profile) {
+        const interests = profile.preferences.interests.slice(0, 3).join(', ');
+        const tokens = profile.preferences.favoriteTokens.slice(0, 5).join(', ');
+        const watchlist = profile.portfolio?.watchlist?.slice(0, 5).join(', ') || '';
+        
         userContext = `
 User Profile:
 - Wallet: ${profile.walletAddress.slice(0, 6)}...${profile.walletAddress.slice(-4)}
 - Experience: ${profile.preferences.experience}
-- Risk Tolerance: ${profile.preferences.riskTolerance}
-- Interests: ${profile.preferences.interests.join(', ')}
-- Favorite Tokens: ${profile.preferences.favoriteTokens.join(', ')}
-- Total Interactions: ${profile.history.totalInteractions}
-${profile.portfolio ? `- Watchlist: ${profile.portfolio.watchlist.join(', ')}` : ''}
+- Risk Tolerance: ${profile.preferences.riskTolerance}${interests ? `
+- Interests: ${interests}` : ''}${tokens ? `
+- Favorite Tokens: ${tokens}` : ''}
+- Total Interactions: ${profile.history.totalInteractions}${watchlist ? `
+- Watchlist: ${watchlist}` : ''}
 `;
       }
     }
 
-    return `${sessionContext}\n${userContext}`.trim();
+    const fullContext = `${sessionContext}\n${userContext}`.trim();
+    
+    // Truncate if exceeds maximum length
+    if (fullContext.length > MAX_CONTEXT_LENGTH) {
+      const truncated = fullContext.substring(0, MAX_CONTEXT_LENGTH - 50);
+      const lastSpace = truncated.lastIndexOf(' ');
+      return (lastSpace > 0 ? truncated.substring(0, lastSpace) : truncated) + '... [truncated]';
+    }
+    
+    return fullContext;
   }
 
   public summarizeConversation(): string {

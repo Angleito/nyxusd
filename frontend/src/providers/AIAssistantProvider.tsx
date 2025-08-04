@@ -9,6 +9,7 @@ import React, {
 import { useAIService } from "../hooks/useAIService";
 import { swapDetectionService } from "../services/swapDetectionService";
 import { transactionService } from "../services/defi/transactionService";
+import { chatMemoryService } from "../services/memory/chatMemoryService";
 import { useAccount, useChainId } from "wagmi";
 
 export type ConversationStep =
@@ -693,10 +694,23 @@ export function AIAssistantProvider({
   } = useAIService({
     onError: (error) => {
       console.error("AI Service Error:", error);
-      addMessage(
-        "I apologize, but I encountered an error. Let me try again or use a simpler approach.",
-        "ai",
-      );
+      
+      // Handle specific error types
+      let errorMessage = "I apologize, but I encountered an error. Let me try again or use a simpler approach.";
+      
+      if (error.message.includes('conversation history is too long')) {
+        errorMessage = "Let me clear some conversation history and try again with a fresh context.";
+        // Clear some memory context to prevent recurring errors
+        if (walletAddress) {
+          chatMemoryService.getCurrentSession()?.messages?.splice(0, 10);
+        }
+      } else if (error.message.includes('Invalid request format')) {
+        errorMessage = "I had trouble understanding your request format. Could you please rephrase your question?";
+      } else if (error.message.includes('Rate limit exceeded')) {
+        errorMessage = "I'm receiving too many requests right now. Please wait a moment and try again.";
+      }
+      
+      addMessage(errorMessage, "ai");
     },
   });
 
