@@ -37,6 +37,7 @@ export function msSince(date: Date): number {
 }
 import { EventEmitter } from 'events';
 import { ConversationalAgent, createConversationalAgent, type ConversationContext } from './conversationalAgent';
+import { secureVoiceClient } from './secureVoiceClient';
 
 export interface VoiceConfig {
   voiceId?: string;
@@ -486,14 +487,21 @@ export class VoiceService extends EventEmitter {
         this.recognition.onerror = (event) => {
           console.error('Speech recognition error:', event.error);
           
-          // Stop the infinite restart loop on network errors
-          if (event.error === 'network' || event.error === 'service-not-allowed' || event.error === 'not-allowed') {
+          // Friendly bubble-up error for UI
+          const normalized = String(event.error || '').toLowerCase();
+
+          // Stop the infinite restart loop on network-like or permission errors
+          if (normalized === 'network' || normalized === 'service-not-allowed' || normalized === 'not-allowed' || normalized === 'aborted') {
             console.warn('🎤 VoiceService: Disabling speech recognition due to persistent errors');
             if (this.currentSession) {
               this.currentSession.status = 'error';
               this.currentSession.isActive = false;
             }
-            this.emit('error', new Error(`Speech recognition failed: ${event.error}`));
+            const friendlyMessage =
+              normalized === 'not-allowed' || normalized === 'service-not-allowed'
+                ? 'Microphone permission is required for voice chat. Please allow access in your browser settings.'
+                : 'Speech recognition unavailable due to a network or service issue. Please retry.';
+            this.emit('error', new Error(friendlyMessage));
             return;
           }
           
@@ -508,9 +516,23 @@ export class VoiceService extends EventEmitter {
               // Add a small delay to prevent rapid restarts
               setTimeout(() => {
                 if (this.recognition && this.currentSession?.isActive && this.currentSession.status !== 'error') {
-                  this.recognition.start();
+                  try {
+                    this.recognition.start();
+                  } catch (e: any) {
+                    // If already active or blocked, surface friendly info and stop restart loop
+                    if (e?.name === 'InvalidStateError') {
+                      console.warn('🎤 VoiceService: Recognition already active on onend restart path');
+                      return;
+                    }
+                    console.error('🎤 VoiceService: Restart recognition failed:', e);
+                    if (this.currentSession) {
+                      this.currentSession.status = 'error';
+                      this.currentSession.isActive = false;
+                    }
+                    this.emit('error', e instanceof Error ? e : new Error('Failed to restart speech recognition'));
+                  }
                 }
-              }, 100);
+              }, 150);
             } catch (restartError) {
               console.error('🎤 VoiceService: Failed to restart recognition:', restartError);
               if (this.currentSession) {
@@ -740,8 +762,8 @@ export class VoiceService extends EventEmitter {
   }
 
   async startListening(): Promise<void> {
-    console.log('🎤 VoiceService: startListening called', { 
-      hasSession: !!this.currentSession, 
+    console.log('🎤 VoiceService: startListening called', {
+      hasSession: !!this.currentSession,
       hasRecognition: !!this.recognition,
       currentStatus: this.currentSession?.status,
       isActive: this.currentSession?.isActive
@@ -762,6 +784,17 @@ export class VoiceService extends EventEmitter {
       throw new Error('Voice session is in error state');
     }
 
+    // Attempt to resume audio prior to starting recognition (some browsers require user gesture already handled by UI)
+    await this.resumeAudio();
+
+    // Ensure microphone permission (if session was started without permission succeed)
+    try {
+      await this.requestMicrophonePermission();
+    } catch (permErr) {
+      this.emit('error', permErr instanceof Error ? permErr : new Error('Microphone permission required'));
+      throw permErr instanceof Error ? permErr : new Error('Microphone permission required');
+    }
+
     if (this.recognition) {
       console.log('🎤 VoiceService: Starting speech recognition...');
       this.currentSession.status = 'listening';
@@ -774,9 +807,18 @@ export class VoiceService extends EventEmitter {
         console.error('🎤 VoiceService: Error starting speech recognition:', error);
         
         // If recognition is already started, don't treat it as an error
-        if (error.name === 'InvalidStateError' && error.message.includes('already started')) {
+        if (error.name === 'InvalidStateError' && (error.message?.includes('already started') || error.message?.includes('already active'))) {
           console.log('🎤 VoiceService: Recognition already active');
+          this.emit('listeningStarted');
           return;
+        }
+
+        // Surface a friendly error for common cases
+        if (error.name === 'NotAllowedError' || error.name === 'SecurityError') {
+          const friendly = new Error('Microphone permission is required for voice chat. Please allow access and try again.');
+          this.currentSession.status = 'error';
+          this.emit('error', friendly);
+          throw friendly;
         }
         
         this.currentSession.status = 'error';
@@ -784,7 +826,9 @@ export class VoiceService extends EventEmitter {
       }
     } else {
       console.error('🎤 VoiceService: Speech recognition not available');
-      throw new Error('Speech recognition not available');
+      const e = new Error('Speech recognition not available');
+      this.emit('error', e);
+      throw e;
     }
   }
 
@@ -830,19 +874,33 @@ export class VoiceService extends EventEmitter {
       throw new Error('No active voice session');
     }
 
-    if (!this.apiKey) {
-      throw new Error('API key not initialized');
-    }
-
+    // We now route TTS through our secure backend instead of direct ElevenLabs WS.
     this.currentSession.status = 'speaking';
     this.emit('speakingStarted', text);
 
     try {
-      await this.connectWebSocket();
-      await this.sendTextToTTS(text);
+      // Ensure audio context is resumed before attempting playback (handles autoplay policies)
+      await this.resumeAudio();
+
+      const cfg = this.getVoiceConfig();
+      const voiceId = cfg.voiceId || 'EXAVITQu4vr4xnSDxMaL';
+      const modelId = cfg.modelId || 'eleven_turbo_v2_5';
+
+      const audioBuffer = await secureVoiceClient.textToSpeech(text, voiceId, modelId);
+      await this.playAudio(audioBuffer);
+
+      // Emit finished when queue drains; we keep current queue processing behavior
+      // The play pipeline will shift chunks and trigger subsequent calls
+      // For a single TTS call, mark status back to idle after enqueue
+      if (this.currentSession) {
+        this.currentSession.status = 'idle';
+      }
+      this.emit('speakingFinished');
     } catch (error) {
       console.error('Error in text-to-speech:', error);
-      this.currentSession.status = 'error';
+      if (this.currentSession) {
+        this.currentSession.status = 'error';
+      }
       this.handleGenericError(error as Error);
       throw error;
     }
@@ -981,6 +1039,15 @@ export class VoiceService extends EventEmitter {
  private async playAudio(audioData: ArrayBuffer): Promise<void> {
    if (!this.audioContext) return;
 
+   // Attempt to resume if suspended (common after page load until user gesture)
+   if (this.audioContext.state === 'suspended') {
+     try {
+       await this.audioContext.resume();
+     } catch {
+       // swallow
+     }
+   }
+
    this.audioQueue.push(audioData);
    
    if (!this.isPlaying) {
@@ -1113,6 +1180,34 @@ export class VoiceService extends EventEmitter {
 
   getSessionStatus(): string {
     return this.currentSession?.status || 'idle';
+  }
+
+  // Public: resume AudioContext to satisfy autoplay policies
+  public async resumeAudio(): Promise<void> {
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      try {
+        await this.audioContext.resume();
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  // Public: unlock by playing a short silent buffer
+  public async unlockAudio(): Promise<void> {
+    if (!this.audioContext) return;
+    try {
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume();
+      }
+      const buffer = this.audioContext.createBuffer(1, 1, 22050);
+      const source = this.audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.audioContext.destination);
+      source.start(0);
+    } catch {
+      // ignore unlock errors
+    }
   }
 
   // Cleanup method

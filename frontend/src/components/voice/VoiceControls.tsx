@@ -79,6 +79,30 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
     voiceService.on('speakingStarted', handleSpeakingStarted);
     voiceService.on('speakingFinished', handleSpeakingFinished);
 
+    // User-friendly status and fallback notifications
+    const statusListener = (evt: { type: 'status'; message: string; level: 'info' | 'warning' | 'error' }) => {
+      // Prefer non-intrusive warnings unless it's an error
+      if (evt.level === 'error') {
+        setError(evt.message);
+        setStatus('error');
+      } else {
+        // Surface transient warnings in the status text area
+        onStatusChange?.(evt.message);
+      }
+    };
+    const userMessageListener = (evt: { type: 'user'; message: string; canRetry?: boolean }) => {
+      setError(evt.message);
+      setStatus('error');
+    };
+    const modeChangedListener = (_: any) => {
+      // Clear any stale errors when mode changes
+      setError(null);
+    };
+
+    voiceService.on('statusMessage', statusListener as any);
+    voiceService.on('userMessage', userMessageListener as any);
+    voiceService.on('modeChanged', modeChangedListener as any);
+
     return () => {
       // Clean up event listeners
       voiceService.off('transcription', handleTranscription);
@@ -90,6 +114,10 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
       voiceService.off('listeningStopped', handleListeningStopped);
       voiceService.off('speakingStarted', handleSpeakingStarted);
       voiceService.off('speakingFinished', handleSpeakingFinished);
+
+      voiceService.off('statusMessage', () => {});
+      voiceService.off('userMessage', () => {});
+      voiceService.off('modeChanged', () => {});
       
       // Clean up audio analysis
       if (animationFrameRef.current) {
@@ -111,7 +139,11 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
   };
 
   const handleError = (err: any) => {
-    setError(err.message || 'An error occurred');
+    const msg =
+      (err && typeof err.message === 'string' && err.message) ||
+      (typeof err === 'string' && err) ||
+      'An error occurred';
+    setError(msg);
     setStatus('error');
     onError?.(err);
     onStatusChange?.('error');
@@ -232,6 +264,10 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
     }
 
     try {
+      // Unlock/resume audio on explicit user gesture to satisfy autoplay policies
+      await voiceService.resumeAudio();
+      await voiceService.unlockAudio();
+
       if (!sessionActive) {
         console.log('🎤 VoiceControls: Starting voice session...');
         await voiceService.startSession();
@@ -364,9 +400,9 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
         <span className="text-xs text-gray-400">{getStatusText()}</span>
       </div>
 
-      {/* Error display */}
+      {/* Error / status display */}
       <AnimatePresence>
-        {error && (
+        {(error || status === 'error') && (
           <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
@@ -374,7 +410,7 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
             className="flex items-center space-x-1 text-xs text-red-400"
           >
             <AlertCircle className="w-3 h-3" />
-            <span>{error}</span>
+            <span>{error || 'Voice encountered an error'}</span>
           </motion.div>
         )}
       </AnimatePresence>
