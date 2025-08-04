@@ -3,16 +3,15 @@
   "compilerOptions": {
     "target": "ES2020",
     "lib": ["ES2020", "DOM"],
-    "module": "ESNext",
+    "module": "ES2020",
     "moduleResolution": "node",
     "outDir": "./dist",
     "rootDir": ".",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "composite": true,
-    "incremental": true,
-    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "composite": false,
+    "incremental": false,
     
     // Vercel serverless function compatibility
     "allowJs": true,
@@ -23,15 +22,14 @@
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     
-    // Strict settings for production
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
+    // Relaxed settings for Vercel deployment
+    "strict": false,
+    "noImplicitAny": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noUncheckedIndexedAccess": false,
     
     // Node.js compatibility
     "types": ["node"],

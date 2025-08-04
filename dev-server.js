@@ -7,7 +7,7 @@
 const http = require('http');
 const url = require('url');
 
-const PORT = 8081;
+const PORT = process.env.PORT || 8081;
 
 // CoinGecko API for real price data
 const COINGECKO_API = 'https://api.coingecko.com/api/v3';

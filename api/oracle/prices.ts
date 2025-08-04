@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { ApiResponse } from '../types/shared';
-import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from '../utils/cors';
+import type { ApiResponse } from '../types/shared.js';
+import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from '../utils/cors.js';
 
 // CoinGecko API for real price data
 const COINGECKO_API = 'https://api.coingecko.com/api/v3';

@@ -1,9 +1,9 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import type { ApiResponse, ErrorResponse, ValidationError } from '../types/shared';
-import * as E from 'fp-ts/Either';
-import * as TE from 'fp-ts/TaskEither';
-import * as O from 'fp-ts/Option';
-import { pipe } from 'fp-ts/function';
+import type { ApiResponse, ErrorResponse, ValidationError } from '../types/shared.js';
+import * as E from 'fp-ts/lib/Either.js';
+import * as TE from 'fp-ts/lib/TaskEither.js';
+import * as O from 'fp-ts/lib/Option.js';
+import { pipe } from 'fp-ts/lib/function.js';
 
 /**
  * Chat context interface for type safety

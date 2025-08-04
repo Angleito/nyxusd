@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { ExtendedTokenInfo, ApiResponse } from '../types/shared';
-import { BASE_EXTENDED_TOKENS, BASE_CHAIN_ID } from '../constants/tokens';
-import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from '../utils/cors';
+import type { ExtendedTokenInfo, ApiResponse } from '../types/shared.js';
+import { BASE_EXTENDED_TOKENS, BASE_CHAIN_ID } from '../constants/tokens.js';
+import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from '../utils/cors.js';
 
 // CoinGecko API response type definitions
 interface CoinGeckoToken {

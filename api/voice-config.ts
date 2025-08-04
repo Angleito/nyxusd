@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from './utils/cors';
+import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from './utils/cors.js';
 import type { 
   VoiceConfigResponse, 
   ApiErrorResponse, 
   ElevenLabsUser
-} from './types/voice';
-import { validateVoiceEnvironment } from './types/voice';
+} from './types/voice.js';
+import { validateVoiceEnvironment } from './types/voice.js';
 
 export default async function handler(
   req: VercelRequest,

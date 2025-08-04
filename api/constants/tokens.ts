@@ -5,7 +5,7 @@
  * redundancy across multiple API endpoints.
  */
 
-import type { BaseToken, ExtendedTokenInfo } from '../types/shared';
+import type { BaseToken, ExtendedTokenInfo } from '../types/shared.js';
 
 // Base Chain Configuration
 export const BASE_CHAIN_ID = 8453;

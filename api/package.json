@@ -2,11 +2,13 @@
   "name": "nyxusd-api-functions",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@vercel/node": "^3.0.0",
     "jsonwebtoken": "^9.0.2",
     "axios": "^1.6.0",
-    "fp-ts": "^2.16.1"
+    "fp-ts": "^2.16.1",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.5",
