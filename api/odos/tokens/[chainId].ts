@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { BaseToken, ApiResponse } from '../../types/shared';
-import { BASE_CORE_TOKENS, BASE_CHAIN_ID } from '../../constants/tokens';
-import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from '../../utils/cors';
+import type { BaseToken, ApiResponse } from '../../types/shared.js';
+import { BASE_CORE_TOKENS, BASE_CHAIN_ID } from '../../constants/tokens.js';
+import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from '../../utils/cors.js';
 
 // Odos API response type for token data
 interface OdosTokenResponse {

@@ -239,8 +239,9 @@ class TokenService {
     
     const data = await response.json();
     
-    if (data.success && Array.isArray(data.tokens)) {
-      return data.tokens
+    const tokens = data.data?.tokens || data.tokens;
+    if (data.success && Array.isArray(tokens)) {
+      return tokens
         .map((token: CoinGeckoToken) => {
           const address = token.platforms?.['base'] || token.address;
           const decimals = token.decimals;

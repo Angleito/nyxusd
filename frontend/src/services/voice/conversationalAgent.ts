@@ -120,6 +120,10 @@ export class ConversationalAgent extends EventEmitter {
       throw new Error('API key not initialized');
     }
 
+    // Note: Direct ElevenLabs API calls from frontend are not secure
+    // This should be implemented via backend API endpoints
+    throw new Error('Conversational agent creation should be handled by backend API');
+
     this.conversationContext = context || {};
 
     // Build agent prompt with context

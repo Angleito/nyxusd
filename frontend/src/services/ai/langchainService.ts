@@ -1196,7 +1196,10 @@ Ensure the response is valid JSON without any markdown formatting or code blocks
   /**
    * Simple token estimation
    */
-  private estimateTokens(text: string): number {
+  private estimateTokens(text: string | undefined | null): number {
+    if (!text || typeof text !== 'string') {
+      return 0;
+    }
     return Math.ceil(text.length / 4); // Rough approximation
   }
 

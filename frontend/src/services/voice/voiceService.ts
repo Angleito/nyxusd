@@ -401,6 +401,19 @@ export class VoiceService extends EventEmitter {
       throw new Error('API key and voice ID required for conversational mode');
     }
 
+    // Check if conversational mode is properly configured on backend
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/voice-config`);
+      const configData = await response.json();
+      
+      if (!configData.success || !configData.config.features.conversationalMode) {
+        throw new Error('Conversational mode not available on backend');
+      }
+    } catch (error) {
+      console.warn('Conversational mode not available, will fallback to TTS:', error);
+      throw new Error('Conversational mode not configured on backend');
+    }
+
     this.conversationalAgent = createConversationalAgent({
       voiceId: this.config.voiceId,
       ttsConfig: {
