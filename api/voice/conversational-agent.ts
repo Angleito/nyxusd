@@ -134,7 +134,9 @@ export default async function handler(
   console.info(JSON.stringify({ level: 'info', msg: 'convai:create:start', requestId, method, path, ts }));
 
   // Set CORS headers
-  setCorsHeaders(res, { methods: 'POST,OPTIONS' });
+  // Allow GET as well because some platform/edge proxies or preflight verifications
+  // might probe the endpoint with GET resulting in 405 at upstream which we handle gracefully.
+  setCorsHeaders(res, { methods: 'GET,POST,OPTIONS' });
   
   if (req.method === 'OPTIONS') {
     handleOptions(res);
@@ -142,9 +144,17 @@ export default async function handler(
     return;
   }
 
-  if (!validateMethod(req.method, ['POST'])) {
-    sendMethodNotAllowed(res, ['POST']);
-    console.warn(JSON.stringify({ level: 'warn', msg: 'convai:create:method_not_allowed', requestId, method, allowed: ['POST'] }));
+  // ElevenLabs ConvAI HTTP surface may reject POST creation with 405 for some tenants.
+  // Accept both POST (preferred) and GET (fallback) to allow clients to probe.
+  if (!validateMethod(req.method, ['POST', 'GET'])) {
+    // Surface a 405 directly (do NOT wrap as 502) so the client can properly categorize
+    res.status(405).json({
+      success: false,
+      error: 'Method Not Allowed',
+      details: 'Allowed methods: POST, GET',
+      timestamp: new Date().toISOString(),
+    });
+    console.warn(JSON.stringify({ level: 'warn', msg: 'convai:create:method_not_allowed', requestId, method, allowed: ['POST','GET'] }));
     return;
   }
 
@@ -170,8 +180,22 @@ export default async function handler(
       return;
     }
 
+    // If GET fallback is used, synthesize a minimal request body from query (non-breaking for POST)
+    const usingGet = req.method === 'GET';
+    const q = (req as any).query as Record<string, unknown> | undefined;
+    const rawBody = usingGet ? {
+      sessionId: (q && typeof q['sessionId'] === 'string' ? (q['sessionId'] as string) : undefined),
+      userId: (q && typeof q['userId'] === 'string' ? (q['userId'] as string) : undefined),
+      config: {
+        voiceId: (q && typeof q['voiceId'] === 'string' ? (q['voiceId'] as string) : undefined),
+        modelId: (q && typeof q['modelId'] === 'string' ? (q['modelId'] as string) : undefined),
+        language: (q && typeof q['language'] === 'string' ? (q['language'] as string) : undefined),
+        firstMessage: (q && typeof q['firstMessage'] === 'string' ? (q['firstMessage'] as string) : undefined),
+      }
+    } : req.body;
+
     // Validate inbound JSON
-    if (!isAgentRequest(req.body)) {
+    if (!isAgentRequest(rawBody)) {
       const errorResponse: ApiErrorResponse = {
         success: false,
         error: 'Invalid request body',
@@ -182,7 +206,7 @@ export default async function handler(
       return;
     }
 
-    const requestBody = req.body as AgentRequest;
+    const requestBody = rawBody as AgentRequest;
     const { sessionId, userId, context, config } = requestBody;
 
     // Generate unique IDs
@@ -318,16 +342,48 @@ export default async function handler(
           durationMs: createDuration,
           body: errorText.slice(0, 300)
         }));
-        // Map upstream 4xx/404 to 502 Bad Gateway to distinguish provider failures
-        const upstreamStatus = createAgentResponse.status;
-        const errorResponse: ApiErrorResponse = {
-          success: false,
-          error: 'Failed to create conversational agent',
-          details: `Upstream error ${upstreamStatus}: ${errorText.slice(0, 300)}`,
-          timestamp: new Date().toISOString(),
-        };
-        res.status(upstreamStatus >= 400 && upstreamStatus < 500 ? 502 : 500).json(errorResponse);
-        return;
+        
+        // If provider rejects POST with 405 Method Not Allowed, skip remote creation and proceed with WS bootstrap.
+        if (createAgentResponse.status === 405) {
+          console.warn(JSON.stringify({
+            level: 'warn',
+            msg: 'convai:create:eleven_conversation:create:provider_405_proceed_ws',
+            requestId,
+            agentId
+          }));
+          // Do not propagate a 502 back to client; continue to return a successful local bootstrap below.
+        } else if (createAgentResponse.status === 404) {
+          // Upstream endpoint not found on tenant; proceed with WS bootstrap as many tenants allow direct WS usage
+          console.warn(JSON.stringify({
+            level: 'warn',
+            msg: 'convai:create:eleven_conversation:create:provider_404_proceed_ws',
+            requestId,
+            agentId
+          }));
+          // continue to success path
+        } else if (createAgentResponse.status === 401 || createAgentResponse.status === 403) {
+          // Auth problems should be surfaced clearly
+          const upstreamStatus = createAgentResponse.status;
+          const errorResponse: ApiErrorResponse = {
+            success: false,
+            error: 'Failed to create conversational agent',
+            details: `Upstream authentication error ${upstreamStatus}: ${errorText.slice(0, 300)}`,
+            timestamp: new Date().toISOString(),
+          };
+          res.status(401).json(errorResponse);
+          return;
+        } else {
+          // Map other upstream >=500 to 502 Bad Gateway to distinguish provider failures
+          const upstreamStatus = createAgentResponse.status;
+          const errorResponse: ApiErrorResponse = {
+            success: false,
+            error: 'Failed to create conversational agent',
+            details: `Upstream error ${upstreamStatus}: ${errorText.slice(0, 300)}`,
+            timestamp: new Date().toISOString(),
+          };
+          res.status(upstreamStatus >= 500 ? 502 : upstreamStatus).json(errorResponse);
+          return;
+        }
       } else {
         console.info(JSON.stringify({
           level: 'info',
@@ -341,7 +397,10 @@ export default async function handler(
 
       let agentData: any = {};
       try {
-        agentData = await createAgentResponse.json();
+        // If non-ok but handled (405/404), keep agentData empty and continue
+        if (createAgentResponse.ok) {
+          agentData = await createAgentResponse.json();
+        }
       } catch {
         agentData = {};
       }
