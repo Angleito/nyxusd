@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import axios, { AxiosError } from 'axios';
-import type { SwapQuoteRequest, SwapExecuteRequest, SwapQuote, ApiResponse, ErrorResponse, ValidationError } from './types/shared';
-import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from './utils/cors';
-import * as E from 'fp-ts/Either';
-import * as TE from 'fp-ts/TaskEither';
-import * as O from 'fp-ts/Option';
-import { pipe } from 'fp-ts/function';
+import type { SwapQuoteRequest, SwapExecuteRequest, SwapQuote, ApiResponse, ErrorResponse, ValidationError } from './types/shared.js';
+import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from './utils/cors.js';
+import * as E from 'fp-ts/lib/Either.js';
+import * as TE from 'fp-ts/lib/TaskEither.js';
+import * as O from 'fp-ts/lib/Option.js';
+import { pipe } from 'fp-ts/lib/function.js';
 
 /**
  * Action types for swap operations
