@@ -9,20 +9,20 @@ import { pipe } from 'fp-ts/lib/function.js';
  * Chat context interface for type safety
  */
 interface ChatContext {
-  readonly userAgent?: string;
-  readonly sessionId?: string;
-  readonly previousQueries?: ReadonlyArray<string>;
-  readonly userPreferences?: {
-    readonly riskTolerance?: 'low' | 'moderate' | 'high';
-    readonly experience?: 'beginner' | 'intermediate' | 'advanced';
+  userAgent?: string;
+  sessionId?: string;
+  previousQueries?: ReadonlyArray<string>;
+  userPreferences?: {
+    riskTolerance?: 'low' | 'moderate' | 'high';
+    experience?: 'beginner' | 'intermediate' | 'advanced';
   };
-  readonly [key: string]: unknown;
+  [key: string]: unknown;
 }
 
 /**
- * Strongly typed chat request interface
+ * Strongly typed streaming chat request interface
  */
-interface ChatRequest {
+interface StreamChatRequest {
   readonly message: string;
   readonly context?: ChatContext;
   readonly memoryContext?: string;
@@ -31,25 +31,14 @@ interface ChatRequest {
 }
 
 /**
- * Extended chat response interface
+ * OpenRouter streaming response structure
  */
-interface ChatResponse extends ApiResponse<string> {
-  readonly model?: string;
-  readonly usage?: {
-    readonly prompt_tokens?: number;
-    readonly completion_tokens?: number;
-    readonly total_tokens?: number;
-  };
-}
-
-/**
- * OpenRouter API response structure
- */
-interface OpenRouterResponse {
+interface OpenRouterStreamChunk {
   readonly choices?: ReadonlyArray<{
-    readonly message?: {
+    readonly delta?: {
       readonly content?: string;
     };
+    readonly finish_reason?: string;
   }>;
   readonly usage?: {
     readonly prompt_tokens?: number;
@@ -68,14 +57,15 @@ interface RateLimitRecord {
 }
 
 /**
- * Chat error types for better error handling
+ * Stream error types for better error handling
  */
-type ChatError = 
+type StreamError = 
   | { readonly type: 'VALIDATION_ERROR'; readonly errors: ReadonlyArray<ValidationError> }
   | { readonly type: 'RATE_LIMIT_ERROR'; readonly retryAfter: number }
   | { readonly type: 'API_CONFIG_ERROR'; readonly message: string }
   | { readonly type: 'OPENROUTER_ERROR'; readonly message: string; readonly status: number }
   | { readonly type: 'TIMEOUT_ERROR' }
+  | { readonly type: 'STREAM_ERROR'; readonly message: string }
   | { readonly type: 'INTERNAL_ERROR'; readonly message: string };
 
 // Rate limiting store (simple in-memory for serverless)
@@ -83,21 +73,18 @@ const rateLimitStore = new Map<string, RateLimitRecord>();
 
 /**
  * Clean up old entries periodically to prevent memory leaks
- * Using proper typing for the cleanup function
  */
 setInterval((): void => {
   const now = Date.now();
-  const keysToDelete: string[] = [];
-  rateLimitStore.forEach((value, key) => {
+  for (const [key, value] of rateLimitStore.entries()) {
     if (now > value.resetTime) {
-      keysToDelete.push(key);
+      rateLimitStore.delete(key);
     }
-  });
-  keysToDelete.forEach(key => rateLimitStore.delete(key));
+  }
 }, 5 * 60 * 1000); // Clean up every 5 minutes
 
-// Security headers following Vercel best practices
-function setSecurityHeaders(req: VercelRequest, res: VercelResponse): void {
+// Security headers for streaming responses
+function setStreamingHeaders(req: VercelRequest, res: VercelResponse): void {
   const isDevelopment = process.env['NODE_ENV'] === 'development' || 
                        process.env['VERCEL_ENV'] === 'development';
   
@@ -119,17 +106,17 @@ function setSecurityHeaders(req: VercelRequest, res: VercelResponse): void {
     res.setHeader('Access-Control-Allow-Origin', '*');
   }
   
-  // Security headers following Vercel recommendations
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, Authorization');
-  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours preflight cache
+  // SSE specific headers
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Access-Control-Allow-Headers', 'Cache-Control');
   
   // Security headers
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Content-Security-Policy', "default-src 'none'");
   
   // Rate limiting headers
   res.setHeader('X-RateLimit-Limit', '20');
@@ -159,24 +146,14 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number; rese
   
   // Check if limit exceeded
   if (record.count >= maxRequests) {
-    // Block IP for repeated abuse - create new record with blocked status
-    const blockedRecord = { 
-      count: record.count, 
-      resetTime: now + blockDuration, 
-      blocked: true 
-    };
-    rateLimitStore.set(ip, blockedRecord);
-    return { allowed: false, remaining: 0, resetTime: blockedRecord.resetTime };
+    // Block IP for repeated abuse
+    record.blocked = true;
+    record.resetTime = now + blockDuration;
+    return { allowed: false, remaining: 0, resetTime: record.resetTime };
   }
   
-  // Update count - create new record to maintain immutability
-  const updatedRecord = { 
-    count: record.count + 1, 
-    resetTime: record.resetTime, 
-    blocked: record.blocked 
-  };
-  rateLimitStore.set(ip, updatedRecord);
-  return { allowed: true, remaining: maxRequests - updatedRecord.count, resetTime: updatedRecord.resetTime };
+  record.count++;
+  return { allowed: true, remaining: maxRequests - record.count, resetTime: record.resetTime };
 }
 
 /**
@@ -191,15 +168,15 @@ const validateChatContext = (context: unknown): O.Option<ChatContext> => {
   const sanitized: ChatContext = {};
   
   if (typeof ctx['userAgent'] === 'string') {
-    (sanitized as Record<string, unknown>)['userAgent'] = ctx['userAgent'];
+    sanitized.userAgent = ctx['userAgent'];
   }
   
   if (typeof ctx['sessionId'] === 'string') {
-    (sanitized as Record<string, unknown>)['sessionId'] = ctx['sessionId'];
+    sanitized.sessionId = ctx['sessionId'];
   }
   
   if (Array.isArray(ctx['previousQueries']) && ctx['previousQueries'].every(q => typeof q === 'string')) {
-    (sanitized as Record<string, unknown>)['previousQueries'] = ctx['previousQueries'] as ReadonlyArray<string>;
+    sanitized.previousQueries = ctx['previousQueries'] as ReadonlyArray<string>;
   }
   
   if (ctx['userPreferences'] && typeof ctx['userPreferences'] === 'object') {
@@ -208,23 +185,13 @@ const validateChatContext = (context: unknown): O.Option<ChatContext> => {
     const experience = prefs['experience'];
     
     if (riskTolerance === 'low' || riskTolerance === 'moderate' || riskTolerance === 'high') {
-      if (!(sanitized as Record<string, unknown>)['userPreferences']) {
-        (sanitized as Record<string, unknown>)['userPreferences'] = {};
-      }
-      (sanitized as Record<string, unknown>)['userPreferences'] = { 
-        ...(sanitized as Record<string, unknown>)['userPreferences'] as Record<string, unknown>, 
-        riskTolerance 
-      };
+      if (!sanitized.userPreferences) sanitized.userPreferences = {};
+      sanitized.userPreferences = { ...sanitized.userPreferences, riskTolerance };
     }
     
     if (experience === 'beginner' || experience === 'intermediate' || experience === 'advanced') {
-      if (!(sanitized as Record<string, unknown>)['userPreferences']) {
-        (sanitized as Record<string, unknown>)['userPreferences'] = {};
-      }
-      (sanitized as Record<string, unknown>)['userPreferences'] = { 
-        ...(sanitized as Record<string, unknown>)['userPreferences'] as Record<string, unknown>, 
-        experience 
-      };
+      if (!sanitized.userPreferences) sanitized.userPreferences = {};
+      sanitized.userPreferences = { ...sanitized.userPreferences, experience };
     }
   }
   
@@ -234,7 +201,7 @@ const validateChatContext = (context: unknown): O.Option<ChatContext> => {
 /**
  * Comprehensive input validation using functional patterns
  */
-const validateChatRequest = (body: unknown): E.Either<ChatError, ChatRequest> => {
+const validateStreamChatRequest = (body: unknown): E.Either<StreamError, StreamChatRequest> => {
   if (!body || typeof body !== 'object') {
     return E.left({ 
       type: 'VALIDATION_ERROR', 
@@ -246,24 +213,24 @@ const validateChatRequest = (body: unknown): E.Either<ChatError, ChatRequest> =>
   const errors: ValidationError[] = [];
   
   // Validate message
-  if (!request['message'] || typeof request['message'] !== 'string' || (request['message'] as string).trim().length === 0) {
+  if (!request['message'] || typeof request['message'] !== 'string' || request['message'].trim().length === 0) {
     errors.push({ field: 'message', message: 'Message is required and must be a non-empty string' });
   }
   
-  if (typeof request['message'] === 'string' && (request['message'] as string).length > 4000) {
+  if (typeof request['message'] === 'string' && request['message'].length > 4000) {
     errors.push({ field: 'message', message: 'Message too long (max 4000 characters)' });
   }
   
   // Validate optional string fields with length limits
-  if (request['memoryContext'] && (typeof request['memoryContext'] !== 'string' || (request['memoryContext'] as string).length > 2000)) {
+  if (request['memoryContext'] && (typeof request['memoryContext'] !== 'string' || request['memoryContext'].length > 2000)) {
     errors.push({ field: 'memoryContext', message: 'Memory context must be a string with max 2000 characters' });
   }
   
-  if (request['conversationSummary'] && (typeof request['conversationSummary'] !== 'string' || (request['conversationSummary'] as string).length > 1000)) {
+  if (request['conversationSummary'] && (typeof request['conversationSummary'] !== 'string' || request['conversationSummary'].length > 1000)) {
     errors.push({ field: 'conversationSummary', message: 'Conversation summary must be a string with max 1000 characters' });
   }
   
-  if (request['model'] && (typeof request['model'] !== 'string' || !/^[a-zA-Z0-9\-\/\.]+$/.test(request['model'] as string))) {
+  if (request['model'] && (typeof request['model'] !== 'string' || !/^[a-zA-Z0-9\-\/\.]+$/.test(request['model']))) {
     errors.push({ field: 'model', message: 'Model must be a valid model identifier' });
   }
   
@@ -272,12 +239,12 @@ const validateChatRequest = (body: unknown): E.Either<ChatError, ChatRequest> =>
   }
   
   // Build sanitized request
-  const sanitized: ChatRequest = {
+  const sanitized: StreamChatRequest = {
     message: (request['message'] as string).trim(),
     context: pipe(validateChatContext(request['context']), O.toUndefined),
-    memoryContext: typeof request['memoryContext'] === 'string' ? request['memoryContext'] as string : undefined,
-    conversationSummary: typeof request['conversationSummary'] === 'string' ? request['conversationSummary'] as string : undefined,
-    model: typeof request['model'] === 'string' ? request['model'] as string : undefined
+    memoryContext: typeof request['memoryContext'] === 'string' ? request['memoryContext'] : undefined,
+    conversationSummary: typeof request['conversationSummary'] === 'string' ? request['conversationSummary'] : undefined,
+    model: typeof request['model'] === 'string' ? request['model'] : undefined
   };
   
   return E.right(sanitized);
@@ -349,104 +316,136 @@ When users ask questions, provide helpful, detailed responses that guide them to
 };
 
 /**
- * Call OpenRouter API using TaskEither for proper error handling
+ * Stream OpenRouter API response using Server-Sent Events
  */
-const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEither<ChatError, OpenRouterResponse> => {
+const streamOpenRouter = async (
+  request: StreamChatRequest, 
+  model: AllowedModel,
+  res: VercelResponse
+): Promise<E.Either<StreamError, void>> => {
   const apiKey = process.env['OPENROUTER_API_KEY'];
   
   if (!apiKey) {
-    return TE.left({ type: 'API_CONFIG_ERROR', message: 'OpenRouter API key not configured' });
+    return E.left({ type: 'API_CONFIG_ERROR', message: 'OpenRouter API key not configured' });
   }
 
   const systemPrompt = buildSystemPrompt(request.memoryContext, request.conversationSummary);
 
-  return TE.tryCatch(
-    async () => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-      
-      try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': process.env['APP_URL'] || 'https://nyxusd.com',
-            'X-Title': process.env['APP_NAME'] || 'NyxUSD',
-            'User-Agent': 'NyxUSD/1.0'
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for streaming
+    
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': process.env['APP_URL'] || 'https://nyxusd.com',
+        'X-Title': process.env['APP_NAME'] || 'NyxUSD',
+        'User-Agent': 'NyxUSD/1.0'
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt
           },
-          body: JSON.stringify({
-            model,
-            messages: [
-              {
-                role: 'system',
-                content: systemPrompt
-              },
-              {
-                role: 'user',
-                content: request.message
-              }
-            ],
-            temperature: 0.7,
-            max_tokens: 2000,
-            top_p: 1,
-            frequency_penalty: 0,
-            presence_penalty: 0,
-            provider: {
-              order: ["Google", "DeepSeek", "Qwen", "OpenAI"],
-              allow_fallbacks: true,
-            },
-            transforms: ["middle-out"],
-          }),
-          signal: controller.signal
-        });
+          {
+            role: 'user',
+            content: request.message
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        stream: true, // Enable streaming
+        provider: {
+          order: ["Google", "DeepSeek", "Qwen", "OpenAI"],
+          allow_fallbacks: true,
+        },
+        transforms: ["middle-out"],
+      }),
+      signal: controller.signal
+    });
 
-        clearTimeout(timeoutId);
+    clearTimeout(timeoutId);
 
-        if (!response.ok) {
-          const errorText = await response.text().catch(() => 'Unknown error');
-          return Promise.reject({ 
-            type: 'OPENROUTER_ERROR', 
-            message: errorText, 
-            status: response.status 
-          });
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unknown error');
+      return E.left({ 
+        type: 'OPENROUTER_ERROR', 
+        message: errorText, 
+        status: response.status 
+      });
+    }
+
+    if (!response.body) {
+      return E.left({ type: 'STREAM_ERROR', message: 'No response body for streaming' });
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) {
+          break;
         }
 
-        const data = await response.json() as OpenRouterResponse;
-        return data;
-      } catch (fetchError) {
-        clearTimeout(timeoutId);
-        throw fetchError;
-      }
-    },
-    (error): ChatError => {
-      if (typeof error === 'object' && error !== null && 'type' in error) {
-        return error as ChatError;
-      }
-      
-      if (error instanceof Error && error.name === 'AbortError') {
-        return { type: 'TIMEOUT_ERROR' };
-      }
-      
-      return { type: 'INTERNAL_ERROR', message: 'Failed to call OpenRouter API' };
-    }
-  );
-};
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
 
-/**
- * Extract and sanitize AI message from OpenRouter response
- */
-const extractAIMessage = (response: OpenRouterResponse): E.Either<ChatError, string> => {
-  const aiMessage = response.choices?.[0]?.message?.content;
-  
-  if (!aiMessage || typeof aiMessage !== 'string') {
-    return E.left({ type: 'INTERNAL_ERROR', message: 'Invalid response from AI service' });
+        for (const line of lines) {
+          const trimmedLine = line.trim();
+          
+          if (trimmedLine === '') continue;
+          if (trimmedLine === 'data: [DONE]') break;
+          if (!trimmedLine.startsWith('data: ')) continue;
+
+          try {
+            const jsonData = trimmedLine.slice(6); // Remove 'data: ' prefix
+            const chunk: OpenRouterStreamChunk = JSON.parse(jsonData);
+            
+            const content = chunk.choices?.[0]?.delta?.content;
+            if (content) {
+              // Send content as plain text chunk (not SSE format for simplicity)
+              res.write(content);
+            }
+
+            // Check for completion
+            if (chunk.choices?.[0]?.finish_reason) {
+              break;
+            }
+          } catch (parseError) {
+            console.warn('Failed to parse streaming chunk:', parseError);
+            continue;
+          }
+        }
+      }
+
+      res.end();
+      return E.right(undefined);
+
+    } catch (streamError) {
+      console.error('Streaming error:', streamError);
+      return E.left({ type: 'STREAM_ERROR', message: 'Failed to process stream' });
+    }
+
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      return E.left({ type: 'TIMEOUT_ERROR' });
+    }
+    
+    console.error('OpenRouter streaming error:', error);
+    return E.left({ type: 'INTERNAL_ERROR', message: 'Failed to call OpenRouter API' });
   }
-  
-  // Sanitize AI response (basic XSS prevention)
-  const sanitizedMessage = aiMessage.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  
-  return E.right(sanitizedMessage);
 };
 
 /**
@@ -463,7 +462,7 @@ const getClientIP = (req: VercelRequest): string => {
 /**
  * Check rate limiting using functional patterns
  */
-const checkRateLimitTE = (clientIP: string): TE.TaskEither<ChatError, { remaining: number; resetTime: number }> => {
+const checkRateLimitTE = (clientIP: string): TE.TaskEither<StreamError, { remaining: number; resetTime: number }> => {
   return TE.tryCatch(
     async () => {
       const rateLimitResult = checkRateLimit(clientIP);
@@ -478,9 +477,9 @@ const checkRateLimitTE = (clientIP: string): TE.TaskEither<ChatError, { remainin
         resetTime: rateLimitResult.resetTime
       };
     },
-    (error): ChatError => {
+    (error): StreamError => {
       if (typeof error === 'object' && error !== null && 'type' in error) {
-        return error as ChatError;
+        return error as StreamError;
       }
       return { type: 'INTERNAL_ERROR', message: 'Rate limit check failed' };
     }
@@ -488,111 +487,71 @@ const checkRateLimitTE = (clientIP: string): TE.TaskEither<ChatError, { remainin
 };
 
 /**
- * Process chat request using functional composition
+ * Handle streaming errors and send appropriate responses
  */
-const processChatRequest = (request: ChatRequest): TE.TaskEither<ChatError, { message: string; model: AllowedModel; usage?: OpenRouterResponse['usage'] }> => {
-  const selectedModel = validateModel(request.model);
-  
-  return pipe(
-    callOpenRouter(request, selectedModel),
-    TE.chain((response) =>
-      pipe(
-        extractAIMessage(response),
-        TE.fromEither,
-        TE.map((message) => ({
-          message,
-          model: selectedModel,
-          usage: response.usage
-        }))
-      )
-    )
-  );
-};
-
-/**
- * Handle chat errors and send appropriate responses
- */
-const handleChatError = (res: VercelResponse, error: ChatError): void => {
-  console.error('Chat API error:', {
+const handleStreamError = (res: VercelResponse, error: StreamError): void => {
+  console.error('Stream API error:', {
     type: error.type,
     error,
     timestamp: new Date().toISOString()
   });
 
+  // Send error as plain text since we're already in streaming mode
+  let errorMessage = 'An error occurred while processing your request.';
+  let statusCode = 500;
+
   switch (error.type) {
     case 'VALIDATION_ERROR':
-      const validationResponse: ErrorResponse = {
-        success: false,
-        error: 'Validation failed',
-        validationErrors: error.errors
-      };
-      res.status(400).json(validationResponse);
+      errorMessage = 'Invalid request: ' + error.errors.map(e => e.message).join(', ');
+      statusCode = 400;
       break;
-
     case 'RATE_LIMIT_ERROR':
-      const rateLimitResponse: ErrorResponse = {
-        success: false,
-        error: 'Rate limit exceeded. Please try again later.'
-      };
-      res.setHeader('Retry-After', error.retryAfter.toString());
-      res.status(429).json(rateLimitResponse);
+      errorMessage = 'Rate limit exceeded. Please try again later.';
+      statusCode = 429;
       break;
-
     case 'API_CONFIG_ERROR':
-      const configResponse: ErrorResponse = {
-        success: false,
-        error: 'AI service configuration error'
-      };
-      res.status(500).json(configResponse);
+      errorMessage = 'AI service configuration error';
+      statusCode = 500;
       break;
-
     case 'OPENROUTER_ERROR':
-      const openrouterResponse: ErrorResponse = {
-        success: false,
-        error: error.message
-      };
-      
-      let statusCode = 502;
-      if (error.status === 429) statusCode = 429;
-      else if (error.status === 401) statusCode = 500;
-      else if (error.status >= 500) statusCode = 502;
-      else if (error.status >= 400) statusCode = 400;
-      
-      res.status(statusCode).json(openrouterResponse);
+      errorMessage = 'AI service error: ' + error.message;
+      statusCode = error.status === 429 ? 429 : 502;
       break;
-
     case 'TIMEOUT_ERROR':
-      const timeoutResponse: ErrorResponse = {
-        success: false,
-        error: 'Request timeout'
-      };
-      res.status(408).json(timeoutResponse);
+      errorMessage = 'Request timeout';
+      statusCode = 408;
       break;
-
-    case 'INTERNAL_ERROR':
+    case 'STREAM_ERROR':
+      errorMessage = 'Streaming error: ' + error.message;
+      statusCode = 500;
+      break;
     default:
-      const internalResponse: ErrorResponse = {
-        success: false,
-        error: 'Internal server error'
-      };
-      res.status(500).json(internalResponse);
+      errorMessage = 'Internal server error';
+      statusCode = 500;
       break;
   }
+
+  if (!res.headersSent) {
+    res.status(statusCode);
+  }
+  
+  res.write(`Error: ${errorMessage}`);
+  res.end();
 };
 
 /**
- * AI Chat endpoint handler with functional error handling
+ * AI Chat Streaming endpoint handler with functional error handling
  * 
- * Handles chat requests with OpenRouter API integration, implementing
+ * Handles streaming chat requests with OpenRouter API integration, implementing
  * comprehensive validation, rate limiting, and error handling using fp-ts.
  * 
  * @param req - Vercel request object
  * @param res - Vercel response object
- * @returns Promise<void> - Resolves when response is sent
+ * @returns Promise<void> - Resolves when streaming is complete
  */
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  // Set security headers
-  setSecurityHeaders(req, res);
+  // Set streaming headers
+  setStreamingHeaders(req, res);
 
   // Handle preflight request
   if (req.method === 'OPTIONS') {
@@ -602,11 +561,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
   // Validate HTTP method
   if (req.method !== 'POST') {
-    const methodResponse: ErrorResponse = {
-      success: false,
-      error: 'Method not allowed'
-    };
-    res.status(405).json(methodResponse);
+    res.status(405);
+    res.write('Method not allowed');
+    res.end();
     return;
   }
 
@@ -616,7 +573,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   // Process request using functional composition
   await pipe(
     // Validate input
-    validateChatRequest(req.body),
+    validateStreamChatRequest(req.body),
     TE.fromEither,
     // Check rate limiting
     TE.chain((request) =>
@@ -630,25 +587,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
         })
       )
     ),
-    // Process chat request
-    TE.chain(processChatRequest),
+    // Process streaming request
+    TE.chain((request) => {
+      const selectedModel = validateModel(request.model);
+      return TE.fromEither(E.right({ request, selectedModel }));
+    }),
+    // Handle streaming
+    TE.chain(({ request, selectedModel }) =>
+      TE.tryCatch(
+        async () => {
+          const streamResult = await streamOpenRouter(request, selectedModel, res);
+          if (E.isLeft(streamResult)) {
+            throw streamResult.left;
+          }
+          return streamResult.right;
+        },
+        (error): StreamError => {
+          if (typeof error === 'object' && error !== null && 'type' in error) {
+            return error as StreamError;
+          }
+          return { type: 'INTERNAL_ERROR', message: 'Streaming failed' };
+        }
+      )
+    ),
     // Handle result
     TE.fold(
-      // Error case - handle with appropriate error response
-      (error: ChatError) => async (): Promise<void> => {
-        handleChatError(res, error);
+      // Error case - handle with streaming error response
+      (error: StreamError) => async (): Promise<void> => {
+        handleStreamError(res, error);
       },
-      // Success case - return chat response
-      (result) => async (): Promise<void> => {
-        const response: ChatResponse = {
-          success: true,
-          data: result.message,
-          timestamp: new Date().toISOString(),
-          model: result.model,
-          usage: result.usage
-        };
-        
-        res.status(200).json(response);
+      // Success case - streaming already completed
+      () => async (): Promise<void> => {
+        // Response already sent through streaming
       }
     )
   )();

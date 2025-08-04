@@ -104,11 +104,11 @@ const validateSwapQuoteRequest = (body: unknown): E.Either<SwapError, SwapQuoteR
   const request = body as Record<string, unknown>;
   const errors: ValidationError[] = [];
 
-  const inputToken = validateRequiredString(request.inputToken, 'inputToken');
-  const outputToken = validateRequiredString(request.outputToken, 'outputToken');
-  const inputAmount = validateRequiredString(request.inputAmount, 'inputAmount');
-  const userAddress = validateRequiredString(request.userAddress, 'userAddress');
-  const slippageTolerance = validateRequiredNumber(request.slippageTolerance, 'slippageTolerance');
+  const inputToken = validateRequiredString(request['inputToken'], 'inputToken');
+  const outputToken = validateRequiredString(request['outputToken'], 'outputToken');
+  const inputAmount = validateRequiredString(request['inputAmount'], 'inputAmount');
+  const userAddress = validateRequiredString(request['userAddress'], 'userAddress');
+  const slippageTolerance = validateRequiredNumber(request['slippageTolerance'], 'slippageTolerance');
 
   if (E.isLeft(inputToken)) errors.push(inputToken.left);
   if (E.isLeft(outputToken)) errors.push(outputToken.left);
@@ -149,10 +149,10 @@ const validateSwapExecuteRequest = (body: unknown): E.Either<SwapError, SwapExec
   const request = body as Record<string, unknown>;
   const errors: ValidationError[] = [];
 
-  const pathId = validateRequiredString(request.pathId, 'pathId');
-  const routerAddress = validateRequiredString(request.routerAddress, 'routerAddress');
-  const callData = validateRequiredString(request.callData, 'callData');
-  const value = validateRequiredString(request.value, 'value');
+  const pathId = validateRequiredString(request['pathId'], 'pathId');
+  const routerAddress = validateRequiredString(request['routerAddress'], 'routerAddress');
+  const callData = validateRequiredString(request['callData'], 'callData');
+  const value = validateRequiredString(request['value'], 'value');
 
   if (E.isLeft(pathId)) errors.push(pathId.left);
   if (E.isLeft(routerAddress)) errors.push(routerAddress.left);
@@ -359,7 +359,7 @@ export default async function handler(
   }
 
   // Validate action parameter
-  const actionValidation = validateAction(req.query.action);
+  const actionValidation = validateAction(req.query['action']);
   if (E.isLeft(actionValidation)) {
     return handleSwapError(res, actionValidation.left);
   }
