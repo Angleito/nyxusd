@@ -765,7 +765,7 @@ function getBaseInstructionsForStep(step: ConversationStep): string {
   const instructions: Record<ConversationStep, string> = {
     initial:
       "Greet as Nyx, AI investment strategist. Offer custom strategy, templates, or protocol exploration.",
-    chat: "Provide helpful DeFi/investment information in a conversational way.",
+    chat: "Provide helpful DeFi/investment information in a conversational way. When the user expresses intent to: 1) create a CDP, 2) deposit into a yield pool (Safe/Medium/High), 3) check/earn yield, or 4) compound yield, respond with a concise confirmation plus a machine-readable action block on a new line starting with '##ACTION##' and containing a single-line JSON. Use the following shapes:\n\n- Create CDP:\n##ACTION## {\"type\":\"cdp_create\",\"collateral\":\"ETH|USDC|WETH\",\"amount\":\"string\"}\n\n- Deposit to pool:\n##ACTION## {\"type\":\"pool_deposit\",\"pool\":\"safe|medium|high\",\"amount\":\"string\"}\n\n- Query yield / earnings:\n##ACTION## {\"type\":\"yield_check\",\"pool\":\"safe|medium|high\"}\n\n- Compound prompt:\nIf the user asks to compound, or after reporting earnings, ask: \"Do you want to compound?\" and emit:\n##ACTION## {\"type\":\"compound_prompt\",\"pool\":\"safe|medium|high\"}\n\n- Compound yes/no:\n##ACTION## {\"type\":\"compound_execute\",\"pool\":\"safe|medium|high\",\"confirm\":true|false}\n\nAlways include a natural language answer above the action block. Omit the block if no actionable intent is found.",
     strategy_choice:
       "Guide user based on their preference for custom, template, or exploration approach.",
     template_selection:

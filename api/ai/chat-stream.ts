@@ -230,7 +230,7 @@ const validateStreamChatRequest = (body: unknown): E.Either<StreamError, StreamC
     errors.push({ field: 'conversationSummary', message: 'Conversation summary must be a string with max 1000 characters' });
   }
   
-  if (request['model'] && (typeof request['model'] !== 'string' || !/^[a-zA-Z0-9\-\/\.]+$/.test(request['model']))) {
+  if (request['model'] && (typeof request['model'] !== 'string' || !/^[a-zA-Z0-9-/.]+$/.test(request['model']))) {
     errors.push({ field: 'model', message: 'Model must be a valid model identifier' });
   }
   
@@ -276,36 +276,31 @@ const validateModel = (model?: string): AllowedModel => {
  * Build system prompt with memory context using functional composition
  */
 const buildSystemPrompt = (memoryContext?: string, conversationSummary?: string): string => {
-  const basePrompt = `You are NyxUSD, an advanced AI assistant specializing in decentralized finance (DeFi), blockchain technology, and digital asset management. You're designed to be helpful, knowledgeable, and conversational.
+  const nyxIdentity = `You are Nyx, the NYX AI operating exclusively for NYX (nyxusd.com).
+Identity: NYX is a CDP and DeFi hub — an AI-driven DeFi source for custom contracts.
+Scope: Only represent NYX and do not offer, endorse, or refer services outside NYX.
+Compliance: Responses are informational, not financial advice. Prefer actions routed to nyxusd.com or in-app flows.`;
 
-## Your Core Capabilities:
-- **DeFi Operations**: Help with swaps, lending, yield farming, liquidity provision
-- **Cross-chain Trading**: Support for Ethereum, Base, Arbitrum, and other chains  
-- **Portfolio Management**: Analysis, recommendations, risk assessment
-- **Market Insights**: Real-time data interpretation and trend analysis
-- **Security Guidance**: Best practices for wallet and asset protection
+  const basePrompt = `${nyxIdentity}
 
-## Communication Style:
-- Be conversational and approachable, not overly formal
-- Provide clear, actionable advice
+## Core Capabilities (NYX-scoped):
+- DeFi Operations via NYX-managed flows (CDPs, yield pools, swaps)
+- Cross-chain Strategy within NYX integrations (e.g., Base, Sui, others when available)
+- Portfolio insights and risk awareness
+- Market context summaries
+- Security guidance and best practices
+
+## Communication:
+- Conversational, clear, and actionable
 - Ask clarifying questions when needed
-- Explain complex concepts in simple terms
-- Offer specific examples and use cases
+- Explain complex topics simply with concrete examples
 
-## Key Principles:
-- Always prioritize user security and safety
-- Provide educational context with recommendations
+## Principles:
+- Prioritize user safety and privacy
 - Be transparent about risks and limitations
-- Never provide financial advice as investment recommendations
-- Focus on helping users understand their options
+- Do not recommend non-NYX platforms or services; if requested, reframe to NYX-managed options
 
-## Context Awareness:
-- Remember user preferences and past interactions
-- Adapt explanations to user experience level
-- Consider current market conditions in responses
-- Provide relevant, timely information
-
-When users ask questions, provide helpful, detailed responses that guide them toward their goals while keeping them informed about risks and best practices.`;
+Provide helpful responses that guide users to NYX-native actions and learning.`;
 
   const contextAdditions = [
     memoryContext ? `\n\nUser Context: ${memoryContext}` : '',
@@ -335,7 +330,13 @@ const streamOpenRouter = async (
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for streaming
     
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    // Prefer global fetch (Node 18+ / Vercel). Fallback to undici.fetch for lint compatibility.
+    const doFetch: (input: any, init?: any) => Promise<Response> =
+      typeof (globalThis as any).fetch === 'function'
+        ? (globalThis as any).fetch.bind(globalThis)
+        : ((await import('undici')) as any).fetch;
+
+    const response = await doFetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -391,6 +392,8 @@ const streamOpenRouter = async (
     let buffer = '';
 
     try {
+      // Stream consumption loop; reader.read() resolves with done=true to exit
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         const { done, value } = await reader.read();
         

@@ -231,8 +231,20 @@ What would you like to explore today?`,
 
     try {
       // Check if this is a specific crypto query
-      const isCryptoQuery = /price|portfolio|defi|market|trend|btc|eth|crypto/i.test(userMessage.content);
-      
+      const isCryptoQuery = /price|portfolio|defi|market|trend|btc|eth|crypto|cdp|deposit|yield|compound/i.test(userMessage.content);
+
+      // Helper to parse an ##ACTION## block line into JSON
+      const parseAction = (text: string): any | null => {
+        const match = text.split('\n').find((l) => l.trim().startsWith('##ACTION##'));
+        if (!match) return null;
+        const jsonPart = match.replace('##ACTION##', '').trim();
+        try {
+          return JSON.parse(jsonPart);
+        } catch {
+          return null;
+        }
+      };
+
       if (isCryptoQuery) {
         // Use enhanced AI with crypto tools
         const response = await enhancedAIService.sendMessage(
@@ -241,6 +253,7 @@ What would you like to explore today?`,
           true
         );
 
+        // First, render assistant text response
         const assistantMessage: Message = {
           id: `msg_${Date.now()}_assistant`,
           role: "assistant",
@@ -252,20 +265,93 @@ What would you like to explore today?`,
             recommendations: response.recommendations,
           },
         };
-
         setMessages(prev => [...prev, assistantMessage]);
         chatMemoryService.addMessage(assistantMessage);
-        
-        // Speak the response if voice is enabled
         await speakResponse(response.message);
-        
-        // Update user profile based on interaction
-        if (address) {
-          const tokens = response.cryptoData?.tokens || [];
-          if (tokens.length > 0) {
-            tokens.forEach((token: string) => {
-              chatMemoryService.addToWatchlist(address, token);
-            });
+
+        // Second, inspect for actionable block
+        const action = parseAction(response.message || "");
+        if (action && typeof action.type === 'string') {
+          // Handle CDP and Pool actions
+          const nowId = `act_${Date.now()}`;
+          const pushStatus = (text: string) => {
+            const statusMsg: Message = {
+              id: `${nowId}_${Math.random().toString(36).slice(2)}`,
+              role: "system",
+              content: text,
+              timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, statusMsg]);
+            chatMemoryService.addMessage(statusMsg);
+          };
+
+          try {
+            if (action.type === 'cdp_create') {
+              // Render inline intent summary and (optionally) open/create CDP flow
+              pushStatus(`Creating CDP with collateral ${action.collateral} for amount ${action.amount}...`);
+              // TODO: Wire into actual CDP creation flow/service
+              // For demo UX, open an inline confirmation step could be added here.
+              pushStatus(`✅ CDP created successfully (demo). You can now deposit to a pool.`);
+            }
+
+            if (action.type === 'pool_deposit') {
+              pushStatus(`Depositing ${action.amount} into ${String(action.pool).toUpperCase()} pool...`);
+              // TODO: Wire into PoolsSelector / poolsService for execution
+              setActiveSwap(null); // ensure swap UI hidden during deposit UX
+              pushStatus(`✅ Deposit successful (demo). You're now earning yield.`);
+              // Follow-up: ask about compounding
+              const compoundPrompt: Message = {
+                id: `msg_${Date.now()}_compound_prompt`,
+                role: "assistant",
+                content: `You've started earning yield in the ${String(action.pool)} pool. Do you want to compound your earnings automatically when thresholds are met?`,
+                timestamp: new Date(),
+              };
+              setMessages(prev => [...prev, compoundPrompt]);
+              chatMemoryService.addMessage(compoundPrompt);
+              await speakResponse(compoundPrompt.content);
+            }
+
+            if (action.type === 'yield_check') {
+              // TODO: Query current yield APR/APY from poolsService and show
+              pushStatus(`Fetching current yield for ${String(action.pool).toUpperCase()} pool...`);
+              // Demo value
+              pushStatus(`📈 Current APY for ${String(action.pool)} pool: ~12.4% (demo).`);
+              const follow: Message = {
+                id: `msg_${Date.now()}_compound_follow`,
+                role: "assistant",
+                content: `Would you like to enable compounding for this pool?`,
+                timestamp: new Date(),
+              };
+              setMessages(prev => [...prev, follow]);
+              chatMemoryService.addMessage(follow);
+              await speakResponse(follow.content);
+            }
+
+            if (action.type === 'compound_prompt') {
+              const ask: Message = {
+                id: `msg_${Date.now()}_compound_prompt2`,
+                role: "assistant",
+                content: `Do you want to compound your ${String(action.pool)} pool earnings automatically? Please say yes or no.`,
+                timestamp: new Date(),
+              };
+              setMessages(prev => [...prev, ask]);
+              chatMemoryService.addMessage(ask);
+              await speakResponse(ask.content);
+            }
+
+            if (action.type === 'compound_execute') {
+              const confirm = !!action.confirm;
+              if (confirm) {
+                pushStatus(`🔁 Enabling auto-compound on ${String(action.pool).toUpperCase()} pool...`);
+                // TODO: call strategyService/compound setting
+                pushStatus(`✅ Auto-compound enabled (demo).`);
+              } else {
+                pushStatus(`🛑 Auto-compound not enabled.`);
+              }
+            }
+          } catch (flowErr) {
+            console.error('CDP flow error:', flowErr);
+            pushStatus(`❌ Action failed. Please try again.`);
           }
         }
       } else {

@@ -154,17 +154,29 @@ const AGGRESSIVE_COMPRESSION_PATTERNS: Array<[RegExp, string]> = [
 
 /**
  * System prompt templates optimized for different conversation steps
+ *
+ * NOTE: All templates must respect NYX identity and scope policy from platformIdentity.
  */
+const NYX_POLICY_PREFIX = `You are Nyx, the NYX AI operating exclusively for NYX (nyxusd.com).
+Identity: NYX is a CDP and DeFi hub — an AI-driven DeFi source for custom contracts.
+Scope: You must only represent NYX and must not offer, endorse, or refer services outside NYX.
+Compliance: Provide information only, not financial advice. Prefer actions that route users to nyxusd.com or in-app flows.`;
+
 export const OPTIMIZED_TEMPLATES: PromptTemplateMap = {
   initial: () => `
-You are Nyx, an AI investment strategist for DeFi. Welcome users warmly and offer:
+${NYX_POLICY_PREFIX}
+
+Welcome users warmly and offer:
 1) Custom strategy builder
-2) Proven templates  
+2) Proven templates
 3) Protocol explorer
 Keep responses under 100 words.`,
 
   chat: (ctx) => `
-Answer concisely about DeFi/CDP topics. User asks: "${ctx.userMessage}"
+${NYX_POLICY_PREFIX}
+
+Answer concisely about DeFi/CDP topics strictly within NYX context. User asks: "${ctx.userMessage}"
+Do not recommend non-NYX platforms or services. If external is requested, reframe to NYX equivalents.
 Prioritize accuracy over length. Max 150 words.`,
 
   strategy_choice: (ctx) => `
@@ -183,11 +195,12 @@ Present 3 strategy templates:
 Ask which matches their risk preference. Under 100 words.`,
 
   protocol_selection: (ctx) => `
-Recommend protocols for ${ctx.userProfile.riskTolerance || "moderate"} risk:
-• Aave: Stable lending
-• Curve: Low-risk LP
-• Yearn: Auto-optimization
-Ask to choose or explore others. Under 80 words.`,
+${NYX_POLICY_PREFIX}
+
+Recommend options only insofar as they are NYX-integrated routes. For ${ctx.userProfile.riskTolerance || "moderate"} risk:
+• NYX Safe/Medium/High pools via NYX routes
+• If discussing external protocols, frame as underlying integrations managed by NYX, not direct referrals
+Ask to choose or explore NYX-managed options. Under 80 words.`,
 
   strategy_builder: () => `
 Guide allocation with:
@@ -336,10 +349,23 @@ export const OPTIMIZED_OCCUPATION_ANALOGIES: Record<
  * Get occupation-specific analogy for investment concepts
  */
 const getOccupationAnalogy = (occupation: string, concept: string): string => {
-  const analogies =
-    OPTIMIZED_OCCUPATION_ANALOGIES[occupation] ||
-    OPTIMIZED_OCCUPATION_ANALOGIES.default;
-  return analogies[concept] || analogies.investment;
+  const byOcc = OPTIMIZED_OCCUPATION_ANALOGIES[occupation as keyof typeof OPTIMIZED_OCCUPATION_ANALOGIES];
+  const analogies: Record<string, string> =
+    (byOcc as Record<string, string>) ||
+    (OPTIMIZED_OCCUPATION_ANALOGIES.default as Record<string, string>) ||
+    {};
+
+  const candidate = analogies[concept];
+  if (typeof candidate === 'string' && candidate.length > 0) {
+    return candidate;
+  }
+
+  const fallback =
+    analogies['investment'] ||
+    (OPTIMIZED_OCCUPATION_ANALOGIES.default as Record<string, string>)['investment'] ||
+    'building something valuable over time';
+
+  return fallback;
 };
 
 /**
@@ -669,9 +695,15 @@ export const buildSystemPrompt = (
     .withPersonalization(userProfile)
     .withContext({ userMessage })
     .build();
-  
+
+  const NYX_POLICY_PREFIX = `You are Nyx, the NYX AI operating exclusively for NYX (nyxusd.com).
+Identity: NYX is a CDP and DeFi hub — an AI-driven DeFi source for custom contracts.
+Scope: Only represent NYX and do not offer or refer services outside NYX.
+Compliance: Informational only; not financial advice. Prefer actions routed to nyxusd.com or in-app flows.`;
+
   if (buildResult.isOk()) {
-    return new Ok(buildResult.value.prompt);
+    const withPolicy = `${NYX_POLICY_PREFIX}\n\n${buildResult.value.prompt}`;
+    return new Ok(withPolicy);
   } else {
     return new Err((buildResult as Err<PromptBuildResult, string>).error);
   }
