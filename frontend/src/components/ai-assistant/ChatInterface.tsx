@@ -107,9 +107,9 @@ export const ChatInterface: React.FC = () => {
 
   // Sync AI messages to memory service
   useEffect(() => {
-    if (state.messages.length > 0 && !isConversationalMode) {
+    if (!isConversationalMode && state.messages.length > 0) {
       const lastMessage = state.messages[state.messages.length - 1];
-      if (lastMessage.sender === 'ai' && !lastMessage.typing) {
+      if (lastMessage && lastMessage.sender === 'ai' && !lastMessage.typing) {
         const memoryMessage = {
           id: lastMessage.id,
           role: 'assistant' as const,
@@ -277,56 +277,42 @@ export const ChatInterface: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            {/* Voice Chat Toggle - More Prominent */}
-            <motion.button
-              onClick={handleConversationalModeToggle}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 font-medium ${
-                isConversationalMode 
-                  ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg' 
-                  : 'bg-purple-600/20 text-purple-300 hover:text-white hover:bg-purple-600/40 border border-purple-500/30'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label={isConversationalMode ? "Disable Voice Chat" : "Enable Voice Chat"}
-              disabled={voiceChat.status === 'connecting'}
-            >
-              {isConversationalMode ? (
-                <>
-                  <Volume2 className="w-4 h-4" />
-                  <span className="text-sm hidden sm:inline">Voice On</span>
-                </>
-              ) : (
-                <>
-                  <Mic className="w-4 h-4" />
-                  <span className="text-sm hidden sm:inline">Voice Chat</span>
-                </>
-              )}
-            </motion.button>
-
-            {/* Microphone Button (only visible in conversational mode) */}
-            {isConversationalMode && (
+            {/* Voice Chat Toggle Switch (default OFF) */}
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-gray-400">Voice</span>
               <motion.button
-                onClick={voiceChat.toggleListening}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className={`p-2 rounded-lg transition-all duration-200 ${
-                  voiceChat.isListening
-                    ? 'bg-red-600 text-white hover:bg-red-700 animate-pulse'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                onClick={handleConversationalModeToggle}
+                disabled={voiceChat.status === 'connecting'}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
+                  isConversationalMode
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-gray-600 hover:bg-gray-500'
                 }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label={voiceChat.isListening ? "Stop Listening" : "Start Listening"}
-                disabled={voiceChat.status === 'speaking' || voiceChat.status === 'processing'}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                aria-label={isConversationalMode ? "Disable Voice Chat" : "Enable Voice Chat"}
               >
-                {voiceChat.isListening ? (
-                  <MicOff className="w-5 h-5" />
-                ) : (
-                  <Mic className="w-5 h-5" />
-                )}
+                <motion.span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-200 ${
+                    isConversationalMode ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                  layout
+                />
+                <div
+                  className={`absolute inset-0 flex items-center justify-center ${
+                    isConversationalMode ? 'text-white' : 'text-gray-300'
+                  }`}
+                >
+                  {isConversationalMode ? (
+                    <Volume2 className="w-3 h-3" />
+                  ) : (
+                    <MicOff className="w-3 h-3" />
+                  )}
+                </div>
               </motion.button>
-            )}
+            </div>
+
+            {/* Remove per-utterance microphone button; listening is managed by service once in conversational mode */}
 
             <motion.button
               onClick={() => navigate("/dashboard")}

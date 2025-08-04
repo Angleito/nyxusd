@@ -251,43 +251,44 @@ export default async function handler(
         sessionId: finalSessionId,
         ts: new Date().toISOString()
       }));
-      const createAgentResponse = await (globalThis as any).fetch('https://api.elevenlabs.io/v1/convai/conversations', {
+      // Note: ElevenLabs ConvAI REST endpoint is singular "conversation"
+      // Some versions respond 405 to POST /conversations
+      const createAgentResponse = await (globalThis as any).fetch('https://api.elevenlabs.io/v1/convai/conversation', {
         method: 'POST',
         headers: {
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
           'xi-api-key': envValidation.env.ELEVENLABS_API_KEY!,
         },
         body: JSON.stringify({
-          agent_id: agentId,
-          conversation_config: {
-            agent: {
-              prompt: {
-                prompt: agentPrompt,
-              },
-              first_message: agentConfig.firstMessage,
-              language: agentConfig.language,
+          // Provide inline agent configuration as per ConvAI API
+          agent: {
+            prompt: {
+              prompt: agentPrompt,
             },
-            conversation: {
-              conversation_config_override: {
-                tti_config: {
-                  type: 'websocket',
-                  url: 'wss://api.elevenlabs.io/v1/convai/conversation',
-                },
-                tts_config: {
-                  voice_id: agentConfig.voiceId,
-                  model_id: agentConfig.modelId,
-                  voice_settings: {
-                    stability: 0.5,
-                    similarity_boost: 0.75,
-                    style: 0,
-                    use_speaker_boost: true,
-                  },
-                },
-                asr_config: {
-                  provider: 'elevenlabs',
-                  model: 'en_v1',
-                },
+            first_message: agentConfig.firstMessage,
+            language: agentConfig.language,
+          },
+          // Conversation config with websocket target
+          conversation_config: {
+            // tti = text-to-interaction (websocket transport)
+            tti_config: {
+              type: 'websocket',
+              url: 'wss://api.elevenlabs.io/v1/convai/conversation',
+            },
+            tts_config: {
+              voice_id: agentConfig.voiceId,
+              model_id: agentConfig.modelId,
+              voice_settings: {
+                stability: 0.5,
+                similarity_boost: 0.75,
+                style: 0,
+                use_speaker_boost: true,
               },
+            },
+            asr_config: {
+              provider: 'elevenlabs',
+              model: 'en_v1',
             },
           },
         }),
@@ -302,9 +303,11 @@ export default async function handler(
           requestId,
           agentId,
           status: createAgentResponse.status,
+          statusText: createAgentResponse.statusText,
           durationMs: createDuration,
-          errorCode: createAgentResponse.statusText
+          body: errorText.slice(0, 300)
         }));
+        // Preserve upstream status code context in message
         throw new Error(`Failed to create conversational agent: ${createAgentResponse.status} - ${errorText}`);
       } else {
         console.info(JSON.stringify({
@@ -317,7 +320,12 @@ export default async function handler(
         }));
       }
 
-      const agentData = await createAgentResponse.json();
+      let agentData: any = {};
+      try {
+        agentData = await createAgentResponse.json();
+      } catch {
+        agentData = {};
+      }
 
       // Store agent session
       const agentSession = {

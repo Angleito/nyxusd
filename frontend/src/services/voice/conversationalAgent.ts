@@ -273,7 +273,12 @@ export class ConversationalAgent extends EventEmitter {
             // ignore
           }
         }
-        throw new Error(`Failed to create conversational agent: ${response.status} ${response.statusText} - ${details}`);
+        // Preserve upstream code and surface cleaner user-facing message fragments
+        const status = response.status;
+        const statusText = response.statusText || '';
+        const short = typeof details === 'string' ? details.slice(0, 180) : 'Unknown error';
+        const technical = `Failed to create conversational agent: ${status} ${statusText} - ${short}`;
+        throw new Error(technical);
       }
 
       const data = await response.json();
@@ -305,9 +310,20 @@ export class ConversationalAgent extends EventEmitter {
       
       return data.agentId;
     } catch (error) {
-      console.error('Error creating conversational agent:', error);
-      this.emit('error', { type: 'agent_creation', error });
-      throw error;
+      // Normalize error to avoid confusing UI messages
+      const err = error as Error;
+      console.error('Error creating conversational agent:', err);
+      // Emit a concise, categorized error for upstream handlers
+      const userSafeMsg =
+        err.message.includes('405') || err.message.toLowerCase().includes('method not allowed')
+          ? 'Conversational service endpoint rejected the request. Falling back to basic voice.'
+          : err.message.includes('401')
+          ? 'Conversational service authentication failed.'
+          : err.message.includes('500')
+          ? 'Conversational service is currently unavailable.'
+          : 'Failed to start conversational voice.';
+      this.emit('error', { type: 'agent_creation', error: new Error(userSafeMsg) });
+      throw err;
     }
   }
 
