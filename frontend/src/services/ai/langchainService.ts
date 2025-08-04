@@ -518,26 +518,36 @@ export class LangChainAIService implements AIService {
     try {
       // For now, fall back to non-streaming response since our backend API doesn't support streaming yet
       // TODO: Implement Server-Sent Events (SSE) streaming in the backend API
-      console.warn("Streaming not yet implemented with backend API, falling back to regular response");
+      console.warn("Streaming not yet implemented with backend API, using enhanced simulation");
       
       const response = await this.generateResponse(userMessage, context);
       
-      // Simulate streaming by chunking the response
+      // Enhanced streaming simulation with character-by-character display
       const message = response.message || '';
       if (!message) {
         onChunk(''); // Send empty chunk if no message
         return response;
       }
       
-      const words = message.split(' ');
-      const chunkSize = 3; // Send 3 words at a time
+      // Stream character by character for more natural typing effect
+      const chars = message.split('');
+      let accumulatedText = '';
       
-      for (let i = 0; i < words.length; i += chunkSize) {
-        const chunk = words.slice(i, i + chunkSize).join(' ');
-        onChunk(chunk + (i + chunkSize < words.length ? ' ' : ''));
+      for (let i = 0; i < chars.length; i++) {
+        const char = chars[i];
+        accumulatedText += char;
         
-        // Small delay to simulate streaming
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // Send the new character as chunk
+        onChunk(char);
+        
+        // Variable delay based on character type for natural typing
+        let delay = 30; // Base delay
+        if (['.', '!', '?'].includes(char)) delay = 200; // Pause at sentence end
+        else if ([',', ';', ':'].includes(char)) delay = 100; // Pause at punctuation
+        else if (char === ' ') delay = 50; // Slight pause at spaces
+        else if (char === '\n') delay = 150; // Pause at line breaks
+        
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
       
       return response;

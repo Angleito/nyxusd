@@ -685,6 +685,7 @@ export function AIAssistantProvider({
   const { address: walletAddress } = useAccount();
   const chainId = useChainId();
   const handleIntentActionRef = useRef<((intent: any) => void) | null>(null);
+  const streamingContentRef = useRef<Map<string, string>>(new Map());
   const {
     sendMessage: sendAIMessage,
     reset: resetAI,
@@ -872,19 +873,27 @@ export function AIAssistantProvider({
           state.userProfile,
           state.walletData || undefined,
           (chunk) => {
-            // Handle streaming chunks
-            dispatch({
-              type: "UPDATE_MESSAGE",
-              payload: {
-                id: aiMessageId,
-                updates: {
-                  content:
-                    state.messages.find((m) => m.id === aiMessageId)?.content +
-                      chunk || chunk,
-                  typing: true,
+            // Handle streaming chunks with proper accumulation
+            if (chunk && typeof chunk === 'string') {
+              // Get current accumulated content for this message
+              const currentContent = streamingContentRef.current.get(aiMessageId) || '';
+              const newContent = currentContent + chunk;
+              
+              // Update our ref tracking
+              streamingContentRef.current.set(aiMessageId, newContent);
+              
+              // Update the message with accumulated content
+              dispatch({
+                type: "UPDATE_MESSAGE",
+                payload: {
+                  id: aiMessageId,
+                  updates: {
+                    content: newContent,
+                    typing: true,
+                  },
                 },
-              },
-            });
+              });
+            }
           },
         );
 
@@ -897,9 +906,13 @@ export function AIAssistantProvider({
         });
 
         if (response) {
-          // Update the message with final content
-          const finalContent = response.message || "I apologize, but I couldn't generate a response. Please try again.";
+          // Get the final content from streaming or response
+          const streamedContent = streamingContentRef.current.get(aiMessageId);
+          const finalContent = streamedContent || response.message || "I apologize, but I couldn't generate a response. Please try again.";
           console.log('💬 AIProvider: Updating AI message with content:', finalContent.substring(0, 100) + (finalContent.length > 100 ? '...' : ''));
+          
+          // Clean up streaming ref
+          streamingContentRef.current.delete(aiMessageId);
           
           updateMessage(aiMessageId, {
             content: finalContent,
@@ -927,6 +940,8 @@ export function AIAssistantProvider({
           }
         } else {
           console.warn('💬 AIProvider: No response received from AI service');
+          // Clean up streaming ref
+          streamingContentRef.current.delete(aiMessageId);
           // Fallback message if AI fails
           updateMessage(aiMessageId, {
             content:
@@ -941,6 +956,8 @@ export function AIAssistantProvider({
           message: error.message,
           stack: error.stack?.split('\n').slice(0, 5).join('\n')
         });
+        // Clean up streaming ref on error
+        streamingContentRef.current.delete(aiMessageId);
         updateMessage(aiMessageId, {
           content:
             "I encountered an error. Please try again or refresh the page.",
