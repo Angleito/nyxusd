@@ -472,7 +472,12 @@ export class LangChainAIService implements AIService {
       const response = await this.generateResponse(userMessage, context);
       
       // Simulate streaming by chunking the response
-      const message = response.message;
+      const message = response.message || '';
+      if (!message) {
+        onChunk(''); // Send empty chunk if no message
+        return response;
+      }
+      
       const words = message.split(' ');
       const chunkSize = 3; // Send 3 words at a time
       
@@ -1206,7 +1211,11 @@ Ensure the response is valid JSON without any markdown formatting or code blocks
   /**
    * Count personalized elements in response
    */
-  private countPersonalizedElements(text: string): number {
+  private countPersonalizedElements(text: string | undefined | null): number {
+    if (!text || typeof text !== 'string') {
+      return 0;
+    }
+
     const personalizedIndicators = [
       "like",
       "similar to",

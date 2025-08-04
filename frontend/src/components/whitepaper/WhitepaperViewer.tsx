@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiSearch, FiMaximize2, FiMinimize2, FiDownload, FiChevronRight } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkHeadingId from 'remark-heading-id';
 
 interface WhitepaperViewerProps {
   onClose: () => void;
@@ -15,7 +16,7 @@ export const WhitepaperViewer: React.FC<WhitepaperViewerProps> = ({ onClose }) =
   const [activeSection, setActiveSection] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // Table of contents structure
+  // Table of contents structure - matches actual markdown headings
   const tableOfContents = [
     { id: 'executive-summary', title: 'Executive Summary', level: 1 },
     { id: 'the-problem', title: 'The Problem: DeFi\'s Complexity Crisis', level: 1 },
@@ -185,7 +186,7 @@ NyxUSD is revolutionizing DeFi through AI-powered automation...
               <div className="max-w-4xl mx-auto px-8 py-12">
                 <article className="prose prose-invert prose-lg max-w-none">
                   <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
+                    remarkPlugins={[remarkGfm, remarkHeadingId]}
                     components={{
                       h1: ({ children, ...props }) => (
                         <h1 className="text-4xl font-bold text-white mb-6 mt-12" {...props}>

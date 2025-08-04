@@ -4,7 +4,7 @@
 
 ---
 
-## Executive Summary
+## Executive Summary {#executive-summary}
 
 DeFi has created unprecedented financial opportunities, yet 95% of potential users remain locked out by complexity. While $150 billion sits in traditional stablecoins earning nothing, sophisticated yield strategies remain the exclusive domain of whales and institutions.
 

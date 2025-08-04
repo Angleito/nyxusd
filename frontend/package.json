@@ -38,6 +38,7 @@
     "react-router-dom": "^6.14.1",
     "react-syntax-highlighter": "^15.5.0",
     "remark-gfm": "^4.0.1",
+    "remark-heading-id": "^1.0.1",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.1.0",
     "viem": "^2.21.0",
