@@ -161,7 +161,7 @@ export const demoManager = new DemoStateManager();
 // Demo configuration flags
 export const DEMO_CONFIG = {
   enableFastAnimations: true,
-  showDebugInfo: process.env['NODE_ENV'] === 'development',
+  showDebugInfo: import.meta.env.MODE === 'development',
   autoAdvanceScenarios: false,
   recordingMode: false, // Set to true when recording video
 };
