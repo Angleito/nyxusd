@@ -342,17 +342,23 @@ export class VoiceService extends EventEmitter {
 
   private initializeSpeechRecognition(): void {
     if (typeof window !== 'undefined') {
+      console.log('🎤 VoiceService: Initializing speech recognition...');
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      
       if (SpeechRecognition) {
+        console.log('🎤 VoiceService: Speech recognition API available');
         this.recognition = new SpeechRecognition();
         this.recognition.continuous = true;
         this.recognition.interimResults = true;
         this.recognition.lang = 'en-US';
+        console.log('🎤 VoiceService: Speech recognition configured');
 
         this.recognition.onresult = (event: any) => {
           const result = event.results[event.results.length - 1];
           const transcript = result[0].transcript;
           const isFinal = result.isFinal;
+
+          console.log('🎤 VoiceService: Speech recognition result:', { transcript, isFinal });
 
           const transcriptionResult: TranscriptionResult = {
             text: transcript,
@@ -364,6 +370,7 @@ export class VoiceService extends EventEmitter {
           this.emit('transcription', transcriptionResult);
 
           if (isFinal) {
+            console.log('🎤 VoiceService: Final transcription:', transcript);
             this.emit('finalTranscription', transcriptionResult);
           }
         };
@@ -381,7 +388,7 @@ export class VoiceService extends EventEmitter {
           }
         };
       } else {
-        console.warn('Speech Recognition API not available');
+        console.warn('🎤 VoiceService: Speech Recognition API not available in this browser');
       }
     }
   }
@@ -558,15 +565,29 @@ export class VoiceService extends EventEmitter {
   }
 
   async startListening(): Promise<void> {
+    console.log('🎤 VoiceService: startListening called', { 
+      hasSession: !!this.currentSession, 
+      hasRecognition: !!this.recognition 
+    });
+    
     if (!this.currentSession) {
       throw new Error('No active voice session');
     }
 
     if (this.recognition) {
+      console.log('🎤 VoiceService: Starting speech recognition...');
       this.currentSession.status = 'listening';
-      this.recognition.start();
-      this.emit('listeningStarted');
+      
+      try {
+        this.recognition.start();
+        console.log('🎤 VoiceService: Speech recognition started successfully');
+        this.emit('listeningStarted');
+      } catch (error) {
+        console.error('🎤 VoiceService: Error starting speech recognition:', error);
+        throw error;
+      }
     } else {
+      console.error('🎤 VoiceService: Speech recognition not available');
       throw new Error('Speech recognition not available');
     }
   }

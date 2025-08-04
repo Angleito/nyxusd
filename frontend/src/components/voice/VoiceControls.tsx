@@ -37,8 +37,12 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
     // Initialize voice services
     const initializeServices = async () => {
       try {
+        console.log('🎤 VoiceControls: Initializing voice services...');
+        
         // Check if voice service is configured on the server
         const isConfigured = await secureVoiceClient.isConfigured();
+        console.log('🎤 VoiceControls: Server voice config status:', isConfigured);
+        
         if (!isConfigured) {
           setError('Voice service not configured');
           return;
@@ -46,13 +50,17 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
 
         // Get token from server (no API key needed on frontend)
         const tokenData = await secureVoiceClient.getConfig();
+        console.log('🎤 VoiceControls: Token data received:', tokenData.configured);
+        
         if (tokenData.configured) {
           // Initialize voice service with secure configuration
+          console.log('🎤 VoiceControls: Initializing voice service...');
           await voiceService.initialize('secure-token'); // Placeholder, actual auth via server
+          console.log('🎤 VoiceControls: Voice service initialized successfully');
           setIsInitialized(true);
         }
       } catch (err) {
-        console.error('Failed to initialize voice services:', err);
+        console.error('🎤 VoiceControls: Failed to initialize voice services:', err);
         setError('Failed to initialize voice services');
         onError?.(err);
       }
@@ -91,7 +99,7 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
         micStreamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, [apiKey]);
+  }, [onTranscription, onError, onStatusChange]);
 
   const handleTranscription = (result: any) => {
     onTranscription?.(result.text, result.isFinal);
@@ -196,23 +204,29 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
   };
 
   const toggleListening = async () => {
+    console.log('🎤 VoiceControls: Toggle listening clicked', { isInitialized, sessionActive, isListening });
+    
     if (!isInitialized) {
+      console.log('🎤 VoiceControls: Voice services not initialized');
       setError('Voice services not initialized');
       return;
     }
 
     try {
       if (!sessionActive) {
+        console.log('🎤 VoiceControls: Starting voice session...');
         await voiceService.startSession();
       }
 
       if (isListening) {
+        console.log('🎤 VoiceControls: Stopping listening...');
         voiceService.stopListening();
       } else {
+        console.log('🎤 VoiceControls: Starting listening...');
         await voiceService.startListening();
       }
     } catch (err: any) {
-      console.error('Failed to toggle listening:', err);
+      console.error('🎤 VoiceControls: Failed to toggle listening:', err);
       setError(err.message);
     }
   };
