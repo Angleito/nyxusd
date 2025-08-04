@@ -450,7 +450,7 @@ Claims are processed through DAO governance, ensuring community oversight of fun
 | **Cross-Chain Native** | ✅ | ❌ | 🟡 Limited | ❌ | ❌ |
 | **CDP Integration** | ✅ | ❌ | ❌ | ❌ | ✅ |
 | **Dual Revenue Model** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Voice Interface** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **AI Chat Interface** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **Educational AI** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **Personalized Strategies** | ✅ | ❌ | ❌ | 🟡 | ❌ |
 | **Average APY** | 5-100%+ | 5-20% | 10-30% | 8-25% | 0% |
@@ -646,13 +646,13 @@ We partner with protocols and platforms that share our values:
 - Mainnet deployment on Base
 - Sui chain integration
 - Native BTC via IKA Protocol's 2MPC network
-- Voice interface beta
+- Enhanced AI interface beta
 - **Brahma Protocol Integration**: Launch tap-to-pay functionality using CDP positions
   - Partner with Brahma's Swype Card infrastructure for real-world spending
   - Enable users to spend against CDP collateral without liquidating positions
   - Integrate Visa payment rails for access to 100M+ merchants globally
   - Support Apple Pay and Google Pay for seamless mobile payments
-  - Implement voice-controlled payment authorization through AI assistant
+  - Implement secure payment authorization through AI assistant
   - Deploy automated risk management for collateral-backed spending
 - Target: 1,000 users, 100+ merchants accepting NyxUSD CDP payments
 
@@ -691,12 +691,12 @@ Each new chain integration undergoes rigorous security audits and gradual rollou
 
 **Technical Architecture**:
 - **Brahma Swype Card Integration**: Leverage Brahma's battle-tested payment infrastructure built on Gnosis Safe (securing $91B+ in assets)
-- **Voice-Controlled Authorization**: Combine NyxUSD's AI assistant with Brahma's programmable execution policies for seamless payment approval
+- **Smart Authorization**: Combine NyxUSD's AI assistant with Brahma's programmable execution policies for seamless payment approval
 - **CDP-Backed Spending**: Users can spend against their collateralized positions without liquidating yield-generating assets
 - **Automated Risk Management**: Smart contract-based collateral monitoring and liquidation protection during spending
 
 **Payment Flow**:
-1. User initiates payment via voice command or mobile tap
+1. User initiates payment via mobile tap or app interface
 2. NyxUSD AI assistant verifies spending against user-defined policies
 3. Brahma infrastructure automatically borrows USDC against CDP collateral
 4. Payment settles through Visa rails to merchant
