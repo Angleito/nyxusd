@@ -222,9 +222,8 @@ export class ConversationalAgent extends EventEmitter {
     const baseUrl = import.meta.env.VITE_API_URL || window.location.origin;
     const apiUrl = `${baseUrl}/api/voice/conversational-agent`;
 
-    const requestPayload = {
-      sessionId: this.sessionId,
-      userId: this.userId,
+    // Build payload omitting nulls to satisfy server validator
+    const payload: any = {
       context: {
         userProfile: context?.userProfile,
         conversationHistory: context?.conversationHistory,
@@ -235,9 +234,17 @@ export class ConversationalAgent extends EventEmitter {
         voiceId: this.config.voiceId,
         modelId: this.config.ttsConfig?.model,
         language: this.config.language,
-        firstMessage: this.config.firstMessage || "Hello! I'm NyxUSD, your AI crypto assistant. How can I help you with DeFi today?",
+        firstMessage:
+          this.config.firstMessage ||
+          "Hello! I'm NyxUSD, your AI crypto assistant. How can I help you with DeFi today?",
       },
     };
+    if (typeof this.sessionId === 'string' && this.sessionId.length > 0) {
+      payload.sessionId = this.sessionId;
+    }
+    if (typeof this.userId === 'string' && this.userId.length > 0) {
+      payload.userId = this.userId;
+    }
 
     try {
       const response = await fetch(apiUrl, {
@@ -245,12 +252,28 @@ export class ConversationalAgent extends EventEmitter {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestPayload),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Failed to create conversational agent: ${response.statusText} - ${errorData.details || 'Unknown error'}`);
+        // Try parse JSON error first; fall back to text
+        let details = 'Unknown error';
+        try {
+          const errorData = await response.json();
+          if (errorData && typeof errorData.details === 'string') {
+            details = errorData.details;
+          } else if (typeof (errorData?.error) === 'string') {
+            details = errorData.error;
+          }
+        } catch {
+          try {
+            const text = await response.text();
+            details = text.slice(0, 200);
+          } catch {
+            // ignore
+          }
+        }
+        throw new Error(`Failed to create conversational agent: ${response.status} ${response.statusText} - ${details}`);
       }
 
       const data = await response.json();

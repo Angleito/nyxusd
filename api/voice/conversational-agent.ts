@@ -75,11 +75,29 @@ function buildAgentPrompt(context?: AgentRequest['context']): string {
     contextAddition += `\n\nUser Context: ${context.memoryContext}`;
   }
   if (context?.userProfile) {
-    const profile = context.userProfile;
+    const profile = context.userProfile as Record<string, unknown>;
+    // Access via index-signature safe form
+    const prefsRaw = (typeof profile === 'object' && profile && ('preferences' in profile))
+      ? (profile['preferences'] as unknown)
+      : undefined;
+    const prefs = (prefsRaw && typeof prefsRaw === 'object')
+      ? (prefsRaw as Record<string, unknown>)
+      : ({} as Record<string, unknown>);
+
+    const experience = typeof prefs['experience'] === 'string'
+      ? (prefs['experience'] as string)
+      : 'intermediate';
+    const riskTolerance = typeof prefs['riskTolerance'] === 'string'
+      ? (prefs['riskTolerance'] as string)
+      : 'moderate';
+    const interests = Array.isArray(prefs['interests'])
+      ? (prefs['interests'] as unknown[]).map((x) => String(x)).join(', ')
+      : 'general DeFi';
+
     contextAddition += `\n\nUser Profile:
-- Experience Level: ${profile.preferences?.experience || 'intermediate'}
-- Risk Tolerance: ${profile.preferences?.riskTolerance || 'moderate'}
-- Interests: ${profile.preferences?.interests?.join(', ') || 'general DeFi'}`;
+ - Experience Level: ${experience}
+ - Risk Tolerance: ${riskTolerance}
+ - Interests: ${interests}`;
   }
 
   return basePrompt + contextAddition;

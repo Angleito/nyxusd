@@ -114,9 +114,21 @@ export interface TokenConfig {
 
 export interface TTSRequestBody {
   readonly text: string;
-  readonly voiceId?: string;
-  readonly modelId?: string;
+  readonly voiceId?: string;           // optional override
+  readonly modelId?: string;           // optional override
   readonly token: string;
+
+  // Optional tuning/settings used by ElevenLabs and referenced in the handler
+  readonly voiceSettings?: {
+    readonly stability?: number;
+    readonly similarity_boost?: number;
+    readonly style?: number;
+    readonly use_speaker_boost?: boolean;
+  };
+
+  // Output format and latency controls (used by handler defaults)
+  readonly outputFormat?: string;              // e.g. 'mp3_44100_128', 'wav', etc
+  readonly optimizeStreamingLatency?: number;  // 0-5 per ElevenLabs docs
 }
 
 export interface TTSResponseBodySuccess {
