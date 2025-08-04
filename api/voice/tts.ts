@@ -46,6 +46,10 @@ function validateToken(token: string): { valid: boolean; payload?: VoiceTokenPay
   }
 }
 
+/**
+ * POST /api/voice/tts
+ * Existing TTS proxy endpoint (kept intact)
+ */
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
@@ -120,8 +124,8 @@ export default async function handler(
     // Rate limiting based on IP or session
     const clientId = tokenValidation.payload.sessionId ||
                     req.headers['x-forwarded-for']?.toString().split(',')[0] ||
-                    // @ts-expect-error Node types may not include connection on Vercel's request type
-                    (req.connection?.remoteAddress as string | undefined) ||
+                    // Fallback when x-forwarded-for is absent; Vercel may omit connection details
+                    (req.socket && 'remoteAddress' in req.socket ? (req.socket as any).remoteAddress as string | undefined : undefined) ||
                     'unknown';
 
     const rateLimitResult = checkRateLimit(clientId);
@@ -166,17 +170,19 @@ export default async function handler(
     } = body as TTSRequestBody;
 
     if (!text || typeof text !== 'string') {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Text is required and must be a string'
       });
+      return;
     }
 
     if (text.length > 5000) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Text too long. Maximum 5000 characters allowed.'
       });
+      return;
     }
 
     // Clean text for better TTS
@@ -185,10 +191,11 @@ export default async function handler(
       .trim();
 
     if (!cleanText) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Text contains no valid content after cleaning'
       });
+      return;
     }
 
     // Call ElevenLabs TTS API
@@ -222,12 +229,13 @@ export default async function handler(
         error: errorText
       });
 
-      return res.status(elevenLabsResponse.status).json({
+      res.status(elevenLabsResponse.status).json({
         success: false,
         error: 'Failed to generate speech',
         details: `ElevenLabs API returned ${elevenLabsResponse.status}`,
         elevenlabsError: errorText
       });
+      return;
     }
 
     // Get audio data
@@ -256,5 +264,66 @@ export default async function handler(
       timestamp: new Date().toISOString(),
     };
     res.status(500).json(err);
+  }
+}
+
+/**
+ * GET /api/voice/tts?agentId=...
+ * New: Proxy to ElevenLabs to fetch a signed conversation URL for authenticated Conversational AI agents.
+ * Frontend will call this route, then pass signed_url to useConversation().startSession({ url }).
+ * Docs: GET https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=...
+ */
+export async function getSignedUrl(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<void> {
+  if (req.method !== 'GET') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  try {
+    const apiKey = process.env['ELEVENLABS_API_KEY'];
+    const agentId =
+      (req.query['agentId'] as string | undefined) ||
+      process.env['ELEVENLABS_AGENT_ID'];
+
+    if (!apiKey) {
+      res.status(500).json({ error: 'Missing ELEVENLABS_API_KEY' });
+      return;
+    }
+    if (!agentId) {
+      res.status(400).json({ error: 'Missing agentId or ELEVENLABS_AGENT_ID' });
+      return;
+    }
+
+    const upstream = await (globalThis as any).fetch(
+      `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${encodeURIComponent(
+        agentId
+      )}`,
+      {
+        method: 'GET',
+        headers: {
+          'xi-api-key': apiKey,
+        },
+      }
+    );
+
+    if (!upstream.ok) {
+      const detail = await upstream.text().catch(() => '');
+      res
+        .status(upstream.status)
+        .json({ error: 'Failed to get signed URL from ElevenLabs', detail });
+      return;
+    }
+
+    const data = await upstream.json();
+    // Expect { signed_url: "wss://..." }
+    res.status(200).json({ signed_url: data.signed_url, agent_id: agentId });
+  } catch (err: any) {
+    console.error('Signed URL error', err);
+    res
+      .status(500)
+      .json({ error: 'Server error', detail: err?.message ?? 'unknown' });
   }
 }

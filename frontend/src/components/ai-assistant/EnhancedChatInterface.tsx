@@ -406,6 +406,42 @@ What would you like to explore today?`,
                 className="mr-2"
               />
             </VoiceErrorBoundary>
+
+            {/* ElevenLabs Conversational AI (Authenticated) - Start/Stop full voice conversation */}
+            <button
+              onClick={async () => {
+                /**
+                 * Since APIs are set in Vercel, rely on backend validation/feature flags.
+                 * We flip conversationalMode on and start/stop a full-duplex voice session.
+                 */
+                try {
+                  const isActive = voiceService.isSessionActive();
+                  if (!isActive) {
+                    // Ensure conversational mode (backend guard exists in voiceService.initialize/enable)
+                    await voiceService.enableConversationalMode();
+                    const sessionId = await voiceService.startSession({
+                      topic: 'nyxusd',
+                      userContext: { source: 'EnhancedChatInterface' }
+                    } as any);
+                    console.debug('ElevenLabs voice session started:', sessionId);
+                    await voiceService.startListening();
+                    setIsListeningToVoice(true);
+                  } else {
+                    voiceService.stopListening();
+                    await voiceService.endSession();
+                    setIsListeningToVoice(false);
+                  }
+                } catch (e) {
+                  console.error('Failed to toggle ElevenLabs conversational session:', e);
+                }
+              }}
+              className={`px-3 py-1 text-xs rounded ${
+                isListeningToVoice ? 'bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'
+              }`}
+              title="Toggle ElevenLabs Conversational AI session"
+            >
+              {isListeningToVoice ? 'Stop Agent' : 'Start Agent'}
+            </button>
             
             {isConnected && (
               <div className="flex items-center space-x-2 text-sm">
@@ -646,7 +682,7 @@ What would you like to explore today?`,
           </motion.div>
 
           <motion.button
-            onClick={handleSendMessage}
+            onClick={() => void handleSendMessage()}
             disabled={!inputValue.trim() || isTyping}
             className="p-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:from-purple-700 hover:to-pink-700 transition-all duration-200"
             whileHover={{ scale: 1.05 }}
@@ -657,7 +693,7 @@ What would you like to explore today?`,
         </div>
 
         <div className="mt-2 text-xs text-gray-500 text-center">
-          Natural language crypto intelligence • Real-time data • Portfolio analysis
+          Natural language crypto intelligence • Real-time data • Portfolio analysis • Voice (ElevenLabs via Vercel APIs)
         </div>
       </motion.div>
     </motion.div>
