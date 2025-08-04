@@ -377,14 +377,39 @@ export class VoiceService extends EventEmitter {
 
         this.recognition.onerror = (event: any) => {
           console.error('Speech recognition error:', event.error);
+          
+          // Stop the infinite restart loop on network errors
+          if (event.error === 'network' || event.error === 'service-not-allowed' || event.error === 'not-allowed') {
+            console.warn('🎤 VoiceService: Disabling speech recognition due to persistent errors');
+            if (this.currentSession) {
+              this.currentSession.status = 'error';
+              this.currentSession.isActive = false;
+            }
+            this.emit('error', new Error(`Speech recognition failed: ${event.error}`));
+            return;
+          }
+          
           const error = new Error(`Speech recognition failed: ${event.error}`);
           this.handleGenericError(error);
         };
 
         this.recognition.onend = () => {
-          if (this.currentSession?.isActive) {
-            // Restart recognition if session is still active
-            this.recognition.start();
+          // Only restart if session is active and no persistent errors occurred
+          if (this.currentSession?.isActive && this.currentSession.status !== 'error') {
+            try {
+              // Add a small delay to prevent rapid restarts
+              setTimeout(() => {
+                if (this.recognition && this.currentSession?.isActive && this.currentSession.status !== 'error') {
+                  this.recognition.start();
+                }
+              }, 100);
+            } catch (restartError) {
+              console.error('🎤 VoiceService: Failed to restart recognition:', restartError);
+              if (this.currentSession) {
+                this.currentSession.status = 'error';
+                this.currentSession.isActive = false;
+              }
+            }
           }
         };
       } else {
@@ -405,20 +430,41 @@ export class VoiceService extends EventEmitter {
 
   private async initializeConversationalAgent(): Promise<void> {
     if (!this.apiKey || !this.config.voiceId) {
+      console.warn('🎤 VoiceService: API key and voice ID required for conversational mode');
       throw new Error('API key and voice ID required for conversational mode');
     }
 
     // Check if conversational mode is properly configured on backend
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/voice-config`);
-      const configData = await response.json();
+      const apiUrl = import.meta.env.VITE_API_URL || window.location.origin;
+      const response = await fetch(`${apiUrl}/api/voice-config`);
       
-      if (!configData.success || !configData.config.features.conversationalMode) {
-        throw new Error('Conversational mode not available on backend');
+      if (!response.ok) {
+        throw new Error(`Voice config request failed: ${response.status} ${response.statusText}`);
       }
+      
+      const configData = await response.json();
+      console.log('🎤 VoiceService: Voice config response:', {
+        success: configData.success,
+        apiStatus: configData.apiStatus,
+        hasFeatures: !!configData.config?.features,
+        conversationalMode: configData.config?.features?.conversationalMode
+      });
+      
+      if (!configData.success) {
+        throw new Error(`Voice config error: ${configData.error || 'Unknown error'}`);
+      }
+      
+      if (!configData.config?.features?.conversationalMode) {
+        console.warn('🎤 VoiceService: Conversational mode not available on backend, will fallback to TTS');
+        throw new Error('Conversational mode not available - backend not configured');
+      }
+      
+      console.log('🎤 VoiceService: Conversational mode available, proceeding with initialization');
     } catch (error) {
-      console.warn('Conversational mode not available, will fallback to TTS:', error);
-      throw new Error('Conversational mode not configured on backend');
+      console.warn('🎤 VoiceService: Conversational mode initialization failed:', error);
+      this.fallbackMode = 'tts'; // Set fallback mode
+      throw error;
     }
 
     this.conversationalAgent = createConversationalAgent({
@@ -567,11 +613,24 @@ export class VoiceService extends EventEmitter {
   async startListening(): Promise<void> {
     console.log('🎤 VoiceService: startListening called', { 
       hasSession: !!this.currentSession, 
-      hasRecognition: !!this.recognition 
+      hasRecognition: !!this.recognition,
+      currentStatus: this.currentSession?.status,
+      isActive: this.currentSession?.isActive
     });
     
     if (!this.currentSession) {
       throw new Error('No active voice session');
+    }
+
+    // Don't start if already listening or in error state
+    if (this.currentSession.status === 'listening') {
+      console.log('🎤 VoiceService: Already listening, ignoring start request');
+      return;
+    }
+
+    if (this.currentSession.status === 'error') {
+      console.log('🎤 VoiceService: Session in error state, cannot start listening');
+      throw new Error('Voice session is in error state');
     }
 
     if (this.recognition) {
@@ -582,8 +641,16 @@ export class VoiceService extends EventEmitter {
         this.recognition.start();
         console.log('🎤 VoiceService: Speech recognition started successfully');
         this.emit('listeningStarted');
-      } catch (error) {
+      } catch (error: any) {
         console.error('🎤 VoiceService: Error starting speech recognition:', error);
+        
+        // If recognition is already started, don't treat it as an error
+        if (error.name === 'InvalidStateError' && error.message.includes('already started')) {
+          console.log('🎤 VoiceService: Recognition already active');
+          return;
+        }
+        
+        this.currentSession.status = 'error';
         throw error;
       }
     } else {
@@ -600,6 +667,32 @@ export class VoiceService extends EventEmitter {
       }
       this.emit('listeningStopped');
     }
+  }
+
+  resetSession(): void {
+    console.log('🎤 VoiceService: Resetting voice session');
+    
+    // Stop any ongoing recognition
+    if (this.recognition) {
+      try {
+        this.recognition.stop();
+      } catch (error) {
+        // Ignore errors when stopping
+      }
+    }
+    
+    // Reset session state
+    if (this.currentSession) {
+      this.currentSession.status = 'idle';
+      this.currentSession.isActive = false;
+    }
+    
+    // Reset error counters
+    this.retryCount = 0;
+    this.connectionState = 'idle';
+    this.lastError = null;
+    
+    this.emit('sessionReset');
   }
 
   async speakText(text: string): Promise<void> {

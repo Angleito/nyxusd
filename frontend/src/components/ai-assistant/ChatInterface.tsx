@@ -170,7 +170,12 @@ export const ChatInterface: React.FC = () => {
         setIsConversationalMode(false);
       }
     } catch (error) {
-      console.error('Failed to toggle conversational mode:', error);
+      // Don't log conversational mode failures as errors - they're expected when not configured
+      if (error instanceof Error && error.message.includes('not available')) {
+        console.log('Conversational mode not available, using regular voice mode');
+      } else {
+        console.error('Failed to toggle conversational mode:', error);
+      }
     }
   };
 

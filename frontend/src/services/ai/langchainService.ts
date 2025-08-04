@@ -516,53 +516,139 @@ export class LangChainAIService implements AIService {
     const startTime = Date.now();
 
     try {
-      // For now, fall back to non-streaming response since our backend API doesn't support streaming yet
-      // TODO: Implement Server-Sent Events (SSE) streaming in the backend API
-      console.warn("Streaming not yet implemented with backend API, using enhanced simulation");
+      // Determine query type for model selection
+      const queryType = this.analyzeQueryType(userMessage, context);
       
-      const response = await this.generateResponse(userMessage, context);
+      // Build simple context for backend API
+      const memoryContext = this.buildSimpleMemoryContext(context);
+      const conversationSummary = this.buildConversationSummary();
       
-      // Enhanced streaming simulation with character-by-character display
-      const message = response.message || '';
-      if (!message) {
-        onChunk(''); // Send empty chunk if no message
-        return response;
+      // Get selected model
+      const model = this.selectModelByQueryType(queryType);
+      
+      // Call streaming backend API
+      const baseUrl = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
+      const apiUrl = `${baseUrl}/api/ai/chat-stream`;
+      
+      console.log('🤖 AI Service: Making streaming request to:', apiUrl);
+      console.log('🤖 AI Service: Request payload:', {
+        message: userMessage.substring(0, 100) + (userMessage.length > 100 ? '...' : ''),
+        context: Object.keys(context),
+        memoryContext: memoryContext ? 'present' : 'none',
+        conversationSummary: conversationSummary ? 'present' : 'none',
+        model
+      });
+      
+      const requestPayload = {
+        message: userMessage,
+        context,
+        memoryContext,
+        conversationSummary,
+        model
+      };
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestPayload),
+      });
+
+      console.log('🤖 AI Service: Streaming response status:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('🤖 AI Service: Streaming error response:', errorText);
+        throw new Error(`Streaming API error: ${response.status} - ${errorText}`);
       }
-      
-      // Stream character by character for more natural typing effect
-      const chars = message.split('');
-      let accumulatedText = '';
-      
-      for (let i = 0; i < chars.length; i++) {
-        const char = chars[i];
-        accumulatedText += char;
-        
-        // Send the new character as chunk
-        onChunk(char);
-        
-        // Variable delay based on character type for natural typing
-        let delay = 30; // Base delay
-        if (['.', '!', '?'].includes(char)) delay = 200; // Pause at sentence end
-        else if ([',', ';', ':'].includes(char)) delay = 100; // Pause at punctuation
-        else if (char === ' ') delay = 50; // Slight pause at spaces
-        else if (char === '\n') delay = 150; // Pause at line breaks
-        
-        await new Promise(resolve => setTimeout(resolve, delay));
+
+      if (!response.body) {
+        throw new Error('No response body for streaming');
       }
-      
-      return response;
+
+      // Process streaming response
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullMessage = '';
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) {
+            break;
+          }
+
+          const chunk = decoder.decode(value, { stream: true });
+          fullMessage += chunk;
+          
+          // Send chunk to callback
+          onChunk(chunk);
+        }
+      } catch (streamError) {
+        console.error('🤖 AI Service: Stream processing error:', streamError);
+        throw new Error('Failed to process streaming response');
+      }
+
+      // Store conversation in simple memory
+      this.storeConversationLocally(userMessage, fullMessage);
+
+      // Create structured response
+      const parsedResponse = {
+        message: fullMessage,
+        intent: {
+          action: "continue" as const,
+          confidence: 0.8,
+        },
+        shouldContinue: false,
+      };
+
+      // Update analytics
+      this.updateAnalytics(startTime, userMessage, parsedResponse, queryType);
+
+      return this.convertToAIResponse(parsedResponse);
 
     } catch (error) {
       console.error("Streaming error:", error);
 
-      // Fallback to legacy streaming if enhanced system fails
-      if (!this.fallbackMode && (error as any).message?.includes("personalization")) {
-        console.warn("Enhanced streaming failed, falling back to legacy mode");
-        this.fallbackMode = true;
-        return this.streamLegacyResponse(userMessage, context, onChunk);
+      // Fallback to simulated streaming with regular API
+      console.warn("Real streaming failed, falling back to simulated streaming");
+      
+      try {
+        const response = await this.generateResponse(userMessage, context);
+        
+        // Enhanced streaming simulation with character-by-character display
+        const message = response.message || '';
+        if (!message) {
+          onChunk(''); // Send empty chunk if no message
+          return response;
+        }
+        
+        // Stream character by character for more natural typing effect
+        const chars = message.split('');
+        
+        for (let i = 0; i < chars.length; i++) {
+          const char = chars[i];
+          
+          // Send the new character as chunk
+          onChunk(char);
+          
+          // Variable delay based on character type for natural typing
+          let delay = 30; // Base delay
+          if (['.', '!', '?'].includes(char)) delay = 200; // Pause at sentence end
+          else if ([',', ';', ':'].includes(char)) delay = 100; // Pause at punctuation
+          else if (char === ' ') delay = 50; // Slight pause at spaces
+          else if (char === '\n') delay = 150; // Pause at line breaks
+          
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+        
+        return response;
+      } catch (fallbackError) {
+        console.error("Fallback streaming also failed:", fallbackError);
+        throw fallbackError;
       }
-
-      throw error;
     }
   }
 

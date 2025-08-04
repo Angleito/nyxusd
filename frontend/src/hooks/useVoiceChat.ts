@@ -178,9 +178,15 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}): UseVoiceChatRet
           await startSession();
         }
       } catch (err) {
-        console.error('Failed to initialize voice services:', err);
-        setError('Failed to initialize voice services');
-        onErrorRef.current?.(err);
+        // Don't treat conversational mode unavailability as a hard error
+        if (err instanceof Error && err.message.includes('not available')) {
+          console.log('Voice services initialized without conversational mode');
+          setIsInitialized(true); // Still allow regular voice features
+        } else {
+          console.error('Failed to initialize voice services:', err);
+          setError('Failed to initialize voice services');
+          onErrorRef.current?.(err);
+        }
       }
     };
 
