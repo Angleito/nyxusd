@@ -335,6 +335,8 @@ export class LangChainAIService implements AIService {
       const baseUrl = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
       const apiUrl = `${baseUrl}/api/ai/chat`;
       
+      console.log('🔧 AI Service: Validating configuration with URL:', apiUrl);
+      
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -346,10 +348,20 @@ export class LangChainAIService implements AIService {
         }),
       });
 
+      console.log('🔧 AI Service: Validation response status:', response.status, response.statusText);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🔧 AI Service: Validation successful, response:', data.success ? 'success' : 'failed');
+      } else {
+        const errorText = await response.text();
+        console.error('🔧 AI Service: Validation failed, error:', errorText);
+      }
+
       this.isInitialized = response.ok;
       return response.ok;
     } catch (error) {
-      console.error("AI configuration validation failed:", error);
+      console.error("🔧 AI Service: Configuration validation failed with exception:", error);
       this.isInitialized = false;
       return false;
     }
@@ -376,26 +388,63 @@ export class LangChainAIService implements AIService {
       const baseUrl = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
       const apiUrl = `${baseUrl}/api/ai/chat`;
       
+      console.log('🤖 AI Service: Environment variables:', {
+        VITE_API_URL: import.meta.env.VITE_API_URL,
+        MODE: import.meta.env.MODE,
+        baseUrl,
+        finalApiUrl: apiUrl
+      });
+      
+      console.log('🤖 AI Service: Making request to:', apiUrl);
+      console.log('🤖 AI Service: Request payload:', {
+        message: userMessage.substring(0, 100) + (userMessage.length > 100 ? '...' : ''),
+        context: Object.keys(context),
+        memoryContext: memoryContext ? 'present' : 'none',
+        conversationSummary: conversationSummary ? 'present' : 'none',
+        model
+      });
+      
+      const requestPayload = {
+        message: userMessage,
+        context,
+        memoryContext,
+        conversationSummary,
+        model
+      };
+      
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          message: userMessage,
-          context,
-          memoryContext,
-          conversationSummary,
-          model
-        }),
+        body: JSON.stringify(requestPayload),
       });
 
+      console.log('🤖 AI Service: Response status:', response.status, response.statusText);
+      console.log('🤖 AI Service: Response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('🤖 AI Service: Error response body:', errorText);
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: errorText };
+        }
+        throw new Error(errorData.error || `API error: ${response.status} - ${errorText}`);
       }
 
-      const data = await response.json();
+      const responseText = await response.text();
+      console.log('🤖 AI Service: Raw response:', responseText.substring(0, 200) + (responseText.length > 200 ? '...' : ''));
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('🤖 AI Service: Failed to parse JSON response:', parseError);
+        throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
+      }
       
       if (!data.success) {
         throw new Error(data.error || 'API request failed');

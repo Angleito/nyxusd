@@ -117,31 +117,55 @@ export class SecureVoiceClient {
    */
   async getConfig(): Promise<VoiceConfig> {
     if (this.config) {
+      console.log('🎤 Voice Service: Using cached config');
       return this.config!; // Safe because we checked it exists
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/api/voice-config`, {
+      const configUrl = `${this.baseUrl}/api/voice-config`;
+      console.log('🎤 Voice Service: Fetching config from:', configUrl);
+      
+      const response = await fetch(configUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
 
+      console.log('🎤 Voice Service: Config response status:', response.status, response.statusText);
+
       if (!response.ok) {
-        throw new Error(`Failed to get voice config: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('🎤 Voice Service: Config error response:', errorText);
+        throw new Error(`Failed to get voice config: ${response.statusText} - ${errorText}`);
       }
 
-      const data = await response.json();
+      const responseText = await response.text();
+      console.log('🎤 Voice Service: Raw config response:', responseText.substring(0, 200) + (responseText.length > 200 ? '...' : ''));
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('🎤 Voice Service: Failed to parse config JSON:', parseError);
+        throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
+      }
       
       if (!data.success) {
+        console.error('🎤 Voice Service: Config API returned error:', data.error);
         throw new Error(data.error || 'Failed to get voice config');
       }
+
+      console.log('🎤 Voice Service: Config loaded successfully:', {
+        configured: data.configured,
+        apiStatus: data.apiStatus,
+        voiceCount: data.config?.availableVoices?.length || 0
+      });
 
       this.config = data;
       return data;
     } catch (error) {
-      console.error('Error getting voice config:', error);
+      console.error('🎤 Voice Service: Error getting voice config:', error);
       // Return a default config that indicates voice is not configured
       this.config = {
         configured: false,
@@ -359,16 +383,27 @@ const getBaseUrl = () => {
   
   // Use environment variable for API URL, with fallback
   const apiUrl = import.meta.env.VITE_API_URL;
+  const mode = import.meta.env.MODE;
+  
+  console.log('🎤 Voice Service: Environment detection:', {
+    VITE_API_URL: apiUrl,
+    MODE: mode,
+    window: typeof window !== 'undefined' ? 'available' : 'undefined'
+  });
+  
   if (apiUrl) {
+    console.log('🎤 Voice Service: Using VITE_API_URL:', apiUrl);
     return apiUrl;
   }
   
   // In production (Vercel), API routes are served from the same origin
-  if (import.meta.env.MODE === 'production') {
+  if (mode === 'production') {
+    console.log('🎤 Voice Service: Production mode, using relative URLs');
     return '';
   }
   
   // Development fallback
+  console.log('🎤 Voice Service: Development fallback to localhost:8081');
   return 'http://localhost:8081';
 };
 

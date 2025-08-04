@@ -842,22 +842,30 @@ export function AIAssistantProvider({
 
   const sendMessage = useCallback(
     async (content: string) => {
+      console.log('💬 AIProvider: Sending message:', content.substring(0, 100) + (content.length > 100 ? '...' : ''));
+      
       // Add user message
-      addMessage(content, "user");
+      const userMessageId = addMessage(content, "user");
+      console.log('💬 AIProvider: Added user message with ID:', userMessageId);
+      
       setTyping(true);
 
       // Create AI message placeholder
       const aiMessageId = addMessage("", "ai");
+      console.log('💬 AIProvider: Created AI message placeholder with ID:', aiMessageId);
 
       try {
         // First check for DeFi actions
+        console.log('💬 AIProvider: Checking for DeFi actions...');
         const handledByDeFi = await handleDeFiAction(content, aiMessageId);
         
         if (handledByDeFi) {
+          console.log('💬 AIProvider: Message handled by DeFi action, skipping AI service');
           setTyping(false);
           return;
         }
 
+        console.log('💬 AIProvider: Calling AI service...');
         const response = await sendAIMessage(
           content,
           state.currentStep,
@@ -880,10 +888,21 @@ export function AIAssistantProvider({
           },
         );
 
+        console.log('💬 AIProvider: AI service response received:', {
+          hasResponse: !!response,
+          hasMessage: !!(response?.message),
+          messageLength: response?.message?.length || 0,
+          hasNextStep: !!(response?.nextStep),
+          hasIntent: !!(response?.intent)
+        });
+
         if (response) {
           // Update the message with final content
+          const finalContent = response.message || "I apologize, but I couldn't generate a response. Please try again.";
+          console.log('💬 AIProvider: Updating AI message with content:', finalContent.substring(0, 100) + (finalContent.length > 100 ? '...' : ''));
+          
           updateMessage(aiMessageId, {
-            content: response.message || "I apologize, but I couldn't generate a response. Please try again.",
+            content: finalContent,
             typing: false,
           });
 
@@ -907,6 +926,7 @@ export function AIAssistantProvider({
             await handleDeFiAction(response.message, aiMessageId);
           }
         } else {
+          console.warn('💬 AIProvider: No response received from AI service');
           // Fallback message if AI fails
           updateMessage(aiMessageId, {
             content:
@@ -915,7 +935,12 @@ export function AIAssistantProvider({
           });
         }
       } catch (error) {
-        console.error("Failed to send message:", error);
+        console.error("💬 AIProvider: Failed to send message:", error);
+        console.error("💬 AIProvider: Error details:", {
+          name: error.name,
+          message: error.message,
+          stack: error.stack?.split('\n').slice(0, 5).join('\n')
+        });
         updateMessage(aiMessageId, {
           content:
             "I encountered an error. Please try again or refresh the page.",
