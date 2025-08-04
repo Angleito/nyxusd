@@ -51,7 +51,7 @@ export class EnhancedAIService {
     this.baseUrl = baseUrl;
     this.sessionId = this.generateSessionId();
     // Check if we're in production (Vercel) or local development
-    this.isProduction = process.env.NODE_ENV === 'production' || window.location.hostname !== 'localhost';
+    this.isProduction = import.meta.env.MODE === 'production' || window.location.hostname !== 'localhost';
   }
 
   private generateSessionId(): string {
@@ -89,7 +89,7 @@ export class EnhancedAIService {
       return await response.json();
     } catch (error) {
       // Only log in development mode
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.MODE === 'development') {
         console.error('Failed to send message to enhanced AI:', error);
       }
       return {
@@ -176,7 +176,7 @@ export class EnhancedAIService {
       }
     } catch (error) {
       // Only log in development mode
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.MODE === 'development') {
         console.error('Failed to stream message:', error);
       }
       throw error;

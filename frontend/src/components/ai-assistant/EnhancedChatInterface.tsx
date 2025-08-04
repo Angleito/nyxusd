@@ -298,7 +298,7 @@ What would you like to explore today?`,
       }
     } catch (error) {
       // Only log in development mode to avoid console spam
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.MODE === 'development') {
         console.error("Failed to get AI response:", error);
       }
       

@@ -41,8 +41,8 @@ export function useOdosSwap() {
   const [executionError, setExecutionError] = useState<string | null>(null);
 
   const API_URL = useMemo(() => 
-    process.env['NODE_ENV'] === 'production' 
-      ? 'https://nyxusd.vercel.app/api/swap'
+    import.meta.env.MODE === 'production' 
+      ? 'https://nyxusd.com/api/swap'
       : 'http://localhost:3000/api/swap',
     []
   );

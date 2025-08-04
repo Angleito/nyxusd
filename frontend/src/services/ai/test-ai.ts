@@ -12,7 +12,7 @@ async function testAIService() {
 
   // Create service instance
   const aiService = createAIService({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: import.meta.env.VITE_OPENAI_API_KEY,
   });
 
   // Test configuration validation
@@ -20,7 +20,7 @@ async function testAIService() {
   const isValid = await aiService.validateConfiguration();
   console.log(`   Configuration valid: ${isValid ? "✅" : "❌"}`);
 
-  if (!isValid && !process.env.REACT_APP_USE_MOCK_AI) {
+  if (!isValid && !import.meta.env.VITE_USE_MOCK_AI) {
     console.log("\n⚠️  No OpenAI API key found. Using fallback service.\n");
   }
 
