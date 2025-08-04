@@ -332,9 +332,8 @@ export class LangChainAIService implements AIService {
   async validateConfiguration(): Promise<boolean> {
     try {
       // Test backend API connection instead of direct LLM
-      const apiUrl = import.meta.env.MODE === 'production' 
-        ? '/api/ai/chat' 
-        : 'http://localhost:8080/api/ai/chat';
+      const baseUrl = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
+      const apiUrl = `${baseUrl}/api/ai/chat`;
       
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -374,9 +373,8 @@ export class LangChainAIService implements AIService {
       const model = this.selectModelByQueryType(queryType);
       
       // Call backend API
-      const apiUrl = import.meta.env.MODE === 'production' 
-        ? '/api/ai/chat' 
-        : 'http://localhost:8080/api/ai/chat';
+      const baseUrl = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
+      const apiUrl = `${baseUrl}/api/ai/chat`;
       
       const response = await fetch(apiUrl, {
         method: 'POST',

@@ -357,13 +357,19 @@ export class SecureVoiceClient {
 const getBaseUrl = () => {
   if (typeof window === 'undefined') return ''; // SSR
   
+  // Use environment variable for API URL, with fallback
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (apiUrl) {
+    return apiUrl;
+  }
+  
   // In production (Vercel), API routes are served from the same origin
   if (import.meta.env.MODE === 'production') {
     return '';
   }
   
-  // In development, API might be on different port
-  return '';
+  // Development fallback
+  return 'http://localhost:8081';
 };
 
 export const secureVoiceClient = new SecureVoiceClient(getBaseUrl());

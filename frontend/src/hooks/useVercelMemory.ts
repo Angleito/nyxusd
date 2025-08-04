@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import type { ChatMessage } from '../services/memory/chatMemoryService';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
 
 export interface MemoryHookState {
   sessionId: string | null;

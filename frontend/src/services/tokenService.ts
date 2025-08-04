@@ -28,9 +28,9 @@ interface CoinGeckoAssetPlatform {
 
 class TokenService {
   private static instance: TokenService;
-  private baseApiUrl = (import.meta.env['MODE'] === 'production') 
-    ? '/api' 
-    : 'http://localhost:8080/api'; // Backend API endpoint
+  private baseApiUrl = import.meta.env.VITE_API_URL 
+    ? `${import.meta.env.VITE_API_URL}/api`
+    : '/api'; // Backend API endpoint
   private cache: Map<string, { data: ReadonlyArray<TokenInfo>; timestamp: number }> = new Map();
   private cacheTimeout = 5 * 60 * 1000; // 5 minutes cache
   private baseChainId = 8453; // Base mainnet chain ID
