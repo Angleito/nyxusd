@@ -15,7 +15,7 @@ interface TokenMapping {
 }
 
 // Import the token service for dynamic token fetching
-import { tokenService, TokenInfo } from './tokenService';
+import { tokenService } from './tokenService';
 
 // Common Base chain token mappings
 const BASE_TOKENS: Record<string, TokenMapping> = {
@@ -103,27 +103,58 @@ export class SwapDetectionService {
       'i'
     );
     
-    // Check for swap keywords
-    const swapKeywords = ['swap', 'exchange', 'convert', 'trade', 'buy', 'sell', 'change', 'switch'];
-    const hasSwapKeyword = swapKeywords.some(keyword => lowerMessage.includes(keyword));
+    // Check for explicit swap keywords - be more strict
+    const explicitSwapKeywords = ['swap', 'exchange', 'convert', 'trade'];
+    const buyBellKeywords = ['buy', 'sell'];
+    const hasExplicitSwapKeyword = explicitSwapKeywords.some(keyword => lowerMessage.includes(keyword));
+    const hasBuySellKeyword = buyBellKeywords.some(keyword => lowerMessage.includes(keyword));
     
     // Check for token-to-token patterns
     const hasTokenPattern = tokenPattern.test(lowerMessage);
     
-    // Check for phrases that imply swapping
-    const swapPhrases = [
-      'want to get',
-      'need some',
-      'looking to acquire',
-      'want some',
-      'get me',
-      'i need'
+    // More specific swap phrases that clearly indicate trading intent
+    const specificSwapPhrases = [
+      'want to swap',
+      'need to swap',
+      'looking to swap', 
+      'i want to trade',
+      'i need to trade',
+      'want to exchange',
+      'need to exchange'
     ];
-    const hasSwapPhrase = swapPhrases.some(phrase => 
-      lowerMessage.includes(phrase) && swapPhrasePattern.test(lowerMessage)
+    const hasSpecificSwapPhrase = specificSwapPhrases.some(phrase => 
+      lowerMessage.includes(phrase)
     );
     
-    if (!hasSwapKeyword && !hasTokenPattern && !hasSwapPhrase) {
+    // Filter out educational/informational queries
+    const educationalKeywords = [
+      'how do', 'how does', 'what is', 'what are', 'explain', 'understand', 
+      'learn', 'meaning', 'definition', 'work', 'works', 'difference',
+      'help me understand', 'tell me about', 'info about', 'information'
+    ];
+    const isEducationalQuery = educationalKeywords.some(keyword => 
+      lowerMessage.includes(keyword)
+    );
+    
+    // If it's clearly an educational query, don't treat as swap intent
+    if (isEducationalQuery) {
+      return { isSwapIntent: false, confidence: 0 };
+    }
+    
+    // More restrictive detection - require explicit swap intent
+    const hasSwapIntent = hasExplicitSwapKeyword || hasTokenPattern || hasSpecificSwapPhrase;
+    
+    // Only allow buy/sell if it's clearly transactional and has token context
+    if (hasBuySellKeyword && !hasSwapIntent) {
+      const hasTokenContext = swapPhrasePattern.test(lowerMessage);
+      const hasTransactionContext = /\b(\d+|\d+\.\d+|some|all|half)\b/i.test(lowerMessage);
+      
+      if (!hasTokenContext || !hasTransactionContext) {
+        return { isSwapIntent: false, confidence: 0 };
+      }
+    }
+    
+    if (!hasSwapIntent && !hasBuySellKeyword) {
       return { isSwapIntent: false, confidence: 0 };
     }
 
@@ -131,21 +162,26 @@ export class SwapDetectionService {
     const result = await this.extractSwapParametersAsync(message, availableTokens);
     
     // For simple "I want to swap" or "swap tokens", use defaults
-    if (hasSwapKeyword && !result.inputToken && !result.outputToken) {
+    if (hasExplicitSwapKeyword && !result.inputToken && !result.outputToken) {
       result.inputToken = 'ETH';
       result.outputToken = 'USDC';
       result.amount = '';
     }
     
-    // Calculate confidence based on completeness
-    let confidence = 0.5;
+    // Start with lower base confidence and require more evidence
+    let confidence = 0.3;
     
+    // Increase confidence based on explicit indicators
+    if (hasExplicitSwapKeyword) confidence += 0.4;
+    if (hasTokenPattern) confidence += 0.3;
+    if (hasSpecificSwapPhrase) confidence += 0.3;
     if (result.inputToken) confidence += 0.15;
     if (result.outputToken) confidence += 0.15;
     if (result.amount) confidence += 0.2;
     
-    if (result.inputToken || result.outputToken) {
-      confidence = Math.max(confidence, 0.7);
+    // Require minimum confidence threshold of 0.7 for swap intent
+    if (confidence < 0.7) {
+      return { isSwapIntent: false, confidence: 0 };
     }
     
     const missingParams: string[] = [];
@@ -167,28 +203,59 @@ export class SwapDetectionService {
   detectSwapIntent(message: string): SwapIntent {
     const lowerMessage = message.toLowerCase();
     
-    // Check for swap keywords - more aggressive detection
-    const swapKeywords = ['swap', 'exchange', 'convert', 'trade', 'buy', 'sell', 'change', 'switch'];
-    const hasSwapKeyword = swapKeywords.some(keyword => lowerMessage.includes(keyword));
+    // Check for explicit swap keywords - be more strict
+    const explicitSwapKeywords = ['swap', 'exchange', 'convert', 'trade'];
+    const buyBellKeywords = ['buy', 'sell'];
+    const hasExplicitSwapKeyword = explicitSwapKeywords.some(keyword => lowerMessage.includes(keyword));
+    const hasBuySellKeyword = buyBellKeywords.some(keyword => lowerMessage.includes(keyword));
     
-    // Also check for token-to-token patterns even without explicit swap keywords
+    // Check for token-to-token patterns with explicit directional words
     const tokenPattern = /\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher|morpho)\b.*\b(to|for|into|->|→)\b.*\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher|morpho)\b/i;
     const hasTokenPattern = tokenPattern.test(lowerMessage);
     
-    // Check for phrases that imply swapping
-    const swapPhrases = [
-      'want to get',
-      'need some',
-      'looking to acquire',
-      'want some',
-      'get me',
-      'i need'
+    // More specific swap phrases that clearly indicate trading intent
+    const specificSwapPhrases = [
+      'want to swap',
+      'need to swap',
+      'looking to swap', 
+      'i want to trade',
+      'i need to trade',
+      'want to exchange',
+      'need to exchange'
     ];
-    const hasSwapPhrase = swapPhrases.some(phrase => 
-      lowerMessage.includes(phrase) && /\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher|morpho)\b/i.test(lowerMessage)
+    const hasSpecificSwapPhrase = specificSwapPhrases.some(phrase => 
+      lowerMessage.includes(phrase)
     );
     
-    if (!hasSwapKeyword && !hasTokenPattern && !hasSwapPhrase) {
+    // Filter out educational/informational queries
+    const educationalKeywords = [
+      'how do', 'how does', 'what is', 'what are', 'explain', 'understand', 
+      'learn', 'meaning', 'definition', 'work', 'works', 'difference',
+      'help me understand', 'tell me about', 'info about', 'information'
+    ];
+    const isEducationalQuery = educationalKeywords.some(keyword => 
+      lowerMessage.includes(keyword)
+    );
+    
+    // If it's clearly an educational query, don't treat as swap intent
+    if (isEducationalQuery) {
+      return { isSwapIntent: false, confidence: 0 };
+    }
+    
+    // More restrictive detection - require explicit swap intent
+    const hasSwapIntent = hasExplicitSwapKeyword || hasTokenPattern || hasSpecificSwapPhrase;
+    
+    // Only allow buy/sell if it's clearly transactional and has token context
+    if (hasBuySellKeyword && !hasSwapIntent) {
+      const hasTokenContext = /\b(eth|weth|usdc|usdt|dai|aero|brett|degen|higher|morpho)\b/i.test(lowerMessage);
+      const hasTransactionContext = /\b(\d+|\d+\.\d+|some|all|half)\b/i.test(lowerMessage);
+      
+      if (!hasTokenContext || !hasTransactionContext) {
+        return { isSwapIntent: false, confidence: 0 };
+      }
+    }
+    
+    if (!hasSwapIntent && !hasBuySellKeyword) {
       return { isSwapIntent: false, confidence: 0 };
     }
 
@@ -196,28 +263,29 @@ export class SwapDetectionService {
     const result = this.extractSwapParameters(message);
     
     // For simple "I want to swap" or "swap tokens", use defaults
-    if (hasSwapKeyword && !result.inputToken && !result.outputToken) {
-      // Set reasonable defaults to show UI immediately
+    if (hasExplicitSwapKeyword && !result.inputToken && !result.outputToken) {
       result.inputToken = 'ETH';
       result.outputToken = 'USDC';
       result.amount = '';
     }
     
-    // Calculate confidence based on completeness
-    let confidence = 0.5; // Higher base confidence for having swap intent
+    // Start with lower base confidence and require more evidence
+    let confidence = 0.3;
     
+    // Increase confidence based on explicit indicators
+    if (hasExplicitSwapKeyword) confidence += 0.4;
+    if (hasTokenPattern) confidence += 0.3;
+    if (hasSpecificSwapPhrase) confidence += 0.3;
     if (result.inputToken) confidence += 0.15;
     if (result.outputToken) confidence += 0.15;
     if (result.amount) confidence += 0.2;
     
-    // If we have at least one token mentioned, boost confidence
-    if (result.inputToken || result.outputToken) {
-      confidence = Math.max(confidence, 0.7);
+    // Require minimum confidence threshold of 0.7 for swap intent
+    if (confidence < 0.7) {
+      return { isSwapIntent: false, confidence: 0 };
     }
     
-    // Check for missing parameters but don't block UI
     const missingParams: string[] = [];
-    // Only mark as missing if we truly need them
     if (!result.inputToken && !result.outputToken) {
       missingParams.push('tokens');
     }
