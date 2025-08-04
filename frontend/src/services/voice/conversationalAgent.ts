@@ -220,7 +220,21 @@ export class ConversationalAgent extends EventEmitter {
 
     // Call backend API to create conversational agent securely
     const baseUrl = import.meta.env.VITE_API_URL || window.location.origin;
-    const apiUrl = `${baseUrl}/api/voice/conversational-agent`;
+    // Prefer backend-advertised endpoint from voice config to avoid path drift
+    let apiUrl = `${baseUrl}/api/voice/conversational-agent`;
+    try {
+      const resp = await fetch(`${baseUrl}/api/voice-config`, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+      if (resp.ok) {
+        const cfg: any = await resp.json().catch(() => null);
+        const advertised = cfg?.config?.endpoints?.conversationalAgent;
+        if (typeof advertised === 'string' && advertised.length > 0) {
+          // If backend gave a relative path, keep it relative; if absolute, use as-is
+          apiUrl = advertised.startsWith('http') ? advertised : `${baseUrl}${advertised.startsWith('/') ? '' : '/'}${advertised}`;
+        }
+      }
+    } catch {
+      // ignore and keep default
+    }
 
     // Build payload omitting nulls to satisfy server validator
     const payload: any = {

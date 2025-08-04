@@ -251,9 +251,9 @@ export default async function handler(
         sessionId: finalSessionId,
         ts: new Date().toISOString()
       }));
-      // Note: ElevenLabs ConvAI REST endpoint is singular "conversation"
-      // Some versions respond 405 to POST /conversations
-      const createAgentResponse = await (globalThis as any).fetch('https://api.elevenlabs.io/v1/convai/conversation', {
+
+      // Helper moved inline to satisfy linter (no nested function declarations)
+      const postCreate = (url: string) => (globalThis as any).fetch(url, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -263,15 +263,12 @@ export default async function handler(
         body: JSON.stringify({
           // Provide inline agent configuration as per ConvAI API
           agent: {
-            prompt: {
-              prompt: agentPrompt,
-            },
+            prompt: { prompt: agentPrompt },
             first_message: agentConfig.firstMessage,
             language: agentConfig.language,
           },
           // Conversation config with websocket target
           conversation_config: {
-            // tti = text-to-interaction (websocket transport)
             tti_config: {
               type: 'websocket',
               url: 'wss://api.elevenlabs.io/v1/convai/conversation',
@@ -294,6 +291,20 @@ export default async function handler(
         }),
       });
 
+      // Primary path (singular)
+      let createAgentResponse = await postCreate('https://api.elevenlabs.io/v1/convai/conversation');
+
+      // If provider returns 404 for singular, retry plural path for compatibility
+      if (!createAgentResponse.ok && createAgentResponse.status === 404) {
+        console.warn(JSON.stringify({
+          level: 'warn',
+          msg: 'convai:create:eleven_conversation:create:not_found_singular_retry_plural',
+          requestId,
+          agentId
+        }));
+        createAgentResponse = await postCreate('https://api.elevenlabs.io/v1/convai/conversations');
+      }
+
       const createDuration = Date.now() - createStart;
       if (!createAgentResponse.ok) {
         const errorText = await createAgentResponse.text();
@@ -307,8 +318,16 @@ export default async function handler(
           durationMs: createDuration,
           body: errorText.slice(0, 300)
         }));
-        // Preserve upstream status code context in message
-        throw new Error(`Failed to create conversational agent: ${createAgentResponse.status} - ${errorText}`);
+        // Map upstream 4xx/404 to 502 Bad Gateway to distinguish provider failures
+        const upstreamStatus = createAgentResponse.status;
+        const errorResponse: ApiErrorResponse = {
+          success: false,
+          error: 'Failed to create conversational agent',
+          details: `Upstream error ${upstreamStatus}: ${errorText.slice(0, 300)}`,
+          timestamp: new Date().toISOString(),
+        };
+        res.status(upstreamStatus >= 400 && upstreamStatus < 500 ? 502 : 500).json(errorResponse);
+        return;
       } else {
         console.info(JSON.stringify({
           level: 'info',
@@ -344,7 +363,8 @@ export default async function handler(
         success: true,
         agentId,
         sessionId: finalSessionId,
-        websocketUrl: agentData.conversation_config?.conversation?.conversation_config_override?.tti_config?.url || 'wss://api.elevenlabs.io/v1/convai/conversation',
+        // Use stable, documented WS URL; avoid brittle nested fields
+        websocketUrl: 'wss://api.elevenlabs.io/v1/convai/conversation',
         signedUrl: agentData.signed_url,
         expiresAt: new Date(Date.now() + (30 * 60 * 1000)).toISOString(), // 30 minutes
         config: agentConfig,

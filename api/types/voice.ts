@@ -76,6 +76,7 @@ export interface VoiceEndpoints {
   readonly config?: string;
   readonly health: string;
   readonly token: string;
+  readonly conversationalAgent?: string;
 }
 
 export interface VoiceConfig {

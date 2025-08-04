@@ -140,6 +140,7 @@ export default async function handler(
           tts: '/api/voice/tts',
           health: '/api/voice-health',
           token: '/api/voice-token',
+          conversationalAgent: '/api/voice/conversational-agent',
         },
       },
       timestamp: new Date().toISOString(),
