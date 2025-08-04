@@ -762,7 +762,7 @@ We're not optimizing for the next bull market exit. We're building something tha
 
 Real decentralization doesn't mean a few VCs control 60% of the tokens and call it "governance." It means the community actually has power.
 
-**Phase 1 (Months 0-6)**: Minimal necessary centralization for security and iteration. No pre-mining for VCs, no "strategic investor" rounds, no backdoors.
+**Phase 1 (Months 0-6)**: Seed round through JoinPond's community-driven funding mechanism - real people funding real builders, not VCs extracting value. Minimal necessary centralization for security and iteration. No pre-mining for traditional VCs, no "strategic investor" rounds with special terms, no backdoors.
 
 **Phase 2 (Months 6-12)**: Community Snapshot voting on all major decisions. No developer "veto power" - if the community decides, that's what happens.
 
