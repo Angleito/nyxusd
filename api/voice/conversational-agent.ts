@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { setCorsHeaders, handleOptions, validateMethod, sendMethodNotAllowed } from '../utils/cors.js';
+import { setCorsHeaders, handleOptions, validateMethod } from '../utils/cors.js';
 import type {
   ApiErrorResponse,
   AgentRequest,

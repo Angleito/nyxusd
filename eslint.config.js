@@ -14,7 +14,7 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
-        project: ["./tsconfig.json", "./frontend/tsconfig.json", "./api/tsconfig.json"],
+        project: ["./tsconfig.json", "./frontend/tsconfig.json", "./api/tsconfig.json", "./packages/*/tsconfig.json", "./libs/*/tsconfig.json"],
       },
       globals: {
         window: "readonly",
@@ -86,7 +86,7 @@ export default [
   },
   {
     ignores: [
-      "dist/**", 
+      "dist/**",
       "node_modules/**",
       "frontend/dist/**",
       "frontend/node_modules/**",
@@ -94,7 +94,7 @@ export default [
       "api/node_modules/**",
       "packages/*/dist/**",
       "packages/*/node_modules/**",
-      "libs/*/dist/**", 
+      "libs/*/dist/**",
       "libs/*/node_modules/**",
       "**/*.d.ts",
       "**/*.d.ts.map",
@@ -102,4 +102,10 @@ export default [
       "coverage/**",
     ],
   },
+  {
+    files: ["frontend/src/**/*.test.ts", "frontend/src/**/*.test.tsx", "frontend/src/test/**/*", "frontend/src/services/voice/**/*.test.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off"
+    }
+  }
 ];

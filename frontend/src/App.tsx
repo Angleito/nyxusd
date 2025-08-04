@@ -17,6 +17,7 @@ import "./styles/nyx-global.css";
 import "./styles/App.css";
 import "./theme/styles/themes.css";
 import { useEffect } from "react";
+import PoolsSelector from "./components/pools/PoolsSelector";
 
 function App() {
   useEffect(() => {
@@ -93,6 +94,21 @@ function App() {
                   <div className="container mx-auto px-4 py-8">
                     <NyxDashboard />
                   </div>
+                </motion.div>
+              }
+            />
+            <Route
+              path="/pools"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={pageTransition}
+                  className="container mx-auto px-4 py-8"
+                >
+                  <PoolsSelector />
                 </motion.div>
               }
             />

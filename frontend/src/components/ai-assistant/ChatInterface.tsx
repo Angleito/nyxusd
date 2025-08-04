@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, X, Sparkles, Mic, MicOff, Volume2 } from "lucide-react";
+import { Send, X, Sparkles, MicOff, Volume2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ChatMessage } from "./ChatMessage";
 import { TypingIndicator } from "./TypingIndicator";
@@ -51,14 +51,7 @@ export const ChatInterface: React.FC = () => {
       chatMemoryService.addMessage(message);
       
       // Also update AI assistant state for UI consistency
-      const aiMessage = {
-        id: message.id,
-        sender: 'ai' as const,
-        content: response.text,
-        timestamp: response.timestamp,
-        typing: false,
-      };
-      // Note: Would need to add this to AI assistant context if available
+      // Note: Could add to AI assistant context if available
     },
     onAgentSpeaking: (data) => {
       console.log('Agent speaking:', data);

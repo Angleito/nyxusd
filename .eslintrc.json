@@ -23,5 +23,13 @@
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }]
   },
+  "overrides": [
+    {
+      "files": ["frontend/src/**/*.test.ts", "frontend/src/**/*.test.tsx", "frontend/src/test/**/*"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ],
   "ignorePatterns": ["dist/", "node_modules/", "*.js"]
 }

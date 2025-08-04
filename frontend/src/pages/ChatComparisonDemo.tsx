@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChatInterfaceImproved } from "../components/ai-assistant/ChatInterfaceImproved";
 import { ChatInterface } from "../components/ai-assistant/ChatInterface";
-import { Toggle, Layout, Sparkles, Eye, EyeOff } from "lucide-react";
+// 'Toggle' is not exported from lucide-react and isn't used; remove it to fix TS error
+import { Layout, Sparkles, Eye, EyeOff } from "lucide-react";
 import { AIAssistantProvider } from "../providers/AIAssistantProvider";
 
 export const ChatComparisonDemo: React.FC = () => {

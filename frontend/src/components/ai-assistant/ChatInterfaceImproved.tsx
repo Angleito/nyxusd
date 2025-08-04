@@ -1,16 +1,13 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Send, 
-  Sparkles, 
-  Paperclip, 
-  Mic, 
+import {
+  Send,
+  Sparkles,
+  Paperclip,
+  Mic,
   StopCircle,
-  Image,
   Hash,
   AtSign,
-  Code,
-  Smile,
   MoreVertical,
   Settings,
   Download,
@@ -34,7 +31,6 @@ export const ChatInterfaceImproved: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(true);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
@@ -221,20 +217,27 @@ export const ChatInterfaceImproved: React.FC = () => {
         <AnimatePresence initial={false}>
           {groupedMessages.map((group, groupIndex) => (
             <div key={`group-${group.startIndex}`}>
-              {group.messages.map((message, messageIndex) => (
-                <ChatMessageImproved
-                  key={message.id}
-                  message={message}
-                  isFirstInGroup={messageIndex === 0}
-                  isLastInGroup={messageIndex === group.messages.length - 1}
-                  showTimestamp={messageIndex === 0}
-                  previousMessageTimestamp={
-                    groupIndex > 0 
-                      ? groupedMessages[groupIndex - 1].messages[groupedMessages[groupIndex - 1].messages.length - 1].timestamp
-                      : undefined
+              {group.messages.map((message, messageIndex) => {
+                let prevTimestamp: Date | undefined = undefined;
+                if (groupIndex > 0) {
+                  const prevGroup = groupedMessages[groupIndex - 1];
+                  if (prevGroup && Array.isArray(prevGroup.messages) && prevGroup.messages.length > 0) {
+                    const lastIdx = prevGroup.messages.length - 1;
+                    const prevMsg = prevGroup.messages[lastIdx];
+                    prevTimestamp = prevMsg?.timestamp;
                   }
-                />
-              ))}
+                }
+                return (
+                  <ChatMessageImproved
+                    key={message.id}
+                    message={message}
+                    isFirstInGroup={messageIndex === 0}
+                    isLastInGroup={messageIndex === group.messages.length - 1}
+                    showTimestamp={messageIndex === 0}
+                    previousMessageTimestamp={prevTimestamp}
+                  />
+                );
+              })}
             </div>
           ))}
         </AnimatePresence>
