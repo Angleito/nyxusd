@@ -358,8 +358,9 @@ Total Supply: 1,000,000,000 NYX
 **Real community ownership, not VC extraction:**
 
 **80% to Community & Ecosystem (800M NYX)**
-- 40% Community rewards and airdrops
+- 30% Community rewards and airdrops
 - 20% Liquidity mining for real users
+- 10% JoinPond seed round (community-driven funding)
 - 10% Community grants for builders
 - 10% DAO treasury controlled by token holders
 
@@ -375,10 +376,12 @@ Total Supply: 1,000,000,000 NYX
 - NO "strategic investments" (aka VC payoffs)
 
 **No allocation for:**
-- ❌ VCs or "strategic investors"
+- ❌ Traditional VCs or "strategic investors"
 - ❌ Marketing funds for influencer payments
 - ❌ "Advisor" tokens for fancy names
 - ❌ Pre-sale rounds with special terms
+
+**Note:** JoinPond seed funding is different - it's community-driven funding that supports independent builders, not extractive VC investment. The 10% allocation maintains community ownership principles.
 
 **80% community ownership means the community actually owns and controls the protocol.**
 
