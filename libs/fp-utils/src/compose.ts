@@ -189,8 +189,8 @@ export function compose<A, B, C, D, E, F, G, H, I, J>(
 ): (a: A) => A;
 
 // Implementation
-export function compose(...fns: Function[]): Function {
-  return (value: any) => fns.reduceRight((acc, fn) => fn(acc), value);
+export function compose<T = unknown>(...fns: Array<(arg: unknown) => unknown>): (value: T) => unknown {
+  return (value: T) => fns.reduceRight((acc, fn) => fn(acc), value as unknown);
 }
 
 /**
@@ -269,8 +269,8 @@ export function flow<A, B, C, D, E, F, G, H, I, J, K>(
 ): (a: A) => K;
 
 // Implementation
-export function flow(...fns: Function[]): Function {
-  return (value: any) => fns.reduce((acc, fn) => fn(acc), value);
+export function flow<T = unknown>(...fns: Array<(arg: unknown) => unknown>): (value: T) => unknown {
+  return (value: T) => fns.reduce((acc, fn) => fn(acc), value as unknown);
 }
 
 /**

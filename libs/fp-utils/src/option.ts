@@ -243,7 +243,7 @@ export class Some<T> extends Option<T> {
   }
 
   ap<U>(optionFn: Option<(value: T) => U>): Option<U> {
-    return optionFn.flatMap((fn) => this.map(fn));
+    return optionFn.flatMap((fn: (value: T) => U) => this.map(fn));
   }
 
   toArray(): T[] {
@@ -288,11 +288,13 @@ export class None<T> extends Option<T> {
   }
 
   map<U>(_fn: (value: T) => U): Option<U> {
-    return this as any;
+    // None ignores map; preserve None<T> typed as Option<U>
+    return this as unknown as Option<U>;
   }
 
   flatMap<U>(_fn: (value: T) => Option<U>): Option<U> {
-    return this as any;
+    // None short-circuits flatMap
+    return this as unknown as Option<U>;
   }
 
   fold<U>(onNone: () => U, _onSome: (value: T) => U): U {
@@ -328,7 +330,8 @@ export class None<T> extends Option<T> {
   }
 
   ap<U>(_optionFn: Option<(value: T) => U>): Option<U> {
-    return this as any;
+    // Applying a function to a None keeps the None
+    return this as unknown as Option<U>;
   }
 
   toArray(): T[] {

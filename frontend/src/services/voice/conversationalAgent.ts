@@ -1,3 +1,99 @@
+// Types for emitted events to provide strong typing for consumers and tests
+export interface AgentCreatedEvent {
+  agentId: string;
+  sessionId: string;
+  websocketUrl: string;
+  config?: unknown;
+}
+
+export interface ConversationStartedEvent {
+  agentId: string;
+  sessionId: string;
+  status: AgentSession['status'];
+  isActive: boolean;
+  startTime: Date;
+  endTime?: Date;
+  conversationId?: string;
+}
+
+export interface UserTranscriptEvent {
+  text: string;
+  isFinal: boolean;
+  timestamp: Date;
+}
+
+export interface AgentResponseEvent {
+  text: string;
+  timestamp: Date;
+}
+
+export interface AgentSpeakingEvent {
+  isFinal: boolean;
+}
+
+export interface ConversationEndedEvent {
+  reason?: string;
+  session: AgentSession | null;
+}
+
+export interface WebsocketClosedEvent {
+  code: number;
+  reason: string;
+  wasClean: boolean;
+}
+
+export interface ContextUpdatedEvent extends ConversationContext {}
+
+export type ConversationalAgentEvents =
+  | { type: 'agentCreated'; payload: AgentCreatedEvent }
+  | { type: 'conversationStarted'; payload: ConversationStartedEvent }
+  | { type: 'userTranscript'; payload: UserTranscriptEvent }
+  | { type: 'agentResponse'; payload: AgentResponseEvent }
+  | { type: 'agentSpeaking'; payload: AgentSpeakingEvent }
+  | { type: 'agentFinishedSpeaking'; payload: undefined }
+  | { type: 'conversationEnded'; payload: ConversationEndedEvent }
+  | { type: 'websocketClosed'; payload: WebsocketClosedEvent }
+  | { type: 'contextUpdated'; payload: ContextUpdatedEvent }
+  | { type: 'reconnecting'; payload: { agentId: string } }
+  | { type: 'reconnected'; payload: { agentId: string; sessionId: string } }
+  | { type: 'reconnectFailed'; payload: { agentId: string; error: unknown } }
+  | { type: 'error'; payload: { type: string; error: unknown } };
+
+// Discriminated union for inbound WebSocket messages
+/**
+ * Discriminated union for inbound WebSocket messages
+ * Exported for reuse across voice modules and tests.
+ */
+export type InboundWsMessage =
+  | { type: 'audio'; audio: string; isFinal?: boolean; normalizedAlignment?: unknown }
+  | { type: 'transcription'; text: string; isFinal: boolean; timestamp?: string | number | Date }
+  | { type: 'user_transcript'; text: string; is_final: boolean }
+  | { type: 'agent_response'; text: string }
+  | { type: 'conversation_end'; reason?: string }
+  | { type: 'error'; error: unknown };
+
+/**
+ * Runtime guards for inbound messages
+ */
+function isAudioMessage(m: unknown): m is Extract<InboundWsMessage, { type: 'audio' }> {
+  return !!m && typeof m === 'object' && (m as any).type === 'audio' && typeof (m as any).audio === 'string';
+}
+function isTranscriptionMessage(m: unknown): m is Extract<InboundWsMessage, { type: 'transcription' }> {
+  return !!m && typeof m === 'object' && (m as any).type === 'transcription' && typeof (m as any).text === 'string' && typeof (m as any).isFinal === 'boolean';
+}
+function isUserTranscriptMessage(m: unknown): m is Extract<InboundWsMessage, { type: 'user_transcript' }> {
+  return !!m && typeof m === 'object' && (m as any).type === 'user_transcript' && typeof (m as any).text === 'string' && typeof (m as any).is_final === 'boolean';
+}
+function isAgentResponseMessage(m: unknown): m is Extract<InboundWsMessage, { type: 'agent_response' }> {
+  return !!m && typeof m === 'object' && (m as any).type === 'agent_response' && typeof (m as any).text === 'string';
+}
+function isConversationEndMessage(m: unknown): m is Extract<InboundWsMessage, { type: 'conversation_end' }> {
+  return !!m && typeof m === 'object' && (m as any).type === 'conversation_end';
+}
+function isErrorMessage(m: unknown): m is Extract<InboundWsMessage, { type: 'error' }> {
+  return !!m && typeof m === 'object' && (m as any).type === 'error';
+}
+
 import { EventEmitter } from 'events';
 
 export interface ConversationalAgentConfig {
@@ -123,7 +219,7 @@ export class ConversationalAgent extends EventEmitter {
     this.conversationContext = context || {};
 
     // Call backend API to create conversational agent securely
-    const baseUrl = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
+    const baseUrl = import.meta.env.VITE_API_URL || window.location.origin;
     const apiUrl = `${baseUrl}/api/voice/conversational-agent`;
 
     const requestPayload = {
@@ -334,47 +430,68 @@ Key traits:
   }
 
   private handleWebSocketMessage(event: MessageEvent): void {
+    let data: unknown;
     try {
-      const data = JSON.parse(event.data);
-      
-      switch (data.type) {
-        case 'audio':
-          this.handleAudioChunk(data as AudioChunk);
-          break;
-        
-        case 'transcription':
-          this.handleTranscriptionChunk(data as TranscriptionChunk);
-          break;
-          
-        case 'user_transcript':
-          this.emit('userTranscript', {
-            text: data.text,
-            isFinal: data.is_final,
-            timestamp: new Date(),
-          });
-          break;
-
-        case 'agent_response':
-          this.emit('agentResponse', {
-            text: data.text,
-            timestamp: new Date(),
-          });
-          break;
-
-        case 'conversation_end':
-          this.handleConversationEnd(data);
-          break;
-
-        case 'error':
-          this.emit('error', { type: 'websocket', error: data.error });
-          break;
-
-        default:
-          console.log('Unknown WebSocket message type:', data.type);
-      }
+      data = JSON.parse(event.data);
     } catch (error) {
       console.error('Error parsing WebSocket message:', error);
+      return;
     }
+
+    // Discriminated handling with guards and exhaustiveness
+    if (isAudioMessage(data)) {
+      const chunk: AudioChunk = {
+        audio: data.audio,
+        isFinal: !!data.isFinal,
+        normalizedAlignment: (data as any).normalizedAlignment,
+      };
+      this.handleAudioChunk(chunk);
+      return;
+    }
+
+    if (isTranscriptionMessage(data)) {
+      const chunk: TranscriptionChunk = {
+        text: data.text,
+        isFinal: data.isFinal,
+        timestamp: new Date(
+          typeof data.timestamp === 'string' || typeof data.timestamp === 'number'
+            ? new Date(data.timestamp).getTime()
+            : Date.now()
+        ),
+      };
+      this.handleTranscriptionChunk(chunk);
+      return;
+    }
+
+    if (isUserTranscriptMessage(data)) {
+      this.emit('userTranscript', {
+        text: data.text,
+        isFinal: data.is_final,
+        timestamp: new Date(),
+      });
+      return;
+    }
+
+    if (isAgentResponseMessage(data)) {
+      this.emit('agentResponse', {
+        text: data.text,
+        timestamp: new Date(),
+      });
+      return;
+    }
+
+    if (isConversationEndMessage(data)) {
+      this.handleConversationEnd(data);
+      return;
+    }
+
+    if (isErrorMessage(data)) {
+      this.emit('error', { type: 'websocket', error: (data as any).error });
+      return;
+    }
+
+    // Unknown message shape - ignore safely
+    console.log('Unknown WebSocket message payload', data);
   }
 
   private async handleAudioChunk(chunk: AudioChunk): Promise<void> {
@@ -418,15 +535,17 @@ Key traits:
     });
   }
 
-  private handleConversationEnd(data: any): void {
+  private handleConversationEnd(data: { reason?: string } | unknown): void {
     if (this.currentSession) {
       this.currentSession.status = 'idle';
       this.currentSession.isActive = false;
       this.currentSession.endTime = new Date();
     }
 
+    const reason = data && typeof data === 'object' && 'reason' in data ? (data as any).reason : undefined;
+
     this.emit('conversationEnded', {
-      reason: data.reason,
+      reason,
       session: this.currentSession,
     });
 
@@ -455,7 +574,7 @@ Key traits:
     this.audioQueue.push(audioData);
     
     if (!this.isPlaying) {
-      this.processAudioQueue();
+      void this.processAudioQueue();
     }
   }
 
@@ -466,22 +585,27 @@ Key traits:
     }
 
     this.isPlaying = true;
-    const audioData = this.audioQueue.shift()!;
+    const audioData = this.audioQueue.shift();
+    if (!audioData || !this.audioContext) {
+      this.isPlaying = false;
+      return;
+    }
 
     try {
-      const audioBuffer = await this.audioContext!.decodeAudioData(audioData);
-      const source = this.audioContext!.createBufferSource();
+      const audioBuffer = await this.audioContext.decodeAudioData(audioData);
+      const source = this.audioContext.createBufferSource();
       source.buffer = audioBuffer;
-      source.connect(this.audioContext!.destination);
+      source.connect(this.audioContext.destination);
       
       source.onended = () => {
-        this.processAudioQueue();
+        void this.processAudioQueue();
       };
       
       source.start();
     } catch (error) {
       console.error('Error playing audio:', error);
-      this.processAudioQueue(); // Continue with next chunk
+      // Continue with next chunk; ensure loop advances
+      void this.processAudioQueue();
     }
   }
 

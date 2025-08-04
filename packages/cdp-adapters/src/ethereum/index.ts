@@ -1,6 +1,14 @@
 import { BaseCDPAdapter } from '../baseAdapter';
-import { CDP, CDPId, CDPCreationParams, CDPError, Option } from '@nyxusd/cdp-core';
-import { CDPAdapter, CDPResult, BlockchainConfig } from '../types';
+import type { CDP, CDPId, CDPCreationParams } from '@nyxusd/cdp-core/src/types';
+import {
+  CDPResult,
+  BlockchainConfig,
+  DepositCollateralParams,
+  WithdrawCollateralParams,
+  MintNYXUSDParams,
+  BurnNYXUSDParams,
+  Option,
+} from '../types';
 
 /**
  * Ethereum adapter for CDP operations
@@ -9,116 +17,69 @@ export class EthereumCDPAdapter extends BaseCDPAdapter {
   constructor(config: BlockchainConfig) {
     super(config);
   }
-  
+
   async createCDP(params: CDPCreationParams): CDPResult<CDP> {
-    // Ethereum-specific implementation would go here
-    // For now, we'll return a mock result
     try {
-      // In a real implementation, this would:
-      // 1. Connect to Ethereum RPC
-      // 2. Validate contract addresses
-      // 3. Sign and submit transaction
-      // 4. Wait for confirmation
-      // 5. Return the created CDP
-      
-      // Mock implementation for demonstration
       const mockCDP: CDP = {
-        id: `eth_${params.owner.substring(0, 8)}_${Date.now()}` as any,
+        id: `eth_${params.owner.substring(0, 8)}_${Date.now()}` as unknown as CDP['id'],
         owner: params.owner,
         collateralType: params.collateralType,
         collateralAmount: params.collateralAmount,
         debtAmount: params.debtAmount,
-        state: { type: "active", healthFactor: 1.5 },
+        state: { type: 'active', healthFactor: 1.5 },
         config: params.config,
-        createdAt: Date.now() as any,
-        updatedAt: Date.now() as any,
-        accruedFees: 0n as any
+        createdAt: Date.now() as unknown as CDP['createdAt'],
+        updatedAt: Date.now() as unknown as CDP['updatedAt'],
+        accruedFees: 0n as unknown as CDP['accruedFees'],
       };
-      
       return { success: true, data: mockCDP };
-    } catch (error) {
-      return { 
-        success: false, 
-        error: this.formatError("invalid_operation", {
-          operation: "create",
-          state: "ethereum_error"
-        }) 
+    } catch (_e) {
+      return {
+        success: false,
+        error: this.formatError('invalid_operation', {
+          operation: 'create',
+          state: 'ethereum_error',
+        }),
       };
     }
   }
-  
-  async depositCollateral(params: any): CDPResult<any> {
-    // Ethereum-specific implementation would go here
-    return { 
-      success: true, 
-      data: { 
-        message: "Deposit successful on Ethereum",
-        ...params
-      } 
-    };
+
+  async depositCollateral(params: DepositCollateralParams): CDPResult<CDP> {
+    // Placeholder: return original CDP to maintain runtime behavior
+    return { success: true, data: params.cdp };
   }
-  
-  async withdrawCollateral(params: any): CDPResult<any> {
-    // Ethereum-specific implementation would go here
-    return { 
-      success: true, 
-      data: { 
-        message: "Withdrawal successful on Ethereum",
-        ...params
-      } 
-    };
+
+  async withdrawCollateral(params: WithdrawCollateralParams): CDPResult<CDP> {
+    return { success: true, data: params.cdp };
   }
-  
-  async mintDebt(params: any): CDPResult<any> {
-    // Ethereum-specific implementation would go here
-    return { 
-      success: true, 
-      data: { 
-        message: "Minting successful on Ethereum",
-        ...params
-      } 
-    };
+
+  async mintDebt(params: MintNYXUSDParams): CDPResult<CDP> {
+    return { success: true, data: params.cdp };
   }
-  
-  async burnDebt(params: any): CDPResult<any> {
-    // Ethereum-specific implementation would go here
-    return { 
-      success: true, 
-      data: { 
-        message: "Burning successful on Ethereum",
-        ...params
-      } 
-    };
+
+  async burnDebt(params: BurnNYXUSDParams): CDPResult<CDP> {
+    return { success: true, data: params.cdp };
   }
-  
-  async getCDP(id: CDPId): CDPResult<Option<CDP>> {
-    // Ethereum-specific implementation would go here
-    return { 
-      success: true, 
-      data: { 
-        _tag: "None"
-      } 
-    };
+
+  async getCDP(_id: CDPId): CDPResult<Option<CDP>> {
+    return { success: true, data: { _tag: 'None' } };
   }
-  
-  async getCDPsByOwner(owner: string): CDPResult<CDP[]> {
-    // Ethereum-specific implementation would go here
-    return { 
-      success: true, 
-      data: [] 
-    };
+
+  async getCDPsByOwner(_owner: string): CDPResult<readonly CDP[]> {
+    return { success: true, data: [] };
   }
-  
-  async getSystemStats(): CDPResult<any> {
-    // Ethereum-specific implementation would go here
-    return { 
-      success: true, 
+
+  async getSystemStats(): CDPResult<import('@nyxusd/cdp-core/src/types').CDPStats> {
+    return {
+      success: true,
       data: {
-        chain: "ethereum",
         totalCDPs: 0,
-        totalCollateral: "0",
-        totalDebt: "0"
-      }
+        activeCDPs: 0,
+        totalCollateral: 0n as unknown as import('@nyxusd/cdp-core/src/types').CDPStats['totalCollateral'],
+        totalDebt: 0n as unknown as import('@nyxusd/cdp-core/src/types').CDPStats['totalDebt'],
+        averageCollateralizationRatio: 0 as unknown as import('@nyxusd/cdp-core/src/types').CDPStats['averageCollateralizationRatio'],
+        totalAccruedFees: 0n as unknown as import('@nyxusd/cdp-core/src/types').CDPStats['totalAccruedFees'],
+      },
     };
   }
 }

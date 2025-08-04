@@ -245,7 +245,8 @@ export class Ok<T, E = Error> extends Result<T, E> {
   }
 
   flatMapErr<F>(_fn: (error: E) => Result<T, F>): Result<T, F> {
-    return this as any;
+    // Ok ignores flatMapErr; preserve Ok<T,E> typed as Result<T,F>
+    return this as unknown as Result<T, F>;
   }
 
   fold<U>(_onErr: (error: E) => U, onOk: (value: T) => U): U {
@@ -326,15 +327,17 @@ export class Err<T, E = Error> extends Result<T, E> {
   }
 
   map<U>(_fn: (value: T) => U): Result<U, E> {
-    return this as any;
+    // Err ignores map over Ok value; preserve Err<T,E> typed as Result<U,E>
+    return this as unknown as Result<U, E>;
   }
 
   mapErr<F>(fn: (error: E) => F): Result<T, F> {
-    return new Err(fn(this.error));
+    return new Err<T, F>(fn(this.error));
   }
 
   flatMap<U>(_fn: (value: T) => Result<U, E>): Result<U, E> {
-    return this as any;
+    // Err short-circuits flatMap
+    return this as unknown as Result<U, E>;
   }
 
   flatMapErr<F>(fn: (error: E) => Result<T, F>): Result<T, F> {
@@ -362,7 +365,8 @@ export class Err<T, E = Error> extends Result<T, E> {
   }
 
   ap<U>(_resultFn: Result<(value: T) => U, E>): Result<U, E> {
-    return this as any;
+    // Applying a function to an Err keeps the Err
+    return this as unknown as Result<U, E>;
   }
 
   tap(_fn: (value: T) => void): Result<T, E> {

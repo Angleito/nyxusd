@@ -1,7 +1,7 @@
 export interface Voice {
   voice_id: string;
   name: string;
-  samples: any;
+  samples: unknown;
   category: string;
   labels: Record<string, string>;
   description?: string;
@@ -28,6 +28,18 @@ export interface GenerationConfig {
 export interface StreamConfig {
   try_trigger_generation?: boolean;
   chunk_length_schedule?: number[];
+}
+
+export interface ElevenLabsSynthesizeResponse {
+  audioUrl: string;
+  durationMs: number;
+}
+
+function isVoicesPayload(u: unknown): u is { voices: Voice[] } {
+  return !!u && typeof u === 'object' && Array.isArray((u as any).voices);
+}
+function isVoice(u: unknown): u is Voice {
+  return !!u && typeof u === 'object' && typeof (u as any).voice_id === 'string' && typeof (u as any).name === 'string';
 }
 
 export class ElevenLabsClient {
@@ -57,8 +69,13 @@ export class ElevenLabsClient {
         throw new Error(`Failed to fetch voices: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      return data.voices;
+      const data = await response.json().catch(() => ({}));
+      if (!isVoicesPayload(data)) {
+        throw new Error('Invalid voices response payload');
+      }
+      // Narrow elements
+      const voices = (data.voices || []).filter(isVoice);
+      return voices;
     } catch (error) {
       console.error('Error fetching voices:', error);
       throw error;
@@ -81,7 +98,9 @@ export class ElevenLabsClient {
         throw new Error(`Failed to fetch voice: ${response.statusText}`);
       }
 
-      return await response.json();
+      const v = await response.json().catch(() => ({}));
+      if (!isVoice(v)) throw new Error('Invalid voice payload');
+      return v;
     } catch (error) {
       console.error('Error fetching voice:', error);
       throw error;
@@ -133,7 +152,8 @@ export class ElevenLabsClient {
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to generate speech: ${response.statusText}`);
+        const textErr = await response.text().catch(() => '');
+        throw new Error(`Failed to generate speech: ${response.statusText}${textErr ? ` - ${textErr}` : ''}`);
       }
 
       return await response.arrayBuffer();
@@ -192,7 +212,9 @@ export class ElevenLabsClient {
         const { done, value } = await reader.read();
         if (done) break;
         
-        onChunk(value.buffer);
+        // Ensure we pass a true ArrayBuffer
+        const ab: ArrayBuffer = new Uint8Array(value).buffer;
+        onChunk(ab);
       }
     } catch (error) {
       console.error('Error streaming text-to-speech:', error);

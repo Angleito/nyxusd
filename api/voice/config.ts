@@ -1,9 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VoiceConfigResponse, ApiErrorResponse, ElevenLabsUser } from '../types/voice.js';
 
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
-) {
+): Promise<void> {
   // Enable CORS
   const isDevelopment = process.env['NODE_ENV'] === 'development' || 
                        process.env['VERCEL_ENV'] === 'development';
@@ -35,7 +36,8 @@ export default async function handler(
   }
 
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   try {
@@ -43,15 +45,15 @@ export default async function handler(
     const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
     const isConfigured = !!elevenLabsApiKey;
     
-    let apiStatus = 'not_configured';
-    let availableVoices: any[] = [];
-    let subscription = null;
-    let errorDetails = null;
+    let apiStatus: 'not_configured' | 'connected' | 'error' = 'not_configured';
+    let availableVoices: Array<{ id: string; name: string; description: string; category?: string; preview_url?: string }> = [];
+    let subscription: ElevenLabsUser['subscription'] | null = null;
+    let errorDetails: string | null = null;
 
     if (isConfigured) {
       try {
         // Test ElevenLabs API connection
-        const userResponse = await fetch('https://api.elevenlabs.io/v1/user', {
+        const userResponse = await (globalThis as any).fetch('https://api.elevenlabs.io/v1/user', {
           headers: {
             'xi-api-key': elevenLabsApiKey,
           },
@@ -59,25 +61,26 @@ export default async function handler(
 
         if (userResponse.ok) {
           apiStatus = 'connected';
-          const userData = await userResponse.json();
+          const userData = (await userResponse.json()) as ElevenLabsUser;
           subscription = userData.subscription;
 
           // Get available voices
-          const voicesResponse = await fetch('https://api.elevenlabs.io/v1/voices', {
+          const voicesResponse = await (globalThis as any).fetch('https://api.elevenlabs.io/v1/voices', {
             headers: {
               'xi-api-key': elevenLabsApiKey,
             },
           });
 
           if (voicesResponse.ok) {
-            const voicesData = await voicesResponse.json();
-            availableVoices = voicesData.voices?.map((voice: any) => ({
-              id: voice.voice_id,
-              name: voice.name,
-              description: voice.description || `${voice.labels?.gender || 'Unknown'} voice`,
-              category: voice.category || 'general',
-              preview_url: voice.preview_url
-            })) || [];
+            const voicesData = (await voicesResponse.json()) as { voices?: Array<Record<string, unknown>> };
+            availableVoices = voicesData.voices?.map((voice) => ({
+              id: String(voice['voice_id'] ?? ''),
+              name: String(voice['name'] ?? ''),
+              description: (typeof voice['description'] === 'string' && voice['description']) ||
+                `${(voice['labels'] as Record<string, unknown> | undefined)?.['gender'] || 'Unknown'} voice`,
+              category: typeof voice['category'] === 'string' ? voice['category'] : 'general',
+              preview_url: typeof voice['preview_url'] === 'string' ? voice['preview_url'] : undefined,
+            })) ?? [];
           }
         } else {
           apiStatus = 'error';
@@ -104,7 +107,7 @@ export default async function handler(
       ];
     }
     
-    res.status(200).json({
+    const response: VoiceConfigResponse = {
       success: true,
       configured: isConfigured,
       apiStatus,
@@ -112,7 +115,9 @@ export default async function handler(
       config: {
         defaultVoiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
         modelId: process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5',
-        availableVoices,
+        availableVoices: availableVoices.map(v => ({
+          id: v.id, name: v.name, description: v.description,
+        })),
         voiceSettings: {
           stability: 0.5,
           similarity_boost: 0.75,
@@ -122,31 +127,32 @@ export default async function handler(
         limits: {
           maxCharactersPerRequest: 5000,
           maxRequestsPerMinute: 20,
-          sessionTimeout: 300000, // 5 minutes
+          sessionTimeout: 300000,
         },
         features: {
           textToSpeech: isConfigured && apiStatus === 'connected',
           conversationalMode: isConfigured && apiStatus === 'connected',
           streaming: true,
-          voiceCloning: false, // Requires higher tier
+          voiceCloning: false,
         },
         endpoints: {
           session: '/api/voice/session',
           tts: '/api/voice/tts',
           health: '/api/voice-health',
-          token: '/api/voice-token'
-        }
+          token: '/api/voice-token',
+        },
       },
-      subscription,
       timestamp: new Date().toISOString(),
-    });
+    };
+    res.status(200).json(response);
   } catch (error) {
     console.error('Error getting voice config:', error);
-    res.status(500).json({
+    const err: ApiErrorResponse = {
       success: false,
       error: 'Failed to get voice configuration',
       details: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString(),
-    });
+    };
+    res.status(500).json(err);
   }
 }

@@ -159,7 +159,8 @@ export class Left<L, R> extends Either<L, R> {
   }
 
   map<U>(_fn: (value: R) => U): Either<L, U> {
-    return this as any;
+    // Left ignores map over Right value; preserve Left<L, R> typed as Either<L, U>
+    return this as unknown as Either<L, U>;
   }
 
   mapLeft<U>(fn: (error: L) => U): Either<U, R> {
@@ -167,7 +168,8 @@ export class Left<L, R> extends Either<L, R> {
   }
 
   flatMap<U>(_fn: (value: R) => Either<L, U>): Either<L, U> {
-    return this as any;
+    // Left short-circuits flatMap
+    return this as unknown as Either<L, U>;
   }
 
   fold<U>(onLeft: (error: L) => U, _onRight: (value: R) => U): U {
@@ -191,7 +193,8 @@ export class Left<L, R> extends Either<L, R> {
   }
 
   ap<U>(_eitherFn: Either<L, (value: R) => U>): Either<L, U> {
-    return this as any;
+    // Applying a function to a Left keeps the Left
+    return this as unknown as Either<L, U>;
   }
 
   toString(): string {
@@ -227,7 +230,8 @@ export class Right<L, R> extends Either<L, R> {
   }
 
   mapLeft<U>(_fn: (error: L) => U): Either<U, R> {
-    return this as any;
+    // Right ignores mapLeft
+    return this as unknown as Either<U, R>;
   }
 
   flatMap<U>(fn: (value: R) => Either<L, U>): Either<L, U> {

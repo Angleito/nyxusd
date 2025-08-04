@@ -7,6 +7,42 @@
 const http = require('http');
 const url = require('url');
 
+// Node 18+ has global fetch/AbortSignal/Buffer, but ESLint may complain.
+// Explicitly import to satisfy linter and ensure compatibility with older Node.
+const { Buffer } = require('buffer');
+
+let fetchFn = global.fetch;
+let AbortSignalCtor = global.AbortSignal;
+
+// Lazy-load node-fetch if fetch is not available
+if (typeof fetchFn !== 'function') {
+  try {
+    // eslint-disable-next-line no-undef
+    fetchFn = require('node-fetch');
+  } catch {
+    throw new Error('fetch is not available. Install node-fetch or use Node.js v18+.');
+  }
+}
+
+// Provide a timeout helper compatible across environments
+function withTimeout(ms) {
+  if (AbortSignalCtor && typeof AbortSignalCtor.timeout === 'function') {
+    return AbortSignalCtor.timeout(ms);
+  }
+  // Fallback using AbortController if available in global
+  // eslint-disable-next-line no-undef
+  const AC = global.AbortController || (typeof AbortController !== 'undefined' ? AbortController : null);
+  if (!AC) {
+    // As a last resort, return undefined (no timeout)
+    return undefined;
+  }
+  const controller = new AC();
+  // setTimeout is standard in Node; eslint rule likely misconfigured in this environment
+  // eslint-disable-next-line no-undef
+  setTimeout(() => controller.abort(), ms);
+  return controller.signal;
+}
+
 const PORT = process.env.PORT || 8081;
 
 // CoinGecko API for real price data
@@ -51,14 +87,14 @@ const FALLBACK_PRICES = {
 async function fetchRealPrices() {
   try {
     const ids = Object.values(TOKEN_MAPPINGS).join(',');
-    const response = await fetch(
+    const response = await fetchFn(
       `${COINGECKO_API}/simple/price?ids=${ids}&vs_currencies=usd`,
       {
         headers: {
           'Accept': 'application/json',
           'User-Agent': 'NyxUSD/1.0'
         },
-        signal: AbortSignal.timeout(10000)
+        signal: withTimeout(10000)
       }
     );
     
@@ -169,14 +205,38 @@ function handleAIChat(req, res) {
   sendJSON(res, 200, successResponse);
 }
 
-// Handle Voice config endpoint (mock)
-function handleVoiceConfig(req, res) {
-  const errorResponse = {
-    success: false,
-    error: 'Voice service not available in development mode',
-    timestamp: new Date().toISOString()
-  };
-  sendJSON(res, 200, errorResponse);
+// Handle Voice config endpoint by proxying to the real serverless function
+async function handleVoiceConfig(req, res) {
+  try {
+    // Proxy to the local Vercel-style function at /api/voice-config
+    const targetUrl = 'http://localhost:3000/api/voice-config';
+    const response = await fetchFn(targetUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      },
+      signal: withTimeout(10000)
+    });
+
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { success: false, error: 'Invalid JSON from voice-config', raw: text };
+    }
+
+    // Forward status and body
+    sendJSON(res, response.status, data);
+  } catch (error) {
+    console.error('Voice config proxy error:', error instanceof Error ? error.message : String(error));
+    const errorResponse = {
+      success: false,
+      error: 'Failed to proxy voice configuration',
+      timestamp: new Date().toISOString()
+    };
+    sendJSON(res, 502, errorResponse);
+  }
 }
 
 // Handle Health check
@@ -214,7 +274,41 @@ const server = http.createServer(async (req, res) => {
     } else if (pathname === '/api/ai/chat' && method === 'POST') {
       handleAIChat(req, res);
     } else if (pathname === '/api/voice-config' && method === 'GET') {
-      handleVoiceConfig(req, res);
+      await handleVoiceConfig(req, res);
+    } else if ((pathname === '/api/voice-token' && method === 'GET') ||
+               (pathname === '/api/voice-tts' && method === 'POST') ||
+               (pathname === '/api/voice-health' && method === 'GET')) {
+      // Generic proxy for other voice endpoints to frontend dev server (which runs serverless on /api)
+      try {
+        const targetUrl = `http://localhost:3000${pathname}`;
+        const headers = { 'Accept': 'application/json' };
+        // Read body if needed
+        let body = undefined;
+        if (method === 'POST') {
+          const chunks = [];
+          for await (const chunk of req) {
+            chunks.push(chunk);
+          }
+          body = Buffer.concat(chunks);
+        }
+        const response = await fetchFn(targetUrl, {
+          method,
+          headers: method === 'POST' ? { ...headers, 'Content-Type': req.headers['content-type'] || 'application/json' } : headers,
+          body,
+          signal: withTimeout(15000)
+        });
+        // For TTS we may have binary audio; pass-through content-type
+        const contentType = response.headers.get('content-type') || 'application/json';
+        setCorsHeaders(res);
+        res.statusCode = response.status;
+        res.setHeader('Content-Type', contentType);
+        const arrayBuf = await response.arrayBuffer();
+        const buf = Buffer.from(arrayBuf);
+        res.end(buf);
+      } catch (e) {
+        console.error('Voice endpoint proxy error:', e instanceof Error ? e.message : String(e));
+        sendJSON(res, 502, { success: false, error: 'Failed to proxy voice endpoint', timestamp: new Date().toISOString() });
+      }
     } else if (pathname === '/api/health' && method === 'GET') {
       handleHealth(req, res);
     } else {
@@ -244,7 +338,10 @@ server.listen(PORT, () => {
   console.log('- GET /api/oracle/prices');
   console.log('- GET /api/system');
   console.log('- POST /api/ai/chat');
-  console.log('- GET /api/voice-config');
+  console.log('- GET /api/voice-config (proxied to real serverless)');
+  console.log('- GET /api/voice-token (proxied to real serverless via frontend /api)');
+  console.log('- POST /api/voice-tts (proxied to real serverless via frontend /api)');
+  console.log('- GET /api/voice-health (proxied to real serverless via frontend /api)');
   console.log('- GET /api/health');
 });
 

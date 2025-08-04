@@ -1,5 +1,42 @@
+// Local minimal SpeechRecognition interface to avoid `any`
+export interface ISpeechRecognition {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: { results: ArrayLike<{ 0: { transcript: string; confidence: number }; isFinal: boolean }> }) => void) | null;
+  onerror: ((event: { error: string; name?: string; message?: string }) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
+// Strongly-typed user-facing message events
+export type StatusMessageEvent = {
+  type: 'status';
+  message: string;
+  level: 'info' | 'warning' | 'error';
+};
+
+export type UserMessageEvent = {
+  type: 'user';
+  message: string;
+  canRetry?: boolean;
+};
+
+export type AgentMessageEvent = {
+  type: 'agent';
+  message: string;
+};
+
+// Unified outbound UI event discriminated union
+export type UIEvent = StatusMessageEvent | UserMessageEvent | AgentMessageEvent;
+
+// Fix: lastError age computation helper
+export function msSince(date: Date): number {
+  return Date.now() - date.getTime();
+}
 import { EventEmitter } from 'events';
-import { ConversationalAgent, ConversationContext, createConversationalAgent } from './conversationalAgent';
+import { ConversationalAgent, createConversationalAgent, type ConversationContext } from './conversationalAgent';
 
 export interface VoiceConfig {
   voiceId?: string;
@@ -34,7 +71,7 @@ export class VoiceService extends EventEmitter {
   private ws: WebSocket | null = null;
   private audioContext: AudioContext | null = null;
   private mediaRecorder: MediaRecorder | null = null;
-  private recognition: any = null; // SpeechRecognition API
+ private recognition: ISpeechRecognition | null = null; // SpeechRecognition API
   private currentSession: VoiceSession | null = null;
   private audioQueue: ArrayBuffer[] = [];
   private isPlaying: boolean = false;
@@ -170,13 +207,14 @@ export class VoiceService extends EventEmitter {
     this.fallbackMode = 'tts';
     this.connectionState = 'degraded';
     
-    // Emit user-friendly status message
-    const friendlyMessage = this.getUserFriendlyFallbackMessage(reason);
-    this.emit('statusMessage', {
-      type: 'fallback',
-      message: friendlyMessage,
-      level: 'warning'
-    });
+   // Emit user-friendly status message
+   const friendlyMessage = this.getUserFriendlyFallbackMessage(reason);
+   const statusEvent: StatusMessageEvent = {
+     type: 'status',
+     message: friendlyMessage,
+     level: 'warning'
+   };
+   this.emit('statusMessage', statusEvent);
     
     try {
       // Disable conversational mode temporarily
@@ -287,9 +325,10 @@ export class VoiceService extends EventEmitter {
     this.emit('connectionFailed', { reason, retryCount: this.retryCount });
     
     // Provide user-friendly error message
-    const errorMessage = this.getUserFriendlyErrorMessage(reason);
-    this.emit('userMessage', { 
-      type: 'error', 
+    // JSDoc: Guard - ensure we pass an Error instance to formatter
+    const errorMessage = this.getUserFriendlyErrorMessage(new Error(String(reason)));
+    this.emit('userMessage', {
+      type: 'user',
       message: errorMessage,
       canRetry: true
     });
@@ -317,7 +356,9 @@ export class VoiceService extends EventEmitter {
   }
 
   private getUserFriendlyErrorMessage(error: Error): string {
-    const message = error.message.toLowerCase();
+    // Guard: avoid toLowerCase on undefined message
+    const raw = (error && typeof error.message === 'string') ? error.message : '';
+    const message = raw.toLowerCase();
     
     // Environment/Configuration errors
     if (message.includes('elevenlabs_api_key') || message.includes('not configured')) {
@@ -325,7 +366,7 @@ export class VoiceService extends EventEmitter {
     }
     
     // Permission errors
-    if (message.includes('microphone permission') || message.includes('getUserMedia')) {
+    if (message.includes('microphone permission') || message.includes('getusermedia')) {
       return 'Microphone permission is required for voice chat. Please allow microphone access and try again.';
     }
     
@@ -406,23 +447,31 @@ export class VoiceService extends EventEmitter {
       
       if (SpeechRecognition) {
         console.log('🎤 VoiceService: Speech recognition API available');
-        this.recognition = new SpeechRecognition();
+       this.recognition = new SpeechRecognition() as ISpeechRecognition;
         this.recognition.continuous = true;
         this.recognition.interimResults = true;
         this.recognition.lang = 'en-US';
         console.log('🎤 VoiceService: Speech recognition configured');
 
-        this.recognition.onresult = (event: any) => {
-          const result = event.results[event.results.length - 1];
-          const transcript = result[0].transcript;
-          const isFinal = result.isFinal;
+        this.recognition.onresult = (event) => {
+          const results = event.results;
+          if (!results || results.length === 0) {
+            return;
+          }
+          const last = results[results.length - 1];
+          // Runtime guard to ensure expected shape
+          if (!last || !last[0] || typeof last[0].transcript !== 'string') {
+            return;
+          }
+          const transcript = last[0].transcript as string;
+          const isFinal = !!last.isFinal;
 
           console.log('🎤 VoiceService: Speech recognition result:', { transcript, isFinal });
 
           const transcriptionResult: TranscriptionResult = {
             text: transcript,
             isFinal,
-            confidence: result[0].confidence,
+            confidence: typeof last[0].confidence === 'number' ? last[0].confidence : undefined,
             timestamp: new Date(),
           };
 
@@ -434,7 +483,7 @@ export class VoiceService extends EventEmitter {
           }
         };
 
-        this.recognition.onerror = (event: any) => {
+        this.recognition.onerror = (event) => {
           console.error('Speech recognition error:', event.error);
           
           // Stop the infinite restart loop on network errors
@@ -498,23 +547,36 @@ export class VoiceService extends EventEmitter {
       const apiUrl = import.meta.env.VITE_API_URL || window.location.origin;
       const response = await fetch(`${apiUrl}/api/voice-config`);
       
+      // Guard: always check response.ok before attempting to parse body
+      // This prevents consuming an error body that might not be JSON.
       if (!response.ok) {
         throw new Error(`Voice config request failed: ${response.status} ${response.statusText}`);
       }
       
-      const configData = await response.json();
+      // Guard: safely parse JSON and ensure we have an object
+      const configDataRaw = await response.json().catch(() => null);
+      if (!configDataRaw || typeof configDataRaw !== 'object') {
+        throw new Error('Invalid voice config response: non-object JSON');
+      }
+      const configData: any = configDataRaw;
+      
       console.log('🎤 VoiceService: Voice config response:', {
-        success: configData.success,
-        apiStatus: configData.apiStatus,
-        hasFeatures: !!configData.config?.features,
-        conversationalMode: configData.config?.features?.conversationalMode
+        success: (configData as any)?.success,
+        apiStatus: (configData as any)?.apiStatus,
+        hasFeatures: !!(configData as any)?.config?.features,
+        conversationalMode: (configData as any)?.config?.features?.conversationalMode
       });
       
-      if (!configData.success) {
-        throw new Error(`Voice config error: ${configData.error || 'Unknown error'}`);
+      // Guard: verify explicit success before accessing other fields
+      if ((configData as any)?.success !== true) {
+        const msg = typeof (configData as any)?.error === 'string' && (configData as any)?.error.length > 0
+          ? (configData as any).error
+          : 'Unknown error';
+        throw new Error(`Voice config error: ${msg}`);
       }
       
-      if (!configData.config?.features?.conversationalMode) {
+      // Guard: feature flags object existence before access
+      if (!configData.config || !configData.config.features || configData.config.features.conversationalMode !== true) {
         console.warn('🎤 VoiceService: Conversational mode not available on backend, will fallback to TTS');
         throw new Error('Conversational mode not available - backend not configured');
       }
@@ -523,7 +585,7 @@ export class VoiceService extends EventEmitter {
     } catch (error) {
       console.warn('🎤 VoiceService: Conversational mode initialization failed:', error);
       this.fallbackMode = 'tts'; // Set fallback mode
-      throw error;
+      throw error instanceof Error ? error : new Error('Conversational mode initialization failed');
     }
 
     this.conversationalAgent = createConversationalAgent({
@@ -756,7 +818,8 @@ export class VoiceService extends EventEmitter {
     
     // Reset error counters
     this.retryCount = 0;
-    this.connectionState = 'idle';
+    // JSDoc: Guard - connectionState is a health indicator, reset to healthy
+    this.connectionState = 'healthy';
     this.lastError = null;
     
     this.emit('sessionReset');
@@ -790,7 +853,13 @@ export class VoiceService extends EventEmitter {
 
     const voiceId = this.config.voiceId;
     const modelId = this.config.modelId;
-    const wsUrl = `wss://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream-input?model_id=${modelId}&optimize_streaming_latency=${this.config.optimizeStreamingLatency}`;
+    // Guard: ensure required config fields exist before constructing URL
+    if (!voiceId || !modelId) {
+      // JSDoc: Guard ensures we don't construct an invalid WS URL with undefined params
+      throw new Error('Missing voice or model configuration for TTS WebSocket');
+    }
+    const optLatency = typeof this.config.optimizeStreamingLatency === 'number' ? this.config.optimizeStreamingLatency : 0;
+    const wsUrl = `wss://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream-input?model_id=${modelId}&optimize_streaming_latency=${optLatency}`;
 
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(wsUrl);
@@ -822,22 +891,36 @@ export class VoiceService extends EventEmitter {
       };
 
       this.ws.onmessage = async (event) => {
-        const data = JSON.parse(event.data);
-        
-        if (data.audio) {
-          const audioData = atob(data.audio);
-          const audioArray = new Uint8Array(audioData.length);
-          for (let i = 0; i < audioData.length; i++) {
-            audioArray[i] = audioData.charCodeAt(i);
-          }
-          await this.playAudio(audioArray.buffer);
+        // Guard: Parse JSON defensively and validate structure
+        let data: any = null;
+        try {
+          data = JSON.parse(event.data);
+        } catch (e) {
+          console.error('WebSocket message parse error:', e);
+          // JSDoc: Guard prevents runtime errors on malformed WS messages; we drop the message
+          return;
         }
-
-        if (data.isFinal) {
-          this.emit('speakingFinished');
-          if (this.currentSession) {
-            this.currentSession.status = 'idle';
+        
+        try {
+          if (data && typeof data === 'object' && typeof data.audio === 'string' && data.audio.length > 0) {
+            const audioData = atob(data.audio);
+            const audioArray = new Uint8Array(audioData.length);
+            for (let i = 0; i < audioData.length; i++) {
+              audioArray[i] = audioData.charCodeAt(i);
+            }
+            await this.playAudio(audioArray.buffer);
           }
+
+          if (data && typeof data === 'object' && (data.isFinal === true || data.is_final === true)) {
+            this.emit('speakingFinished');
+            if (this.currentSession) {
+              this.currentSession.status = 'idle';
+            }
+          }
+        } catch (innerError) {
+          console.error('Error handling WebSocket message:', innerError);
+          // Keep connection alive; surface as generic error without breaking flow
+          this.handleGenericError(innerError as Error);
         }
       };
 
@@ -867,33 +950,43 @@ export class VoiceService extends EventEmitter {
     this.ws.send(JSON.stringify({ text: '', flush: true }));
   }
 
+  /**
+   * Guarded text splitter for streaming TTS.
+   * Ensures input is a non-empty string and avoids string ops on null/undefined.
+   */
   private splitTextIntoChunks(text: string, maxChunkSize: number = 100): string[] {
-    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    // Guard: ensure text is a safe string
+    const safeText = typeof text === 'string' ? text : '';
+    if (safeText.length === 0) {
+      return [];
+    }
+    const sentences = safeText.match(/[^.!?]+[.!?]+/g) || [safeText];
     const chunks: string[] = [];
     let currentChunk = '';
-
+    
     for (const sentence of sentences) {
-      if ((currentChunk + sentence).length <= maxChunkSize) {
-        currentChunk += sentence;
+      const candidate = `${currentChunk}${sentence}`;
+      if (candidate.length <= maxChunkSize) {
+        currentChunk = candidate;
       } else {
         if (currentChunk) chunks.push(currentChunk);
         currentChunk = sentence;
       }
     }
-
+    
     if (currentChunk) chunks.push(currentChunk);
     return chunks;
   }
 
-  private async playAudio(audioData: ArrayBuffer): Promise<void> {
-    if (!this.audioContext) return;
+ private async playAudio(audioData: ArrayBuffer): Promise<void> {
+   if (!this.audioContext) return;
 
-    this.audioQueue.push(audioData);
-    
-    if (!this.isPlaying) {
-      this.processAudioQueue();
-    }
-  }
+   this.audioQueue.push(audioData);
+   
+   if (!this.isPlaying) {
+     void this.processAudioQueue();
+   }
+ }
 
   private async processAudioQueue(): Promise<void> {
     if (this.audioQueue.length === 0) {
@@ -902,22 +995,26 @@ export class VoiceService extends EventEmitter {
     }
 
     this.isPlaying = true;
-    const audioData = this.audioQueue.shift()!;
+    const audioData = this.audioQueue.shift();
+    if (!audioData || !this.audioContext) {
+      this.isPlaying = false;
+      return;
+    }
 
     try {
-      const audioBuffer = await this.audioContext!.decodeAudioData(audioData);
-      const source = this.audioContext!.createBufferSource();
+      const audioBuffer = await this.audioContext.decodeAudioData(audioData);
+      const source = this.audioContext.createBufferSource();
       source.buffer = audioBuffer;
-      source.connect(this.audioContext!.destination);
+      source.connect(this.audioContext.destination);
       
       source.onended = () => {
-        this.processAudioQueue();
+        void this.processAudioQueue();
       };
       
       source.start();
     } catch (error) {
       console.error('Error playing audio:', error);
-      this.processAudioQueue(); // Continue with next chunk
+      void this.processAudioQueue(); // Continue with next chunk
     }
   }
 

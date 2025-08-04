@@ -1,17 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
-
-interface VoiceSessionRequest {
-  action: 'start' | 'end';
-  sessionId?: string;
-  userId?: string;
-  context?: {
-    userProfile?: any;
-    conversationHistory?: any[];
-    memoryContext?: string;
-    defiCapabilities?: any;
-  };
-}
+import type {
+  SessionRequest,
+  SessionCreateRequest,
+  SessionEndRequest,
+  SessionCreateResponse,
+  SessionEndResponse,
+  ApiErrorResponse,
+  VoiceTokenPayload,
+  ElevenLabsSubscription,
+} from '../types/voice.js';
 
 // Session storage (in production, use Redis or database)
 const activeSessions = new Map<string, {
@@ -19,11 +17,11 @@ const activeSessions = new Map<string, {
   userId?: string;
   startTime: number;
   lastActivity: number;
-  context?: any;
+  context?: unknown;
 }>();
 
 // Clean up old sessions
-setInterval(() => {
+setInterval((): void => {
   const now = Date.now();
   const thirtyMinutes = 30 * 60 * 1000;
   
@@ -37,7 +35,7 @@ setInterval(() => {
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
-) {
+): Promise<void> {
   // Enable CORS
   const isDevelopment = process.env['NODE_ENV'] === 'development' || 
                        process.env['VERCEL_ENV'] === 'development';
@@ -69,32 +67,39 @@ export default async function handler(
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   try {
     // Check if ElevenLabs API key is configured
     const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
     if (!elevenLabsApiKey) {
-      return res.status(500).json({ 
+      res.status(500).json({
         success: false,
-        error: 'Voice service not configured (ElevenLabs API key missing)' 
+        error: 'Voice service not configured (ElevenLabs API key missing)'
       });
+      return;
     }
 
-    const { action, sessionId, userId, context }: VoiceSessionRequest = req.body || {};
+    const body = (req.body ?? {}) as Partial<SessionRequest>;
+    const action = body.action;
+    const sessionId = (body as Partial<SessionEndRequest>)?.sessionId;
+    const userId = (body as Partial<SessionCreateRequest>)?.userId;
+    const context = (body as Partial<SessionCreateRequest>)?.context;
 
-    if (!action || !['start', 'end'].includes(action)) {
-      return res.status(400).json({
+    if (action !== 'start' && action !== 'end') {
+      res.status(400).json({
         success: false,
         error: 'Invalid action. Must be "start" or "end"'
       });
+      return;
     }
 
     if (action === 'start') {
       // Generate new session ID
       const newSessionId = sessionId || `voice_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
+
       // Create session record
       const session = {
         id: newSessionId,
@@ -103,25 +108,26 @@ export default async function handler(
         lastActivity: Date.now(),
         context
       };
-      
+
       activeSessions.set(newSessionId, session);
 
       // Generate JWT token for secure voice communication
+      const now = Math.floor(Date.now() / 1000);
+      const tokenPayload: VoiceTokenPayload = {
+        sessionId: newSessionId,
+        voiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
+        type: 'voice_session',
+        iat: now,
+        exp: now + (30 * 60),
+      };
       const token = jwt.sign(
-        {
-          sessionId: newSessionId,
-          userId,
-          voiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
-          type: 'voice_session',
-          iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + (30 * 60), // 30 minutes expiry
-        },
+        tokenPayload,
         process.env['JWT_SECRET'] || 'default-secret-change-in-production'
       );
 
       // Test ElevenLabs API connectivity
       try {
-        const testResponse = await fetch('https://api.elevenlabs.io/v1/user', {
+        const testResponse = await (globalThis as any).fetch('https://api.elevenlabs.io/v1/user', {
           headers: {
             'xi-api-key': elevenLabsApiKey,
           },
@@ -131,9 +137,9 @@ export default async function handler(
           throw new Error(`ElevenLabs API error: ${testResponse.status}`);
         }
 
-        const userData = await testResponse.json();
-        
-        return res.status(200).json({
+        const userData = (await testResponse.json()) as { subscription?: ElevenLabsSubscription | null };
+
+        const successResp: SessionCreateResponse = {
           success: true,
           sessionId: newSessionId,
           token,
@@ -153,43 +159,50 @@ export default async function handler(
               use_speaker_boost: true,
             },
           }
-        });
+        };
+        res.status(200).json(successResp);
+        return;
 
       } catch (apiError) {
         console.error('ElevenLabs API test failed:', apiError);
-        
+
         // Clean up session since API is not working
         activeSessions.delete(newSessionId);
-        
-        return res.status(500).json({
+
+        const errResp: ApiErrorResponse = {
           success: false,
           error: 'Failed to connect to ElevenLabs API',
-          details: apiError instanceof Error ? apiError.message : 'Unknown error'
-        });
+          details: apiError instanceof Error ? apiError.message : 'Unknown error',
+          timestamp: new Date().toISOString(),
+        };
+        res.status(500).json(errResp);
+        return;
       }
 
     } else if (action === 'end') {
       if (!sessionId) {
-        return res.status(400).json({
+        res.status(400).json({
           success: false,
           error: 'Session ID required for ending session'
         });
+        return;
       }
 
       const session = activeSessions.get(sessionId);
       if (!session) {
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           error: 'Session not found or already expired'
         });
+        return;
       }
 
       // Remove session
       activeSessions.delete(sessionId);
-      
+
       const duration = Date.now() - session.startTime;
-      
-      return res.status(200).json({
+
+      const endResp: SessionEndResponse = {
         success: true,
         sessionId,
         ended: true,
@@ -199,15 +212,19 @@ export default async function handler(
           endTime: new Date().toISOString(),
           durationMs: duration
         }
-      });
+      };
+      res.status(200).json(endResp);
+      return;
     }
 
   } catch (error) {
     console.error('Voice session error:', error);
-    res.status(500).json({
+    const errResp: ApiErrorResponse = {
       success: false,
       error: 'Internal server error',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    });
+      details: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    };
+    res.status(500).json(errResp);
   }
 }

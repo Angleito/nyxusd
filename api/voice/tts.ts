@@ -1,19 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
-
-interface TTSRequest {
-  text: string;
-  voiceId?: string;
-  modelId?: string;
-  voiceSettings?: {
-    stability?: number;
-    similarity_boost?: number;
-    style?: number;
-    use_speaker_boost?: boolean;
-  };
-  outputFormat?: 'mp3_44100_128' | 'pcm_16000' | 'pcm_22050' | 'pcm_24000' | 'pcm_44100';
-  optimizeStreamingLatency?: number;
-}
+import type {
+  ApiErrorResponse,
+  TTSRequestBody,
+  VoiceTokenPayload,
+} from '../types/voice.js';
+import { isValidTTSRequest } from '../types/voice.js';
 
 // Rate limiting
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -39,14 +31,17 @@ function checkRateLimit(clientId: string): { allowed: boolean; remaining: number
   return { allowed: true, remaining: maxRequests - record.count };
 }
 
-function validateToken(token: string): { valid: boolean; payload?: any } {
+function validateToken(token: string): { valid: boolean; payload?: VoiceTokenPayload } {
   try {
     const payload = jwt.verify(
-      token, 
+      token,
       process.env['JWT_SECRET'] || 'default-secret-change-in-production'
     );
-    return { valid: true, payload };
-  } catch (error) {
+    if (typeof payload === 'object' && payload && 'sessionId' in payload && 'type' in payload) {
+      return { valid: true, payload: payload as VoiceTokenPayload };
+    }
+    return { valid: false };
+  } catch {
     return { valid: false };
   }
 }
@@ -54,7 +49,7 @@ function validateToken(token: string): { valid: boolean; payload?: any } {
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
-) {
+): Promise<void> {
   // Enable CORS
   const isDevelopment = process.env['NODE_ENV'] === 'development' || 
                        process.env['VERCEL_ENV'] === 'development';
@@ -86,60 +81,80 @@ export default async function handler(
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   try {
     // Check if ElevenLabs API key is configured
     const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
     if (!elevenLabsApiKey) {
-      return res.status(500).json({ 
+      res.status(500).json({
         success: false,
-        error: 'Voice service not configured (ElevenLabs API key missing)' 
+        error: 'Voice service not configured (ElevenLabs API key missing)'
       });
+      return;
     }
 
     // Validate JWT token
     const authHeader = req.headers.authorization;
     const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-    
+
     if (!token) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         error: 'Authorization token required'
       });
+      return;
     }
 
     const tokenValidation = validateToken(token);
-    if (!tokenValidation.valid) {
-      return res.status(401).json({
+    if (!tokenValidation.valid || !tokenValidation.payload) {
+      res.status(401).json({
         success: false,
         error: 'Invalid or expired token'
       });
+      return;
     }
 
     // Rate limiting based on IP or session
-    const clientId = tokenValidation.payload.sessionId || 
-                    req.headers['x-forwarded-for']?.toString().split(',')[0] || 
-                    req.connection.remoteAddress || 
+    const clientId = tokenValidation.payload.sessionId ||
+                    req.headers['x-forwarded-for']?.toString().split(',')[0] ||
+                    // @ts-expect-error Node types may not include connection on Vercel's request type
+                    (req.connection?.remoteAddress as string | undefined) ||
                     'unknown';
-    
+
     const rateLimitResult = checkRateLimit(clientId);
     if (!rateLimitResult.allowed) {
-      return res.status(429).json({
+      res.status(429).json({
         success: false,
         error: 'Rate limit exceeded. Try again later.',
         retryAfter: 60
       });
+      return;
     }
 
     res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
 
     // Parse and validate request
+    const body = req.body as unknown;
+    if (!isValidTTSRequest(body)) {
+      const err: ApiErrorResponse = {
+        success: false,
+        error: 'Invalid request body',
+        details: 'Request must include valid text (1-5000 chars) and token',
+        timestamp: new Date().toISOString(),
+      };
+      res.status(400).json(err);
+      return;
+    }
+
     const {
       text,
       voiceId = process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
       modelId = process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5',
+      // per ElevenLabs API, voice_settings fields are optional; default below:
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       voiceSettings = {
         stability: 0.5,
         similarity_boost: 0.75,
@@ -148,7 +163,7 @@ export default async function handler(
       },
       outputFormat = 'mp3_44100_128',
       optimizeStreamingLatency = 2
-    }: TTSRequest = req.body || {};
+    } = body as TTSRequestBody;
 
     if (!text || typeof text !== 'string') {
       return res.status(400).json({
@@ -178,20 +193,24 @@ export default async function handler(
 
     // Call ElevenLabs TTS API
     const elevenLabsUrl = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
-    
-    const elevenLabsResponse = await fetch(elevenLabsUrl, {
+
+    const elevenLabsResponse = await (globalThis as any).fetch(elevenLabsUrl, {
       method: 'POST',
       headers: {
-        'Accept': 'audio/mpeg',
+        Accept: 'audio/mpeg',
         'Content-Type': 'application/json',
         'xi-api-key': elevenLabsApiKey,
       },
       body: JSON.stringify({
         text: cleanText,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         model_id: modelId,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         voice_settings: voiceSettings,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         output_format: outputFormat,
-        optimize_streaming_latency: optimizeStreamingLatency
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        optimize_streaming_latency: optimizeStreamingLatency,
       }),
     });
 
@@ -213,7 +232,8 @@ export default async function handler(
 
     // Get audio data
     const audioBuffer = await elevenLabsResponse.arrayBuffer();
-    const audioData = Buffer.from(audioBuffer);
+    // eslint-disable-next-line no-undef
+    const audioData = Buffer.from(audioBuffer as ArrayBuffer);
 
     // Set appropriate headers for audio response
     res.setHeader('Content-Type', 'audio/mpeg');
@@ -229,10 +249,12 @@ export default async function handler(
 
   } catch (error) {
     console.error('TTS endpoint error:', error);
-    res.status(500).json({
+    const err: ApiErrorResponse = {
       success: false,
       error: 'Internal server error',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    });
+      details: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    };
+    res.status(500).json(err);
   }
 }

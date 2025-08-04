@@ -1,20 +1,22 @@
-import { createCDPAdapter, CDPAdapter, BlockchainConfig } from '@nyxusd/cdp-adapters';
-import { 
-  CDP, 
-  CDPId, 
+import { createCDPAdapter, CDPAdapter, BlockchainConfig, CDPResult } from '@nyxusd/cdp-adapters';
+import type {
+  CDP,
+  CDPId,
   CDPCreationParams,
+} from '@nyxusd/cdp-core/src/types';
+import type {
   DepositCollateralParams,
   WithdrawCollateralParams,
   MintNYXUSDParams,
-  BurnNYXUSDParams
-} from '@nyxusd/cdp-core';
+  BurnNYXUSDParams,
+} from '@nyxusd/cdp-adapters';
 
 /**
  * Unified CDP SDK configuration
  */
 export interface CDP_SDK_Config {
-  chain: string;
-  config: BlockchainConfig;
+  readonly chain: string;
+  readonly config: BlockchainConfig;
 }
 
 /**
@@ -22,91 +24,67 @@ export interface CDP_SDK_Config {
  */
 export class NyxUSD_CDP_SDK {
   private adapter: CDPAdapter;
-  
+
   constructor(config: CDP_SDK_Config) {
     this.adapter = createCDPAdapter(config.chain, config.config);
   }
-  
+
   /**
    * Create a new CDP
    */
-  async createCDP(params: CDPCreationParams): Promise<
-    { success: true; data: CDP } | 
-    { success: false; error: any }
-  > {
+  async createCDP(params: CDPCreationParams): CDPResult<CDP> {
     return this.adapter.createCDP(params);
   }
-  
+
   /**
    * Deposit collateral into a CDP
    */
-  async depositCollateral(params: DepositCollateralParams): Promise<
-    { success: true; data: any } | 
-    { success: false; error: any }
-  > {
+  async depositCollateral(params: DepositCollateralParams): CDPResult<CDP> {
     return this.adapter.depositCollateral(params);
   }
-  
+
   /**
    * Withdraw collateral from a CDP
    */
-  async withdrawCollateral(params: WithdrawCollateralParams): Promise<
-    { success: true; data: any } | 
-    { success: false; error: any }
-  > {
+  async withdrawCollateral(params: WithdrawCollateralParams): CDPResult<CDP> {
     return this.adapter.withdrawCollateral(params);
   }
-  
+
   /**
    * Mint debt (nyxUSD) from a CDP
    */
-  async mintDebt(params: MintNYXUSDParams): Promise<
-    { success: true; data: any } | 
-    { success: false; error: any }
-  > {
+  async mintDebt(params: MintNYXUSDParams): CDPResult<CDP> {
     return this.adapter.mintDebt(params);
   }
-  
+
   /**
    * Burn debt (nyxUSD) to reduce CDP debt
    */
-  async burnDebt(params: BurnNYXUSDParams): Promise<
-    { success: true; data: any } | 
-    { success: false; error: any }
-  > {
+  async burnDebt(params: BurnNYXUSDParams): CDPResult<CDP> {
     return this.adapter.burnDebt(params);
   }
-  
+
   /**
    * Get a specific CDP by ID
    */
-  async getCDP(id: CDPId): Promise<
-    { success: true; data: any } | 
-    { success: false; error: any }
-  > {
+  async getCDP(id: CDPId): CDPResult<import('@nyxusd/cdp-adapters').Option<CDP>> {
     return this.adapter.getCDP(id);
   }
-  
+
   /**
    * Get all CDPs owned by an address
    */
-  async getCDPsByOwner(owner: string): Promise<
-    { success: true; data: CDP[] } | 
-    { success: false; error: any }
-  > {
+  async getCDPsByOwner(owner: string): CDPResult<readonly CDP[]> {
     return this.adapter.getCDPsByOwner(owner);
   }
-  
+
   /**
    * Get system statistics
    */
-  async getSystemStats(): Promise<
-    { success: true; data: any } | 
-    { success: false; error: any }
-  > {
+  async getSystemStats(): CDPResult<import('@nyxusd/cdp-core/src/types').CDPStats> {
     return this.adapter.getSystemStats();
   }
-  
+
   /**
    * Switch to a different blockchain adapter
    */

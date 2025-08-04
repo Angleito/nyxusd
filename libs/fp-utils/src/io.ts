@@ -126,7 +126,7 @@ export class IO<T> {
    * @param fn - Function that returns an IO for side effects
    * @returns This IO with side effects applied
    */
-  tapIO(fn: (value: T) => IO<any>): IO<T> {
+  tapIO(fn: (value: T) => IO<unknown>): IO<T> {
     return this.flatMap((value) => fn(value).map(() => value));
   }
 

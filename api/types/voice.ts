@@ -1,23 +1,13 @@
 /**
  * Voice API TypeScript Type Definitions
- * 
- * Comprehensive type definitions for ElevenLabs integration,
- * JWT tokens, and voice service responses.
+ *
+ * Centralized, precise types for Voice API endpoints and ElevenLabs integration.
+ * Includes runtime guards for narrowing unknown JSON.
  */
 
-// ElevenLabs API Response Types
-export interface ElevenLabsUser {
-  readonly user_id: string;
-  readonly subscription: ElevenLabsSubscription;
-  readonly is_new_user: boolean;
-  readonly xi_api_key: string;
-  readonly can_extend_character_limit: boolean;
-  readonly can_extend_voice_limit: boolean;
-  readonly can_use_instant_voice_cloning: boolean;
-  readonly can_use_professional_voice_cloning: boolean;
-  readonly available_for_tiers: ReadonlyArray<string>;
-  readonly xi_api_key_id: string;
-}
+/* =========================
+ * ElevenLabs API Types
+ * ========================= */
 
 export interface ElevenLabsSubscription {
   readonly tier: 'free' | 'starter' | 'creator' | 'pro' | 'scale' | 'business';
@@ -37,7 +27,23 @@ export interface ElevenLabsSubscription {
   readonly status: 'free' | 'active' | 'inactive';
 }
 
-// Voice Configuration Types
+export interface ElevenLabsUser {
+  readonly user_id: string;
+  readonly subscription: ElevenLabsSubscription;
+  readonly is_new_user: boolean;
+  readonly xi_api_key: string;
+  readonly can_extend_character_limit: boolean;
+  readonly can_extend_voice_limit: boolean;
+  readonly can_use_instant_voice_cloning: boolean;
+  readonly can_use_professional_voice_cloning: boolean;
+  readonly available_for_tiers: ReadonlyArray<string>;
+  readonly xi_api_key_id: string;
+}
+
+/* =========================
+ * Voice Config Types
+ * ========================= */
+
 export interface VoiceSettings {
   readonly stability: number;
   readonly similarity_boost: number;
@@ -67,7 +73,7 @@ export interface VoiceFeatures {
 export interface VoiceEndpoints {
   readonly session: string;
   readonly tts: string;
-  readonly config: string;
+  readonly config?: string;
   readonly health: string;
   readonly token: string;
 }
@@ -82,7 +88,10 @@ export interface VoiceConfig {
   readonly endpoints: VoiceEndpoints;
 }
 
-// JWT Token Types
+/* =========================
+ * JWT / Token Types
+ * ========================= */
+
 export interface VoiceTokenPayload {
   readonly sessionId: string;
   readonly voiceId: string;
@@ -99,12 +108,19 @@ export interface TokenConfig {
   readonly voiceSettings: VoiceSettings;
 }
 
-// API Request/Response Types
+/* =========================
+ * API Contracts
+ * ========================= */
+
 export interface TTSRequestBody {
   readonly text: string;
   readonly voiceId?: string;
   readonly modelId?: string;
   readonly token: string;
+}
+
+export interface TTSResponseBodySuccess {
+  readonly success: true;
 }
 
 export interface VoiceHealthStatus {
@@ -119,7 +135,6 @@ export interface ServerlessInfo {
   readonly environment: string;
 }
 
-// API Response Types
 export interface VoiceConfigResponse {
   readonly success: true;
   readonly configured: boolean;
@@ -151,30 +166,133 @@ export interface ApiErrorResponse {
   readonly timestamp?: string;
 }
 
-// Type guards for runtime validation
+/* =========================
+ * Conversational Agent Types
+ * ========================= */
+
+export interface AgentContext {
+  readonly userProfile?: unknown;
+  readonly conversationHistory?: ReadonlyArray<unknown>;
+  readonly memoryContext?: string;
+  readonly defiCapabilities?: unknown;
+}
+
+export interface AgentConfig {
+  readonly voiceId?: string;
+  readonly modelId?: string;
+  readonly language?: string;
+  readonly firstMessage?: string;
+}
+
+export interface AgentRequest {
+  readonly sessionId?: string;
+  readonly userId?: string;
+  readonly context?: AgentContext;
+  readonly config?: AgentConfig;
+}
+
+export interface AgentResponse {
+  readonly success: true;
+  readonly agentId: string;
+  readonly sessionId: string;
+  readonly websocketUrl: string;
+  readonly signedUrl?: string;
+  readonly expiresAt: string;
+  readonly config: {
+    readonly voiceId: string;
+    readonly modelId: string;
+    readonly language: string;
+    readonly firstMessage: string;
+  };
+  readonly timestamp: string;
+}
+
+/* If future WS/SSE events are emitted, this discriminated union can be used */
+export type AgentEvent =
+  | { readonly type: 'ready'; readonly agentId: string; readonly sessionId: string }
+  | { readonly type: 'message'; readonly role: 'assistant' | 'user'; readonly content: string; readonly ts: string }
+  | { readonly type: 'error'; readonly error: string; readonly details?: string; readonly ts: string };
+
+/* =========================
+ * Session Types
+ * ========================= */
+
+export interface SessionCreateRequest {
+  readonly action: 'start';
+  readonly sessionId?: string;
+  readonly userId?: string;
+  readonly context?: AgentContext;
+}
+
+export interface SessionEndRequest {
+  readonly action: 'end';
+  readonly sessionId: string;
+}
+
+export type SessionRequest = SessionCreateRequest | SessionEndRequest;
+
+export interface SessionCreateResponse {
+  readonly success: true;
+  readonly sessionId: string;
+  readonly token: string;
+  readonly expiresAt: string;
+  readonly elevenlabs: {
+    readonly connected: boolean;
+    readonly subscription: ElevenLabsSubscription | null;
+  };
+  readonly config: {
+    readonly voiceId: string;
+    readonly modelId: string;
+    readonly wsUrl: string;
+    readonly voiceSettings: VoiceSettings;
+  };
+}
+
+export interface SessionEndResponse {
+  readonly success: true;
+  readonly sessionId: string;
+  readonly ended: true;
+  readonly duration: number;
+  readonly summary: {
+    readonly startTime: string;
+    readonly endTime: string;
+    readonly durationMs: number;
+  };
+}
+
+/* =========================
+ * Runtime Guards
+ * ========================= */
+
 export function isValidTTSRequest(body: unknown): body is TTSRequestBody {
-  if (typeof body !== 'object' || body === null) {
-    return false;
-  }
-  
+  if (typeof body !== 'object' || body === null) return false;
   const req = body as Record<string, unknown>;
-  
-  return (
-    typeof req['text'] === 'string' &&
-    req['text'].length > 0 &&
-    req['text'].length <= 5000 &&
-    typeof req['token'] === 'string' &&
-    req['token'].length > 0 &&
-    (req['voiceId'] === undefined || typeof req['voiceId'] === 'string') &&
-    (req['modelId'] === undefined || typeof req['modelId'] === 'string')
-  );
+  if (typeof req['text'] !== 'string') return false;
+  if (req['text'].length === 0 || req['text'].length > 5000) return false;
+  if (typeof req['token'] !== 'string' || req['token'].length === 0) return false;
+  if (req['voiceId'] !== undefined && typeof req['voiceId'] !== 'string') return false;
+  if (req['modelId'] !== undefined && typeof req['modelId'] !== 'string') return false;
+  return true;
 }
 
 export function isValidSessionId(sessionId: unknown): sessionId is string {
   return typeof sessionId === 'string' && sessionId.length > 0;
 }
 
-// Environment variable validation
+export function isAgentRequest(body: unknown): body is AgentRequest {
+  if (typeof body !== 'object' || body === null) return false;
+  const b = body as Record<string, unknown>;
+  if (b['sessionId'] !== undefined && typeof b['sessionId'] !== 'string') return false;
+  if (b['userId'] !== undefined && typeof b['userId'] !== 'string') return false;
+  if (b['context'] !== undefined && typeof b['context'] !== 'object') return false;
+  if (b['config'] !== undefined && typeof b['config'] !== 'object') return false;
+  return true;
+}
+
+/* =========================
+ * Environment Validation
+ * ========================= */
+
 export interface VoiceEnvironment {
   readonly ELEVENLABS_API_KEY: string;
   readonly ELEVENLABS_DEFAULT_VOICE_ID: string;
@@ -194,7 +312,6 @@ export function validateVoiceEnvironment(): {
   const errors: string[] = [];
   const envData: Record<string, string | undefined> = {};
 
-  // Required environment variables
   const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
   if (!elevenLabsApiKey) {
     errors.push('ELEVENLABS_API_KEY is required');
@@ -209,9 +326,10 @@ export function validateVoiceEnvironment(): {
     envData['JWT_SECRET'] = jwtSecret;
   }
 
-  // Optional with defaults
-  envData['ELEVENLABS_DEFAULT_VOICE_ID'] = process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL';
-  envData['ELEVENLABS_MODEL_ID'] = process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5';
+  envData['ELEVENLABS_DEFAULT_VOICE_ID'] =
+    process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL';
+  envData['ELEVENLABS_MODEL_ID'] =
+    process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5';
   envData['NODE_ENV'] = process.env['NODE_ENV'];
   envData['VERCEL_ENV'] = process.env['VERCEL_ENV'];
   envData['VERCEL_REGION'] = process.env['VERCEL_REGION'];
@@ -220,6 +338,15 @@ export function validateVoiceEnvironment(): {
   return {
     isValid: errors.length === 0,
     env: envData as Partial<VoiceEnvironment>,
-    errors
+    errors,
   };
 }
+
+/* =========================
+ * Barrel export helper
+ * ========================= */
+
+export type {
+  // re-export well-known response shapes for convenience if needed externally
+  TTSResponseBodySuccess as TTSResponseBody,
+};

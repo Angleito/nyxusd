@@ -1,5 +1,15 @@
 export { BaseCDPAdapter } from './baseAdapter';
-export { CDPAdapter, CDPResult, BlockchainConfig } from './types';
+export {
+  CDPAdapter,
+  CDPResult,
+  BlockchainConfig,
+  // Expose operation parameter types and Option used by SDK/consumers
+  Option,
+  DepositCollateralParams,
+  WithdrawCollateralParams,
+  MintNYXUSDParams,
+  BurnNYXUSDParams,
+} from './types';
 
 // Blockchain-specific adapters
 export { EthereumCDPAdapter } from './ethereum';
