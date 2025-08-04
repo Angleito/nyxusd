@@ -34,11 +34,6 @@ const mainNavItems: NavItem[] = [
     description: "Choose Safe, Medium, or High Risk pool",
   },
   {
-    label: "Pools",
-    href: "/pools",
-    description: "Choose Safe, Medium, or High Risk pool",
-  },
-  {
     label: "My CDPs",
     href: "/cdp",
     description: "Manage your Collateralized Debt Positions",

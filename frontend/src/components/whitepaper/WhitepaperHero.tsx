@@ -151,7 +151,7 @@ export const WhitepaperHero: React.FC<WhitepaperHeroProps> = ({ onViewClick }) =
             className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6"
           >
             {[
-              { label: 'Community Owned', value: '50%' },
+              { label: 'Community Owned', value: '70%' },
               { label: 'Revenue Multiplier', value: '2.46x' },
               { label: 'Target APY', value: '5-100%+' },
               { label: 'Response Time', value: '<3s' },
