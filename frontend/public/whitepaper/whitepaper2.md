@@ -6,15 +6,15 @@
 
 ## Executive Summary {#executive-summary}
 
-DeFi has created unprecedented financial opportunities, yet 95% of potential users remain locked out by complexity. While $150 billion sits in traditional stablecoins earning nothing, sophisticated yield strategies remain the exclusive domain of whales and institutions.
+DeFi has created unprecedented financial opportunities, yet most potential users remain locked out by complexity. While billions sit in traditional stablecoins earning nothing, sophisticated yield strategies remain the exclusive domain of whales and institutions.
 
 **NyxUSD changes everything.**
 
 We've built the first protocol where artificial intelligence doesn't just optimize yields—it creates and deploys custom smart contracts based on plain English requests. Users choose from three risk-calibrated pools or describe their goals to our AI, which then generates, tests, and deploys personalized yield strategies across multiple chains.
 
 **Core Innovation Highlights:**
-- **On-Chain Data Intelligence**: Our AI analyzes millions of transactions, liquidity flows, and yield patterns across Base and Sui
-- **Autonomous Smart Contract Generation**: First protocol where AI writes and deploys custom strategies
+- **On-Chain Data Intelligence**: Our AI analyzes transaction patterns, liquidity flows, and yield opportunities across Base and Sui
+- **Autonomous Smart Contract Generation**: Protocol where AI writes and deploys custom strategies
 - **Cross-Chain Native**: Seamless operation across multiple blockchains without manual bridging
 - **Natural Language Interface**: Making DeFi as simple as having a conversation
 
@@ -27,12 +27,12 @@ We've built the first protocol where artificial intelligence doesn't just optimi
 5. **Conversational DeFi**: Transform complex strategies into simple conversations
 6. **Self-Improving AI**: Machine learning models that evolve with market conditions
 
-### Key Metrics
-- **Target APY**: 5-100%+ across risk tiers
-- **Response Time**: <3 seconds for AI strategy generation
-- **Cross-Chain Efficiency**: 40% lower gas costs through intelligent routing
-- **Revenue Multiplier**: 2.46x more revenue per CDP than MakerDAO
-- **Custom Portfolio Fee**: 3% one-time for custom contracts + 10% performance fee for AI monitoring
+### Key Features (Hackathon POC)
+- **Multiple Risk Tiers**: Safe, Medium, and High-risk yield strategies
+- **AI Strategy Generation**: Fast response times for custom contract creation
+- **Cross-Chain Architecture**: Efficient routing across multiple blockchains
+- **Dual Revenue Model**: Revenue from both stability fees and deployed collateral yields
+- **Custom Portfolio Creation**: One-time fees for AI-generated contracts with performance monitoring
 
 ---
 
@@ -105,25 +105,25 @@ The decentralized finance revolution promised financial freedom for everyone. In
 
 NyxUSD transforms the entire DeFi experience into three simple choices—or one conversation:
 
-### 🛡️ **Safe Pool** (5-10% APY)
+### 🛡️ **Safe Pool** (Conservative Strategy)
 
-The Safe Pool prioritizes capital preservation while generating consistent returns. Our AI allocates funds across blue-chip protocols like Aave, Compound, and Pendle's fixed-yield products. The system continuously monitors rates and automatically rebalances to capture the best risk-adjusted returns. With zero leverage and diversification across multiple protocols, this pool maintains a 95/100 safety score with virtually no liquidation risk.
+The Safe Pool prioritizes capital preservation while generating steady returns. Our AI allocates funds across established protocols like Aave and Compound. The system continuously monitors rates and automatically rebalances to capture optimal risk-adjusted returns. With zero leverage and diversification across multiple protocols, this pool maintains high safety standards with minimal liquidation risk.
 
 **Perfect for**: Conservative investors, treasuries, long-term holdings
 
-### ⚡ **Medium Pool** (10-25% APY)
+### ⚡ **Medium Pool** (Balanced Strategy)
 
-The Medium Pool balances growth with controlled risk exposure. Our AI employs moderate leverage (2-3x maximum) across established protocols on both Base and Sui chains. The system dynamically adjusts positions based on market conditions, automatically deleveraging during high volatility periods. With a safety score of 75/100, this pool includes automated liquidation protection to safeguard user funds.
+The Medium Pool balances growth with controlled risk exposure. Our AI employs moderate leverage across established protocols on both Base and Sui chains. The system dynamically adjusts positions based on market conditions, automatically deleveraging during high volatility periods. This pool includes automated liquidation protection to safeguard user funds.
 
-**Perfect for**: Balanced growth seekers, 6-12 month horizons
+**Perfect for**: Balanced growth seekers, medium-term horizons
 
-### 🚀 **High Risk Pool** (25-100%+ APY)
+### 🚀 **High Risk Pool** (Aggressive Strategy)
 
-The High Risk Pool pursues aggressive yield opportunities across new protocol launches, concentrated liquidity positions, and perpetual funding strategies. While accepting higher risk with a 45/100 safety score, the AI implements mandatory stop-losses at -15% to limit downside. The system can utilize up to 10x leverage but continuously monitors positions for risk management.
+The High Risk Pool pursues aggressive yield opportunities across new protocol launches, concentrated liquidity positions, and advanced DeFi strategies. While accepting higher risk, the AI implements mandatory stop-losses to limit downside. The system monitors positions continuously for risk management.
 
 **Perfect for**: Experienced yield farmers, risk-tolerant investors
 
-### 🤖 **Custom AI Portfolios** (Variable APY)
+### 🤖 **Custom AI Portfolios** (Personalized Strategy)
 
 This is where NyxUSD becomes revolutionary. Users simply describe their financial goals in plain English, and our AI creates a complete custom strategy:
 
@@ -187,12 +187,12 @@ The NyxUSD architecture consists of four main layers working in harmony:
 
 Traditional CDP protocols like MakerDAO only earn from stability fees charged to borrowers. NyxUSD revolutionizes this model by generating revenue from two sources simultaneously:
 
-When users deposit collateral and mint NyxUSD stablecoins, they pay a standard 5% annual stability fee. But unlike traditional protocols where the minted stablecoins sit idle, NyxUSD immediately deploys these funds into yield-generating strategies. This deployment generates an additional 3-8% annual return that flows directly to the protocol treasury.
+When users deposit collateral and mint NyxUSD stablecoins, they pay a stability fee. But unlike traditional protocols where the minted stablecoins sit idle, NyxUSD immediately deploys these funds into yield-generating strategies. This deployment generates additional returns that flow to the protocol treasury.
 
-This dual revenue model means that for every $1 million in CDP positions:
-- Traditional protocols earn $50,000 annually from stability fees
-- NyxUSD earns $50,000 from fees PLUS $65,000 from deployment yields
-- Total revenue: $115,000 (2.3x multiplier)
+This dual revenue model creates a significant advantage:
+- Traditional protocols only earn from stability fees
+- NyxUSD earns from fees PLUS deployment yields, creating multiple revenue streams
+- Creates a revenue multiplier effect compared to traditional CDP protocols
 
 The system maintains careful collateralization ratios and includes AI-powered monitoring to protect positions from liquidation while maximizing yield generation.
 
@@ -231,7 +231,7 @@ The system evaluates multiple paths considering:
 - Historical reliability and uptime
 - Current congestion levels
 
-This hybrid approach typically reduces cross-chain costs by 40-60% compared to using only decentralized bridges, while maintaining user optionality between trustless and centralized paths.
+This hybrid approach aims to reduce cross-chain costs compared to using only decentralized bridges, while maintaining user optionality between trustless and centralized paths.
 
 **Revolutionary Native BTC Access**: Through our integration with IKA Protocol's 2MPC (Two-Party Multi-Party Computation) network on Sui, Ethereum users can now buy and control native Bitcoin without wrapped tokens or synthetic representations. This breakthrough technology enables:
 
@@ -389,16 +389,15 @@ Total Supply: 1,000,000,000 NYX
 
 NyxUSD generates revenue from multiple innovative streams:
 
-#### Revenue Streams Breakdown
+#### Revenue Streams Breakdown (Concept)
 
-| Source | Rate | Estimated Annual Revenue |
-|--------|------|---------------------------------------|
-| CDP Stability Fees | 5% | $25M |
-| CDP Deployment Yields | 3-8% | $50M |
-| AI Performance Fees | 10% of profits from AI monitoring | $15M |
-| Custom Contract Creation | 3% one-time fee | $10M |
-| Premium Features | Subscription | $5M |
-| **Total** | | **$105M** |
+| Source | Rate | Description |
+|--------|------|-------------|
+| CDP Stability Fees | 5% | Standard borrowing fees on minted stablecoins |
+| CDP Deployment Yields | Variable | Yields generated from deploying minted assets |
+| AI Performance Fees | 10% of profits | Fees from AI monitoring and optimization |
+| Custom Contract Creation | 3% one-time | Fee for AI-generated custom strategies |
+| Premium Features | Subscription | Advanced AI features and analytics |
 
 The dual CDP revenue model is particularly innovative—while users pay standard stability fees, the protocol also earns yields by deploying their minted NyxUSD productively. This creates a compounding effect where every dollar borrowed strengthens the protocol treasury.
 
@@ -419,25 +418,23 @@ This distribution ensures the protocol can weather market downturns, continuousl
 
 ### Sustainable Growth Mechanics
 
-#### Treasury Growth Projection
+#### Treasury Growth Model (Conceptual)
 
-Based on conservative growth estimates:
-- Year 1: $10M revenue generating $3.5M for treasury
-- Year 2: $50M revenue generating $17.5M for treasury
-- Year 3: $105M revenue generating $36.75M for treasury
-- Cumulative Treasury Value: $57.75M
-
-This treasury growth enables sustained development, marketing, and user acquisition without relying on token emissions.
+The treasury grows through sustainable fee collection:
+- Revenue scales with protocol adoption and usage
+- Treasury funds enable continuous development and improvements  
+- Growth supports user acquisition without relying on token emissions
+- All growth projections are theoretical until protocol launches
 
 #### Insurance Fund
 
-The insurance fund targets 10% of assets under management to protect users against:
-- Smart contract exploits (up to $10M coverage)
-- Oracle failures (up to $5M coverage)
-- Bridge security issues (up to $5M coverage)
-- AI errors (up to $2M coverage)
+The insurance fund is designed to protect users against various risks:
+- Smart contract exploits and vulnerabilities
+- Oracle failures and price manipulation
+- Bridge security issues and cross-chain risks
+- AI errors and unexpected behavior
 
-Claims are processed through DAO governance, ensuring community oversight of fund usage.
+Coverage amounts and fund size will be determined based on actual protocol usage and community governance decisions.
 
 ---
 
@@ -456,8 +453,8 @@ Claims are processed through DAO governance, ensuring community oversight of fun
 | **AI Chat Interface** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **Educational AI** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | **Personalized Strategies** | ✅ | ❌ | ❌ | 🟡 | ❌ |
-| **Average APY** | 5-100%+ | 5-20% | 10-30% | 8-25% | 0% |
-| **Setup Time** | 3 mins | 30 mins | 20 mins | 25 mins | 45 mins |
+| **Yield Strategy** | Multiple Tiers | Fixed Vaults | Auto-compound | Managed | No Yield |
+| **User Experience** | Conversational | Manual Selection | Manual Selection | Manual Selection | Complex Setup |
 
 ### Competitive Advantages Deep Dive
 
@@ -643,7 +640,7 @@ We partner with protocols and platforms that share our values:
 - Integrate first yield protocols (Aave, Compound)
 - Launch AI contract generation beta
 - Begin security audits
-- Target: 100 early users
+- Goal: Build with community feedback
 
 #### Q1 2026: Beta Expansion & Real-World Integration
 - Mainnet deployment on Base
@@ -657,7 +654,7 @@ We partner with protocols and platforms that share our values:
   - Support Apple Pay and Google Pay for seamless mobile payments
   - Implement secure payment authorization through AI assistant
   - Deploy automated risk management for collateral-backed spending
-- Target: 1,000 users, 100+ merchants accepting NyxUSD CDP payments
+- Goal: Community adoption and real-world utility
 
 #### Q2 2026: Full Launch
 - Midnight chain integration (following Base and Sui)
@@ -666,7 +663,7 @@ We partner with protocols and platforms that share our values:
 - Mobile application release
 - Advanced AI strategies live
 - Institutional features
-- Target: 10,000 users
+- Goal: Full multi-chain deployment
 
 ### Blockchain Integration Sequence
 
@@ -718,35 +715,34 @@ Each new chain integration undergoes rigorous security audits and gradual rollou
 ### Long-Term Vision (2026-2028)
 
 **Late 2026 Goals**:
-- 10,000+ active users
-- 10+ integrated protocols
-- Native iOS and Android applications
-- Native BTC integration fully operational
+- Multi-chain protocol deployment
+- Mobile application availability
+- Core integrations established
+- Community governance active
 
-**2027 Targets**:
-- 100,000+ active users
-- 25+ integrated protocols
-- Regulatory compliance in 5+ jurisdictions
-- Institutional partnerships established
+**2027 Vision**:
+- Expanded protocol integrations
+- Regulatory compliance framework
+- Sustainable community growth
+- Enhanced AI capabilities
 
-**2028 Vision**:
-- 1 million+ users globally
-- Become leading AI-powered DeFi interface
-- Enable sovereign wealth fund participation
-- Scale Brahma integration to support global payment infrastructure
-- Achieve regulatory approval for CDP-backed payments in major jurisdictions
+**2028 Long-term Vision**:
+- Leading community-owned DeFi interface
+- Global payment infrastructure integration
+- Regulatory approvals in key jurisdictions
+- Mature decentralized governance
 
-### Success Metrics (Post-Launch)
+### Success Framework (Conceptual)
 
-| Metric | 3 Months | 6 Months | 12 Months | 24 Months |
-|--------|----------|----------|-----------|-----------|
-| Users | 100 | 1,000 | 10,000 | 50,000 |
-| Custom Portfolios | 10 | 100 | 1,000 | 10,000 |
-| Daily DeFi Transactions | 50 | 500 | 5,000 | 25,000 |
-| Daily Payment Transactions | - | 50 | 1,000 | 10,000 |
-| Merchant Partners | - | 10 | 100 | 1,000 |
-| CDP-Backed Payment Volume | - | $100k | $5M | $50M |
-| Protocol Revenue | $5k | $50k | $500k | $2.5M |
+**Growth Indicators:**
+- **User Adoption**: Community growth and engagement
+- **Custom Portfolios**: AI-generated strategy adoption
+- **Transaction Volume**: Daily protocol usage
+- **Payment Integration**: Real-world utility adoption
+- **Merchant Network**: Payment acceptance growth
+- **Protocol Sustainability**: Revenue and treasury health
+
+**Note**: All metrics are conceptual projections for a hackathon POC. Actual performance will depend on market conditions, adoption, and successful implementation.
 
 ---
 
