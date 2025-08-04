@@ -883,7 +883,7 @@ export function AIAssistantProvider({
         if (response) {
           // Update the message with final content
           updateMessage(aiMessageId, {
-            content: response.message,
+            content: response.message || "I apologize, but I couldn't generate a response. Please try again.",
             typing: false,
           });
 
@@ -903,7 +903,7 @@ export function AIAssistantProvider({
           }
 
           // Check if AI response mentions swapping
-          if (response.message.toLowerCase().includes('swap')) {
+          if (response.message && typeof response.message === 'string' && response.message.toLowerCase().includes('swap')) {
             await handleDeFiAction(response.message, aiMessageId);
           }
         } else {
