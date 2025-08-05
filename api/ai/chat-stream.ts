@@ -321,8 +321,16 @@ const streamOpenRouter = async (
   // Support Authorization bearer passthrough in addition to env
   const headerAuth = (request as any).__authToken as string | undefined;
   // Accept both OpenRouter and OpenAI keys; prefer header, then OPENROUTER_API_KEY, then OPENAI_API_KEY
-  const envKeyOpenRouter = process.env['OPENROUTER_API_KEY'];
-  const envKeyOpenAI = process.env['OPENAI_API_KEY'];
+  // Normalize environment variable loading across Vercel setups:
+  // Prefer OPENROUTER_API_KEY, then OPENAI_API_KEY, plus common aliases to avoid misconfig.
+  const envKeyOpenRouter =
+    process.env['OPENROUTER_API_KEY'] ||
+    process.env['OPENROUTER_KEY'] ||
+    process.env['NEXT_PUBLIC_OPENROUTER_API_KEY'];
+  const envKeyOpenAI =
+    process.env['OPENAI_API_KEY'] ||
+    process.env['OPENAI_SECRET_KEY'] ||
+    process.env['NEXT_PUBLIC_OPENAI_API_KEY'];
   const envKey = envKeyOpenRouter || envKeyOpenAI;
   const apiKey = headerAuth || envKey;
   
@@ -347,8 +355,8 @@ const streamOpenRouter = async (
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': process.env['APP_URL'] || 'https://nyxusd.com',
-        'X-Title': process.env['APP_NAME'] || 'NyxUSD',
+        'HTTP-Referer': process.env['APP_URL'] || process.env['FRONTEND_URL'] || 'https://nyxusd.com',
+        'X-Title': process.env['APP_NAME'] || process.env['VITE_APP_NAME'] || 'NyxUSD',
         'User-Agent': 'NyxUSD/1.0'
       },
       body: JSON.stringify({

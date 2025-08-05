@@ -352,8 +352,16 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
   // Prefer header if provided, otherwise use env
   const headerAuth = (request as any).__authToken as string | undefined;
   // Support both OpenRouter and OpenAI keys. Prefer header, then OPENROUTER_API_KEY, then OPENAI_API_KEY.
-  const envKeyOpenRouter = process.env['OPENROUTER_API_KEY'];
-  const envKeyOpenAI = process.env['OPENAI_API_KEY'];
+  // Normalize environment variable loading across Vercel setups:
+  // Prefer OPENROUTER_API_KEY, then OPENAI_API_KEY, then legacy names from .env.vercel if present.
+  const envKeyOpenRouter =
+    process.env['OPENROUTER_API_KEY'] ||
+    process.env['OPENROUTER_KEY'] || // legacy alias
+    process.env['NEXT_PUBLIC_OPENROUTER_API_KEY']; // avoid, but some projects misconfigure
+  const envKeyOpenAI =
+    process.env['OPENAI_API_KEY'] ||
+    process.env['OPENAI_SECRET_KEY'] || // alias
+    process.env['NEXT_PUBLIC_OPENAI_API_KEY']; // avoid, but normalize if set
   const envKey = envKeyOpenRouter || envKeyOpenAI;
   const apiKey = headerAuth || envKey;
 
@@ -380,8 +388,8 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
           headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
-            'HTTP-Referer': process.env['APP_URL'] || 'https://nyxusd.com',
-            'X-Title': process.env['APP_NAME'] || 'NyxUSD',
+            'HTTP-Referer': process.env['APP_URL'] || process.env['FRONTEND_URL'] || 'https://nyxusd.com',
+            'X-Title': process.env['APP_NAME'] || process.env['VITE_APP_NAME'] || 'NyxUSD',
             'User-Agent': 'NyxUSD/1.0'
           },
           body: JSON.stringify({
