@@ -91,7 +91,7 @@ function App() {
           <main>
             <AnimatePresence mode="wait">
               <Routes>
-                {/* Make the old ChatPage UI (EnhancedChatInterface via StandaloneAIAssistant) the default route */}
+                {/* Make the main dashboard the default route with Nyx profile visual */}
                 <Route
                   path="/"
                   element={
@@ -101,13 +101,15 @@ function App() {
                       exit="out"
                       variants={pageVariants}
                       transition={pageTransition}
-                      className="container mx-auto px-4 py-8 h-[calc(100vh-80px)]"
                     >
-                      <StandaloneAIAssistant />
+                      <HeroSection />
+                      <div className="container mx-auto px-4 py-8">
+                        <Dashboard variant="nyx" />
+                      </div>
                     </motion.div>
                   }
                 />
-                {/* Preserve previous landing dashboard at /home */}
+                {/* Provide dedicated routes for chat and the previous landing alias */}
                 <Route
                   path="/home"
                   element={
