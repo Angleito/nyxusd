@@ -88,7 +88,7 @@ function App() {
           {/* Demo Controller for Video Recording */}
           <DemoEnhancer />
           
-          <main>
+          <main className="relative z-10">
             <AnimatePresence mode="wait">
               <Routes>
                 {/* New dashboard as the default home page */}
@@ -101,9 +101,11 @@ function App() {
                       exit="out"
                       variants={pageVariants}
                       transition={pageTransition}
-                      className="container mx-auto px-4 py-8 h-[calc(100vh-80px)]"
                     >
-                      <UnifiedAIAssistant position="center" />
+                      <HeroSection />
+                      <div className="container mx-auto px-4 py-8">
+                        <Dashboard variant="nyx" />
+                      </div>
                     </motion.div>
                   }
                 />
