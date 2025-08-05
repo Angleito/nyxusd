@@ -351,7 +351,10 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
   // Support both env var and optional Authorization bearer passthrough from client
   // Prefer header if provided, otherwise use env
   const headerAuth = (request as any).__authToken as string | undefined;
-  const envKey = process.env['OPENROUTER_API_KEY'];
+  // Support both OpenRouter and OpenAI keys. Prefer header, then OPENROUTER_API_KEY, then OPENAI_API_KEY.
+  const envKeyOpenRouter = process.env['OPENROUTER_API_KEY'];
+  const envKeyOpenAI = process.env['OPENAI_API_KEY'];
+  const envKey = envKeyOpenRouter || envKeyOpenAI;
   const apiKey = headerAuth || envKey;
 
   if (!apiKey) {
@@ -565,6 +568,7 @@ const handleChatError = (res: VercelResponse, error: ChatError): void => {
         success: false,
         error: error.message || 'AI service configuration error'
       };
+      // Missing server-side credentials is a server misconfiguration; return 500 to avoid misleading 401
       res.status(500).json(configResponse);
       break;
     }

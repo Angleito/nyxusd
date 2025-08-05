@@ -331,7 +331,11 @@ export class LangChainAIService implements AIService {
 
   async validateConfiguration(): Promise<boolean> {
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
+      // Use relative path in dev or when VITE_API_URL is not set; default to current origin
+      const isDev = typeof window !== 'undefined' && (import.meta.env.DEV || window.location.hostname === 'localhost');
+      const baseUrl = import.meta.env.VITE_API_URL
+        ? import.meta.env.VITE_API_URL
+        : (isDev ? '' : (typeof window !== 'undefined' ? window.location.origin : 'https://nyxusd.com'));
       const apiUrl = `${baseUrl}/api/ai/chat`;
       
       console.log('🔧 AI Service: Validating configuration with URL:', apiUrl);
@@ -369,7 +373,7 @@ export class LangChainAIService implements AIService {
       console.error('🔧 AI Service: Validation failed, error:', bodyForLog);
 
       // Don't fail initialization solely for missing server-side config; allow app to run
-      if ((res.status === 401 || res.status === 500) && bodyForLog.includes('No auth credentials found')) {
+      if ((res.status === 401 || res.status === 500) && (bodyForLog.includes('No auth credentials found') || bodyForLog.includes('AI service configuration error'))) {
         console.warn('🔧 AI Service: API key not configured server-side; frontend will surface config error during use');
         this.isInitialized = true;
         return true;
@@ -402,7 +406,10 @@ export class LangChainAIService implements AIService {
       const model = this.selectModelByQueryType(queryType);
       
       // Call backend API
-      const baseUrl = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
+      const isDev2 = typeof window !== 'undefined' && (import.meta.env.DEV || window.location.hostname === 'localhost');
+      const baseUrl = import.meta.env.VITE_API_URL
+        ? import.meta.env.VITE_API_URL
+        : (isDev2 ? '' : (typeof window !== 'undefined' ? window.location.origin : 'https://nyxusd.com'));
       const apiUrl = `${baseUrl}/api/ai/chat`;
       
       console.log('🤖 AI Service: Environment variables:', {
@@ -469,7 +476,7 @@ export class LangChainAIService implements AIService {
         // Check for API key configuration errors
         if (
           (response.status === 401 || response.status === 500) &&
-          (errorText.includes('OpenRouter API key not configured') || errorText.includes('No auth credentials found'))
+          (errorText.includes('OpenRouter API key not configured') || errorText.includes('No auth credentials found') || errorText.includes('AI service configuration error'))
         ) {
           throw new Error('AI service is not properly configured. Please contact support.');
         }
@@ -573,7 +580,10 @@ export class LangChainAIService implements AIService {
       const model = this.selectModelByQueryType(queryType);
       
       // Call streaming backend API
-      const baseUrl = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
+      const isDev3 = typeof window !== 'undefined' && (import.meta.env.DEV || window.location.hostname === 'localhost');
+      const baseUrl = import.meta.env.VITE_API_URL
+        ? import.meta.env.VITE_API_URL
+        : (isDev3 ? '' : (typeof window !== 'undefined' ? window.location.origin : 'https://nyxusd.com'));
       const apiUrl = `${baseUrl}/api/ai/chat-stream`;
       
       console.log('🤖 AI Service: Making streaming request to:', apiUrl);
@@ -625,7 +635,7 @@ export class LangChainAIService implements AIService {
           }
           if (
             (response.status === 401 || response.status === 500) &&
-            (errorText.includes('OpenRouter API key not configured') || errorText.includes('No auth credentials found'))
+            (errorText.includes('OpenRouter API key not configured') || errorText.includes('No auth credentials found') || errorText.includes('AI service configuration error'))
           ) {
             throw new Error('AI service is not properly configured. Please contact support.');
           }

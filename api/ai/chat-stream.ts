@@ -320,7 +320,10 @@ const streamOpenRouter = async (
 ): Promise<E.Either<StreamError, void>> => {
   // Support Authorization bearer passthrough in addition to env
   const headerAuth = (request as any).__authToken as string | undefined;
-  const envKey = process.env['OPENROUTER_API_KEY'];
+  // Accept both OpenRouter and OpenAI keys; prefer header, then OPENROUTER_API_KEY, then OPENAI_API_KEY
+  const envKeyOpenRouter = process.env['OPENROUTER_API_KEY'];
+  const envKeyOpenAI = process.env['OPENAI_API_KEY'];
+  const envKey = envKeyOpenRouter || envKeyOpenAI;
   const apiKey = headerAuth || envKey;
   
   if (!apiKey) {
@@ -530,6 +533,7 @@ const handleStreamError = (res: VercelResponse, error: StreamError): void => {
       statusCode = 429;
       break;
     case 'API_CONFIG_ERROR':
+      // Missing server-side credentials is misconfiguration => 500
       errorMessage = error.message || 'AI service configuration error';
       statusCode = 500;
       break;
