@@ -91,7 +91,7 @@ function App() {
           <main className="relative z-10">
             <AnimatePresence mode="wait">
               <Routes>
-                {/* New dashboard as the default home page */}
+                {/* AI Assistant as the default home page */}
                 <Route
                   path="/"
                   element={
@@ -101,17 +101,15 @@ function App() {
                       exit="out"
                       variants={pageVariants}
                       transition={pageTransition}
+                      className="container mx-auto px-4 py-8 h-[calc(100vh-80px)]"
                     >
-                      <HeroSection />
-                      <div className="container mx-auto px-4 py-8">
-                        <Dashboard variant="nyx" />
-                      </div>
+                      <StandaloneAIAssistant />
                     </motion.div>
                   }
                 />
-                {/* Provide dedicated routes for chat and the previous landing alias */}
+                {/* Dashboard route with hero section */}
                 <Route
-                  path="/home"
+                  path="/dashboard"
                   element={
                     <motion.div
                       initial="initial"
