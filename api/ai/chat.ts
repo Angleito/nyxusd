@@ -1,5 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import type { ApiResponse, ErrorResponse, ValidationError } from '../types/shared.js';
+import { withRateLimit } from '../utils/rateLimit.js';
 import * as E from 'fp-ts/lib/Either.js';
 import * as TE from 'fp-ts/lib/TaskEither.js';
 import * as O from 'fp-ts/lib/Option.js';
@@ -406,9 +407,23 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
 
         if (!response.ok) {
           const errorText = await response.text().catch(() => 'Unknown error');
+          
+          // Try to parse error as JSON
+          let errorMessage = errorText;
+          try {
+            const errorData = JSON.parse(errorText);
+            if (errorData.error?.message) {
+              errorMessage = errorData.error.message;
+            } else if (errorData.message) {
+              errorMessage = errorData.message;
+            }
+          } catch {
+            // Keep original error text if not JSON
+          }
+          
           return Promise.reject({ 
             type: 'OPENROUTER_ERROR', 
-            message: errorText, 
+            message: errorMessage, 
             status: response.status 
           });
         }
@@ -544,7 +559,7 @@ const handleChatError = (res: VercelResponse, error: ChatError): void => {
     case 'API_CONFIG_ERROR': {
       const configResponse: ErrorResponse = {
         success: false,
-        error: 'AI service configuration error'
+        error: error.message || 'AI service configuration error'
       };
       res.status(500).json(configResponse);
       break;
@@ -597,7 +612,7 @@ const handleChatError = (res: VercelResponse, error: ChatError): void => {
  * @param res - Vercel response object
  * @returns Promise<void> - Resolves when response is sent
  */
-export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+async function chatHandler(req: VercelRequest, res: VercelResponse): Promise<void> {
   // Set security headers
   setSecurityHeaders(req, res);
 
@@ -660,3 +675,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     )
   )();
 }
+
+// Export with rate limiting applied
+export default withRateLimit(chatHandler, {
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 20, // 20 chat requests per minute per IP
+  message: 'Too many chat requests, please try again later.'
+});

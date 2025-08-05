@@ -358,6 +358,17 @@ export class LangChainAIService implements AIService {
         console.error('🔧 AI Service: Validation failed, error:', errorText);
       }
 
+      // Don't fail initialization for configuration errors
+      // The service can still be used, it will just return config error messages
+      if (response.status === 500) {
+        const errorText = await response.text();
+        if (errorText.includes('OpenRouter API key not configured') || errorText.includes('No auth credentials found')) {
+          console.warn('🔧 AI Service: API key not configured, service will return configuration errors');
+          this.isInitialized = true; // Allow initialization but service will return config errors
+          return true;
+        }
+      }
+      
       this.isInitialized = response.ok;
       return response.ok;
     } catch (error) {
@@ -448,6 +459,11 @@ export class LangChainAIService implements AIService {
           throw new Error('Invalid request format. Please try again with a different message.');
         }
         
+        // Check for API key configuration errors
+        if (response.status === 500 && (errorText.includes('OpenRouter API key not configured') || errorText.includes('No auth credentials found'))) {
+          throw new Error('AI service is not properly configured. Please contact support.');
+        }
+        
         throw new Error(errorData.error || `API error: ${response.status} - ${errorText}`);
       }
 
@@ -463,6 +479,10 @@ export class LangChainAIService implements AIService {
       }
       
       if (!data.success) {
+        // Check for configuration errors
+        if (data.error && (data.error.includes('OpenRouter API key not configured') || data.error.includes('No auth credentials found'))) {
+          throw new Error('AI service is not properly configured. Please contact support.');
+        }
         throw new Error(data.error || 'API request failed');
       }
 

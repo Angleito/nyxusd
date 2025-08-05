@@ -376,9 +376,23 @@ const streamOpenRouter = async (
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'Unknown error');
+      
+      // Try to parse error as JSON
+      let errorMessage = errorText;
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.error?.message) {
+          errorMessage = errorData.error.message;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch {
+        // Keep original error text if not JSON
+      }
+      
       return E.left({ 
         type: 'OPENROUTER_ERROR', 
-        message: errorText, 
+        message: errorMessage, 
         status: response.status 
       });
     }
@@ -513,7 +527,7 @@ const handleStreamError = (res: VercelResponse, error: StreamError): void => {
       statusCode = 429;
       break;
     case 'API_CONFIG_ERROR':
-      errorMessage = 'AI service configuration error';
+      errorMessage = error.message || 'AI service configuration error';
       statusCode = 500;
       break;
     case 'OPENROUTER_ERROR':
