@@ -10,6 +10,7 @@ import type {
   VoiceTokenPayload,
   ElevenLabsSubscription,
 } from '../types/voice.js';
+import { withRateLimit, rateLimiters } from '../utils/rateLimit.js';
 
 // Session storage (in production, use Redis or database)
 const activeSessions = new Map<string, {
@@ -32,7 +33,7 @@ setInterval((): void => {
   }
 }, 5 * 60 * 1000); // Clean every 5 minutes
 
-export default async function handler(
+async function sessionHandler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<void> {
@@ -115,14 +116,24 @@ export default async function handler(
       const now = Math.floor(Date.now() / 1000);
       const tokenPayload: VoiceTokenPayload = {
         sessionId: newSessionId,
-        voiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
+        voiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID']!,
         type: 'voice_session',
         iat: now,
         exp: now + (30 * 60),
       };
+      // JWT secret is required for secure token generation
+      const jwtSecret = process.env['JWT_SECRET'];
+      if (!jwtSecret) {
+        res.status(500).json({
+          success: false,
+          error: 'Voice service not configured (JWT secret missing)'
+        });
+        return;
+      }
+      
       const token = jwt.sign(
         tokenPayload,
-        process.env['JWT_SECRET'] || 'default-secret-change-in-production'
+        jwtSecret
       );
 
       // Test ElevenLabs API connectivity
@@ -149,7 +160,7 @@ export default async function handler(
             subscription: userData.subscription || null
           },
           config: {
-            voiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
+            voiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID']!,
             modelId: process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5',
             wsUrl: 'wss://api.elevenlabs.io/v1/text-to-speech',
             voiceSettings: {
@@ -228,3 +239,10 @@ export default async function handler(
     res.status(500).json(errResp);
   }
 }
+
+// Export with rate limiting applied
+export default withRateLimit(sessionHandler, {
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 20, // 20 session creations per minute per IP
+  message: 'Too many session creation attempts, please try again later.'
+});

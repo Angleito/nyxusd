@@ -20,7 +20,7 @@ describe('VoiceService fallback and TTS WebSocket handling', () => {
 
   it('initialization fallback: conversational init failure sets fallback to TTS and emits status/mode change', async () => {
     const svc = new VoiceService({
-      voiceId: 'EXAVITQu4vr4xnSDxMaL',
+      voiceId: 'test-voice-id',
       modelId: 'eleven_turbo_v2_5',
       conversationalMode: true,
     });

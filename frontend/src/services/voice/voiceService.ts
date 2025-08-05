@@ -72,13 +72,18 @@ export class VoiceService extends EventEmitter {
   private ws: WebSocket | null = null;
   private audioContext: AudioContext | null = null;
   private mediaRecorder: MediaRecorder | null = null;
- private recognition: ISpeechRecognition | null = null; // SpeechRecognition API
+  private recognition: ISpeechRecognition | null = null; // SpeechRecognition API
   private currentSession: VoiceSession | null = null;
   private audioQueue: ArrayBuffer[] = [];
   private isPlaying: boolean = false;
   private config: VoiceConfig;
   private apiKey: string | null = null;
   private conversationalAgent: ConversationalAgent | null = null;
+
+  // STT recording state
+  private sttStream: MediaStream | null = null;
+  private sttChunks: Blob[] = [];
+  private sttRecording: boolean = false;
   
   // Dual-mode architecture and fallback support
   private fallbackMode: 'tts' | 'conversational' | null = null;
@@ -92,7 +97,7 @@ export class VoiceService extends EventEmitter {
   constructor(config?: VoiceConfig) {
     super();
     this.config = config || {
-      voiceId: 'EXAVITQu4vr4xnSDxMaL', // Default voice (Sarah)
+      voiceId: '', // Will be populated from server config
       modelId: 'eleven_turbo_v2_5',
       stability: 0.5,
       similarityBoost: 0.75,
@@ -891,7 +896,7 @@ export class VoiceService extends EventEmitter {
         (serverCfg && serverCfg.config && typeof serverCfg.config.modelId === 'string' && serverCfg.config.modelId) || null;
 
       const cfg = this.getVoiceConfig();
-      const voiceId = cfg.voiceId || advertisedVoiceId || 'EXAVITQu4vr4xnSDxMaL';
+      const voiceId = cfg.voiceId || advertisedVoiceId || '';
       const modelId = cfg.modelId || advertisedModelId || 'eleven_turbo_v2_5';
 
       console.log('🎤 VoiceService: TTS request start', { voiceId, modelId, textLen: (text || '').length });
@@ -1245,6 +1250,76 @@ export class VoiceService extends EventEmitter {
     } catch {
       // ignore unlock errors
     }
+  }
+
+  // Speech-to-Text (STT) using backend Whisper endpoint
+  public async startSttRecording(mimeType: string = 'audio/webm'): Promise<void> {
+    if (this.sttRecording) return;
+    // Get mic
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    this.sttStream = stream;
+    this.sttChunks = [];
+    const mediaRecorder = new MediaRecorder(stream, { mimeType });
+    this.mediaRecorder = mediaRecorder;
+    mediaRecorder.ondataavailable = (ev) => {
+      if (ev.data && ev.data.size > 0) {
+        this.sttChunks.push(ev.data);
+      }
+    };
+    mediaRecorder.start(100); // small chunks
+    this.sttRecording = true;
+    this.emit('listeningStarted');
+  }
+
+  public async stopSttRecordingAndTranscribe(): Promise<string> {
+    if (!this.sttRecording || !this.mediaRecorder) {
+      throw new Error('STT not recording');
+    }
+    const mediaRecorder = this.mediaRecorder;
+    const stopped = new Promise<void>((resolve) => {
+      mediaRecorder.onstop = () => resolve();
+    });
+    mediaRecorder.stop();
+    await stopped;
+
+    const blob = new Blob(this.sttChunks, { type: this.sttChunks[0]?.type || 'audio/webm' });
+
+    // Cleanup stream
+    if (this.sttStream) {
+      this.sttStream.getTracks().forEach((t) => t.stop());
+      this.sttStream = null;
+    }
+    this.sttChunks = [];
+    this.sttRecording = false;
+    this.emit('listeningStopped');
+
+    const apiBase = import.meta.env.VITE_API_URL || window.location.origin;
+    const fd = new FormData();
+    fd.append('file', blob, 'speech.webm');
+
+    const resp = await fetch(`${apiBase}/api/voice/stt`, {
+      method: 'POST',
+      body: fd,
+    });
+
+    if (!resp.ok) {
+      const snippet = await resp.text().catch(() => '').then(t => t.slice(0, 200));
+      throw new Error(`STT request failed: ${resp.status} ${resp.statusText} - ${snippet}`);
+    }
+    const data = await resp.json().catch(() => ({} as any));
+    const text = typeof data?.text === 'string' ? data.text : '';
+    if (!text) {
+      throw new Error('Empty transcription');
+    }
+    // Emit events for UI parity
+    const result: TranscriptionResult = { text, isFinal: true, timestamp: new Date() };
+    this.emit('transcription', result);
+    this.emit('finalTranscription', result);
+    return text;
+  }
+
+  public isSttRecording(): boolean {
+    return this.sttRecording;
   }
 
   // Cleanup method

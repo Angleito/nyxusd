@@ -340,7 +340,7 @@ export function validateVoiceEnvironment(): {
   }
 
   envData['ELEVENLABS_DEFAULT_VOICE_ID'] =
-    process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL';
+    process.env['ELEVENLABS_DEFAULT_VOICE_ID']!;
   envData['ELEVENLABS_MODEL_ID'] =
     process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5';
   envData['NODE_ENV'] = process.env['NODE_ENV'];

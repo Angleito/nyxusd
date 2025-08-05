@@ -77,7 +77,9 @@ export default async function handler(
     
     res.status(200).json(response);
   } catch (error) {
-    console.error('Error generating voice token:', error);
+    // Log error without exposing sensitive details
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Voice token generation failed:', errorMessage);
     const errorResponse: ApiErrorResponse = {
       success: false,
       error: 'Failed to generate voice token',

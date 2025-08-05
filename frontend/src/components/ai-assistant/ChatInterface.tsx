@@ -21,7 +21,7 @@ export const ChatInterface: React.FC = () => {
 
   // Voice chat integration (no API key needed - uses secure server endpoint)
   const voiceChat = useVoiceChat({
-    voiceId: 'EXAVITQu4vr4xnSDxMaL', // Default voice
+    voiceId: '', // Will use voice ID from server config
     conversationalMode: isConversationalMode,
     onTranscription: (text, isFinal) => {
       if (isFinal && text.trim()) {

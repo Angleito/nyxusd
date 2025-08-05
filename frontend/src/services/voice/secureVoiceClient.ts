@@ -139,7 +139,7 @@ export class SecureVoiceClient {
       voiceId:
         typeof cfg?.['voiceId'] === 'string' && (cfg['voiceId'] as string).length > 0
           ? (cfg['voiceId'] as string)
-          : this.config?.config.defaultVoiceId || 'EXAVITQu4vr4xnSDxMaL',
+          : this.config?.config.defaultVoiceId || '',
       modelId:
         typeof cfg?.['modelId'] === 'string' && (cfg['modelId'] as string).length > 0
           ? (cfg['modelId'] as string)
@@ -318,7 +318,7 @@ export class SecureVoiceClient {
       this.config = {
         configured: false,
         config: {
-          defaultVoiceId: 'EXAVITQu4vr4xnSDxMaL',
+          defaultVoiceId: '',
           modelId: 'eleven_turbo_v2_5',
           availableVoices: [],
           voiceSettings: {

@@ -168,7 +168,7 @@ export default async function handler(
 
     const {
       text,
-      voiceId = process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
+      voiceId = process.env['ELEVENLABS_DEFAULT_VOICE_ID']!,
       modelId = process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5',
       // per ElevenLabs API, voice_settings fields are optional; default below:
       // eslint-disable-next-line @typescript-eslint/naming-convention

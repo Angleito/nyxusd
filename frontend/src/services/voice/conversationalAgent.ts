@@ -796,7 +796,7 @@ export function createConversationalAgent(config: ConversationalAgentConfig): Co
 
 // Singleton instance for default crypto assistant
 export const cryptoAgent = createConversationalAgent({
-  voiceId: 'EXAVITQu4vr4xnSDxMaL', // Default voice
+  voiceId: '', // Will use voice ID from server config
   agentPrompt: `
 You are a knowledgeable crypto and DeFi assistant for NYXUSD, a sophisticated stablecoin protocol. 
 You help users with portfolio analysis, yield farming strategies, and DeFi operations.

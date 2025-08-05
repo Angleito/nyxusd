@@ -113,7 +113,7 @@ export default async function handler(
       apiStatus,
       errorDetails,
       config: {
-        defaultVoiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID'] || 'EXAVITQu4vr4xnSDxMaL',
+        defaultVoiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID']!,
         modelId: process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5',
         availableVoices: availableVoices.map(v => ({
           id: v.id, name: v.name, description: v.description,
