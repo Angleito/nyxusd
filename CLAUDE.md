@@ -91,6 +91,9 @@ npm run validate              # Full validation (lint + type-check + test)
 # Python DeFi Finder
 python example_usage.py        # Test DeFi yield finder
 pytest test_defi_finder.py    # Run Python tests
+
+# Email Subscription Tests
+node api/test-subscriptions.mjs # Test email subscription endpoints
 ```
 
 ### Frontend-specific

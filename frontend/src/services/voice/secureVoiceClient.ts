@@ -328,6 +328,8 @@ export class SecureVoiceClient {
           text,
           voiceId: voiceId || tokenData.config.voiceId,
           modelId: modelId || tokenData.config.modelId,
+          // Include token in body to satisfy server validator isValidTTSRequest
+          token: tokenData.token,
         }),
       });
 
@@ -341,6 +343,14 @@ export class SecureVoiceClient {
           (typeof maybeJson.error === 'string' && maybeJson.error) ||
           `${response.status} ${response.statusText}`;
         throw new Error(`Failed to generate speech: ${msg}`);
+      }
+
+      // Ensure server returned audio, not JSON, to avoid decode failures upstream
+      const contentType = response.headers.get('Content-Type') || '';
+      if (!contentType.toLowerCase().includes('audio')) {
+        // Try to parse small snippet for diagnostics
+        const snippet = await response.text().catch(() => '').then(t => t.slice(0, 200));
+        throw new Error(`Unexpected TTS response type: ${contentType}. Snippet: ${snippet}`);
       }
 
       return await response.arrayBuffer();

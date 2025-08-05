@@ -85,6 +85,40 @@ export interface SystemMetrics {
   }>;
 }
 
+// Email Subscription Types
+export interface SubscriptionMetadata {
+  readonly userAgent?: string;
+  readonly referrer?: string;
+  readonly campaign?: string;
+}
+
+export interface EmailSubscription {
+  readonly email: string;
+  readonly subscribedAt: Date;
+  readonly source: string;
+  readonly ipAddress?: string;
+  readonly metadata?: SubscriptionMetadata;
+}
+
+export interface SubscriptionRequest {
+  readonly email: string;
+  readonly source?: string;
+  readonly metadata?: SubscriptionMetadata;
+}
+
+export interface SubscriptionResponse {
+  readonly success: boolean;
+  readonly message?: string;
+  readonly subscription?: EmailSubscription;
+  readonly error?: string;
+}
+
+export interface SubscriptionCountResponse {
+  readonly success: boolean;
+  readonly count: number;
+  readonly timestamp: string;
+}
+
 // Common Validation Error Types
 export interface ValidationError {
   readonly field: string;

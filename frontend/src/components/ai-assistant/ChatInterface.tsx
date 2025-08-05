@@ -113,6 +113,13 @@ export const ChatInterface: React.FC = () => {
       }
     }
   }, [state.messages, isConversationalMode]);
+  // 🔊 TTS-Bridge: call TTS on new AI message
+  useEffect(() => {
+    const lastMessage = state.messages[state.messages.length - 1];
+    if (lastMessage && lastMessage.sender === 'ai' && !lastMessage.typing) {
+      voiceChat.speakText(lastMessage.content);
+    }
+  }, [state.messages]);
 
   // Handle conversational mode toggle
   const handleConversationalModeToggle = async (): Promise<void> => {

@@ -886,7 +886,21 @@ export class VoiceService extends EventEmitter {
       const voiceId = cfg.voiceId || 'EXAVITQu4vr4xnSDxMaL';
       const modelId = cfg.modelId || 'eleven_turbo_v2_5';
 
+      console.log('🎤 VoiceService: TTS request start', { voiceId, modelId, textLen: (text || '').length });
+
       const audioBuffer = await secureVoiceClient.textToSpeech(text, voiceId, modelId);
+
+      console.log('🎤 VoiceService: TTS response received', { bytes: (audioBuffer && (audioBuffer as ArrayBuffer).byteLength) || 0 });
+
+      // Quick sanity probe: first few bytes (MPEG frames often start with 0xFF)
+      try {
+        const view = new Uint8Array(audioBuffer);
+        const head = Array.from(view.slice(0, 8));
+        console.log('🎤 VoiceService: TTS response head bytes', head);
+      } catch (e) {
+        console.warn('🎤 VoiceService: Unable to inspect audio buffer head');
+      }
+
       await this.playAudio(audioBuffer);
 
       // Emit finished when queue drains; we keep current queue processing behavior
@@ -897,7 +911,7 @@ export class VoiceService extends EventEmitter {
       }
       this.emit('speakingFinished');
     } catch (error) {
-      console.error('Error in text-to-speech:', error);
+      console.error('🎤 VoiceService: Error in text-to-speech', error);
       if (this.currentSession) {
         this.currentSession.status = 'error';
       }
@@ -1037,16 +1051,23 @@ export class VoiceService extends EventEmitter {
   }
 
  private async playAudio(audioData: ArrayBuffer): Promise<void> {
-   if (!this.audioContext) return;
+   if (!this.audioContext) {
+     console.warn('🎤 VoiceService: No AudioContext available');
+     return;
+   }
 
    // Attempt to resume if suspended (common after page load until user gesture)
    if (this.audioContext.state === 'suspended') {
      try {
+       console.log('🎤 VoiceService: AudioContext suspended, attempting resume');
        await this.audioContext.resume();
-     } catch {
-       // swallow
+       console.log('🎤 VoiceService: AudioContext state after resume', this.audioContext.state);
+     } catch (e) {
+       console.warn('🎤 VoiceService: Failed to resume AudioContext', e);
      }
    }
+
+   console.log('🎤 VoiceService: Queueing audio buffer', { bytes: audioData.byteLength, queueLen: this.audioQueue.length });
 
    this.audioQueue.push(audioData);
    
@@ -1069,18 +1090,26 @@ export class VoiceService extends EventEmitter {
     }
 
     try {
+      console.log('🎤 VoiceService: Decoding audio data...');
       const audioBuffer = await this.audioContext.decodeAudioData(audioData);
+      console.log('🎤 VoiceService: Decoded buffer', { duration: audioBuffer.duration, sampleRate: audioBuffer.sampleRate, channels: audioBuffer.numberOfChannels });
+ 
       const source = this.audioContext.createBufferSource();
       source.buffer = audioBuffer;
       source.connect(this.audioContext.destination);
       
       source.onended = () => {
+        console.log('🎤 VoiceService: Source ended, advancing queue');
         void this.processAudioQueue();
       };
       
       source.start();
-    } catch (error) {
-      console.error('Error playing audio:', error);
+      console.log('🎤 VoiceService: Playback started');
+    } catch (error: any) {
+      // decodeAudioData frequently throws when body is JSON or empty buffer
+      console.error('🎤 VoiceService: Error decoding/playing audio', {
+        name: error?.name, message: error?.message
+      });
       void this.processAudioQueue(); // Continue with next chunk
     }
   }

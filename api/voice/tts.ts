@@ -93,6 +93,7 @@ export default async function handler(
     // Check if ElevenLabs API key is configured
     const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
     if (!elevenLabsApiKey) {
+      console.error('[TTS] Missing ELEVENLABS_API_KEY');
       res.status(500).json({
         success: false,
         error: 'Voice service not configured (ElevenLabs API key missing)'
@@ -105,6 +106,7 @@ export default async function handler(
     const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
     if (!token) {
+      console.warn('[TTS] Missing Authorization bearer token');
       res.status(401).json({
         success: false,
         error: 'Authorization token required'
@@ -114,6 +116,7 @@ export default async function handler(
 
     const tokenValidation = validateToken(token);
     if (!tokenValidation.valid || !tokenValidation.payload) {
+      console.warn('[TTS] Invalid token provided');
       res.status(401).json({
         success: false,
         error: 'Invalid or expired token'
@@ -139,10 +142,20 @@ export default async function handler(
     }
 
     res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
+    // Lightweight request trace (no secrets)
+    try {
+      const ct = (req.headers['content-type'] || '').toString();
+      const origin = req.headers.origin || '';
+      console.log('[TTS] Incoming request', { origin, ct, remaining: rateLimitResult.remaining });
+    } catch (e) {
+      // eslint: explicitly log and proceed
+      console.warn('[TTS] Failed to log incoming request metadata');
+    }
 
     // Parse and validate request
     const body = req.body as unknown;
     if (!isValidTTSRequest(body)) {
+      console.warn('[TTS] Invalid request body (failing validator isValidTTSRequest)');
       const err: ApiErrorResponse = {
         success: false,
         error: 'Invalid request body',
@@ -200,6 +213,7 @@ export default async function handler(
 
     // Call ElevenLabs TTS API
     const elevenLabsUrl = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+    console.log('[TTS] Upstream request', { voiceId, modelId, len: cleanText.length, outputFormat, optimizeStreamingLatency });
 
     const elevenLabsResponse = await (globalThis as any).fetch(elevenLabsUrl, {
       method: 'POST',
@@ -242,6 +256,7 @@ export default async function handler(
     const audioBuffer = await elevenLabsResponse.arrayBuffer();
     // eslint-disable-next-line no-undef
     const audioData = Buffer.from(audioBuffer as ArrayBuffer);
+    console.log('[TTS] Upstream success', { bytes: audioData.length });
 
     // Set appropriate headers for audio response
     res.setHeader('Content-Type', 'audio/mpeg');
@@ -254,6 +269,11 @@ export default async function handler(
 
     // Return audio data
     res.status(200).send(audioData);
+    try {
+      console.log('[TTS] Response sent', { status: 200, bytes: audioData.length, ct: 'audio/mpeg' });
+    } catch (e) {
+      console.warn('[TTS] Failed to log response metadata');
+    }
 
   } catch (error) {
     console.error('TTS endpoint error:', error);
