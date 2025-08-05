@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Maximize2, Minimize2 } from "lucide-react";
-import { ChatInterface } from "./ChatInterface";
+import { EnhancedChatInterface } from "./EnhancedChatInterface";
 import { AIAssistantProvider } from "../../providers/AIAssistantProvider";
 
 interface UnifiedAIAssistantProps {
@@ -134,7 +134,7 @@ export const UnifiedAIAssistant: React.FC<UnifiedAIAssistantProps> = ({
                 </div>
 
                 {/* Chat component */}
-                <ChatInterface />
+                <EnhancedChatInterface />
               </div>
             </motion.div>
           )}
@@ -162,7 +162,7 @@ export const StandaloneAIAssistant: React.FC = () => {
   return (
     <AIAssistantProvider>
       <div className="w-full h-full">
-        <ChatInterface />
+        <EnhancedChatInterface />
       </div>
     </AIAssistantProvider>
   );

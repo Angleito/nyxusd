@@ -229,7 +229,7 @@ export const NyxHeader: React.FC = () => {
             <div className="hidden lg:flex items-center gap-6">
               <Navigation className="flex items-center" />
               <div className="flex items-center">
-                <NyxWalletConnectButton />
+                <CustomConnectButton variant="nyx" />
               </div>
             </div>
 

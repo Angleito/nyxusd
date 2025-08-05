@@ -6,12 +6,12 @@ import { fetchSystemStats, fetchOraclePrices } from "../../services/api";
 import { Card, CardContent, CardTitle, CardHeader } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { 
-  ShieldCheckIcon, 
-  CurrencyDollarIcon, 
-  ChartBarIcon,
-  UserCircleIcon,
-  ArrowRightIcon,
-  SparklesIcon,
+  Shield, 
+  DollarSign, 
+  BarChart3,
+  UserCircle,
+  ArrowRight,
+  Sparkles,
   Layout,
   Wallet
 } from "lucide-react";
@@ -139,7 +139,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <Card variant="glow" className="overflow-hidden">
             <div className="p-8 relative">
               <div className="absolute top-0 right-0 w-64 h-64 opacity-10">
-                <SparklesIcon className="w-full h-full" />
+                <Sparkles className="w-full h-full" />
               </div>
               <div className="relative z-10">
                 <h2 className="text-4xl font-bold mb-4">
@@ -150,17 +150,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <Link to="/ai-assistant">
-                    <Button variant="primary" icon={<UserCircleIcon className="w-5 h-5" />}>
+                    <Button variant="primary" icon={<UserCircle className="w-5 h-5" />}>
                       Ape In
                     </Button>
                   </Link>
                   <Link to="/cdp">
-                    <Button variant="secondary" icon={<CurrencyDollarIcon className="w-5 h-5" />}>
+                    <Button variant="secondary" icon={<DollarSign className="w-5 h-5" />}>
                       Manage CDPs
                     </Button>
                   </Link>
                   <Link to="/pools">
-                    <Button variant="ghost" icon={<SparklesIcon className="w-5 h-5" />}>
+                    <Button variant="ghost" icon={<Sparkles className="w-5 h-5" />}>
                       Choose Pool
                     </Button>
                   </Link>
@@ -178,19 +178,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <StatsCard
             title="Total Value Locked"
             value={`$${systemStats?.totalValueLocked?.toLocaleString?.() || systemStats?.metrics?.totalValueLocked?.toLocaleString?.() || "0"}`}
-            icon={<ShieldCheckIcon className="w-5 h-5" />}
+            icon={<Shield className="w-5 h-5" />}
             variant="data"
           />
           <StatsCard
             title="NyxUSD Supply"
             value={(systemStats as any)?.totalDebt?.toLocaleString?.() || "0"}
-            icon={<CurrencyDollarIcon className="w-5 h-5" />}
+            icon={<DollarSign className="w-5 h-5" />}
             variant="data"
           />
           <StatsCard
             title="Active CDPs"
             value={(systemStats as any)?.activeCDPs || "0"}
-            icon={<ChartBarIcon className="w-5 h-5" />}
+            icon={<BarChart3 className="w-5 h-5" />}
             variant="data"
           />
           <StatsCard
@@ -290,7 +290,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <div className="flex-1 text-center md:text-left">
                       <div className="flex items-center justify-center md:justify-start space-x-3 mb-3">
                         <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                          <SparklesIcon className="w-7 h-7 text-white" />
+                          <Sparkles className="w-7 h-7 text-white" />
                         </div>
                         <h2 className="text-2xl md:text-3xl font-bold text-white">
                           AI Portfolio Assistant
@@ -301,7 +301,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </p>
                     </div>
                     <Link to="/ai-assistant">
-                      <Button variant="primary" size="lg" icon={<ArrowRightIcon className="w-5 h-5" />} iconPosition="right">
+                      <Button variant="primary" size="lg" icon={<ArrowRight className="w-5 h-5" />} iconPosition="right">
                         Start AI Consultation
                       </Button>
                     </Link>
@@ -322,7 +322,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <Card variant="elevated" className="h-full">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <ShieldCheckIcon className="w-5 h-5 text-purple-500" />
+                    <Shield className="w-5 h-5 text-purple-500" />
                     <span>Privacy Protection</span>
                   </CardTitle>
                 </CardHeader>

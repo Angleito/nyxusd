@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPools } from '../../services/poolsService';
 import type { Pool } from '../../types/pools';
-import { Card, CardContent, CardTitle } from '../ui/Card';
+import { Card as NyxCard, CardContent as NyxCardContent, CardTitle as NyxCardTitle } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { SparklesIcon, ShieldCheckIcon, FireIcon } from '@heroicons/react/24/outline';
 
@@ -52,11 +52,11 @@ export const PoolsSelector: React.FC<Props> = ({ onSelect }) => {
 
   if (error) {
     return (
-      <Card variant="elevated" className="max-w-xl mx-auto">
-        <CardContent>
+      <NyxCard variant="elevated" className="max-w-xl mx-auto">
+        <NyxCardContent>
           <p className="nyx-body-large" style={{ color: 'var(--nyx-error)' }}>Failed to load pools</p>
-        </CardContent>
-      </Card>
+        </NyxCardContent>
+      </NyxCard>
     );
   }
 
@@ -64,9 +64,9 @@ export const PoolsSelector: React.FC<Props> = ({ onSelect }) => {
 
   return (
     <div className="space-y-6">
-      <Card variant="glow">
+      <NyxCard variant="glow">
         <div className="p-6">
-          <CardTitle className="mb-2">Choose Your Pool</NyxCardTitle>
+          <NyxCardTitle className="mb-2">Choose Your Pool</NyxCardTitle>
           <p className="nyx-body" style={{ color: 'var(--nyx-gleam-70)' }}>
             Three calibrated strategies from the whitepaper. Sub-names in full degen glory.
           </p>
@@ -75,7 +75,7 @@ export const PoolsSelector: React.FC<Props> = ({ onSelect }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {pools.map((p) => (
-          <Card key={p.id} variant="elevated" className="flex flex-col">
+          <NyxCard key={p.id} variant="elevated" className="flex flex-col">
             <div className="p-6 flex-1 flex flex-col">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export const PoolsSelector: React.FC<Props> = ({ onSelect }) => {
                 </Button>
               </div>
             </div>
-          </Card>
+          </NyxCard>
         ))}
       </div>
     </div>
