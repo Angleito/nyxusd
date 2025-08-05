@@ -2,14 +2,14 @@
 
 ## Current Settings
 - **Mock AI**: DISABLED (USE_MOCK_AI=false)
-- **Real AI**: Will be used when OpenAI API key is provided
+- **Real AI**: Will be used when OpenRouter API key is provided
 - **Market Data**: Real-time prices from CoinGecko API
 
 ## API Configuration
 
-### 1. OpenAI API (Required for AI Chat)
-**Get an OpenAI API Key**:
-- Sign up at [platform.openai.com](https://platform.openai.com)
+### 1. OpenRouter API (Required for AI Chat)
+**Get an OpenRouter API Key**:
+- Sign up at [openrouter.ai](https://openrouter.ai)
 - Create an API key in your dashboard
 - Add credits to your account
 
@@ -22,7 +22,7 @@
 ### 3. Add Your API Keys
 Edit the `.env` file and add your keys:
 ```
-OPENAI_API_KEY=sk-your-actual-api-key-here
+OPENROUTER_API_KEY=sk-your-actual-api-key-here
 COINGECKO_API_KEY=CG-your-api-key-here  # Optional
 ```
 
@@ -34,7 +34,7 @@ npm run dev
 
 ## Current Configuration
 - Mock AI is now **DISABLED** in `.env`
-- The app will attempt to use real OpenAI API
+- The app will attempt to use real OpenRouter API
 - If no API key is provided, you'll see error messages
 - To temporarily use mock responses, set `USE_MOCK_AI=true`
 - CoinGecko API will work without a key (free tier) or with enhanced limits (pro tier)
@@ -49,7 +49,7 @@ npm run dev
 - Static price data
 
 ### Real AI (USE_MOCK_AI=false) 
-- Uses OpenAI GPT models
+- Uses various AI models through OpenRouter
 - Requires valid API key
 - Provides intelligent responses
 - Understands context and crypto knowledge
@@ -62,7 +62,7 @@ npm run dev
 ## Troubleshooting
 
 If you see errors after disabling mock AI:
-1. Ensure you have a valid OpenAI API key in `.env`
+1. Ensure you have a valid OpenRouter API key in `.env`
 2. Check that the API key has credits
 3. Verify the backend server is running
 4. Check console for specific error messages

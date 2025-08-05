@@ -91,128 +91,162 @@ function App() {
           <main>
             <AnimatePresence mode="wait">
               <Routes>
-            <Route
-              path="/"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={pageTransition}
-                >
-                  <HeroSection />
-                  <div className="container mx-auto px-4 py-8">
-                    <Dashboard variant="nyx" />
-                  </div>
-                </motion.div>
-              }
-            />
-            <Route
-              path="/pools"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={pageTransition}
-                  className="container mx-auto px-4 py-8"
-                >
-                  <PoolsSelector />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/cdp"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={pageTransition}
-                  className="pt-24"
-                >
-                  <CDPHub />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/system"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={pageTransition}
-                  className="py-8"
-                >
-                  <ModernSystemStats />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/ai-assistant"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={pageTransition}
-                  className="container mx-auto px-4 py-8 h-[calc(100vh-80px)]"
-                >
-                  <StandaloneAIAssistant />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/about"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={pageTransition}
-                >
-                  <AboutPage />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/contact"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={pageTransition}
-                >
-                  <ContactPage />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/whitepaper"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={pageTransition}
-                >
-                  <WhitepaperPage />
-                </motion.div>
-              }
-            />
-          </Routes>
-        </AnimatePresence>
-      </main>
+                {/* Make the old ChatPage UI (EnhancedChatInterface via StandaloneAIAssistant) the default route */}
+                <Route
+                  path="/"
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                      className="container mx-auto px-4 py-8 h-[calc(100vh-80px)]"
+                    >
+                      <StandaloneAIAssistant />
+                    </motion.div>
+                  }
+                />
+                {/* Preserve previous landing dashboard at /home */}
+                <Route
+                  path="/home"
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <HeroSection />
+                      <div className="container mx-auto px-4 py-8">
+                        <Dashboard variant="nyx" />
+                      </div>
+                    </motion.div>
+                  }
+                />
+                {/* Keep other routes unchanged */}
+                <Route
+                  path="/pools"
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                      className="container mx-auto px-4 py-8"
+                    >
+                      <PoolsSelector />
+                    </motion.div>
+                  }
+                />
+                <Route
+                  path="/cdp"
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                      className="pt-24"
+                    >
+                      <CDPHub />
+                    </motion.div>
+                  }
+                />
+                <Route
+                  path="/system"
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                      className="py-8"
+                    >
+                      <ModernSystemStats />
+                    </motion.div>
+                  }
+                />
+                <Route
+                  path="/ai-assistant"
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                      className="container mx-auto px-4 py-8 h-[calc(100vh-80px)]"
+                    >
+                      <StandaloneAIAssistant />
+                    </motion.div>
+                  }
+                />
+                {/* Optional: legacy alias to ensure deep links still work */}
+                <Route
+                  path="/chat"
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                      className="container mx-auto px-4 py-8 h-[calc(100vh-80px)]"
+                    >
+                      <StandaloneAIAssistant />
+                    </motion.div>
+                  }
+                />
+                <Route
+                  path="/about"
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <AboutPage />
+                    </motion.div>
+                  }
+                />
+                <Route
+                  path="/contact"
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <ContactPage />
+                    </motion.div>
+                  }
+                />
+                <Route
+                  path="/whitepaper"
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <WhitepaperPage />
+                    </motion.div>
+                  }
+                />
+              </Routes>
+            </AnimatePresence>
+          </main>
       <Analytics />
     </div>
       </ThemeTransition>

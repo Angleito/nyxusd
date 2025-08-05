@@ -2,7 +2,7 @@
 
 ## Overview
 
-The NyxUSD AI Assistant is powered by OpenAI's GPT-4 model through LangChain, providing natural language interactions for guiding users through the CDP investment process.
+The NyxUSD AI Assistant is powered by various AI models through OpenRouter, providing natural language interactions for guiding users through the CDP investment process.
 
 ## Architecture
 
@@ -10,7 +10,7 @@ The NyxUSD AI Assistant is powered by OpenAI's GPT-4 model through LangChain, pr
 
 1. **AI Service Layer** (`frontend/src/services/ai/`)
    - `aiService.ts` - Core AI service interface and types
-   - `langchainService.ts` - LangChain/OpenAI implementation
+   - `langchainService.ts` - LangChain/OpenRouter implementation
    - `fallbackService.ts` - Fallback service when AI is unavailable
    - `conversationChain.ts` - Conversation flow management
    - `promptTemplates.ts` - Step-specific prompt templates
@@ -36,10 +36,10 @@ The NyxUSD AI Assistant is powered by OpenAI's GPT-4 model through LangChain, pr
 cp .env.example .env
 ```
 
-2. Add your OpenAI API key:
+2. Add your OpenRouter API key:
 
 ```env
-OPENAI_API_KEY=sk-your-api-key-here
+OPENROUTER_API_KEY=sk-your-api-key-here
 ```
 
 3. Optional configurations:
@@ -98,14 +98,14 @@ npm run dev
 
 ### Testing the Integration
 
-1. **Without OpenAI API Key**:
+1. **Without OpenRouter API Key**:
    - Set `USE_MOCK_AI=true` in `.env`
    - The system will use the fallback service with pre-defined responses
 
-2. **With OpenAI API Key**:
+2. **With OpenRouter API Key**:
    - Add your API key to `.env`
    - Set `USE_MOCK_AI=false`
-   - The system will use real AI responses
+   - The system will use real AI responses through OpenRouter
 
 ### API Examples
 
@@ -166,12 +166,12 @@ POST /api/ai/chat
 ### Common Issues
 
 1. **"AI service not configured"**
-   - Check if `OPENAI_API_KEY` is set in `.env`
+   - Check if `OPENROUTER_API_KEY` is set in `.env`
    - Verify the API key is valid
 
 2. **Rate Limit Errors**
    - Implement exponential backoff
-   - Consider using GPT-3.5 for less critical responses
+   - Consider using different models for less critical responses
 
 3. **Streaming Not Working**
    - Check if your environment supports SSE
@@ -183,12 +183,75 @@ Enable debug logging:
 
 ```javascript
 localStorage.setItem("AI_DEBUG", "true");
-```
+`` Tangential response: Using multi-step reasoning through the sequentialthinking MCP server to understand this project.
+<thinking>
+<thought_1>
+First, I need to understand what this project is about. From the available files and directory structure, I can see this is a DeFi (Decentralized Finance) project called NYXUSD.
+</thought_1>
+<thought_2>
+Looking at the directory structure, I see there's a clear separation between frontend and backend (api). The frontend appears to be a React/Vite application.
+</thought_2>
+<thought_3>
+The backend appears to be Node.js with TypeScript, with several API endpoints for different services:
+- AI services (/api/ai/)
+- Voice services (/api/voice/)
+- Oracle services (/api/oracle/)
+- Subscription services (/api/subscriptions/)
+- Swap services (/api/swap/)
+- Pool services (/api/pools/)
+</thought_3>
+<thought_4>
+The project seems to be integrating with various DeFi protocols and has components for:
+- CDP (Collateralized Debt Position) management
+- Wallet connection and management
+- Oracle price feeds
+- Token swaps
+- Strategy building
+</thought_4>
+<thought_5>
+There's extensive documentation in the repository:
+- AI_CONFIG.md
+- API_SETUP.md
+- VOICE_SETUP.md
+- docs/AI_INTEGRATION.md
+- Various other markdown files in the docs and hackathon directories
+</thought_5>
+<thought_6>
+From the .env.example file, I can see the project uses several external services:
+- OpenRouter for AI services (instead of directly using OpenAI)
+- ElevenLabs for voice services
+- CDP-related configurations for various chains
+- Oracle configurations
+</thought_6>
+<thought_7>
+The documentation shows the project is focused on providing a user-friendly interface for DeFi investing, using AI to guide users through:
+- Investment goal selection
+- Occupation-based analogies for better understanding
+- Strategy building for CDP positions
+- Portfolio analysis
+</thought_7>
+<thought_8>
+The voice integration appears to be an optional feature that enhances the user experience by allowing voice conversations with the AI assistant.
+</thought_8>
+<thought_9>
+The project seems to have both a mock mode for development/testing and real integration mode with external services, which is a good development practice.
+</thought_9>
+<thought_10>
+Based on the error logs and environment files, I now understand that the authentication issues were:
+1. Inconsistent variable naming: OPENROUTER_API_KEY vs OPENAI_API_KEY
+2. Missing voice service credentials
+3. Missing JWT secret for voice session security
+</thought_10>
 
-## Future Enhancements
+These issues have been resolved by:
+1. Standardizing on OPENROUTER_API_KEY throughout the application
+2. Properly adding ELEVENLABS_API_KEY to both backend and frontend configurations
+3. Adding a JWT_SECRET for secure voice session management
 
-1. **Multi-Model Support**: Add support for Claude, Gemini, etc.
-2. **Fine-Tuning**: Custom model for DeFi-specific responses
-3. **Analytics**: Track conversation metrics and user satisfaction
-4. **Caching**: Implement response caching for common queries
-5. **Multi-Language**: Support for multiple languages
+The solution was implemented by updating:
+1. Environment configuration files (.env.example, frontend/.env.example)
+2. Documentation files (AI_CONFIG.md, API_SETUP.md, VOICE_SETUP.md, docs/AI_INTEGRATION.md)
+3. The actual .env file to match the corrected structure
+
+Now that these authentication issues are resolved, the application should properly connect to both the AI service (OpenRouter) and voice service (ElevenLabs) in production.
+</thinking>

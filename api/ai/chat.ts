@@ -65,7 +65,7 @@ interface OpenRouterResponse {
 interface RateLimitRecord {
   count: number;
   resetTime: number;
-  blocked?: boolean;
+  blocked: boolean | undefined;
 }
 
 /**
@@ -153,7 +153,7 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number; rese
   
   // Reset or create new record
   if (!record || now > record.resetTime) {
-    const newRecord = { count: 1, resetTime: now + windowMs };
+    const newRecord: RateLimitRecord = { count: 1, resetTime: now + windowMs, blocked: undefined };
     rateLimitStore.set(ip, newRecord);
     return { allowed: true, remaining: maxRequests - 1, resetTime: newRecord.resetTime };
   }
@@ -161,20 +161,20 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number; rese
   // Check if limit exceeded
   if (record.count >= maxRequests) {
     // Block IP for repeated abuse - create new record with blocked status
-    const blockedRecord = { 
-      count: record.count, 
-      resetTime: now + blockDuration, 
-      blocked: true 
+    const blockedRecord: RateLimitRecord = {
+      count: record.count,
+      resetTime: now + blockDuration,
+      blocked: true
     };
     rateLimitStore.set(ip, blockedRecord);
     return { allowed: false, remaining: 0, resetTime: blockedRecord.resetTime };
   }
   
   // Update count - create new record to maintain immutability
-  const updatedRecord = { 
-    count: record.count + 1, 
-    resetTime: record.resetTime, 
-    blocked: record.blocked 
+  const updatedRecord: RateLimitRecord = {
+    count: record.count + 1,
+    resetTime: record.resetTime,
+    blocked: record.blocked
   };
   rateLimitStore.set(ip, updatedRecord);
   return { allowed: true, remaining: maxRequests - updatedRecord.count, resetTime: updatedRecord.resetTime };
@@ -183,7 +183,7 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number; rese
 /**
  * Validate and sanitize chat context using functional validation
  */
-const validateChatContext = (context: unknown): O.Option<ChatContext> => {
+const validateChatContext = (context: unknown): O.Option<ChatContext | undefined> => {
   if (!context || typeof context !== 'object') {
     return O.none;
   }
@@ -275,11 +275,13 @@ const validateChatRequest = (body: unknown): E.Either<ChatError, ChatRequest> =>
   // Build sanitized request
   const sanitized: ChatRequest = {
     message: (request['message'] as string).trim(),
-    context: pipe(validateChatContext(request['context']), O.toUndefined),
-    memoryContext: typeof request['memoryContext'] === 'string' ? request['memoryContext'] as string : undefined,
-    conversationSummary: typeof request['conversationSummary'] === 'string' ? request['conversationSummary'] as string : undefined,
-    model: typeof request['model'] === 'string' ? request['model'] as string : undefined
-  };
+    // exactOptionalPropertyTypes requires explicit undefined to be omitted at assignment time,
+    // so assign only when present.
+    ...(O.isSome(validateChatContext(request['context'])) && { context: O.toUndefined(validateChatContext(request['context'])) as ChatContext | undefined }),
+    ...(typeof request['memoryContext'] === 'string' && { memoryContext: request['memoryContext'] as string }),
+    ...(typeof request['conversationSummary'] === 'string' && { conversationSummary: request['conversationSummary'] as string }),
+    ...(typeof request['model'] === 'string' && { model: request['model'] as string }),
+  } as ChatRequest;
   
   return E.right(sanitized);
 };
@@ -362,7 +364,12 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
   const envKeyOpenAI =
     process.env['OPENAI_API_KEY'] ||
     process.env['OPENAI_SECRET_KEY'];
-  const envKey = envKeyOpenRouter || envKeyOpenAI;
+  // Allow additional aliases to reduce misconfig risk
+  const envKeyAliases = [
+    process.env['OPENAI_TOKEN'],
+    process.env['OPENROUTER_TOKEN'],
+  ].filter(Boolean) as string[];
+  const envKey = envKeyOpenRouter || envKeyOpenAI || envKeyAliases[0];
   // Do NOT accept browser-sent Authorization for production to avoid CORS/AUTH reliance.
   // Only allow header in development to assist local testing.
   const allowHeaderAuth = (process.env['NODE_ENV'] === 'development' || process.env['VERCEL_ENV'] === 'development');
@@ -579,8 +586,10 @@ const handleChatError = (res: VercelResponse, error: ChatError): void => {
         success: false,
         error: error.message || 'AI service configuration error'
       };
-      // Missing server-side credentials is a server misconfiguration; return 500 to avoid misleading 401
-      res.status(500).json(configResponse);
+      // Surface as 401 to match frontend expectation for "No auth credentials found"
+      // but include header to clarify server misconfiguration.
+      res.setHeader('X-Config-Error', 'AI credentials missing on server');
+      res.status(error.message === 'No auth credentials found' ? 401 : 500).json(configResponse);
       break;
     }
 
@@ -686,7 +695,7 @@ async function chatHandler(req: VercelRequest, res: VercelResponse): Promise<voi
           data: result.message,
           timestamp: new Date().toISOString(),
           model: result.model,
-          usage: result.usage
+          ...(result.usage ? { usage: result.usage } : {})
         };
         
         res.status(200).json(response);
