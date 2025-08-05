@@ -376,7 +376,7 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
   const apiKey = (allowHeaderAuth && headerAuth) ? headerAuth : envKey;
 
   if (!apiKey) {
-    return TE.left({ type: 'API_CONFIG_ERROR', message: 'No auth credentials found' });
+    return TE.left({ type: 'API_CONFIG_ERROR', message: 'Missing OPENROUTER_API_KEY on server' });
   }
 
   const systemPrompt = buildSystemPrompt(request.memoryContext, request.conversationSummary);

@@ -1,4 +1,5 @@
-import { AIService, AIServiceConfig, AIContext, AIResponse } from "./aiService";
+import { AIService, AIServiceConfig, AIContext, AIResponse, AIServiceError } from "./aiService";
+import { LangChainAIService } from "./langchainService";
 import {
   getWalletPrompt,
   getWalletAnalysisMessage,
@@ -14,22 +15,44 @@ import {
 import { detectUserIntent } from "../../lib/ai-assistant/naturalLanguageProcessor";
 import { getNextStep } from "./conversationChain";
 
+/**
+ * FallbackAIService previously produced mock responses.
+ * Update: it must never mask server misconfiguration.
+ * If configuration validation fails, throw INVALID_CONFIG to surface the error to the UI.
+ */
 export class FallbackAIService implements AIService {
   private useCount = 0;
+  private config: AIServiceConfig;
 
   constructor(config: AIServiceConfig) {
-    // Config is available but not used in fallback service
-    void config;
+    this.config = config;
   }
 
   async validateConfiguration(): Promise<boolean> {
+    const service = new LangChainAIService(this.config);
+    const ok = await service.validateConfiguration();
+    if (!ok) {
+      // Surface a clear configuration error instead of silently returning false
+      throw new AIServiceError(
+        "AI service is not properly configured. Please contact support.",
+        "INVALID_CONFIG"
+      );
+    }
     return true;
+  }
+
+  private async ensureConfigured(): Promise<void> {
+    // Enforce validation on every entry-point to avoid mock fallbacks
+    await this.validateConfiguration();
   }
 
   async generateResponse(
     userMessage: string,
     context: AIContext,
   ): Promise<AIResponse> {
+    // Do not produce mock responses when config is invalid
+    await this.ensureConfigured();
+
     this.useCount++;
 
     const { conversationStep, walletData } = context;
@@ -202,6 +225,9 @@ export class FallbackAIService implements AIService {
     context: AIContext,
     onChunk: (chunk: string) => void,
   ): Promise<AIResponse> {
+    // Do not simulate streaming when config is invalid
+    await this.ensureConfigured();
+
     const response = await this.generateResponse(userMessage, context);
 
     const words = response.message.split(" ");

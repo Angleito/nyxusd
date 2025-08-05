@@ -8,7 +8,27 @@ export default defineConfig({
     host: true,
     // Proxy for local development
     proxy: {
-      "/api": {
+      "/api/oracle": {
+        target: "http://localhost:8081",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/api/system": {
+        target: "http://localhost:8081",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/api/health": {
+        target: "http://localhost:8081",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/api/ai/chat": {
+        target: "http://localhost:8081",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/api/ai/chat-stream": {
         target: "http://localhost:8081",
         changeOrigin: true,
         secure: false,

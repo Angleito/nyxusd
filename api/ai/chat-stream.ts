@@ -241,11 +241,11 @@ const validateStreamChatRequest = (body: unknown): E.Either<StreamError, StreamC
   // Build sanitized request
   const sanitized: StreamChatRequest = {
     message: (request['message'] as string).trim(),
-    context: pipe(validateChatContext(request['context']), O.toUndefined),
-    memoryContext: typeof request['memoryContext'] === 'string' ? request['memoryContext'] : undefined,
-    conversationSummary: typeof request['conversationSummary'] === 'string' ? request['conversationSummary'] : undefined,
-    model: typeof request['model'] === 'string' ? request['model'] : undefined
-  };
+    ...(O.isSome(validateChatContext(request['context'])) && { context: O.toUndefined(validateChatContext(request['context'])) as ChatContext }),
+    ...(typeof request['memoryContext'] === 'string' && { memoryContext: request['memoryContext'] }),
+    ...(typeof request['conversationSummary'] === 'string' && { conversationSummary: request['conversationSummary'] }),
+    ...(typeof request['model'] === 'string' && { model: request['model'] })
+  } as StreamChatRequest;
   
   return E.right(sanitized);
 };
@@ -314,29 +314,35 @@ Provide helpful responses that guide users to NYX-native actions and learning.`;
  * Stream OpenRouter API response using Server-Sent Events
  */
 const streamOpenRouter = async (
-  request: StreamChatRequest,
-  model: AllowedModel,
-  res: VercelResponse
+request: StreamChatRequest,
+model: AllowedModel,
+res: VercelResponse
 ): Promise<E.Either<StreamError, void>> => {
-  // Support Authorization bearer passthrough in addition to env
-  const headerAuth = (request as any).__authToken as string | undefined;
-  // Accept both OpenRouter and OpenAI keys; prefer header, then OPENROUTER_API_KEY, then OPENAI_API_KEY
-  // Normalize environment variable loading across Vercel setups:
-  // Prefer OPENROUTER_API_KEY, then OPENAI_API_KEY, plus common aliases to avoid misconfig.
-  const envKeyOpenRouter =
-    process.env['OPENROUTER_API_KEY'] ||
-    process.env['OPENROUTER_KEY'] ||
-    process.env['NEXT_PUBLIC_OPENROUTER_API_KEY'];
-  const envKeyOpenAI =
-    process.env['OPENAI_API_KEY'] ||
-    process.env['OPENAI_SECRET_KEY'] ||
-    process.env['NEXT_PUBLIC_OPENAI_API_KEY'];
-  const envKey = envKeyOpenRouter || envKeyOpenAI;
-  const apiKey = headerAuth || envKey;
-  
-  if (!apiKey) {
-    return E.left({ type: 'API_CONFIG_ERROR', message: 'No auth credentials found' });
-  }
+// Support Authorization bearer passthrough in addition to env
+const headerAuth = (request as any).__authToken as string | undefined;
+// Accept both OpenRouter and OpenAI keys; prefer header, then OPENROUTER_API_KEY, then OPENAI_API_KEY
+// Normalize environment variable loading across Vercel setups:
+// Prefer OPENROUTER_API_KEY, then OPENAI_API_KEY, plus common aliases to avoid misconfig.
+const envKeyOpenRouter =
+  process.env['OPENROUTER_API_KEY'] ||
+  process.env['OPENROUTER_KEY'];
+const envKeyOpenAI =
+  process.env['OPENAI_API_KEY'] ||
+  process.env['OPENAI_SECRET_KEY'];
+// Allow additional aliases to reduce misconfig risk
+const envKeyAliases = [
+  process.env['OPENAI_TOKEN'],
+  process.env['OPENROUTER_TOKEN'],
+].filter(Boolean) as string[];
+const envKey = envKeyOpenRouter || envKeyOpenAI || envKeyAliases[0];
+// Do NOT accept browser-sent Authorization for production to avoid CORS/AUTH reliance.
+// Only allow header in development to assist local testing.
+const allowHeaderAuth = (process.env['NODE_ENV'] === 'development' || process.env['VERCEL_ENV'] === 'development');
+const apiKey = (allowHeaderAuth && headerAuth) ? headerAuth : envKey;
+
+if (!apiKey) {
+  return E.left({ type: 'API_CONFIG_ERROR', message: 'Missing OPENROUTER_API_KEY on server' });
+}
 
   const systemPrompt = buildSystemPrompt(request.memoryContext, request.conversationSummary);
 

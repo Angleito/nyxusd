@@ -192,17 +192,79 @@ function handleSystemStats(req, res) {
   sendJSON(res, 200, successResponse);
 }
 
-// Handle AI chat endpoint (mock)
-function handleAIChat(req, res) {
-  const successResponse = {
-    success: true,
-    data: {
-      response: "I'm a development mock response. The AI service is not configured for local development.",
+// Handle AI chat endpoint with proper error handling for missing API keys
+async function handleAIChat(req, res) {
+  try {
+    // Read body
+    const chunks = [];
+    for await (const chunk of req) {
+      chunks.push(chunk);
+    }
+    const body = Buffer.concat(chunks);
+    
+    // Check for required environment variables
+    const openRouterKey = process.env.OPENROUTER_API_KEY;
+    const elevenLabsKey = process.env.ELEVENLABS_API_KEY;
+    const jwtSecret = process.env.JWT_SECRET;
+    
+    if (!openRouterKey) {
+      const errorResponse = {
+        success: false,
+        error: 'Missing OPENROUTER_API_KEY on server',
+        timestamp: new Date().toISOString()
+      };
+      sendJSON(res, 500, errorResponse);
+      return;
+    }
+    
+    if (!elevenLabsKey) {
+      const errorResponse = {
+        success: false,
+        error: 'Missing ELEVENLABS_API_KEY on server',
+        timestamp: new Date().toISOString()
+      };
+      sendJSON(res, 500, errorResponse);
+      return;
+    }
+    
+    if (!jwtSecret) {
+      const errorResponse = {
+        success: false,
+        error: 'Missing JWT_SECRET on server',
+        timestamp: new Date().toISOString()
+      };
+      sendJSON(res, 500, errorResponse);
+      return;
+    }
+    
+    // If all environment variables are set, proxy to the local Vercel-style function at /api/ai/chat
+    const targetUrl = 'http://localhost:3000/api/ai/chat';
+    const headers = { 'Accept': 'application/json' };
+    
+    const response = await fetchFn(targetUrl, {
+      method: 'POST',
+      headers: { ...headers, 'Content-Type': req.headers['content-type'] || 'application/json' },
+      body,
+      signal: withTimeout(15000)
+    });
+    
+    // Forward status and body
+    const contentType = response.headers.get('content-type') || 'application/json';
+    setCorsHeaders(res);
+    res.statusCode = response.status;
+    res.setHeader('Content-Type', contentType);
+    const arrayBuf = await response.arrayBuffer();
+    const buf = Buffer.from(arrayBuf);
+    res.end(buf);
+  } catch (error) {
+    console.error('AI chat proxy error:', error instanceof Error ? error.message : String(error));
+    const errorResponse = {
+      success: false,
+      error: 'Failed to proxy AI chat endpoint',
       timestamp: new Date().toISOString()
-    },
-    timestamp: new Date().toISOString()
-  };
-  sendJSON(res, 200, successResponse);
+    };
+    sendJSON(res, 502, errorResponse);
+  }
 }
 
 // Handle Voice config endpoint by proxying to the real serverless function
@@ -273,6 +335,74 @@ const server = http.createServer(async (req, res) => {
       handleSystemStats(req, res);
     } else if (pathname === '/api/ai/chat' && method === 'POST') {
       handleAIChat(req, res);
+    } else if (pathname === '/api/ai/chat-stream' && method === 'POST') {
+      // Handle AI chat streaming endpoint with proper error handling for missing API keys
+      try {
+        // Read body
+        const chunks = [];
+        for await (const chunk of req) {
+          chunks.push(chunk);
+        }
+        const body = Buffer.concat(chunks);
+        
+        // Check for required environment variables
+        const openRouterKey = process.env.OPENROUTER_API_KEY;
+        const elevenLabsKey = process.env.ELEVENLABS_API_KEY;
+        const jwtSecret = process.env.JWT_SECRET;
+        
+        if (!openRouterKey) {
+          const errorResponse = {
+            success: false,
+            error: 'Missing OPENROUTER_API_KEY on server',
+            timestamp: new Date().toISOString()
+          };
+          sendJSON(res, 500, errorResponse);
+          return;
+        }
+        
+        if (!elevenLabsKey) {
+          const errorResponse = {
+            success: false,
+            error: 'Missing ELEVENLABS_API_KEY on server',
+            timestamp: new Date().toISOString()
+          };
+          sendJSON(res, 500, errorResponse);
+          return;
+        }
+        
+        if (!jwtSecret) {
+          const errorResponse = {
+            success: false,
+            error: 'Missing JWT_SECRET on server',
+            timestamp: new Date().toISOString()
+          };
+          sendJSON(res, 500, errorResponse);
+          return;
+        }
+        
+        // If all environment variables are set, proxy to the local Vercel-style function at /api/ai/chat-stream
+        const targetUrl = `http://localhost:3000${pathname}`;
+        const headers = { 'Accept': 'text/event-stream' };
+        
+        const response = await fetchFn(targetUrl, {
+          method,
+          headers: { ...headers, 'Content-Type': req.headers['content-type'] || 'application/json' },
+          body,
+          signal: withTimeout(15000)
+        });
+        
+        // Forward status and body with SSE content-type
+        const contentType = response.headers.get('content-type') || 'text/event-stream';
+        setCorsHeaders(res);
+        res.statusCode = response.status;
+        res.setHeader('Content-Type', contentType);
+        const arrayBuf = await response.arrayBuffer();
+        const buf = Buffer.from(arrayBuf);
+        res.end(buf);
+      } catch (e) {
+        console.error('AI chat stream proxy error:', e instanceof Error ? e.message : String(e));
+        sendJSON(res, 502, { success: false, error: 'Failed to proxy AI chat stream endpoint', timestamp: new Date().toISOString() });
+      }
     } else if (pathname === '/api/voice-config' && method === 'GET') {
       await handleVoiceConfig(req, res);
     } else if ((pathname === '/api/voice-token' && method === 'GET') ||
@@ -338,6 +468,7 @@ server.listen(PORT, () => {
   console.log('- GET /api/oracle/prices');
   console.log('- GET /api/system');
   console.log('- POST /api/ai/chat');
+  console.log('- POST /api/ai/chat-stream');
   console.log('- GET /api/voice-config (proxied to real serverless)');
   console.log('- GET /api/voice-token (proxied to real serverless via frontend /api)');
   console.log('- POST /api/voice-tts (proxied to real serverless via frontend /api)');
