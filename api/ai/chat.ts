@@ -354,16 +354,19 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
   // Support both OpenRouter and OpenAI keys. Prefer header, then OPENROUTER_API_KEY, then OPENAI_API_KEY.
   // Normalize environment variable loading across Vercel setups:
   // Prefer OPENROUTER_API_KEY, then OPENAI_API_KEY, then legacy names from .env.vercel if present.
+  // Prefer server-only keys. Never use NEXT_PUBLIC* keys for server auth.
+  // Also support Vercel env prefixing for edge/runtime by reading process.env directly.
   const envKeyOpenRouter =
     process.env['OPENROUTER_API_KEY'] ||
-    process.env['OPENROUTER_KEY'] || // legacy alias
-    process.env['NEXT_PUBLIC_OPENROUTER_API_KEY']; // avoid, but some projects misconfigure
+    process.env['OPENROUTER_KEY'];
   const envKeyOpenAI =
     process.env['OPENAI_API_KEY'] ||
-    process.env['OPENAI_SECRET_KEY'] || // alias
-    process.env['NEXT_PUBLIC_OPENAI_API_KEY']; // avoid, but normalize if set
+    process.env['OPENAI_SECRET_KEY'];
   const envKey = envKeyOpenRouter || envKeyOpenAI;
-  const apiKey = headerAuth || envKey;
+  // Do NOT accept browser-sent Authorization for production to avoid CORS/AUTH reliance.
+  // Only allow header in development to assist local testing.
+  const allowHeaderAuth = (process.env['NODE_ENV'] === 'development' || process.env['VERCEL_ENV'] === 'development');
+  const apiKey = (allowHeaderAuth && headerAuth) ? headerAuth : envKey;
 
   if (!apiKey) {
     return TE.left({ type: 'API_CONFIG_ERROR', message: 'No auth credentials found' });
@@ -621,23 +624,15 @@ const handleChatError = (res: VercelResponse, error: ChatError): void => {
 
 /**
  * AI Chat endpoint handler with functional error handling
- * 
+ *
  * Handles chat requests with OpenRouter API integration, implementing
  * comprehensive validation, rate limiting, and error handling using fp-ts.
- * 
+ *
  * @param req - Vercel request object
  * @param res - Vercel response object
  * @returns Promise<void> - Resolves when response is sent
  */
 async function chatHandler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  // Set security headers
-  setSecurityHeaders(req, res);
-
-  // Handle preflight request
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
 
   // Validate HTTP method
   if (req.method !== 'POST') {

@@ -127,22 +127,11 @@ export default async function handler(
   res: VercelResponse
 ): Promise<void> {
   // request start log
-  const requestId = genRequestId();
-  const ts = new Date().toISOString();
-  const method = req.method || 'UNKNOWN';
-  const path = (req as any).url || '/api/voice/conversational-agent';
-  console.info(JSON.stringify({ level: 'info', msg: 'convai:create:start', requestId, method, path, ts }));
-
-  // Set CORS headers
-  // Allow GET as well because some platform/edge proxies or preflight verifications
-  // might probe the endpoint with GET resulting in 405 at upstream which we handle gracefully.
-  setCorsHeaders(res, { methods: 'GET,POST,OPTIONS' });
-  
-  if (req.method === 'OPTIONS') {
-    handleOptions(res);
-    console.info(JSON.stringify({ level: 'info', msg: 'convai:create:options', requestId, ts: new Date().toISOString() }));
-    return;
-  }
+    const requestId = genRequestId();
+    const ts = new Date().toISOString();
+    const method = req.method || 'UNKNOWN';
+    const path = (req as any).url || '/api/voice/conversational-agent';
+    console.info(JSON.stringify({ level: 'info', msg: 'convai:create:start', requestId, method, path, ts }));
 
   // ElevenLabs ConvAI HTTP surface may reject POST creation with 405 for some tenants.
   // Accept both POST (preferred) and GET (fallback) to allow clients to probe.

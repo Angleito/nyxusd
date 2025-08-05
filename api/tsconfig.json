@@ -22,14 +22,14 @@
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     
-    // Relaxed settings for Vercel deployment
-    "strict": false,
-    "noImplicitAny": false,
-    "exactOptionalPropertyTypes": false,
-    "noImplicitReturns": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noUncheckedIndexedAccess": false,
+    // Enable strict type checking for better code quality
+    "strict": true,
+    "noImplicitAny": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": true,
     
     // Node.js compatibility
     "types": ["node"],

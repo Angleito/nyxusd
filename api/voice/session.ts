@@ -37,35 +37,6 @@ async function sessionHandler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<void> {
-  // Enable CORS
-  const isDevelopment = process.env['NODE_ENV'] === 'development' || 
-                       process.env['VERCEL_ENV'] === 'development';
-  
-  const allowedOrigins = [
-    'https://nyxusd.com',
-    'https://www.nyxusd.com',
-    ...(isDevelopment ? [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'http://localhost:8080'
-    ] : [])
-  ];
-  
-  const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else if (isDevelopment) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
-
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
-  
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
 
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });

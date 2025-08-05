@@ -574,23 +574,15 @@ const handleStreamError = (res: VercelResponse, error: StreamError): void => {
 
 /**
  * AI Chat Streaming endpoint handler with functional error handling
- * 
+ *
  * Handles streaming chat requests with OpenRouter API integration, implementing
  * comprehensive validation, rate limiting, and error handling using fp-ts.
- * 
+ *
  * @param req - Vercel request object
  * @param res - Vercel response object
  * @returns Promise<void> - Resolves when streaming is complete
  */
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  // Set streaming headers
-  setStreamingHeaders(req, res);
-
-  // Handle preflight request
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
 
   // Validate HTTP method
   if (req.method !== 'POST') {
