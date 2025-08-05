@@ -882,9 +882,17 @@ export class VoiceService extends EventEmitter {
       // Ensure audio context is resumed before attempting playback (handles autoplay policies)
       await this.resumeAudio();
 
+      // Always prefer server-advertised defaultVoiceId/modelId from /api/voice-config via secureVoiceClient
+      // to honor Vercel env (ELEVENLABS_DEFAULT_VOICE_ID, ELEVENLABS_MODEL_ID)
+      const serverCfg = await secureVoiceClient.getConfig().catch(() => null as any);
+      const advertisedVoiceId =
+        (serverCfg && serverCfg.config && typeof serverCfg.config.defaultVoiceId === 'string' && serverCfg.config.defaultVoiceId) || null;
+      const advertisedModelId =
+        (serverCfg && serverCfg.config && typeof serverCfg.config.modelId === 'string' && serverCfg.config.modelId) || null;
+
       const cfg = this.getVoiceConfig();
-      const voiceId = cfg.voiceId || 'EXAVITQu4vr4xnSDxMaL';
-      const modelId = cfg.modelId || 'eleven_turbo_v2_5';
+      const voiceId = cfg.voiceId || advertisedVoiceId || 'EXAVITQu4vr4xnSDxMaL';
+      const modelId = cfg.modelId || advertisedModelId || 'eleven_turbo_v2_5';
 
       console.log('🎤 VoiceService: TTS request start', { voiceId, modelId, textLen: (text || '').length });
 
