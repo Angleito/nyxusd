@@ -27,9 +27,9 @@ interface SystemConfig {
  * Parse environment configuration safely
  */
 const getSystemConfig = (): SystemConfig => ({
-  isProduction: process.env['NODE_ENV'] === 'production',
-  deploymentId: process.env['VERCEL_DEPLOYMENT_ID'],
-  nodeEnv: process.env['NODE_ENV'] || 'development'
+  isProduction: process.env.NODE_ENV === 'production',
+  deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
+  nodeEnv: process.env.NODE_ENV || 'development'
 });
 
 /**

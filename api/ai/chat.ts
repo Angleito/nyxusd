@@ -99,8 +99,8 @@ setInterval((): void => {
 
 // Security headers following Vercel best practices
 function setSecurityHeaders(req: VercelRequest, res: VercelResponse): void {
-  const isDevelopment = process.env['NODE_ENV'] === 'development' || 
-                       process.env['VERCEL_ENV'] === 'development';
+  const isDevelopment = process.env.NODE_ENV === 'development' || 
+                       process.env.VERCEL_ENV === 'development';
   
   // CORS configuration - be restrictive in production
   const allowedOrigins = [
@@ -359,20 +359,20 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
   // Prefer server-only keys. Never use NEXT_PUBLIC* keys for server auth.
   // Also support Vercel env prefixing for edge/runtime by reading process.env directly.
   const envKeyOpenRouter =
-    process.env['OPENROUTER_API_KEY'] ||
-    process.env['OPENROUTER_KEY'];
+    process.env.OPENROUTER_API_KEY ||
+    process.env.OPENROUTER_KEY;
   const envKeyOpenAI =
-    process.env['OPENAI_API_KEY'] ||
-    process.env['OPENAI_SECRET_KEY'];
+    process.env.OPENAI_API_KEY ||
+    process.env.OPENAI_SECRET_KEY;
   // Allow additional aliases to reduce misconfig risk
   const envKeyAliases = [
-    process.env['OPENAI_TOKEN'],
-    process.env['OPENROUTER_TOKEN'],
+    process.env.OPENAI_TOKEN,
+    process.env.OPENROUTER_TOKEN,
   ].filter(Boolean) as string[];
   const envKey = envKeyOpenRouter || envKeyOpenAI || envKeyAliases[0];
   // Do NOT accept browser-sent Authorization for production to avoid CORS/AUTH reliance.
   // Only allow header in development to assist local testing.
-  const allowHeaderAuth = (process.env['NODE_ENV'] === 'development' || process.env['VERCEL_ENV'] === 'development');
+  const allowHeaderAuth = (process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'development');
   const apiKey = (allowHeaderAuth && headerAuth) ? headerAuth : envKey;
 
   if (!apiKey) {
@@ -398,8 +398,8 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
           headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
-            'HTTP-Referer': process.env['APP_URL'] || process.env['FRONTEND_URL'] || 'https://nyxusd.com',
-            'X-Title': process.env['APP_NAME'] || process.env['VITE_APP_NAME'] || 'NyxUSD',
+            'HTTP-Referer': process.env.APP_URL || process.env.FRONTEND_URL || 'https://nyxusd.com',
+            'X-Title': process.env.APP_NAME || process.env.VITE_APP_NAME || 'NyxUSD',
             'User-Agent': 'NyxUSD/1.0'
           },
           body: JSON.stringify({
@@ -666,16 +666,16 @@ async function chatHandler(req: VercelRequest, res: VercelResponse): Promise<voi
   if (req.body && typeof req.body === 'object' && (req.body as any).__validation === true) {
     const missing: string[] = [];
     const hasOpenRouter =
-      !!process.env['OPENROUTER_API_KEY'] ||
-      !!process.env['OPENROUTER_KEY'] ||
-      !!process.env['OPENAI_API_KEY'] ||
-      !!process.env['OPENAI_SECRET_KEY'] ||
-      !!process.env['OPENAI_TOKEN'] ||
-      !!process.env['OPENROUTER_TOKEN'];
+      !!process.env.OPENROUTER_API_KEY ||
+      !!process.env.OPENROUTER_KEY ||
+      !!process.env.OPENAI_API_KEY ||
+      !!process.env.OPENAI_SECRET_KEY ||
+      !!process.env.OPENAI_TOKEN ||
+      !!process.env.OPENROUTER_TOKEN;
     if (!hasOpenRouter) missing.push('OPENROUTER_API_KEY');
 
     // JWT secret is used by voice endpoints and potentially sessions; include if required
-    if (!process.env['JWT_SECRET']) {
+    if (!process.env.JWT_SECRET) {
       // Don't hard fail if voice not used, but surface as missing for visibility
       missing.push('JWT_SECRET');
     }

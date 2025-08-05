@@ -80,8 +80,8 @@ export default async function handler(
       },
       serverless: {
         platform: 'vercel',
-        region: process.env['VERCEL_REGION'] || 'unknown',
-        environment: process.env['VERCEL_ENV'] || 'development',
+        region: process.env.VERCEL_REGION || 'unknown',
+        environment: process.env.VERCEL_ENV || 'development',
       },
       timestamp: new Date().toISOString(),
     };

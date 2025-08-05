@@ -85,8 +85,8 @@ setInterval((): void => {
 
 // Security headers for streaming responses
 function setStreamingHeaders(req: VercelRequest, res: VercelResponse): void {
-  const isDevelopment = process.env['NODE_ENV'] === 'development' || 
-                       process.env['VERCEL_ENV'] === 'development';
+  const isDevelopment = process.env.NODE_ENV === 'development' || 
+                       process.env.VERCEL_ENV === 'development';
   
   // CORS configuration - be restrictive in production
   const allowedOrigins = [
@@ -324,20 +324,20 @@ const headerAuth = (request as any).__authToken as string | undefined;
 // Normalize environment variable loading across Vercel setups:
 // Prefer OPENROUTER_API_KEY, then OPENAI_API_KEY, plus common aliases to avoid misconfig.
 const envKeyOpenRouter =
-  process.env['OPENROUTER_API_KEY'] ||
-  process.env['OPENROUTER_KEY'];
+  process.env.OPENROUTER_API_KEY ||
+  process.env.OPENROUTER_KEY;
 const envKeyOpenAI =
-  process.env['OPENAI_API_KEY'] ||
-  process.env['OPENAI_SECRET_KEY'];
+  process.env.OPENAI_API_KEY ||
+  process.env.OPENAI_SECRET_KEY;
 // Allow additional aliases to reduce misconfig risk
 const envKeyAliases = [
-  process.env['OPENAI_TOKEN'],
-  process.env['OPENROUTER_TOKEN'],
+  process.env.OPENAI_TOKEN,
+  process.env.OPENROUTER_TOKEN,
 ].filter(Boolean) as string[];
 const envKey = envKeyOpenRouter || envKeyOpenAI || envKeyAliases[0];
 // Do NOT accept browser-sent Authorization for production to avoid CORS/AUTH reliance.
 // Only allow header in development to assist local testing.
-const allowHeaderAuth = (process.env['NODE_ENV'] === 'development' || process.env['VERCEL_ENV'] === 'development');
+const allowHeaderAuth = (process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'development');
 const apiKey = (allowHeaderAuth && headerAuth) ? headerAuth : envKey;
 
 if (!apiKey) {
@@ -361,8 +361,8 @@ if (!apiKey) {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': process.env['APP_URL'] || process.env['FRONTEND_URL'] || 'https://nyxusd.com',
-        'X-Title': process.env['APP_NAME'] || process.env['VITE_APP_NAME'] || 'NyxUSD',
+        'HTTP-Referer': process.env.APP_URL || process.env.FRONTEND_URL || 'https://nyxusd.com',
+        'X-Title': process.env.APP_NAME || process.env.VITE_APP_NAME || 'NyxUSD',
         'User-Agent': 'NyxUSD/1.0'
       },
       body: JSON.stringify({

@@ -13,7 +13,7 @@ export default async function handler(
 
   try {
     // Check if voice service is configured
-    const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
+    const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY;
     const isConfigured = !!elevenLabsApiKey;
     
     let apiStatus: 'not_configured' | 'connected' | 'error' = 'not_configured';
@@ -84,8 +84,8 @@ export default async function handler(
       apiStatus,
       errorDetails,
       config: {
-        defaultVoiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID']!,
-        modelId: process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5',
+        defaultVoiceId: process.env.ELEVENLABS_DEFAULT_VOICE_ID!,
+        modelId: process.env.ELEVENLABS_MODEL_ID || 'eleven_turbo_v2_5',
         availableVoices: availableVoices.map(v => ({
           id: v.id, name: v.name, description: v.description,
         })),

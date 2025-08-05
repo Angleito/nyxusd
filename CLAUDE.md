@@ -236,7 +236,6 @@ Required for production:
 - **Comprehensive JSDoc comments**
 - **NO `any` types** - Use proper generics or union types
 - **NO type assertions** without validation
-- **Property access with bracket notation** for process.env
 
 ### Functional Patterns
 - Pure functions without side effects
@@ -297,12 +296,6 @@ const userProfile = chatMemoryService.getUserProfile(address);
 const memoryContext = chatMemoryService.getMemoryPromptContext(address);
 ```
 
-### Environment Variable Access
-```typescript
-// Always use bracket notation for env vars
-const apiKey = process.env['API_KEY'];
-const nodeEnv = process.env['NODE_ENV'];
-```
 
 ## Debugging
 

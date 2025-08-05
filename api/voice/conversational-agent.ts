@@ -431,7 +431,7 @@ export default async function handler(
     } catch (apiError) {
       const err = apiError as any;
       const safeMessage = err && err.message ? redact(err.message) : 'Unknown error';
-      const stack = (process.env['NODE_ENV'] && process.env['NODE_ENV'] !== 'production') ? err?.stack : undefined;
+      const stack = (process.env.NODE_ENV && process.env.NODE_ENV !== 'production') ? err?.stack : undefined;
       console.error(JSON.stringify({
         level: 'error',
         msg: 'convai:create:error:elevenlabs',
@@ -452,7 +452,7 @@ export default async function handler(
   } catch (error) {
     const err = error as any;
     const safeMessage = err && err.message ? redact(err.message) : 'Unknown error';
-    const stack = (process.env['NODE_ENV'] && process.env['NODE_ENV'] !== 'production') ? err?.stack : undefined;
+    const stack = (process.env.NODE_ENV && process.env.NODE_ENV !== 'production') ? err?.stack : undefined;
     console.error(JSON.stringify({
       level: 'error',
       msg: 'convai:create:error',

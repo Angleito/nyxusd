@@ -18,8 +18,8 @@ type TranscriptionError = {
 
 function setCors(res: VercelResponse): void {
   const isDevelopment =
-    process.env['NODE_ENV'] === 'development' ||
-    process.env['VERCEL_ENV'] === 'development';
+    process.env.NODE_ENV === 'development' ||
+    process.env.VERCEL_ENV === 'development';
 
   const allowedOrigins = [
     'https://nyxusd.com',
@@ -106,7 +106,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   }
 
   try {
-    const OPENAI_API_KEY = process.env['OPENAI_API_KEY'];
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
     if (!OPENAI_API_KEY) {
       const payload: TranscriptionError = {
         success: false,
@@ -118,7 +118,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       return;
     }
 
-    const MODEL = process.env['VOICE_STT_MODEL'] || 'gpt-4o-mini-transcribe';
+    const MODEL = process.env.VOICE_STT_MODEL || 'gpt-4o-mini-transcribe';
 
     const ct = (req.headers['content-type'] || '').toString();
     if (!ct.toLowerCase().includes('multipart/form-data')) {

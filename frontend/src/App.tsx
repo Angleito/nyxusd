@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NyxHeader } from "./components/layout/NyxHeader";
 import { Dashboard } from "./components/dashboard/Dashboard";
+import NyxMascotDashboard from "./components/dashboard/NyxMascotDashboard";
 import HeroSection from "./components/dashboard/HeroSection";
 import CDPHub from "./components/cdp/CDPHub";
 import { ModernSystemStats } from "./components/stats/ModernSystemStats";
@@ -91,7 +92,7 @@ function App() {
           <main className="relative z-10">
             <AnimatePresence mode="wait">
               <Routes>
-                {/* Nyx Dashboard as the default home page */}
+                {/* Nyx Mascot Dashboard as the default home page */}
                 <Route
                   path="/"
                   element={
@@ -101,9 +102,8 @@ function App() {
                       exit="out"
                       variants={pageVariants}
                       transition={pageTransition}
-                      className="container mx-auto px-4 py-8"
                     >
-                      <Dashboard variant="nyx" />
+                      <NyxMascotDashboard />
                     </motion.div>
                   }
                 />

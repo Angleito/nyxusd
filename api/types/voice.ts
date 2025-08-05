@@ -325,28 +325,29 @@ export function validateVoiceEnvironment(): {
   const errors: string[] = [];
   const envData: Record<string, string | undefined> = {};
 
-  const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
+  const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY;
   if (!elevenLabsApiKey) {
     errors.push('ELEVENLABS_API_KEY is required');
   } else {
     envData['ELEVENLABS_API_KEY'] = elevenLabsApiKey;
   }
 
-  const jwtSecret = process.env['JWT_SECRET'];
+  const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
     errors.push('JWT_SECRET is required');
   } else {
     envData['JWT_SECRET'] = jwtSecret;
   }
 
-  envData['ELEVENLABS_DEFAULT_VOICE_ID'] =
-    process.env['ELEVENLABS_DEFAULT_VOICE_ID']!;
+  const defaultVoiceId = process.env.ELEVENLABS_DEFAULT_VOICE_ID || '4Kt8muEUKO23q5wH9LHK';
+  envData['ELEVENLABS_DEFAULT_VOICE_ID'] = defaultVoiceId;
+  
   envData['ELEVENLABS_MODEL_ID'] =
-    process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5';
-  envData['NODE_ENV'] = process.env['NODE_ENV'];
-  envData['VERCEL_ENV'] = process.env['VERCEL_ENV'];
-  envData['VERCEL_REGION'] = process.env['VERCEL_REGION'];
-  envData['FRONTEND_URL'] = process.env['FRONTEND_URL'];
+    process.env.ELEVENLABS_MODEL_ID || 'eleven_turbo_v2_5';
+  envData['NODE_ENV'] = process.env.NODE_ENV;
+  envData['VERCEL_ENV'] = process.env.VERCEL_ENV;
+  envData['VERCEL_REGION'] = process.env.VERCEL_REGION;
+  envData['FRONTEND_URL'] = process.env.FRONTEND_URL;
 
   return {
     isValid: errors.length === 0,

@@ -5,8 +5,8 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
  */
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   // Enable CORS for development
-  const isDevelopment = process.env['NODE_ENV'] === 'development' || 
-                       process.env['VERCEL_ENV'] === 'development';
+  const isDevelopment = process.env.NODE_ENV === 'development' || 
+                       process.env.VERCEL_ENV === 'development';
   
   const allowedOrigins = [
     'https://nyxusd.com',
@@ -38,9 +38,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const openRouterKey = process.env['OPENROUTER_API_KEY'];
-  const openAiKey = process.env['OPENAI_API_KEY'];
-  const elevenLabsKey = process.env['ELEVENLABS_API_KEY'];
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+  const openAiKey = process.env.OPENAI_API_KEY;
+  const elevenLabsKey = process.env.ELEVENLABS_API_KEY;
 
   res.status(200).json({
     success: true,
@@ -61,10 +61,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
         keyPrefix: elevenLabsKey ? elevenLabsKey.substring(0, 7) + '...' : null
       },
       environment: {
-        NODE_ENV: process.env['NODE_ENV'],
-        VERCEL_ENV: process.env['VERCEL_ENV'],
-        APP_NAME: process.env['APP_NAME'],
-        APP_URL: process.env['APP_URL']
+        NODE_ENV: process.env.NODE_ENV,
+        VERCEL_ENV: process.env.VERCEL_ENV,
+        APP_NAME: process.env.APP_NAME,
+        APP_URL: process.env.APP_URL
       }
     },
     timestamp: new Date().toISOString()

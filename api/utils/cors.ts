@@ -8,8 +8,8 @@
 import type { VercelResponse } from '@vercel/node';
 
 // Standard CORS headers with development support
-const isDevelopment = process.env['NODE_ENV'] === 'development' || 
-                     process.env['VERCEL_ENV'] === 'development';
+const isDevelopment = process.env.NODE_ENV === 'development' || 
+                     process.env.VERCEL_ENV === 'development';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Credentials': 'true',

@@ -35,7 +35,7 @@ function validateToken(token: string): { valid: boolean; payload?: VoiceTokenPay
   try {
     const payload = jwt.verify(
       token,
-      process.env['JWT_SECRET'] || 'default-secret-change-in-production'
+      process.env.JWT_SECRET || 'default-secret-change-in-production'
     );
     if (typeof payload === 'object' && payload && 'sessionId' in payload && 'type' in payload) {
       return { valid: true, payload: payload as VoiceTokenPayload };
@@ -62,7 +62,7 @@ export default async function handler(
 
   try {
     // Check if ElevenLabs API key is configured
-    const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
+    const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY;
     if (!elevenLabsApiKey) {
       console.error('[TTS] Missing ELEVENLABS_API_KEY');
       res.status(500).json({
@@ -139,8 +139,8 @@ export default async function handler(
 
     const {
       text,
-      voiceId = process.env['ELEVENLABS_DEFAULT_VOICE_ID']!,
-      modelId = process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5',
+      voiceId = process.env.ELEVENLABS_DEFAULT_VOICE_ID!,
+      modelId = process.env.ELEVENLABS_MODEL_ID || 'eleven_turbo_v2_5',
       // per ElevenLabs API, voice_settings fields are optional; default below:
       // eslint-disable-next-line @typescript-eslint/naming-convention
       voiceSettings = {
@@ -274,10 +274,10 @@ export async function getSignedUrl(
   }
 
   try {
-    const apiKey = process.env['ELEVENLABS_API_KEY'];
+    const apiKey = process.env.ELEVENLABS_API_KEY;
     const agentId =
       (req.query['agentId'] as string | undefined) ||
-      process.env['ELEVENLABS_AGENT_ID'];
+      process.env.ELEVENLABS_AGENT_ID;
 
     if (!apiKey) {
       res.status(500).json({ error: 'Missing ELEVENLABS_API_KEY' });

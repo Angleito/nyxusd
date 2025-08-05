@@ -45,7 +45,7 @@ async function sessionHandler(
 
   try {
     // Check if ElevenLabs API key is configured
-    const elevenLabsApiKey = process.env['ELEVENLABS_API_KEY'];
+    const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY;
     if (!elevenLabsApiKey) {
       res.status(500).json({
         success: false,
@@ -87,13 +87,13 @@ async function sessionHandler(
       const now = Math.floor(Date.now() / 1000);
       const tokenPayload: VoiceTokenPayload = {
         sessionId: newSessionId,
-        voiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID']!,
+        voiceId: process.env.ELEVENLABS_DEFAULT_VOICE_ID!,
         type: 'voice_session',
         iat: now,
         exp: now + (30 * 60),
       };
       // JWT secret is required for secure token generation
-      const jwtSecret = process.env['JWT_SECRET'];
+      const jwtSecret = process.env.JWT_SECRET;
       if (!jwtSecret) {
         res.status(500).json({
           success: false,
@@ -131,8 +131,8 @@ async function sessionHandler(
             subscription: userData.subscription || null
           },
           config: {
-            voiceId: process.env['ELEVENLABS_DEFAULT_VOICE_ID']!,
-            modelId: process.env['ELEVENLABS_MODEL_ID'] || 'eleven_turbo_v2_5',
+            voiceId: process.env.ELEVENLABS_DEFAULT_VOICE_ID!,
+            modelId: process.env.ELEVENLABS_MODEL_ID || 'eleven_turbo_v2_5',
             wsUrl: 'wss://api.elevenlabs.io/v1/text-to-speech',
             voiceSettings: {
               stability: 0.5,
