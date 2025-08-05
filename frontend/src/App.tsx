@@ -91,7 +91,7 @@ function App() {
           <main className="relative z-10">
             <AnimatePresence mode="wait">
               <Routes>
-                {/* AI Assistant as the default home page */}
+                {/* Nyx Dashboard as the default home page */}
                 <Route
                   path="/"
                   element={
@@ -101,15 +101,15 @@ function App() {
                       exit="out"
                       variants={pageVariants}
                       transition={pageTransition}
-                      className="container mx-auto px-4 py-8 h-[calc(100vh-80px)]"
+                      className="container mx-auto px-4 py-8"
                     >
-                      <StandaloneAIAssistant />
+                      <Dashboard variant="nyx" />
                     </motion.div>
                   }
                 />
-                {/* Dashboard route with hero section */}
+                {/* Classic dashboard with hero section */}
                 <Route
-                  path="/dashboard"
+                  path="/classic"
                   element={
                     <motion.div
                       initial="initial"
@@ -120,7 +120,7 @@ function App() {
                     >
                       <HeroSection />
                       <div className="container mx-auto px-4 py-8">
-                        <Dashboard variant="nyx" />
+                        <Dashboard variant="modern" />
                       </div>
                     </motion.div>
                   }
