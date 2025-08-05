@@ -11,7 +11,7 @@
     "packages/cdp-sdk"
   ],
   "scripts": {
-    "build": "tsc --build",
+    "build": "npm run build:frontend",
     "clean:build": "tsc --build --clean",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -28,14 +28,15 @@
     "type-check": "tsc --noEmit --skipLibCheck",
     "clean": "npm run clean:build && rm -rf dist node_modules packages/*/node_modules libs/*/node_modules packages/*/dist libs/*/dist coverage",
     "validate": "npm run lint && npm run type-check && npm run test",
-    "build:frontend": "cd frontend && npm install && npm run build",
+    "build:frontend": "cd frontend && npm run build",
     "build:api": "cd api && npm install && npm run build",
     "dev:api": "node dev-server.js",
     "dev": "concurrently \"npm run dev:api\" \"cd frontend && npm run dev\"",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f"
+    "docker:logs": "docker-compose logs -f",
+    "vercel-build": "npm run build:frontend"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",
