@@ -91,7 +91,7 @@ function App() {
           <main>
             <AnimatePresence mode="wait">
               <Routes>
-                {/* Make the main dashboard the default route with Nyx profile visual */}
+                {/* New dashboard as the default home page */}
                 <Route
                   path="/"
                   element={
@@ -101,11 +101,9 @@ function App() {
                       exit="out"
                       variants={pageVariants}
                       transition={pageTransition}
+                      className="container mx-auto px-4 py-8 h-[calc(100vh-80px)]"
                     >
-                      <HeroSection />
-                      <div className="container mx-auto px-4 py-8">
-                        <Dashboard variant="nyx" />
-                      </div>
+                      <UnifiedAIAssistant position="center" />
                     </motion.div>
                   }
                 />
