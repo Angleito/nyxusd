@@ -120,61 +120,131 @@ export class SecureVoiceClient {
 
   /**
    * Get or refresh the voice token
+   * Strategy:
+   * 1) If cached token not expired, return it
+   * 2) Try POST /api/voice/session action=start (preferred)
+   * 3) Fallback to GET /api/voice-token
    */
   private async getToken(): Promise<VoiceToken> {
-    // Check if we have a valid token
-    if (this.token && this.tokenExpiry > Date.now()) {
+    // Serve from cache if still valid and session present
+    if (this.token && this.tokenExpiry > Date.now() && this.sessionId && this.config?.config) {
       return {
         token: this.token,
-        sessionId: this.sessionId!,
-        // Preserve original behavior; internal cast retained
-        config: this.config!.config as any,
+        sessionId: this.sessionId,
+        config: this.config.config as any,
       };
     }
 
+    const coerceConfig = (cfg: Record<string, unknown> | undefined): VoiceToken['config'] => ({
+      voiceId:
+        typeof cfg?.['voiceId'] === 'string' && (cfg['voiceId'] as string).length > 0
+          ? (cfg['voiceId'] as string)
+          : this.config?.config.defaultVoiceId || 'EXAVITQu4vr4xnSDxMaL',
+      modelId:
+        typeof cfg?.['modelId'] === 'string' && (cfg['modelId'] as string).length > 0
+          ? (cfg['modelId'] as string)
+          : this.config?.config.modelId || 'eleven_turbo_v2_5',
+      wsUrl:
+        typeof cfg?.['wsUrl'] === 'string' && (cfg['wsUrl'] as string).length > 0
+          ? (cfg['wsUrl'] as string)
+          : 'wss://api.elevenlabs.io/v1',
+      optimizeStreamingLatency:
+        typeof cfg?.['optimizeStreamingLatency'] === 'number'
+          ? (cfg['optimizeStreamingLatency'] as number)
+          : 2,
+      voiceSettings:
+        (cfg?.['voiceSettings'] as any) || {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0,
+          use_speaker_boost: true,
+        },
+    });
+
     try {
-      const response = await fetch(
+      // Preferred: start session
+      const startResp = await fetch(`${this.baseUrl}/api/voice/session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'start', sessionId: this.sessionId }),
+      });
+
+      if (startResp.ok) {
+        const startDataUnknown: unknown = await startResp.json().catch(() => ({}));
+        const startData = (typeof startDataUnknown === 'object' && startDataUnknown !== null
+          ? (startDataUnknown as Record<string, unknown>)
+          : {}) as Record<string, unknown>;
+
+        if (startData['success'] === true && typeof startData['sessionId'] === 'string' && typeof startData['token'] === 'string') {
+          const newSessionId = startData['sessionId'] as string;
+          const newToken = startData['token'] as string;
+
+          this.sessionId = newSessionId;
+          this.token = newToken;
+          this.tokenExpiry = Date.now() + 29 * 60 * 1000;
+
+          const cfg = (startData['config'] as Record<string, unknown> | undefined) || {};
+          return {
+            token: newToken,
+            sessionId: newSessionId,
+            config: coerceConfig(cfg),
+          };
+        }
+        // non-success payload -> fall through
+      } else {
+        // log snippet and fall through
+        try {
+          const snippet = (await startResp.text().catch(() => '')).slice(0, 200);
+          console.warn('Voice session start failed, fallback to /api/voice-token:', startResp.status, startResp.statusText, snippet);
+        } catch {
+          // ignore
+        }
+      }
+
+      // Fallback: GET /api/voice-token
+      const tokenResp = await fetch(
         `${this.baseUrl}/api/voice-token${this.sessionId ? `?sessionId=${this.sessionId}` : ''}`,
         {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
         }
       );
 
-      if (!response.ok) {
-        const snippet = (await response.text()).slice(0, 120);
-        throw new Error(`Failed to get voice token: ${response.status} ${response.statusText} - ${snippet}`);
+      if (!tokenResp.ok) {
+        const snippet = (await tokenResp.text().catch(() => '')).slice(0, 120);
+        throw new Error(`Failed to get voice token: ${tokenResp.status} ${tokenResp.statusText} - ${snippet}`);
       }
 
-      const raw: unknown = await response.json().catch(() => ({}));
-      // Keep existing envelope behavior (success, token, sessionId, config fields).
-      // We do minimal safe checks and set cache; behavior preserved.
+      const raw: unknown = await tokenResp.json().catch(() => ({} as unknown));
       const obj = (typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {}) as Record<
         string,
         unknown
       >;
 
-      if (obj.success !== true) {
-        const emsg =
-          typeof obj.error === 'string' && obj.error.length > 0 ? obj.error : 'Failed to get voice token';
-        throw new Error(emsg);
+      if (obj['success'] !== true) {
+        const errStr =
+          typeof obj['error'] === 'string' && (obj['error'] as string).length > 0
+            ? (obj['error'] as string)
+            : 'Failed to get voice token';
+        throw new Error(errStr);
       }
 
-      const token = typeof obj.token === 'string' ? obj.token : '';
-      const sessionId = typeof obj.sessionId === 'string' ? obj.sessionId : '';
+      const token = typeof obj['token'] === 'string' ? (obj['token'] as string) : '';
+      const sessionId = typeof obj['sessionId'] === 'string' ? (obj['sessionId'] as string) : '';
       if (!token || !sessionId) {
         throw new Error('Invalid token payload');
       }
 
       this.token = token;
       this.sessionId = sessionId;
-      // Keep original 4 minutes validity window (refresh 1 minute before)
       this.tokenExpiry = Date.now() + 4 * 60 * 1000;
 
-      // Return as original shape (relies on backend 'config' field passthrough)
-      return obj as unknown as VoiceToken;
+      const cfg = (obj['config'] as Record<string, unknown> | undefined) || {};
+      return {
+        token,
+        sessionId,
+        config: coerceConfig(cfg),
+      };
     } catch (error) {
       console.error('Error getting voice token:', error);
       throw error;
