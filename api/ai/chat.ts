@@ -348,10 +348,14 @@ Provide helpful responses that guide users to NYX-native actions and learning.`;
  * Call OpenRouter API using TaskEither for proper error handling
  */
 const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEither<ChatError, OpenRouterResponse> => {
-  const apiKey = process.env['OPENROUTER_API_KEY'];
-  
+  // Support both env var and optional Authorization bearer passthrough from client
+  // Prefer header if provided, otherwise use env
+  const headerAuth = (request as any).__authToken as string | undefined;
+  const envKey = process.env['OPENROUTER_API_KEY'];
+  const apiKey = headerAuth || envKey;
+
   if (!apiKey) {
-    return TE.left({ type: 'API_CONFIG_ERROR', message: 'OpenRouter API key not configured' });
+    return TE.left({ type: 'API_CONFIG_ERROR', message: 'No auth credentials found' });
   }
 
   const systemPrompt = buildSystemPrompt(request.memoryContext, request.conversationSummary);
@@ -421,10 +425,10 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
             // Keep original error text if not JSON
           }
           
-          return Promise.reject({ 
-            type: 'OPENROUTER_ERROR', 
-            message: errorMessage, 
-            status: response.status 
+          return Promise.reject({
+            type: 'OPENROUTER_ERROR',
+            message: errorMessage,
+            status: response.status
           });
         }
 
@@ -571,9 +575,10 @@ const handleChatError = (res: VercelResponse, error: ChatError): void => {
         error: error.message
       };
       
+      // Preserve upstream semantics; send 401/403 as-is, not 500
       let statusCode = 502;
       if (error.status === 429) statusCode = 429;
-      else if (error.status === 401) statusCode = 500;
+      else if (error.status === 401 || error.status === 403) statusCode = error.status;
       else if (error.status >= 500) statusCode = 502;
       else if (error.status >= 400) statusCode = 400;
       
@@ -632,6 +637,11 @@ async function chatHandler(req: VercelRequest, res: VercelResponse): Promise<voi
     return;
   }
 
+  // Inject Authorization bearer token from request header into the request object
+  const authHeader = (req.headers['authorization'] as string | undefined) || '';
+  const bearer = authHeader.replace(/^Bearer\s+/i, '').trim();
+  // We'll pass this into the processing flow by attaching to the body-derived request later
+
   // Get client IP for rate limiting
   const clientIP = getClientIP(req);
 
@@ -640,15 +650,17 @@ async function chatHandler(req: VercelRequest, res: VercelResponse): Promise<voi
     // Validate input
     validateChatRequest(req.body),
     TE.fromEither,
+    // Attach auth to request for downstream callOpenRouter
+    TE.map((validated) => Object.assign({}, validated, { __authToken: bearer || undefined })),
     // Check rate limiting
-    TE.chain((request) =>
+    TE.chain((requestWithAuth) =>
       pipe(
         checkRateLimitTE(clientIP),
         TE.map((rateLimitInfo) => {
           // Set rate limit headers
           res.setHeader('X-RateLimit-Remaining', rateLimitInfo.remaining.toString());
           res.setHeader('X-RateLimit-Reset', new Date(rateLimitInfo.resetTime).toISOString());
-          return request;
+          return requestWithAuth;
         })
       )
     ),

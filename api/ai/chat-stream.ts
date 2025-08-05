@@ -314,14 +314,17 @@ Provide helpful responses that guide users to NYX-native actions and learning.`;
  * Stream OpenRouter API response using Server-Sent Events
  */
 const streamOpenRouter = async (
-  request: StreamChatRequest, 
+  request: StreamChatRequest,
   model: AllowedModel,
   res: VercelResponse
 ): Promise<E.Either<StreamError, void>> => {
-  const apiKey = process.env['OPENROUTER_API_KEY'];
+  // Support Authorization bearer passthrough in addition to env
+  const headerAuth = (request as any).__authToken as string | undefined;
+  const envKey = process.env['OPENROUTER_API_KEY'];
+  const apiKey = headerAuth || envKey;
   
   if (!apiKey) {
-    return E.left({ type: 'API_CONFIG_ERROR', message: 'OpenRouter API key not configured' });
+    return E.left({ type: 'API_CONFIG_ERROR', message: 'No auth credentials found' });
   }
 
   const systemPrompt = buildSystemPrompt(request.memoryContext, request.conversationSummary);
@@ -390,10 +393,10 @@ const streamOpenRouter = async (
         // Keep original error text if not JSON
       }
       
-      return E.left({ 
-        type: 'OPENROUTER_ERROR', 
-        message: errorMessage, 
-        status: response.status 
+      return E.left({
+        type: 'OPENROUTER_ERROR',
+        message: errorMessage,
+        status: response.status
       });
     }
 
@@ -532,7 +535,8 @@ const handleStreamError = (res: VercelResponse, error: StreamError): void => {
       break;
     case 'OPENROUTER_ERROR':
       errorMessage = 'AI service error: ' + error.message;
-      statusCode = error.status === 429 ? 429 : 502;
+      // Preserve upstream 401/403 to avoid generic 502 masking auth failures
+      statusCode = error.status === 429 ? 429 : (error.status === 401 || error.status === 403 ? error.status : 502);
       break;
     case 'TIMEOUT_ERROR':
       errorMessage = 'Request timeout';
@@ -584,6 +588,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
+  // Extract Authorization bearer, pass through to OpenRouter if present
+  const authHeader = (req.headers['authorization'] as string | undefined) || '';
+  const bearer = authHeader.replace(/^Bearer\s+/i, '').trim();
+
   // Get client IP for rate limiting
   const clientIP = getClientIP(req);
 
@@ -592,15 +600,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     // Validate input
     validateStreamChatRequest(req.body),
     TE.fromEither,
+    // Attach auth to request for downstream streamOpenRouter
+    TE.map((validated) => Object.assign({}, validated, { __authToken: bearer || undefined })),
     // Check rate limiting
-    TE.chain((request) =>
+    TE.chain((requestWithAuth) =>
       pipe(
         checkRateLimitTE(clientIP),
         TE.map((rateLimitInfo) => {
           // Set rate limit headers
           res.setHeader('X-RateLimit-Remaining', rateLimitInfo.remaining.toString());
           res.setHeader('X-RateLimit-Reset', new Date(rateLimitInfo.resetTime).toISOString());
-          return request;
+          return requestWithAuth;
         })
       )
     ),
@@ -613,7 +623,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     TE.chain(({ request, selectedModel }) =>
       TE.tryCatch(
         async () => {
-          const streamResult = await streamOpenRouter(request, selectedModel, res);
+          const streamResult = await streamOpenRouter(request as any, selectedModel, res);
           if (E.isLeft(streamResult)) {
             throw streamResult.left;
           }

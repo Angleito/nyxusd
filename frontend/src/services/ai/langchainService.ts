@@ -331,16 +331,16 @@ export class LangChainAIService implements AIService {
 
   async validateConfiguration(): Promise<boolean> {
     try {
-      // Test backend API connection instead of direct LLM
       const baseUrl = import.meta.env.VITE_API_URL || 'https://nyxusd.com';
       const apiUrl = `${baseUrl}/api/ai/chat`;
       
       console.log('🔧 AI Service: Validating configuration with URL:', apiUrl);
       
-      const response = await fetch(apiUrl, {
+      const res = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
+          // Do NOT send OpenRouter API key from the browser
         },
         body: JSON.stringify({
           message: 'test',
@@ -348,29 +348,35 @@ export class LangChainAIService implements AIService {
         }),
       });
 
-      console.log('🔧 AI Service: Validation response status:', response.status, response.statusText);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('🔧 AI Service: Validation successful, response:', data.success ? 'success' : 'failed');
-      } else {
-        const errorText = await response.text();
-        console.error('🔧 AI Service: Validation failed, error:', errorText);
+      console.log('🔧 AI Service: Validation response status:', res.status, res.statusText);
+
+      // Read body ONCE to avoid "body stream already read"
+      const text = await res.text();
+      let json: any = null;
+      try {
+        json = JSON.parse(text);
+      } catch (e) {
+        // ignore JSON parse errors; we'll treat body as text
       }
 
-      // Don't fail initialization for configuration errors
-      // The service can still be used, it will just return config error messages
-      if (response.status === 500) {
-        const errorText = await response.text();
-        if (errorText.includes('OpenRouter API key not configured') || errorText.includes('No auth credentials found')) {
-          console.warn('🔧 AI Service: API key not configured, service will return configuration errors');
-          this.isInitialized = true; // Allow initialization but service will return config errors
-          return true;
-        }
+      if (res.ok) {
+        console.log('🔧 AI Service: Validation successful, response:', json?.success ? 'success' : 'failed');
+        this.isInitialized = true;
+        return true;
       }
-      
-      this.isInitialized = response.ok;
-      return response.ok;
+
+      const bodyForLog = json ? JSON.stringify(json) : text;
+      console.error('🔧 AI Service: Validation failed, error:', bodyForLog);
+
+      // Don't fail initialization solely for missing server-side config; allow app to run
+      if ((res.status === 401 || res.status === 500) && bodyForLog.includes('No auth credentials found')) {
+        console.warn('🔧 AI Service: API key not configured server-side; frontend will surface config error during use');
+        this.isInitialized = true;
+        return true;
+      }
+
+      this.isInitialized = false;
+      return false;
     } catch (error) {
       console.error("🔧 AI Service: Configuration validation failed with exception:", error);
       this.isInitialized = false;
@@ -426,7 +432,8 @@ export class LangChainAIService implements AIService {
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
+          // Never include provider API keys in frontend requests
         },
         body: JSON.stringify(requestPayload),
       });
@@ -460,7 +467,10 @@ export class LangChainAIService implements AIService {
         }
         
         // Check for API key configuration errors
-        if (response.status === 500 && (errorText.includes('OpenRouter API key not configured') || errorText.includes('No auth credentials found'))) {
+        if (
+          (response.status === 401 || response.status === 500) &&
+          (errorText.includes('OpenRouter API key not configured') || errorText.includes('No auth credentials found'))
+        ) {
           throw new Error('AI service is not properly configured. Please contact support.');
         }
         
@@ -586,7 +596,8 @@ export class LangChainAIService implements AIService {
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
+          // Never include provider API keys in frontend requests
         },
         body: JSON.stringify(requestPayload),
       });
@@ -602,7 +613,7 @@ export class LangChainAIService implements AIService {
         try {
           errorData = JSON.parse(errorText);
           if (response.status === 400 && errorData.validationErrors) {
-            const validationError = errorData.validationErrors.find((err: any) => 
+            const validationError = errorData.validationErrors.find((err: any) =>
               err.field === 'memoryContext' && err.message.includes('2000 characters')
             );
             if (validationError) {
@@ -612,7 +623,13 @@ export class LangChainAIService implements AIService {
           if (response.status === 400 && errorData.error === 'Validation failed') {
             throw new Error('Invalid request format. Please try again with a different message.');
           }
-        } catch (parseError) {
+          if (
+            (response.status === 401 || response.status === 500) &&
+            (errorText.includes('OpenRouter API key not configured') || errorText.includes('No auth credentials found'))
+          ) {
+            throw new Error('AI service is not properly configured. Please contact support.');
+          }
+        } catch {
           // If we can't parse the error, use the original text
         }
         
@@ -682,10 +699,10 @@ export class LangChainAIService implements AIService {
         }
         
         // Stream character by character for more natural typing effect
-        const chars = message.split('');
+        const chars: string[] = message.split('');
         
         for (let i = 0; i < chars.length; i++) {
-          const char = chars[i];
+          const char: string = chars[i] ?? '';
           
           // Send the new character as chunk
           onChunk(char);
