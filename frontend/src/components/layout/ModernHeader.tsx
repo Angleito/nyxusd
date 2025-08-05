@@ -4,7 +4,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { Navigation } from "./Navigation";
-import { WalletConnectButton } from "../wallet/WalletConnectButton";
+import { CustomConnectButton } from "../wallet/RainbowKitButton";
 
 export const ModernHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -124,7 +124,7 @@ export const ModernHeader: React.FC = () => {
             {/* Desktop Navigation and Wallet */}
             <div className="hidden lg:flex items-center space-x-4">
               <Navigation />
-              <WalletConnectButton className="ml-4" />
+              <CustomConnectButton className="ml-4" />
             </div>
 
             {/* Mobile Menu Button */}
@@ -228,7 +228,7 @@ export const ModernHeader: React.FC = () => {
                   
                   {/* Mobile Wallet Connection */}
                   <div className="px-4 pt-4 border-t border-gray-800 mt-4">
-                    <WalletConnectButton className="w-full" />
+                    <CustomConnectButton className="w-full" />
                   </div>
                 </div>
 

@@ -1,5 +1,4 @@
 import React from "react";
-import WalletConnectButton from "./WalletConnectButton";
 import { RainbowKitButton, CustomConnectButton } from "./RainbowKitButton";
 import { useAccount, useBalance, useChainId } from "wagmi";
 import { formatBalance, getChainName } from "../../lib/wallet";
@@ -24,13 +23,13 @@ export const WalletDemo: React.FC = () => {
         </p>
       </div>
 
-      {/* Option 1: Custom Wallet Button */}
+      {/* Option 1: Custom Styled Connect Button */}
       <div className="border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-3">Option 1: Custom Wallet Button</h3>
+        <h3 className="text-lg font-semibold mb-3">Option 1: Custom Styled Connect Button</h3>
         <p className="text-sm text-gray-600 mb-4">
           A fully custom implementation with dropdown connector selection
         </p>
-        <WalletConnectButton />
+        <CustomConnectButton />
       </div>
 
       {/* Option 2: RainbowKit Default */}

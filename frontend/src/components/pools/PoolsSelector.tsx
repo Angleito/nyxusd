@@ -52,11 +52,11 @@ export const PoolsSelector: React.FC<Props> = ({ onSelect }) => {
 
   if (error) {
     return (
-      <NyxCard variant="elevated" className="max-w-xl mx-auto">
-        <NyxCardContent>
+      <Card variant="elevated" className="max-w-xl mx-auto">
+        <CardContent>
           <p className="nyx-body-large" style={{ color: 'var(--nyx-error)' }}>Failed to load pools</p>
-        </NyxCardContent>
-      </NyxCard>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -64,9 +64,9 @@ export const PoolsSelector: React.FC<Props> = ({ onSelect }) => {
 
   return (
     <div className="space-y-6">
-      <NyxCard variant="glow">
+      <Card variant="glow">
         <div className="p-6">
-          <NyxCardTitle className="mb-2">Choose Your Pool</NyxCardTitle>
+          <CardTitle className="mb-2">Choose Your Pool</NyxCardTitle>
           <p className="nyx-body" style={{ color: 'var(--nyx-gleam-70)' }}>
             Three calibrated strategies from the whitepaper. Sub-names in full degen glory.
           </p>
@@ -75,7 +75,7 @@ export const PoolsSelector: React.FC<Props> = ({ onSelect }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {pools.map((p) => (
-          <NyxCard key={p.id} variant="elevated" className="flex flex-col">
+          <Card key={p.id} variant="elevated" className="flex flex-col">
             <div className="p-6 flex-1 flex flex-col">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export const PoolsSelector: React.FC<Props> = ({ onSelect }) => {
                 </Button>
               </div>
             </div>
-          </NyxCard>
+          </Card>
         ))}
       </div>
     </div>

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAccount, useBalance, useChainId } from "wagmi";
 import { formatBalance, getChainName } from "../../lib/wallet";
-import { WalletConnectButton } from "../wallet/WalletConnectButton";
+import { CustomConnectButton } from "../wallet/RainbowKitButton";
 import { MidnightWalletCard } from "../wallet/MidnightWalletCard";
 import { useMidnightWallet } from "../../hooks/useMidnightWallet";
 
@@ -68,7 +68,7 @@ export const WalletDashboardCard: React.FC<WalletDashboardCardProps> = ({
           <p className="text-gray-600 text-sm mb-6">
             Connect your wallet to view your portfolio and manage CDPs
           </p>
-          <WalletConnectButton />
+          <CustomConnectButton />
           
           <div className="mt-6 pt-4 border-t border-gray-100">
             <p className="text-xs text-gray-500 mb-3">Privacy-first with Midnight Protocol</p>

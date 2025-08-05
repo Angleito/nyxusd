@@ -17,14 +17,6 @@ The wallet integration supports multiple popular crypto wallets through wagmi an
 
 ## Components
 
-### WalletConnectButton
-A custom wallet connection button with dropdown connector selection.
-```tsx
-import { WalletConnectButton } from './components/wallet/WalletConnectButton';
-
-<WalletConnectButton className="my-custom-class" />
-```
-
 ### RainbowKitButton
 Pre-built wallet connection UI from RainbowKit with multiple variants:
 ```tsx
@@ -35,6 +27,9 @@ import { RainbowKitButton, CustomConnectButton } from './components/wallet/Rainb
 
 // Custom styled to match app design
 <CustomConnectButton />
+
+// With custom variant styles
+<CustomConnectButton variant="nyx" showBalance={false} />
 ```
 
 ### WalletStatus

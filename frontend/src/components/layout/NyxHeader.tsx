@@ -4,7 +4,7 @@ import { Bars3Icon, XMarkIcon, ChevronDownIcon } from "@heroicons/react/24/outli
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { Navigation } from "./Navigation";
-import { NyxWalletConnectButton } from "../wallet/NyxWalletConnectButton";
+import { CustomConnectButton } from "../wallet/RainbowKitButton";
 import { useTheme } from "../../contexts/ThemeContext";
 
 interface Chain {
@@ -338,7 +338,7 @@ export const NyxHeader: React.FC = () => {
                   
                   {/* Mobile Wallet Connection */}
                   <div className="px-4 pt-4 border-t mt-4" style={{ borderColor: 'var(--nyx-void-60)' }}>
-                    <NyxWalletConnectButton className="w-full" />
+                    <CustomConnectButton variant="nyx" className="w-full" />
                   </div>
                 </div>
 
