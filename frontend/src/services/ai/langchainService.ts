@@ -406,16 +406,16 @@ export class LangChainAIService implements AIService {
       const model = this.selectModelByQueryType(queryType);
       
       // Call backend API
-      const isDev2 = typeof window !== 'undefined' && (import.meta.env.DEV || window.location.hostname === 'localhost');
-      const baseUrl = import.meta.env.VITE_API_URL
-        ? import.meta.env.VITE_API_URL
-        : (isDev2 ? '' : (typeof window !== 'undefined' ? window.location.origin : 'https://nyxusd.com'));
-      const apiUrl = `${baseUrl}/api/ai/chat`;
+      const baseUrl2 =
+        import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim().length > 0
+          ? import.meta.env.VITE_API_URL.trim()
+          : (typeof window !== 'undefined' ? '' : (process.env.APP_URL || 'https://nyxusd.com'));
+      const apiUrl = `${baseUrl2}/api/ai/chat`;
       
       console.log('🤖 AI Service: Environment variables:', {
         VITE_API_URL: import.meta.env.VITE_API_URL,
         MODE: import.meta.env.MODE,
-        baseUrl,
+        baseUrl: baseUrl2,
         finalApiUrl: apiUrl
       });
       
@@ -425,7 +425,8 @@ export class LangChainAIService implements AIService {
         context: Object.keys(context),
         memoryContext: memoryContext ? 'present' : 'none',
         conversationSummary: conversationSummary ? 'present' : 'none',
-        model
+        model,
+        resolvedBaseUrl: resolvedBaseUrl2
       });
       
       const requestPayload = {
@@ -580,11 +581,11 @@ export class LangChainAIService implements AIService {
       const model = this.selectModelByQueryType(queryType);
       
       // Call streaming backend API
-      const isDev3 = typeof window !== 'undefined' && (import.meta.env.DEV || window.location.hostname === 'localhost');
-      const baseUrl = import.meta.env.VITE_API_URL
-        ? import.meta.env.VITE_API_URL
-        : (isDev3 ? '' : (typeof window !== 'undefined' ? window.location.origin : 'https://nyxusd.com'));
-      const apiUrl = `${baseUrl}/api/ai/chat-stream`;
+      const baseUrl3 =
+        import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim().length > 0
+          ? import.meta.env.VITE_API_URL.trim()
+          : (typeof window !== 'undefined' ? '' : (process.env.APP_URL || 'https://nyxusd.com'));
+      const apiUrl = `${baseUrl3}/api/ai/chat-stream`;
       
       console.log('🤖 AI Service: Making streaming request to:', apiUrl);
       console.log('🤖 AI Service: Request payload:', {
@@ -592,7 +593,8 @@ export class LangChainAIService implements AIService {
         context: Object.keys(context),
         memoryContext: memoryContext ? 'present' : 'none',
         conversationSummary: conversationSummary ? 'present' : 'none',
-        model
+        model,
+        resolvedBaseUrl: resolvedBaseUrl3
       });
       
       const requestPayload = {
