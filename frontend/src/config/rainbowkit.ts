@@ -17,7 +17,9 @@ import {
 } from 'viem/chains';
 import { midnightTestnet } from './chains';
 
-const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
+const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ??
++  // Fallback demo Project ID – replace with your own in production
++  'b2a1c4d5e6f7g8h9i0j1k2l3m4n5o6p7';
 const enableTestnets = import.meta.env.VITE_ENABLE_TESTNETS === 'true';
 
 // Define chains based on environment
