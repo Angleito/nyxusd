@@ -77,21 +77,19 @@ export const NyxMascotDashboard: React.FC = () => {
         >
           {/* Left side - Welcome text and mascot */}
           <div className="flex-1 flex flex-col lg:flex-row items-center gap-8">
-            {/* Nyx-chan Mascot */}
+            {/* Nyx-chan Mascot Placeholder */}
             <motion.div 
               animate={floatAnimation}
               className="relative"
             >
-              <div className="w-48 h-48 lg:w-64 lg:h-64 relative">
-                <img 
-                  src="/nyx-mascot.svg" 
-                  alt="Nyx-chan" 
-                  className="w-full h-full object-contain drop-shadow-2xl"
-                  onError={(e) => {
-                    // Fallback to jpg if svg fails
-                    (e.target as HTMLImageElement).src = "/nyx-mascot.jpg";
-                  }}
-                />
+              <div className="w-48 h-48 lg:w-64 lg:h-64 relative flex items-center justify-center">
+                {/* Mascot placeholder with gradient background */}
+                <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-2xl">
+                  <div className="text-center">
+                    <div className="text-6xl lg:text-8xl font-bold text-white mb-2">NYX</div>
+                    <div className="text-xl lg:text-2xl text-blue-100">ちゃん</div>
+                  </div>
+                </div>
                 {/* Glow effect behind mascot */}
                 <div className="absolute inset-0 bg-blue-500/20 blur-3xl -z-10" />
               </div>
