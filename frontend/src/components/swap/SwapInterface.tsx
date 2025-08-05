@@ -126,15 +126,6 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
     return () => clearTimeout(delayDebounce);
   }, [inputAmount, slippage, address, fetchQuote, inputTokenDetails, outputTokenDetails]);
 
-  // Voice feedback when quote is loaded
-  useEffect(() => {
-    if (quoteData && voiceEnabled && inputAmount) {
-      const outputAmount = formatOutputAmount();
-      const feedback = `You will receive approximately ${outputAmount} ${outputToken} for ${inputAmount} ${inputToken}`;
-      voiceService.speak(feedback);
-      VoiceFeedback.playNotification();
-    }
-  }, [quoteData, voiceEnabled, inputAmount, inputToken, outputToken, formatOutputAmount]);
 
   const handleSwap = useCallback(async (): Promise<void> => {
     if (!walletClient || !publicClient || !address) {
@@ -213,6 +204,16 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
       return '0.00';
     }
   }, [quoteData, outputTokenDetails]);
+
+  // Voice feedback when quote is loaded
+  useEffect(() => {
+    if (quoteData && voiceEnabled && inputAmount) {
+      const outputAmount = formatOutputAmount();
+      const feedback = `You will receive approximately ${outputAmount} ${outputToken} for ${inputAmount} ${inputToken}`;
+      voiceService.speak(feedback);
+      VoiceFeedback.playNotification();
+    }
+  }, [quoteData, voiceEnabled, inputAmount, inputToken, outputToken, formatOutputAmount]);
 
   const containerClass = embedded 
     ? "bg-gray-900/50 rounded-lg p-4 border border-purple-800/30"

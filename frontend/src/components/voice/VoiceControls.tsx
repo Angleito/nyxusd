@@ -56,6 +56,13 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
           // Initialize voice service with secure configuration
           console.log('🎤 VoiceControls: Initializing voice service...');
           await voiceService.initialize('secure-token'); // Placeholder, actual auth via server
+          
+          // Enable conversational mode if available
+          if (tokenData.config?.features?.conversationalMode) {
+            console.log('🎤 VoiceControls: Enabling conversational mode...');
+            await voiceService.enableConversationalMode();
+          }
+          
           console.log('🎤 VoiceControls: Voice service initialized successfully');
           setIsInitialized(true);
         }
