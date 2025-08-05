@@ -77,20 +77,69 @@ export const NyxMascotDashboard: React.FC = () => {
         >
           {/* Left side - Welcome text and mascot */}
           <div className="flex-1 flex flex-col lg:flex-row items-center gap-8">
-            {/* Nyx-chan Mascot Placeholder */}
+            {/* Floating Nyx Orb */}
             <motion.div 
               animate={floatAnimation}
               className="relative"
             >
               <div className="w-48 h-48 lg:w-64 lg:h-64 relative flex items-center justify-center">
-                {/* Mascot placeholder with gradient background */}
-                <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-2xl">
-                  <div className="text-center">
-                    <div className="text-6xl lg:text-8xl font-bold text-white mb-2">NYX</div>
-                    <div className="text-xl lg:text-2xl text-blue-100">ちゃん</div>
-                  </div>
-                </div>
-                {/* Glow effect behind mascot */}
+                {/* Central Orb - NYX */}
+                <motion.div
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 lg:w-52 lg:h-52 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-2xl shadow-blue-500/50"
+                  animate={{
+                    rotate: 360,
+                    scale: [1, 1.05, 1],
+                  }}
+                  transition={{
+                    rotate: {
+                      duration: 20,
+                      repeat: Infinity,
+                      ease: "linear",
+                    },
+                    scale: {
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    },
+                  }}
+                >
+                  {/* Nyx Icon in center */}
+                  <img 
+                    src="/nyx-assets/images/nyx-icon.svg"
+                    alt="NYX"
+                    className="w-24 h-24 lg:w-32 lg:h-32 filter drop-shadow-2xl"
+                  />
+                </motion.div>
+
+                {/* Orbiting rings */}
+                <motion.div
+                  className="absolute inset-0 border-2 border-blue-400/30 rounded-full"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+
+                <motion.div
+                  className="absolute inset-4 border border-cyan-300/20 rounded-full"
+                  animate={{
+                    scale: [1.1, 1, 1.1],
+                    opacity: [0.2, 0.4, 0.2],
+                  }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 2,
+                  }}
+                />
+
+                {/* Glow effect */}
                 <div className="absolute inset-0 bg-blue-500/20 blur-3xl -z-10" />
               </div>
             </motion.div>
