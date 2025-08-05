@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { fetchSystemStats, fetchOraclePrices } from "../../services/api";
-import { NyxCard, NyxCardTitle, NyxCardContent } from "../ui/NyxCard";
-import { NyxButton } from "../ui/NyxButton";
+import { Card, CardTitle, CardContent } from "../ui/Card";
+import { Button } from "../ui/Button";
 import { 
   ShieldCheckIcon, 
   CurrencyDollarIcon, 
@@ -57,8 +57,8 @@ export const NyxDashboard: React.FC = () => {
 
   if (statsError || pricesError) {
     return (
-      <NyxCard variant="elevated" className="max-w-lg mx-auto">
-        <NyxCardContent>
+      <Card variant="elevated" className="max-w-lg mx-auto">
+        <CardContent>
           <div className="text-center py-8">
             <p className="nyx-body-large mb-4" style={{ color: 'var(--nyx-error)' }}>
               Failed to load system data
@@ -67,8 +67,8 @@ export const NyxDashboard: React.FC = () => {
               Please check your connection and try again
             </p>
           </div>
-        </NyxCardContent>
-      </NyxCard>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -103,7 +103,7 @@ export const NyxDashboard: React.FC = () => {
     >
       {/* Welcome Section */}
       <motion.div variants={itemVariants}>
-        <NyxCard variant="glow" className="overflow-hidden">
+        <Card variant="glow" className="overflow-hidden">
           <div className="p-8 relative">
             <div className="absolute top-0 right-0 w-64 h-64 opacity-10">
               <SparklesIcon className="w-full h-full" />
@@ -117,24 +117,24 @@ export const NyxDashboard: React.FC = () => {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link to="/ai-assistant">
-                  <NyxButton variant="primary" icon={<UserCircleIcon className="w-5 h-5" />}>
+                  <Button variant="primary" icon={<UserCircleIcon className="w-5 h-5" />}>
                     Ape In
-                  </NyxButton>
+                  </Button>
                 </Link>
                 <Link to="/cdp">
-                  <NyxButton variant="secondary" icon={<CurrencyDollarIcon className="w-5 h-5" />}>
+                  <Button variant="secondary" icon={<CurrencyDollarIcon className="w-5 h-5" />}>
                     Manage CDPs
-                  </NyxButton>
+                  </Button>
                 </Link>
                 <Link to="/pools">
-                  <NyxButton variant="ghost" icon={<SparklesIcon className="w-5 h-5" />}>
+                  <Button variant="ghost" icon={<SparklesIcon className="w-5 h-5" />}>
                     Choose Pool
-                  </NyxButton>
+                  </Button>
                 </Link>
               </div>
             </div>
           </div>
-        </NyxCard>
+        </Card>
       </motion.div>
 
       {/* Stats Grid */}
@@ -143,8 +143,8 @@ export const NyxDashboard: React.FC = () => {
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
       >
         {/* Total Value Locked */}
-        <NyxCard variant="data">
-          <NyxCardContent>
+        <Card variant="data">
+          <CardContent>
             <div className="flex items-center justify-between mb-2">
               <p className="nyx-body-small" style={{ color: 'var(--nyx-gleam-60)' }}>
                 Total Value Locked
@@ -154,12 +154,12 @@ export const NyxDashboard: React.FC = () => {
             <p className="nyx-heading-2 nyx-text-gradient">
               ${systemStats?.totalValueLocked?.toLocaleString?.() || systemStats?.metrics?.totalValueLocked?.toLocaleString?.() || "0"}
             </p>
-          </NyxCardContent>
-        </NyxCard>
+          </CardContent>
+        </Card>
 
         {/* NyxUSD Supply */}
-        <NyxCard variant="data">
-          <NyxCardContent>
+        <Card variant="data">
+          <CardContent>
             <div className="flex items-center justify-between mb-2">
               <p className="nyx-body-small" style={{ color: 'var(--nyx-gleam-60)' }}>
                 NyxUSD Supply
@@ -169,12 +169,12 @@ export const NyxDashboard: React.FC = () => {
             <p className="nyx-heading-2 nyx-text-gradient">
               {(systemStats as any)?.totalDebt?.toLocaleString?.() || "0"}
             </p>
-          </NyxCardContent>
-        </NyxCard>
+          </CardContent>
+        </Card>
 
         {/* Active CDPs */}
-        <NyxCard variant="data">
-          <NyxCardContent>
+        <Card variant="data">
+          <CardContent>
             <div className="flex items-center justify-between mb-2">
               <p className="nyx-body-small" style={{ color: 'var(--nyx-gleam-60)' }}>
                 Active CDPs
@@ -184,12 +184,12 @@ export const NyxDashboard: React.FC = () => {
             <p className="nyx-heading-2 nyx-text-gradient">
               {(systemStats as any)?.activeCDPs || "0"}
             </p>
-          </NyxCardContent>
-        </NyxCard>
+          </CardContent>
+        </Card>
 
         {/* Collateral Ratio */}
-        <NyxCard variant="data">
-          <NyxCardContent>
+        <Card variant="data">
+          <CardContent>
             <div className="flex items-center justify-between mb-2">
               <p className="nyx-body-small" style={{ color: 'var(--nyx-gleam-60)' }}>
                 Avg Collateral Ratio
@@ -210,15 +210,15 @@ export const NyxDashboard: React.FC = () => {
                 return typeof ratio === 'number' ? `${(ratio * 100).toFixed(0)}%` : "0%";
               })()}
             </p>
-          </NyxCardContent>
-        </NyxCard>
+          </CardContent>
+        </Card>
       </motion.div>
 
       {/* Oracle Prices */}
       <motion.div variants={itemVariants}>
-        <NyxCard variant="elevated">
+        <Card variant="elevated">
           <div className="p-6">
-            <NyxCardTitle className="mb-4">Oracle Prices</NyxCardTitle>
+            <CardTitle className="mb-4">Oracle Prices</CardTitle>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {prices && Object.entries(prices).map(([asset, price]) => (
                 <div key={asset} className="nyx-glass rounded-lg p-4">
@@ -232,14 +232,14 @@ export const NyxDashboard: React.FC = () => {
               ))}
             </div>
           </div>
-        </NyxCard>
+        </Card>
       </motion.div>
 
       {/* Quick Actions */}
       <motion.div variants={itemVariants}>
-        <NyxCard variant="elevated">
+        <Card variant="elevated">
           <div className="p-6">
-            <NyxCardTitle className="mb-4">Quick Actions</NyxCardTitle>
+            <CardTitle className="mb-4">Quick Actions</CardTitle>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Link to="/cdp" className="block">
                 <div className="nyx-glass rounded-lg p-4 hover:border-purple-500/50 transition-all">
@@ -270,7 +270,7 @@ export const NyxDashboard: React.FC = () => {
               </Link>
             </div>
           </div>
-        </NyxCard>
+        </Card>
       </motion.div>
     </motion.div>
   );

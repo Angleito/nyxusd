@@ -3,10 +3,11 @@ import { motion, HTMLMotionProps } from "framer-motion";
 import { clsx } from "clsx";
 
 export interface CardProps extends HTMLMotionProps<"div"> {
-  variant?: "default" | "elevated" | "outlined" | "gradient";
+  variant?: "default" | "elevated" | "outlined" | "gradient" | "glow" | "data" | "nft";
   padding?: "none" | "sm" | "md" | "lg" | "xl";
   hover?: boolean;
   children: React.ReactNode;
+  onClick?: () => void;
 }
 
 export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -27,6 +28,12 @@ const cardVariants = {
   outlined: "bg-transparent border-2 border-gray-700",
   gradient:
     "bg-gradient-to-br from-gray-900/80 to-gray-800/50 border border-gray-700/50",
+  glow:
+    "bg-gray-900/80 border border-purple-500/30 shadow-lg shadow-purple-500/20 nyx-card-glow",
+  data:
+    "bg-gray-900/60 border border-gray-700/50 backdrop-blur-md",
+  nft:
+    "bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-500/30",
 };
 
 const cardPadding = {
@@ -45,6 +52,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
       hover = true,
       className,
       children,
+      onClick,
       ...props
     },
     ref,
@@ -59,20 +67,24 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
           cardVariants[variant],
           // Padding styles
           cardPadding[padding],
+          // Interactive styles
+          onClick && "cursor-pointer",
           className,
         )}
+        onClick={onClick}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         whileHover={
           hover
             ? {
                 y: -4,
+                scale: onClick ? 0.98 : 1,
                 boxShadow:
-                  variant === "gradient" || variant === "elevated"
+                  variant === "gradient" || variant === "elevated" || variant === "glow"
                     ? "0 20px 60px -12px rgba(168, 85, 247, 0.15)"
                     : "0 20px 60px -12px rgba(0, 0, 0, 0.4)",
                 borderColor:
-                  variant === "outlined" ? "rgb(168, 85, 247)" : undefined,
+                  variant === "outlined" || variant === "glow" ? "rgb(168, 85, 247)" : undefined,
                 transition: {
                   type: "spring",
                   stiffness: 400,
@@ -81,6 +93,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
               }
             : undefined
         }
+        whileTap={onClick ? { scale: 0.98 } : undefined}
         transition={{
           type: "spring",
           stiffness: 300,
@@ -144,3 +157,45 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
 );
 
 CardFooter.displayName = "CardFooter";
+
+export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  children: React.ReactNode;
+}
+
+export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
+  ({ className, children, ...props }, ref) => (
+    <h3
+      ref={ref}
+      className={clsx(
+        "text-2xl font-bold tracking-tight text-white",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </h3>
+  ),
+);
+
+CardTitle.displayName = "CardTitle";
+
+export interface CardSubtitleProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  children: React.ReactNode;
+}
+
+export const CardSubtitle = React.forwardRef<HTMLParagraphElement, CardSubtitleProps>(
+  ({ className, children, ...props }, ref) => (
+    <p
+      ref={ref}
+      className={clsx(
+        "text-sm text-gray-400",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </p>
+  ),
+);
+
+CardSubtitle.displayName = "CardSubtitle";

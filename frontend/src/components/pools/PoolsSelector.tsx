@@ -2,8 +2,8 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPools } from '../../services/poolsService';
 import type { Pool } from '../../types/pools';
-import { NyxCard, NyxCardContent, NyxCardTitle } from '../ui/NyxCard';
-import { NyxButton } from '../ui/NyxButton';
+import { Card, CardContent, CardTitle } from '../ui/Card';
+import { Button } from '../ui/Button';
 import { SparklesIcon, ShieldCheckIcon, FireIcon } from '@heroicons/react/24/outline';
 
 type Props = {
@@ -103,12 +103,12 @@ export const PoolsSelector: React.FC<Props> = ({ onSelect }) => {
               </div>
 
               <div className="mt-6">
-                <NyxButton
+                <Button
                   variant={p.risk === 'high' ? 'primary' : p.risk === 'medium' ? 'secondary' : 'ghost'}
                   onClick={() => onSelect?.(p)}
                 >
                   Select {p.name}
-                </NyxButton>
+                </Button>
               </div>
             </div>
           </NyxCard>

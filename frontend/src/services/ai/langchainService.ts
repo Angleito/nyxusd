@@ -331,12 +331,9 @@ export class LangChainAIService implements AIService {
 
   async validateConfiguration(): Promise<boolean> {
     try {
-      // Use relative path in dev or when VITE_API_URL is not set; default to current origin
-      const isDev = typeof window !== 'undefined' && (import.meta.env.DEV || window.location.hostname === 'localhost');
-      const baseUrl = import.meta.env.VITE_API_URL
-        ? import.meta.env.VITE_API_URL
-        : (isDev ? '' : (typeof window !== 'undefined' ? window.location.origin : 'https://nyxusd.com'));
-      const apiUrl = `${baseUrl}/api/ai/chat`;
+      // Always call Vercel serverless functions via same-origin relative paths from the browser.
+      // Never hit external/base URLs from frontend for API.
+      const apiUrl = `/api/ai/chat`;
       
       console.log('🔧 AI Service: Validating configuration with URL:', apiUrl);
       

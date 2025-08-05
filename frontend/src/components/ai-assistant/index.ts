@@ -1,5 +1,5 @@
 export { AIAssistant } from "./AIAssistant";
-export { ChatInterface } from "./ChatInterface";
+export { EnhancedChatInterface } from "./EnhancedChatInterface";
 export { ChatMessage } from "./ChatMessage";
 export { TypingIndicator } from "./TypingIndicator";
 export { WalletConnectionStep } from "./WalletConnectionStep";
