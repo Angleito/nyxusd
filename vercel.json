@@ -11,10 +11,10 @@
   ],
   "functions": {
     "api/**/*.ts": {
-      "runtime": "nodejs18.x"
+      "runtime": "nodejs22.x"
     },
     "api/**/*.py": {
-      "runtime": "python3.9"
+      "runtime": "python3.12"
     }
   },
   "env": {
