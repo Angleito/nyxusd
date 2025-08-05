@@ -369,11 +369,10 @@ export class LangChainAIService implements AIService {
       const bodyForLog = json ? JSON.stringify(json) : text;
       console.error('🔧 AI Service: Validation failed, error:', bodyForLog);
 
-      // Don't fail initialization solely for missing server-side config; allow app to run
-      if ((res.status === 401 || res.status === 500) && (bodyForLog.includes('No auth credentials found') || bodyForLog.includes('AI service configuration error'))) {
-        console.warn('🔧 AI Service: API key not configured server-side; frontend will surface config error during use');
-        this.isInitialized = true;
-        return true;
+      // Detect missing server-side API key and throw clear error
+      if ((res.status === 401 || res.status === 500) &&
+          (bodyForLog.includes('No auth credentials found') || bodyForLog.includes('AI service configuration error'))) {
+        throw new Error('Missing OPENROUTER_API_KEY on server');
       }
 
       this.isInitialized = false;

@@ -55,14 +55,38 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
         if (tokenData.configured) {
           // Initialize voice service with secure configuration
           console.log('🎤 VoiceControls: Initializing voice service...');
-          await voiceService.initialize('secure-token'); // Placeholder, actual auth via server
+          // Initialize voice service: fetch token and apply configuration
+          console.log('🎤 VoiceControls: Fetching voice token...');
+          const tokenResponse = await fetch('/api/voice-token', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          });
+          if (!tokenResponse.ok) {
+            throw new Error(`Failed to fetch voice token: ${tokenResponse.statusText}`);
+          }
+          const { token, config: tokenConfig } = await tokenResponse.json();
           
+          console.log('🎤 VoiceControls: Initializing voice service with token...');
+          await voiceService.initialize(token);
+
+          // Apply server-provided voice configuration
+          voiceService.setVoiceConfig({
+            voiceId: tokenConfig.voiceId,
+            modelId: tokenConfig.modelId,
+            stability: tokenConfig.voiceSettings.stability,
+            similarityBoost: tokenConfig.voiceSettings.similarity_boost,
+            style: tokenConfig.voiceSettings.style,
+            useSpeakerBoost: tokenConfig.voiceSettings.use_speaker_boost,
+            optimizeStreamingLatency: tokenConfig.optimizeStreamingLatency,
+            conversationalMode: tokenData.config?.features?.conversationalMode || false,
+          });
+
           // Enable conversational mode if available
           if (tokenData.config?.features?.conversationalMode) {
             console.log('🎤 VoiceControls: Enabling conversational mode...');
             await voiceService.enableConversationalMode();
           }
-          
+
           console.log('🎤 VoiceControls: Voice service initialized successfully');
           setIsInitialized(true);
         }
