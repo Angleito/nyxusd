@@ -187,14 +187,21 @@ What would you like to explore today?`,
       // Create a contextual message based on what was detected
       let contextMessage = "I'll help you swap tokens. ";
       
+      // Add cross-chain context if detected
+      const chainContext = swapIntent.isCrossChain 
+        ? ` from ${swapIntent.sourceChain} to ${swapIntent.destinationChain}` 
+        : swapIntent.sourceChain && swapIntent.sourceChain !== 'Base' 
+        ? ` on ${swapIntent.sourceChain}`
+        : '';
+      
       if (swapIntent.inputToken && swapIntent.outputToken && swapIntent.amount) {
-        contextMessage = `Perfect! Let's swap ${swapIntent.amount} ${swapIntent.inputToken} to ${swapIntent.outputToken}.`;
+        contextMessage = `Perfect! Let's swap ${swapIntent.amount} ${swapIntent.inputToken} to ${swapIntent.outputToken}${chainContext}.`;
       } else if (swapIntent.inputToken && swapIntent.outputToken) {
-        contextMessage = `Great! Let's set up your ${swapIntent.inputToken} to ${swapIntent.outputToken} swap. Just enter the amount you'd like to swap.`;
+        contextMessage = `Great! Let's set up your ${swapIntent.inputToken} to ${swapIntent.outputToken} swap${chainContext}. Just enter the amount you'd like to swap.`;
       } else if (swapIntent.outputToken) {
-        contextMessage = `I'll help you get some ${swapIntent.outputToken}. You can adjust the tokens and amount below.`;
+        contextMessage = `I'll help you get some ${swapIntent.outputToken}${chainContext}. You can adjust the tokens and amount below.`;
       } else {
-        contextMessage = "Here's the swap interface. You can select your tokens and enter the amount.";
+        contextMessage = `Here's the swap interface${chainContext}. You can select your tokens and enter the amount.`;
       }
       
       // Create swap interface message
@@ -209,6 +216,9 @@ What would you like to explore today?`,
             inputToken: swapIntent.inputToken || 'ETH',
             outputToken: swapIntent.outputToken || 'USDC',
             amount: swapIntent.amount || '',
+            sourceChain: swapIntent.sourceChain,
+            destinationChain: swapIntent.destinationChain,
+            isCrossChain: swapIntent.isCrossChain,
           }
         }
       };
@@ -233,16 +243,31 @@ What would you like to explore today?`,
       // Check if this is a specific crypto query
       const isCryptoQuery = /price|portfolio|defi|market|trend|btc|eth|crypto|cdp|deposit|yield|compound/i.test(userMessage.content);
 
-      // Helper to parse an ##ACTION## block line into JSON
+      // Helper to parse action blocks in both ##ACTION## and ```ACTION formats
       const parseAction = (text: string): any | null => {
-        const match = text.split('\n').find((l) => l.trim().startsWith('##ACTION##'));
-        if (!match) return null;
-        const jsonPart = match.replace('##ACTION##', '').trim();
-        try {
-          return JSON.parse(jsonPart);
-        } catch {
-          return null;
+        // Check for ##ACTION## format (single line)
+        const singleLineMatch = text.split('\n').find((l) => l.trim().startsWith('##ACTION##'));
+        if (singleLineMatch) {
+          const jsonPart = singleLineMatch.replace('##ACTION##', '').trim();
+          try {
+            return JSON.parse(jsonPart);
+          } catch {
+            return null;
+          }
         }
+        
+        // Check for ```ACTION format (code block)
+        const codeBlockRegex = /```ACTION\s*([\s\S]*?)\s*```/;
+        const codeBlockMatch = text.match(codeBlockRegex);
+        if (codeBlockMatch) {
+          try {
+            return JSON.parse(codeBlockMatch[1].trim());
+          } catch {
+            return null;
+          }
+        }
+        
+        return null;
       };
 
       if (isCryptoQuery) {
@@ -655,6 +680,10 @@ What would you like to explore today?`,
                       initialInputToken={activeSwap.inputToken}
                       initialOutputToken={activeSwap.outputToken}
                       initialAmount={activeSwap.amount}
+                      sourceChain={message.metadata?.swapParams?.sourceChain}
+                      destinationChain={message.metadata?.swapParams?.destinationChain}
+                      isCrossChain={message.metadata?.swapParams?.isCrossChain}
+                      voiceEnabled={voiceEnabled}
                       embedded={true}
                       onSwapComplete={(txHash) => {
                         const successMessage: Message = {

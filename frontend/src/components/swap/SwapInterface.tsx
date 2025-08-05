@@ -7,23 +7,33 @@ import { useOdosSwap } from '../../hooks/useOdosSwap';
 import { swapDetectionService } from '../../services/swapDetectionService';
 import { tokenService, TokenInfo } from '../../services/tokenService';
 import { TokenSearch } from './TokenSearch';
+import { VoiceFeedback } from '../../utils/voiceFeedback';
+import { voiceService } from '../../services/voice/voiceService';
 
 interface SwapInterfaceProps {
   readonly initialInputToken?: string;
   readonly initialOutputToken?: string;
   readonly initialAmount?: string;
+  readonly sourceChain?: string;
+  readonly destinationChain?: string;
+  readonly isCrossChain?: boolean;
   readonly onSwapComplete?: (txHash: string) => void;
   readonly onCancel?: () => void;
   readonly embedded?: boolean;
+  readonly voiceEnabled?: boolean;
 }
 
 export const SwapInterface: React.FC<SwapInterfaceProps> = ({
   initialInputToken = 'AERO',
   initialOutputToken = 'ETH',
   initialAmount = '',
+  sourceChain = 'Base',
+  destinationChain = 'Base',
+  isCrossChain = false,
   onSwapComplete,
   onCancel,
-  embedded = false
+  embedded = false,
+  voiceEnabled = false
 }) => {
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
@@ -116,26 +126,73 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
     return () => clearTimeout(delayDebounce);
   }, [inputAmount, slippage, address, fetchQuote, inputTokenDetails, outputTokenDetails]);
 
+  // Voice feedback when quote is loaded
+  useEffect(() => {
+    if (quoteData && voiceEnabled && inputAmount) {
+      const outputAmount = formatOutputAmount();
+      const feedback = `You will receive approximately ${outputAmount} ${outputToken} for ${inputAmount} ${inputToken}`;
+      voiceService.speak(feedback);
+      VoiceFeedback.playNotification();
+    }
+  }, [quoteData, voiceEnabled, inputAmount, inputToken, outputToken, formatOutputAmount]);
+
   const handleSwap = useCallback(async (): Promise<void> => {
     if (!walletClient || !publicClient || !address) {
       console.error('Wallet not connected');
+      if (voiceEnabled) {
+        await voiceService.speak("Please connect your wallet first");
+        VoiceFeedback.playError();
+      }
       return;
     }
 
     if (!quoteData) {
       console.error('No quote available');
+      if (voiceEnabled) {
+        await voiceService.speak("Please wait for the quote to load");
+        VoiceFeedback.playError();
+      }
       return;
     }
 
     try {
+      // Play processing sound and provide voice feedback
+      if (voiceEnabled) {
+        VoiceFeedback.playProcessing();
+        const swapFeedback = VoiceFeedback.generateSwapFeedback({
+          inputToken,
+          outputToken,
+          amount: inputAmount,
+          priceImpact: quoteData.priceImpact,
+          gasEstimate: formatUnits(BigInt(quoteData.gasEstimate || '0'), 18),
+          isCrossChain,
+          sourceChain,
+          destinationChain
+        });
+        await voiceService.speak(swapFeedback);
+      }
+
       const txHash = await executeSwap(walletClient, publicClient);
-      if (txHash && onSwapComplete) {
-        onSwapComplete(txHash);
+      
+      if (txHash) {
+        if (voiceEnabled) {
+          VoiceFeedback.playSuccess();
+          const successFeedback = VoiceFeedback.generateTransactionFeedback('success', txHash);
+          await voiceService.speak(successFeedback);
+        }
+        if (onSwapComplete) {
+          onSwapComplete(txHash);
+        }
       }
     } catch (error) {
       console.error('Swap execution failed:', error);
+      if (voiceEnabled) {
+        VoiceFeedback.playError();
+        const errorFeedback = VoiceFeedback.generateTransactionFeedback('failed');
+        await voiceService.speak(errorFeedback);
+      }
     }
-  }, [walletClient, publicClient, address, quoteData, executeSwap, onSwapComplete]);
+  }, [walletClient, publicClient, address, quoteData, executeSwap, onSwapComplete, voiceEnabled, inputToken, outputToken, inputAmount, isCrossChain, sourceChain, destinationChain]);
 
   const switchTokens = useCallback((): void => {
     setInputToken(outputToken);

@@ -6,6 +6,9 @@ interface SwapIntent {
   amount?: string;
   isPercentage?: boolean;
   missingParams?: string[];
+  sourceChain?: string;
+  destinationChain?: string;
+  isCrossChain?: boolean;
 }
 
 interface TokenMapping {
@@ -16,6 +19,28 @@ interface TokenMapping {
 
 // Import the token service for dynamic token fetching
 import { tokenService } from './tokenService';
+
+// Supported chains mapping
+const SUPPORTED_CHAINS: Record<string, { id: number; name: string }> = {
+  'ETHEREUM': { id: 1, name: 'Ethereum' },
+  'ETH': { id: 1, name: 'Ethereum' },
+  'MAINNET': { id: 1, name: 'Ethereum' },
+  'OPTIMISM': { id: 10, name: 'Optimism' },
+  'OP': { id: 10, name: 'Optimism' },
+  'BSC': { id: 56, name: 'BSC' },
+  'BINANCE': { id: 56, name: 'BSC' },
+  'POLYGON': { id: 137, name: 'Polygon' },
+  'MATIC': { id: 137, name: 'Polygon' },
+  'FANTOM': { id: 250, name: 'Fantom' },
+  'FTM': { id: 250, name: 'Fantom' },
+  'ZKSYNC': { id: 324, name: 'zkSync Era' },
+  'ZK': { id: 324, name: 'zkSync Era' },
+  'BASE': { id: 8453, name: 'Base' },
+  'ARBITRUM': { id: 42161, name: 'Arbitrum' },
+  'ARB': { id: 42161, name: 'Arbitrum' },
+  'AVALANCHE': { id: 43114, name: 'Avalanche' },
+  'AVAX': { id: 43114, name: 'Avalanche' },
+};
 
 // Common Base chain token mappings
 const BASE_TOKENS: Record<string, TokenMapping> = {
@@ -304,6 +329,14 @@ export class SwapDetectionService {
   private async extractSwapParametersAsync(message: string, availableTokens: string[]): Promise<Partial<SwapIntent>> {
     const result: Partial<SwapIntent> = {};
     
+    // Extract chain information first
+    const chainInfo = this.extractChainInfo(message);
+    if (chainInfo.sourceChain) result.sourceChain = chainInfo.sourceChain;
+    if (chainInfo.destinationChain) result.destinationChain = chainInfo.destinationChain;
+    if (chainInfo.sourceChain && chainInfo.destinationChain && chainInfo.sourceChain !== chainInfo.destinationChain) {
+      result.isCrossChain = true;
+    }
+    
     // Create dynamic patterns using available tokens
     const tokenList = availableTokens.join('|');
     const patterns = [
@@ -390,6 +423,36 @@ export class SwapDetectionService {
       result.isPercentage = true;
     }
 
+    // Check for fraction patterns
+    const fractionPatterns = [
+      { pattern: /half\s+(?:of\s+)?(?:my\s+)?(${tokenList})/i, value: '50' },
+      { pattern: /quarter\s+(?:of\s+)?(?:my\s+)?(${tokenList})/i, value: '25' },
+      { pattern: /third\s+(?:of\s+)?(?:my\s+)?(${tokenList})/i, value: '33.33' },
+    ];
+    
+    for (const { pattern, value } of fractionPatterns) {
+      const match = message.match(new RegExp(pattern.source.replace('${tokenList}', tokenList), 'i'));
+      if (match) {
+        result.amount = value;
+        result.isPercentage = true;
+        if (!result.inputToken) {
+          result.inputToken = this.safeNormalizeToken(match[1]);
+        }
+        break;
+      }
+    }
+
+    // Check for stablecoin aggregation patterns
+    if (/stable(?:coin)?s?/i.test(message) && !result.outputToken) {
+      result.outputToken = 'USDC'; // Default stablecoin
+    }
+
+    // Check for max/maximum patterns
+    if (/max(?:imum)?\s+(?:amount\s+)?(?:of\s+)?(${tokenList})/i.test(message)) {
+      result.amount = '100';
+      result.isPercentage = true;
+    }
+
     return result;
   }
 
@@ -398,6 +461,14 @@ export class SwapDetectionService {
    */
   private extractSwapParameters(message: string): Partial<SwapIntent> {
     const result: Partial<SwapIntent> = {};
+    
+    // Extract chain information first
+    const chainInfo = this.extractChainInfo(message);
+    if (chainInfo.sourceChain) result.sourceChain = chainInfo.sourceChain;
+    if (chainInfo.destinationChain) result.destinationChain = chainInfo.destinationChain;
+    if (chainInfo.sourceChain && chainInfo.destinationChain && chainInfo.sourceChain !== chainInfo.destinationChain) {
+      result.isCrossChain = true;
+    }
     
     // Pattern variations for swap detection - expanded and ordered by specificity
     const patterns = [
@@ -494,6 +565,36 @@ export class SwapDetectionService {
       result.isPercentage = true;
     }
 
+    // Check for fraction patterns
+    const fractionPatterns = [
+      { pattern: /half\s+(?:of\s+)?(?:my\s+)?(\w+)/i, value: '50' },
+      { pattern: /quarter\s+(?:of\s+)?(?:my\s+)?(\w+)/i, value: '25' },
+      { pattern: /third\s+(?:of\s+)?(?:my\s+)?(\w+)/i, value: '33.33' },
+    ];
+    
+    for (const { pattern, value } of fractionPatterns) {
+      const match = message.match(pattern);
+      if (match) {
+        result.amount = value;
+        result.isPercentage = true;
+        if (!result.inputToken) {
+          result.inputToken = this.safeNormalizeToken(match[1]);
+        }
+        break;
+      }
+    }
+
+    // Check for stablecoin aggregation patterns
+    if (/stable(?:coin)?s?/i.test(message) && !result.outputToken) {
+      result.outputToken = 'USDC'; // Default stablecoin
+    }
+
+    // Check for max/maximum patterns
+    if (/max(?:imum)?\s+(?:amount\s+)?(?:of\s+)?(\w+)/i.test(message)) {
+      result.amount = '100';
+      result.isPercentage = true;
+    }
+
     return result;
   }
 
@@ -505,6 +606,63 @@ export class SwapDetectionService {
       return 'ETH'; // Default fallback
     }
     return this.normalizeToken(token, availableTokens);
+  }
+
+  /**
+   * Extract chain information from message
+   */
+  private extractChainInfo(message: string): { sourceChain?: string; destinationChain?: string } {
+    const result: { sourceChain?: string; destinationChain?: string } = {};
+    const chainNames = Object.keys(SUPPORTED_CHAINS).join('|');
+    
+    // Patterns for chain detection
+    const patterns = [
+      // "on Arbitrum to Base"
+      new RegExp(`on\\s+(${chainNames})\\s+to\\s+(${chainNames})`, 'i'),
+      // "from Ethereum to Polygon"
+      new RegExp(`from\\s+(${chainNames})\\s+to\\s+(${chainNames})`, 'i'),
+      // "ETH on Arbitrum to USDC on Base"
+      new RegExp(`\\w+\\s+on\\s+(${chainNames})\\s+(?:to|for)\\s+\\w+\\s+on\\s+(${chainNames})`, 'i'),
+      // "swap on Base"
+      new RegExp(`(?:swap|exchange|trade)\\s+on\\s+(${chainNames})`, 'i'),
+      // "using Arbitrum"
+      new RegExp(`using\\s+(${chainNames})`, 'i'),
+      // "via Optimism"
+      new RegExp(`via\\s+(${chainNames})`, 'i'),
+    ];
+    
+    for (const pattern of patterns) {
+      const match = message.match(pattern);
+      if (match) {
+        if (match.length === 3) {
+          // Two chains detected
+          result.sourceChain = this.normalizeChain(match[1]);
+          result.destinationChain = this.normalizeChain(match[2]);
+        } else if (match.length === 2) {
+          // Single chain detected - use as both source and destination
+          result.sourceChain = this.normalizeChain(match[1]);
+          result.destinationChain = result.sourceChain;
+        }
+        break;
+      }
+    }
+    
+    // If no chains detected, default to Base (hackathon focus)
+    if (!result.sourceChain && !result.destinationChain) {
+      result.sourceChain = 'Base';
+      result.destinationChain = 'Base';
+    }
+    
+    return result;
+  }
+
+  /**
+   * Normalize chain name
+   */
+  private normalizeChain(chain: string): string {
+    const upperChain = chain.toUpperCase();
+    const chainInfo = SUPPORTED_CHAINS[upperChain];
+    return chainInfo ? chainInfo.name : chain;
   }
 
   /**

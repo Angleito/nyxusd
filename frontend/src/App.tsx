@@ -11,15 +11,18 @@ import { AboutPage } from "./components/about/AboutPage";
 import ContactPage from "./components/contact/ContactPage";
 import WhitepaperPage from "./pages/WhitepaperPage";
 import { DemoEnhancer } from "./components/demo/DemoEnhancer";
+import { DemoModeIndicator } from "./components/demo/DemoModeIndicator";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ThemeTransition, ThemeBackground } from "./components/theme/ThemeTransition";
 import "./styles/nyx-global.css";
 import "./styles/App.css";
 import "./theme/styles/themes.css";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import PoolsSelector from "./components/pools/PoolsSelector";
 
 function App() {
+  const demoModeRef = useRef<{ simulateCommand: (command: string) => void } | null>(null);
+
   useEffect(() => {
     // Generate starfield effect
     const starfield = document.getElementById('app-starfield');
@@ -73,6 +76,14 @@ function App() {
           
           {/* Global AI Assistant - Available on all pages */}
           <UnifiedAIAssistant position="bottom-right" />
+          
+          {/* Demo Mode Indicator - Shows demo scenarios */}
+          <DemoModeIndicator 
+            onScenarioSelect={(command) => {
+              // TODO: Send command to AI assistant
+              console.log('Demo command:', command);
+            }}
+          />
           
           {/* Demo Controller for Video Recording */}
           <DemoEnhancer />

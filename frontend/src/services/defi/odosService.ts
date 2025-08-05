@@ -103,7 +103,8 @@ export class OdosService {
     outputToken: string,
     amount: string,
     userAddress: string,
-    slippage: number = 1
+    slippage: number = 1,
+    destinationChainId?: number
   ): Promise<OdosQuoteResponse> {
     const request: OdosQuoteRequest = {
       chainId,
@@ -264,6 +265,16 @@ export class OdosService {
       { id: 42161, name: 'Arbitrum' },
       { id: 43114, name: 'Avalanche' },
     ];
+  }
+
+  /**
+   * Get chain ID from chain name
+   */
+  getChainIdByName(chainName: string): number {
+    const chain = this.getSupportedChains().find(
+      c => c.name.toLowerCase() === chainName.toLowerCase()
+    );
+    return chain ? chain.id : 8453; // Default to Base
   }
 
   /**
