@@ -11,10 +11,10 @@
   ],
   "functions": {
     "api/**/*.ts": {
-      "runtime": "nodejs22.x"
+      "maxDuration": 10
     },
     "api/**/*.py": {
-      "runtime": "python3.12"
+      "maxDuration": 10
     }
   },
   "env": {
