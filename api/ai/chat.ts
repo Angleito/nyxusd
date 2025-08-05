@@ -637,6 +637,9 @@ const handleChatError = (res: VercelResponse, error: ChatError): void => {
  * Handles chat requests with OpenRouter API integration, implementing
  * comprehensive validation, rate limiting, and error handling using fp-ts.
  *
+ * Supports a configuration validation probe by sending { __validation: true }
+ * which bypasses user/session gating and only validates server config.
+ *
  * @param req - Vercel request object
  * @param res - Vercel response object
  * @returns Promise<void> - Resolves when response is sent
@@ -644,12 +647,46 @@ const handleChatError = (res: VercelResponse, error: ChatError): void => {
 async function chatHandler(req: VercelRequest, res: VercelResponse): Promise<void> {
 
   // Validate HTTP method
+  // Allow OPTIONS preflight quickly
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return;
+  }
+
   if (req.method !== 'POST') {
     const methodResponse: ErrorResponse = {
       success: false,
       error: 'Method not allowed'
     };
     res.status(405).json(methodResponse);
+    return;
+  }
+
+  // Config validation probe bypass: if __validation === true, only check env keys and return
+  if (req.body && typeof req.body === 'object' && (req.body as any).__validation === true) {
+    const missing: string[] = [];
+    const hasOpenRouter =
+      !!process.env['OPENROUTER_API_KEY'] ||
+      !!process.env['OPENROUTER_KEY'] ||
+      !!process.env['OPENAI_API_KEY'] ||
+      !!process.env['OPENAI_SECRET_KEY'] ||
+      !!process.env['OPENAI_TOKEN'] ||
+      !!process.env['OPENROUTER_TOKEN'];
+    if (!hasOpenRouter) missing.push('OPENROUTER_API_KEY');
+
+    // JWT secret is used by voice endpoints and potentially sessions; include if required
+    if (!process.env['JWT_SECRET']) {
+      // Don't hard fail if voice not used, but surface as missing for visibility
+      missing.push('JWT_SECRET');
+    }
+
+    if (missing.length > 0) {
+      res.setHeader('X-Config-Error', `Missing: ${missing.join(', ')}`);
+      res.status(500).json({ success: false, error: 'AI service configuration error' });
+      return;
+    }
+
+    res.status(200).json({ success: true });
     return;
   }
 

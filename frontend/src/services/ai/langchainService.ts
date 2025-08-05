@@ -343,7 +343,9 @@ export class LangChainAIService implements AIService {
           'Content-Type': 'application/json'
           // Do NOT send OpenRouter API key from the browser
         },
+        // Mark this request as a configuration validation probe so server can bypass user auth
         body: JSON.stringify({
+          __validation: true,
           message: 'test',
           context: {},
         }),
