@@ -421,7 +421,7 @@ export class ProtocolIntegrationService {
       "healthy",
       "warning",
     ];
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const status = statuses[Math.floor(Math.random() * statuses.length)] || "healthy";
 
     const messages = {
       healthy: "Protocol operating normally",

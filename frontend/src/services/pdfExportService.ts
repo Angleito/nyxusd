@@ -43,6 +43,7 @@ class PDFExportService {
     };
 
     // Configure html2pdf options
+    const jsPdfConfig = defaultOptions.jsPDF;
     const html2pdfOptions = {
       margin: defaultOptions.margin,
       filename: defaultOptions.filename,
@@ -56,7 +57,11 @@ class PDFExportService {
         useCORS: true,
         logging: false
       },
-      jsPDF: defaultOptions.jsPDF,
+      jsPDF: jsPdfConfig ? {
+        unit: jsPdfConfig.unit,
+        format: typeof jsPdfConfig.format === 'string' ? jsPdfConfig.format : 'a4',
+        orientation: jsPdfConfig.orientation
+      } : undefined,
       pagebreak: defaultOptions.pagebreak,
       enableLinks: true
     };

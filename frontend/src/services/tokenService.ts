@@ -258,7 +258,7 @@ class TokenService {
             tags: this.inferTokenTags(token)
           } satisfies TokenInfo;
         })
-        .filter((token): token is TokenInfo => Boolean(token.address)); // Filter out tokens without addresses
+        .filter((token): token is TokenInfo & { tags: ReadonlyArray<string> } => Boolean(token.address) && Boolean(token.tags)); // Filter out tokens without addresses and tags
     }
     
     return [];

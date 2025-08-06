@@ -634,11 +634,11 @@ export class SwapDetectionService {
     for (const pattern of patterns) {
       const match = message.match(pattern);
       if (match) {
-        if (match.length === 3) {
+        if (match.length === 3 && match[1] && match[2]) {
           // Two chains detected
           result.sourceChain = this.normalizeChain(match[1]);
           result.destinationChain = this.normalizeChain(match[2]);
-        } else if (match.length === 2) {
+        } else if (match.length === 2 && match[1]) {
           // Single chain detected - use as both source and destination
           result.sourceChain = this.normalizeChain(match[1]);
           result.destinationChain = result.sourceChain;

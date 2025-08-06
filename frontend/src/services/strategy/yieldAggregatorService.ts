@@ -61,7 +61,7 @@ export class YieldAggregatorService {
         position: {
           protocol: "aave",
           positionType: "lending",
-          assets: [assets[0]],
+          assets: assets[0] ? [assets[0]] : [],
           currentAPY: 8.5,
           tvl: 2500000000,
           utilization: 82,
@@ -98,7 +98,7 @@ export class YieldAggregatorService {
         position: {
           protocol: "yearn",
           positionType: "vault",
-          assets: [assets[0]],
+          assets: assets[0] ? [assets[0]] : [],
           currentAPY: 15.8,
           tvl: 280000000,
           risks: ["Strategy risk", "Smart contract risk"],
@@ -214,7 +214,9 @@ export class YieldAggregatorService {
       const largestPosition = Array.from(allocations.entries()).sort(
         (a, b) => b[1] - a[1],
       )[0];
-      allocations.set(largestPosition[0], largestPosition[1] + (100 - total));
+      if (largestPosition) {
+        allocations.set(largestPosition[0], largestPosition[1] + (100 - total));
+      }
     }
 
     return allocations;

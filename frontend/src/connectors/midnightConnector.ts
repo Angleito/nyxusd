@@ -4,13 +4,13 @@ import type { Address } from 'viem'
 import { midnightTestnet } from '../config/chains'
 
 // Types for Midnight DApp Connector API integration (Lace wallet)
-interface MidnightDAppConnector {
+export interface MidnightDAppConnector {
   isEnabled: () => Promise<boolean>
   enable: () => Promise<MidnightWalletApi>
   serviceUriConfig: () => Promise<ServiceUriConfig>
 }
 
-interface MidnightWalletApi {
+export interface MidnightWalletApi {
   state: () => Promise<WalletState>
   balanceTransaction: (transaction: any, newCoins?: any[]) => Promise<any>
   proveTransaction: (provingRecipe: any) => Promise<any>
@@ -18,14 +18,14 @@ interface MidnightWalletApi {
   transferTransaction: (transfers: TransferRequest[]) => Promise<any>
 }
 
-interface WalletState {
+export interface WalletState {
   address: string
   balance: bigint
   network: string
   connected: boolean
 }
 
-interface ServiceUriConfig {
+export interface ServiceUriConfig {
   indexerUrl: string
   indexerWsUrl: string
   nodeUrl: string

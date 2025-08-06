@@ -314,9 +314,9 @@ export class StrategyService {
       ...mockStrategies[index],
       ...updates,
       updatedAt: new Date(),
-    };
+    } as Strategy;
 
-    return mockStrategies[index];
+    return mockStrategies[index] as Strategy;
   }
 
   /**
