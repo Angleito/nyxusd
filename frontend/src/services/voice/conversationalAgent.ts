@@ -177,6 +177,10 @@ export class ConversationalAgent extends EventEmitter {
   private sessionId: string | null = null;
   private userId: string | null = null;
   private websocketUrl: string | null = null;
+  // Audio capture for microphone input
+  private mediaStream: MediaStream | null = null;
+  private mediaRecorder: MediaRecorder | null = null;
+  private audioProcessor: ScriptProcessorNode | null = null;
 
   constructor(config: ConversationalAgentConfig) {
     super();
@@ -479,8 +483,15 @@ Key traits:
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(wsUrl);
 
-      this.ws.onopen = () => {
+      this.ws.onopen = async () => {
         console.log('Conversational AI WebSocket connected');
+        // Start capturing audio after WebSocket is connected
+        try {
+          await this.startAudioCapture();
+        } catch (audioError) {
+          console.error('Failed to start audio capture:', audioError);
+          // Continue anyway - WebSocket is connected
+        }
         resolve();
       };
 
@@ -739,6 +750,9 @@ Key traits:
     this.audioQueue = [];
     this.isPlaying = false;
     
+    // Stop audio capture
+    this.stopAudioCapture();
+    
     if (this.ws) {
       // Remove all event listeners before nulling the WebSocket
       if (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING) {
@@ -816,6 +830,76 @@ Key traits:
     return result;
   }
 
+  private async startAudioCapture(): Promise<void> {
+    try {
+      // Request microphone access
+      this.mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 16000
+        } 
+      });
+      
+      if (!this.audioContext) {
+        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      
+      // Create media recorder to capture audio chunks
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
+        ? 'audio/webm;codecs=opus' 
+        : 'audio/webm';
+      
+      this.mediaRecorder = new MediaRecorder(this.mediaStream, {
+        mimeType,
+        audioBitsPerSecond: 128000
+      });
+      
+      // Send audio chunks to WebSocket
+      this.mediaRecorder.ondataavailable = async (event) => {
+        if (event.data.size > 0 && this.ws && this.ws.readyState === WebSocket.OPEN) {
+          // Convert blob to base64 and send
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if (reader.result && typeof reader.result === 'string') {
+              const base64Audio = reader.result.split(',')[1];
+              this.ws?.send(JSON.stringify({
+                type: 'audio',
+                audio: base64Audio
+              }));
+            }
+          };
+          reader.readAsDataURL(event.data);
+        }
+      };
+      
+      // Start recording with 100ms chunks
+      this.mediaRecorder.start(100);
+      console.log('Audio capture started');
+    } catch (error) {
+      console.error('Failed to start audio capture:', error);
+      throw error;
+    }
+  }
+  
+  private stopAudioCapture(): void {
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      this.mediaRecorder.stop();
+      this.mediaRecorder = null;
+    }
+    
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach(track => track.stop());
+      this.mediaStream = null;
+    }
+    
+    if (this.audioProcessor) {
+      this.audioProcessor.disconnect();
+      this.audioProcessor = null;
+    }
+  }
+  
   dispose(): void {
     this.endConversation();
     

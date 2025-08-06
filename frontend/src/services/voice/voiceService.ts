@@ -791,7 +791,8 @@ export class VoiceService extends EventEmitter {
       hasSession: !!this.currentSession,
       hasRecognition: !!this.recognition,
       currentStatus: this.currentSession?.status,
-      isActive: this.currentSession?.isActive
+      isActive: this.currentSession?.isActive,
+      mode: this.currentSession?.mode
     });
     
     if (!this.currentSession) {
@@ -807,6 +808,14 @@ export class VoiceService extends EventEmitter {
     if (this.currentSession.status === 'error') {
       console.log('🎤 VoiceService: Session in error state, cannot start listening');
       throw new Error('Voice session is in error state');
+    }
+
+    // In conversational mode, the WebSocket handles all audio - no speech recognition needed
+    if (this.currentSession.mode === 'conversational' && this.conversationalAgent) {
+      console.log('🎤 VoiceService: Conversational mode - audio handled by WebSocket');
+      this.currentSession.status = 'listening';
+      this.emit('listeningStarted');
+      return;
     }
 
     // Attempt to resume audio prior to starting recognition (some browsers require user gesture already handled by UI)
@@ -860,6 +869,16 @@ export class VoiceService extends EventEmitter {
   }
 
   stopListening(): void {
+    // In conversational mode, just update status - WebSocket handles audio
+    if (this.currentSession?.mode === 'conversational') {
+      if (this.currentSession) {
+        this.currentSession.status = 'idle';
+      }
+      this.emit('listeningStopped');
+      return;
+    }
+
+    // Regular TTS mode - stop speech recognition
     if (this.recognition) {
       this.recognition.stop();
       if (this.currentSession) {
