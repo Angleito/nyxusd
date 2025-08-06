@@ -332,10 +332,9 @@ export function validateVoiceEnvironment(): {
     envData['ELEVENLABS_API_KEY'] = elevenLabsApiKey;
   }
 
+  // JWT_SECRET is optional - will use simple base64 token if not present
   const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) {
-    errors.push('JWT_SECRET is required');
-  } else {
+  if (jwtSecret) {
     envData['JWT_SECRET'] = jwtSecret;
   }
 

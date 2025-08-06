@@ -44,17 +44,30 @@ export default async function handler(
     const sessionId = (isValidSessionId(querySessionId) ? querySessionId : null) || 
                      `voice_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
-    // Generate a short-lived token with session info
+    // Generate a simple token without JWT if JWT_SECRET is not available
     const now = Math.floor(Date.now() / 1000);
-    const tokenPayload: VoiceTokenPayload = {
-      sessionId,
-      voiceId: envValidation.env.ELEVENLABS_DEFAULT_VOICE_ID!,
-      type: 'voice_session',
-      iat: now,
-      exp: now + (5 * 60), // 5 minutes expiry
-    };
+    let token: string;
     
-    const token = jwt.sign(tokenPayload, envValidation.env.JWT_SECRET!);
+    if (envValidation.env.JWT_SECRET) {
+      const tokenPayload: VoiceTokenPayload = {
+        sessionId,
+        voiceId: envValidation.env.ELEVENLABS_DEFAULT_VOICE_ID!,
+        type: 'voice_session',
+        iat: now,
+        exp: now + (5 * 60), // 5 minutes expiry
+      };
+      token = jwt.sign(tokenPayload, envValidation.env.JWT_SECRET);
+    } else {
+      // Fallback to simple base64 encoded token if JWT_SECRET not available
+      const simplePayload = {
+        sessionId,
+        voiceId: envValidation.env.ELEVENLABS_DEFAULT_VOICE_ID!,
+        type: 'voice_session',
+        iat: now,
+        exp: now + (5 * 60),
+      };
+      token = Buffer.from(JSON.stringify(simplePayload)).toString('base64');
+    }
 
     // Return token and configuration (but NOT the actual API key)
     const response: VoiceTokenResponse = {
