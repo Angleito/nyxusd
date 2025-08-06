@@ -36,6 +36,7 @@ export function useWallet() {
       const timer = setTimeout(() => setError(null), 5000);
       return () => clearTimeout(timer);
     }
+    return () => {}; // Always return cleanup function
   }, [error]);
 
   // Safe connect with error handling
@@ -72,8 +73,8 @@ export function useWallet() {
   }, [switchChain]);
 
   // Switch to mainnet helper
-  const switchToMainnet = useCallback(() => {
-    return switchToChain(mainnet.id);
+  const switchToMainnet = useCallback(async () => {
+    return await switchToChain(mainnet.id);
   }, [switchToChain]);
 
   // Check if on wrong network

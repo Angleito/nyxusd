@@ -29,8 +29,8 @@ class PDFExportService {
       margin: [10, 10, 10, 10],
       pagebreak: {
         mode: ['avoid-all', 'css', 'legacy'],
-        before: '.pdf-page-break-before',
-        after: '.pdf-page-break-after',
+        before: ['.pdf-page-break-before'],
+        after: ['.pdf-page-break-after'],
         avoid: ['table', 'pre', 'blockquote']
       },
       jsPDF: {

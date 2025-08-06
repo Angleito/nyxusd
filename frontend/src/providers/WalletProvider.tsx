@@ -1,9 +1,8 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
-import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { wagmiConfig } from "../config/wagmi";
-import { rainbowkitTheme } from "../config/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 
 interface WalletProviderProps {
@@ -24,7 +23,6 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     <WagmiProvider config={wagmiConfig} reconnectOnMount={false}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider 
-          theme={lightTheme(rainbowkitTheme)}
           modalSize="compact"
           showRecentTransactions={false}
         >

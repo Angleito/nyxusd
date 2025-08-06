@@ -294,7 +294,7 @@ export class TransactionService {
         // Native token (ETH)
         const balance = await getBalance(wagmiConfig, {
           address: address as `0x${string}`,
-          chainId: currentChainId
+          chainId: currentChainId as 1 | 10 | 11155111 | 42161 | 421614 | 99999 | 8453 | 84532
         });
         return {
           balance: balance.value.toString(),
@@ -307,7 +307,7 @@ export class TransactionService {
           abi: ERC20_ABI,
           functionName: 'balanceOf',
           args: [address as `0x${string}`],
-          chainId: currentChainId
+          chainId: currentChainId as 1 | 10 | 11155111 | 42161 | 421614 | 99999 | 8453 | 84532
         });
 
         // Get token info for decimals - fallback to 18 if not found

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
 
@@ -346,11 +345,14 @@ export const usePerformantAnimation = (
  * Custom hook for hover animations
  */
 export const useHoverAnimation = (
-  _hoverConfig: Partial<AnimationConfig> = {},
-  _exitConfig: Partial<AnimationConfig> = {},
+  hoverConfig: Partial<AnimationConfig> = {},
+  exitConfig: Partial<AnimationConfig> = {},
 ) => {
   const [isHovered, setIsHovered] = useState(false);
   const shouldAnimate = !prefersReducedMotion();
+  
+  const fullHoverConfig = { ...defaultConfig, ...hoverConfig };
+  const fullExitConfig = { ...defaultConfig, ...exitConfig };
 
   const hoverProps = useMemo(
     () => ({
@@ -359,18 +361,20 @@ export const useHoverAnimation = (
       className: shouldAnimate ? (isHovered ? "animate-scale-in" : "") : "",
       style: shouldAnimate
         ? {
-            transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+            transition: `all ${fullHoverConfig.duration}ms ${fullHoverConfig.easing}`,
             transform: isHovered ? "scale(1.05)" : "scale(1)",
           }
         : {},
     }),
-    [isHovered, shouldAnimate],
+    [isHovered, shouldAnimate, fullHoverConfig.duration, fullHoverConfig.easing],
   );
 
   return {
     isHovered,
     hoverProps,
     shouldAnimate,
+    fullHoverConfig,
+    fullExitConfig,
   };
 };
 

@@ -1769,8 +1769,167 @@ const ANALOGY_TEMPLATES: Record<
     ],
   },
 
-  // Additional categories would follow the same pattern...
-  // For brevity, I'm including representative examples rather than all categories
+  // Additional categories - empty for now
+  health: {
+    growth: [],
+    income: [],
+    preservation: [],
+    diversification: [],
+    risk: [],
+    liquidity: [],
+    leverage: [],
+    staking: [],
+    yields: [],
+    impermanent_loss: [],
+    slippage: [],
+    smart_contracts: [],
+    clmm: [],
+    pools: []
+  },
+  arts: {
+    growth: [],
+    income: [],
+    preservation: [],
+    diversification: [],
+    risk: [],
+    liquidity: [],
+    leverage: [],
+    staking: [],
+    yields: [],
+    impermanent_loss: [],
+    slippage: [],
+    smart_contracts: [],
+    clmm: [],
+    pools: []
+  },
+  outdoors: {
+    growth: [],
+    income: [],
+    preservation: [],
+    diversification: [],
+    risk: [],
+    liquidity: [],
+    leverage: [],
+    staking: [],
+    yields: [],
+    impermanent_loss: [],
+    slippage: [],
+    smart_contracts: [],
+    clmm: [],
+    pools: []
+  },
+  collecting: {
+    growth: [],
+    income: [],
+    preservation: [],
+    diversification: [],
+    risk: [],
+    liquidity: [],
+    leverage: [],
+    staking: [],
+    yields: [],
+    impermanent_loss: [],
+    slippage: [],
+    smart_contracts: [],
+    clmm: [],
+    pools: []
+  },
+  learning: {
+    growth: [],
+    income: [],
+    preservation: [],
+    diversification: [],
+    risk: [],
+    liquidity: [],
+    leverage: [],
+    staking: [],
+    yields: [],
+    impermanent_loss: [],
+    slippage: [],
+    smart_contracts: [],
+    clmm: [],
+    pools: []
+  },
+  technology: {
+    growth: [],
+    income: [],
+    preservation: [],
+    diversification: [],
+    risk: [],
+    liquidity: [],
+    leverage: [],
+    staking: [],
+    yields: [],
+    impermanent_loss: [],
+    slippage: [],
+    smart_contracts: [],
+    clmm: [],
+    pools: []
+  },
+  finance: {
+    growth: [],
+    income: [],
+    preservation: [],
+    diversification: [],
+    risk: [],
+    liquidity: [],
+    leverage: [],
+    staking: [],
+    yields: [],
+    impermanent_loss: [],
+    slippage: [],
+    smart_contracts: [],
+    clmm: [],
+    pools: []
+  },
+  travel: {
+    growth: [],
+    income: [],
+    preservation: [],
+    diversification: [],
+    risk: [],
+    liquidity: [],
+    leverage: [],
+    staking: [],
+    yields: [],
+    impermanent_loss: [],
+    slippage: [],
+    smart_contracts: [],
+    clmm: [],
+    pools: []
+  },
+  food: {
+    growth: [],
+    income: [],
+    preservation: [],
+    diversification: [],
+    risk: [],
+    liquidity: [],
+    leverage: [],
+    staking: [],
+    yields: [],
+    impermanent_loss: [],
+    slippage: [],
+    smart_contracts: [],
+    clmm: [],
+    pools: []
+  },
+  environment: {
+    growth: [],
+    income: [],
+    preservation: [],
+    diversification: [],
+    risk: [],
+    liquidity: [],
+    leverage: [],
+    staking: [],
+    yields: [],
+    impermanent_loss: [],
+    slippage: [],
+    smart_contracts: [],
+    clmm: [],
+    pools: []
+  }
 };
 
 // Cross-category combination logic
@@ -1798,7 +1957,7 @@ export class AnalogyEngine {
     }
 
     // Try single category first
-    if (categories.length === 1) {
+    if (categories.length === 1 && categories[0]) {
       return this.generateSingleCategoryAnalogy(context, categories[0]);
     }
 
@@ -1834,10 +1993,10 @@ export class AnalogyEngine {
    */
   public combineAnalogies(analogies: string[]): string {
     if (analogies.length === 0) return "";
-    if (analogies.length === 1) return analogies[0];
+    if (analogies.length === 1 && analogies[0]) return analogies[0];
 
     // For 2 analogies, blend them
-    if (analogies.length === 2) {
+    if (analogies.length === 2 && analogies[0] && analogies[1]) {
       return `Think of it like ${analogies[0].toLowerCase()}. Or alternatively, ${analogies[1].toLowerCase()}`;
     }
 
@@ -1936,6 +2095,17 @@ export class AnalogyEngine {
       .sort((a, b) => b.score - a.score);
 
     const best = scoredTemplates[0];
+    if (!best) {
+      return {
+        primary: "Think of this as a basic investment principle",
+        alternative: undefined,
+        confidence: 0.3,
+        categories: [category],
+        templateUsed: `${category}-${context.concept}`,
+        crossCategoryMatch: false,
+      };
+    }
+    
     const alternative =
       scoredTemplates.length > 1 ? scoredTemplates[1] : undefined;
 

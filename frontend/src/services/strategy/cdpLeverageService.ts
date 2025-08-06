@@ -70,7 +70,7 @@ export class CDPLeverageService {
     const baseAPY = this.calculateBaseAPY(strategy);
     const collateralPrice = COLLATERAL_PRICES[collateralAsset.symbol] || 1;
     const borrowRate =
-      BORROW_RATES[collateralAsset.symbol] || BORROW_RATES.stable;
+      BORROW_RATES[collateralAsset.symbol] || BORROW_RATES.stable || 3.5;
 
     // Calculate recommended multipliers based on risk tolerance
     const multipliers = {
@@ -186,7 +186,7 @@ export class CDPLeverageService {
 
     const baseAPY = this.calculateBaseAPY(strategy);
     const borrowRate =
-      BORROW_RATES[collateralAsset.symbol] || BORROW_RATES.stable;
+      BORROW_RATES[collateralAsset.symbol] || BORROW_RATES.stable || 3.5;
     const monthlyInvestment = strategy.totalValueLocked || 10000;
 
     return multipliers.map((multiplier) => {

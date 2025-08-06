@@ -1,0 +1,47 @@
+npm warn Unknown project config "workspaces-experimental". This will stop working in the next major version of npm.
+
+> nyxusd-frontend@0.1.0 build
+> tsc && vite build
+
+src/services/defi/odosService.ts(125,7): error TS2322: Type 'number' is not assignable to type 'string'.
+src/services/defi/odosService.ts(236,7): error TS2532: Object is possibly 'undefined'.
+src/services/defi/odosService.ts(240,7): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'BigNumberish'.
+  Type 'undefined' is not assignable to type 'BigNumberish'.
+src/services/defi/transactionService.ts(297,11): error TS2322: Type 'number' is not assignable to type '1 | 10 | 11155111 | 42161 | 421614 | 99999 | 8453 | 84532 | undefined'.
+src/services/defi/transactionService.ts(310,11): error TS2322: Type 'number' is not assignable to type '1 | 10 | 11155111 | 42161 | 421614 | 99999 | 8453 | 84532 | undefined'.
+src/services/pdfExportService.ts(1,22): error TS7016: Could not find a declaration file for module 'html2pdf.js'. '/Users/angel/Projects/nyxusd/frontend/node_modules/html2pdf.js/dist/html2pdf.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/html2pdf.js` if it exists or add a new declaration (.d.ts) file containing `declare module 'html2pdf.js';`
+src/services/pdfExportService.ts(32,9): error TS2322: Type 'string' is not assignable to type 'string[]'.
+src/services/pdfExportService.ts(33,9): error TS2322: Type 'string' is not assignable to type 'string[]'.
+src/services/strategy/cdpLeverageService.ts(89,7): error TS18048: 'borrowRate' is possibly 'undefined'.
+src/services/strategy/cdpLeverageService.ts(96,53): error TS18048: 'borrowRate' is possibly 'undefined'.
+src/services/strategy/cdpLeverageService.ts(98,8): error TS18048: 'borrowRate' is possibly 'undefined'.
+src/services/strategy/cdpLeverageService.ts(107,19): error TS18048: 'borrowRate' is possibly 'undefined'.
+src/services/strategy/cdpLeverageService.ts(198,29): error TS18048: 'borrowRate' is possibly 'undefined'.
+src/services/strategy/cdpLeverageService.ts(202,43): error TS18048: 'borrowRate' is possibly 'undefined'.
+src/services/strategy/protocolIntegrationService.ts(433,7): error TS2322: Type '"critical" | "warning" | "healthy" | undefined' is not assignable to type '"critical" | "warning" | "healthy"'.
+  Type 'undefined' is not assignable to type '"critical" | "warning" | "healthy"'.
+src/services/strategy/protocolIntegrationService.ts(434,25): error TS2538: Type 'undefined' cannot be used as an index type.
+src/services/strategy/strategyService.ts(313,5): error TS2322: Type '{ updatedAt: Date; id?: string | undefined; name?: string | undefined; description?: string | undefined; createdAt?: Date | undefined; owner?: string | undefined; allocations?: StrategyAllocation[] | undefined; ... 8 more ...; tags?: string[] | undefined; }' is not assignable to type 'Strategy'.
+  Types of property 'id' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/services/strategy/strategyService.ts(319,5): error TS2322: Type 'Strategy | undefined' is not assignable to type 'Strategy'.
+  Type 'undefined' is not assignable to type 'Strategy'.
+src/services/strategy/yieldAggregatorService.ts(64,20): error TS2322: Type 'Asset | undefined' is not assignable to type 'Asset'.
+  Type 'undefined' is not assignable to type 'Asset'.
+src/services/strategy/yieldAggregatorService.ts(101,20): error TS2322: Type 'Asset | undefined' is not assignable to type 'Asset'.
+  Type 'undefined' is not assignable to type 'Asset'.
+src/services/strategy/yieldAggregatorService.ts(217,23): error TS18048: 'largestPosition' is possibly 'undefined'.
+src/services/strategy/yieldAggregatorService.ts(217,43): error TS18048: 'largestPosition' is possibly 'undefined'.
+src/services/swapDetectionService.ts(639,52): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/services/swapDetectionService.ts(640,57): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/services/swapDetectionService.ts(643,52): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/services/tokenService.ts(261,35): error TS2677: A type predicate's type must be assignable to its parameter's type.
+  Type 'TokenInfo' is not assignable to type '{ chainId: number; tags: readonly string[]; logoURI?: string | undefined; decimals?: number | undefined; address?: string | undefined; id: string; symbol: string; name: string; }'.
+    Types of property 'tags' are incompatible.
+      Type 'readonly string[] | undefined' is not assignable to type 'readonly string[]'.
+        Type 'undefined' is not assignable to type 'readonly string[]'.

@@ -122,7 +122,7 @@ export class OdosService {
       ],
       userAddress,
       slippageLimitPercent: slippage,
-      referralCode: 2109965136, // Optional: Add your referral code
+      referralCode: "2109965136", // Optional: Add your referral code
       disableRFQs: false,
       compact: true,
     };
@@ -233,11 +233,11 @@ export class OdosService {
     route: string;
   } {
     const inputAmount = ethers.formatUnits(
-      quote.inTokens[0].amount,
+      quote.inTokens[0]?.amount || "0",
       18 // Default to 18, should use actual token decimals
     );
     const outputAmount = ethers.formatUnits(
-      quote.outAmounts[0],
+      quote.outAmounts[0] || "0",
       18 // Default to 18, should use actual token decimals
     );
 

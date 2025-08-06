@@ -594,7 +594,7 @@ const addOccupationContext = (
     general: {},
   };
 
-  const occupationContext = contextMap[occupation];
+  const occupationContext = contextMap[occupation] || {};
   const relevantContext = Object.entries(occupationContext).find(([key]) =>
     recommendationTitle.toLowerCase().includes(key.toLowerCase()),
   );

@@ -165,7 +165,7 @@ ${walletConnected ? `I see you're connected with wallet ${address?.slice(0, 6)}.
 
   const getContext = useCallback(() => {
     return {
-      conversationStep: "natural_conversation",
+      conversationStep: "chat" as const,
       userProfile: {
         experience: state.userProfile.experience,
         riskTolerance: state.userProfile.riskTolerance,

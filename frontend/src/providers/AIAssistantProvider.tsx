@@ -964,11 +964,12 @@ export function AIAssistantProvider({
           });
         }
       } catch (error) {
-        console.error("💬 AIProvider: Failed to send message:", error);
+        const err = error as Error;
+        console.error("💬 AIProvider: Failed to send message:", err);
         console.error("💬 AIProvider: Error details:", {
-          name: error.name,
-          message: error.message,
-          stack: error.stack?.split('\n').slice(0, 5).join('\n')
+          name: err.name,
+          message: err.message,
+          stack: err.stack?.split('\n').slice(0, 5).join('\n')
         });
         // Clean up streaming ref on error
         streamingContentRef.current.delete(aiMessageId);

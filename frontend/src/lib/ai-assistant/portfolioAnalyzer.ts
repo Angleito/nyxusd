@@ -218,21 +218,21 @@ export function generateAllocationSuggestions(
   suggestions.push({
     asset: "Stablecoins (USDC/DAI)",
     currentPercentage: 0, // This would be calculated from actual wallet data
-    suggestedPercentage: targetAllocations.stablecoins,
+    suggestedPercentage: targetAllocations.stablecoins ?? 30,
     reason: "Provides stability and liquidity for your portfolio",
   });
 
   suggestions.push({
     asset: "Bitcoin (BTC)",
     currentPercentage: 0,
-    suggestedPercentage: targetAllocations.bitcoin,
+    suggestedPercentage: targetAllocations.bitcoin ?? 25,
     reason: "Digital gold - store of value with long-term growth potential",
   });
 
   suggestions.push({
     asset: "Ethereum (ETH)",
     currentPercentage: 0,
-    suggestedPercentage: targetAllocations.ethereum,
+    suggestedPercentage: targetAllocations.ethereum ?? 25,
     reason:
       "Smart contract platform with strong ecosystem and DeFi opportunities",
   });
@@ -240,7 +240,7 @@ export function generateAllocationSuggestions(
   suggestions.push({
     asset: "Blue-chip DeFi (AAVE/UNI)",
     currentPercentage: 0,
-    suggestedPercentage: targetAllocations.defi,
+    suggestedPercentage: targetAllocations.defi ?? 10,
     reason: "Exposure to decentralized finance innovation",
   });
 
@@ -248,7 +248,7 @@ export function generateAllocationSuggestions(
     suggestions.push({
       asset: "Emerging Protocols",
       currentPercentage: 0,
-      suggestedPercentage: targetAllocations.emerging,
+      suggestedPercentage: targetAllocations.emerging ?? 15,
       reason: "Higher risk/reward opportunities in new protocols",
     });
   }
@@ -396,7 +396,7 @@ function getTargetAllocations(
 
 function checkRebalancingNeed(
   walletData: WalletData,
-  _targetAllocations: Record<string, number>,
+  targetAllocations: Record<string, number>,
 ): boolean {
   // Simplified check - in reality would map actual assets to categories
   // and calculate deviation from targets
@@ -404,6 +404,7 @@ function checkRebalancingNeed(
 
   // This is a simplified implementation
   // In production, would need more sophisticated asset categorization
+  console.log('Target allocations:', targetAllocations); // Use the parameter
   return walletData.assets.length > 0 && Math.random() > 0.5; // Mock logic
 }
 
