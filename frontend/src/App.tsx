@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { NyxHeader } from "./components/layout/NyxHeader";
 import { Dashboard } from "./components/dashboard/Dashboard";
 import NyxMascotDashboard from "./components/dashboard/NyxMascotDashboard";
+import DashboardWithHero from "./components/dashboard/DashboardWithHero";
 import HeroSection from "./components/dashboard/HeroSection";
 import CDPHub from "./components/cdp/CDPHub";
 import { ModernSystemStats } from "./components/stats/ModernSystemStats";
@@ -92,9 +93,24 @@ function App() {
           <main className="relative z-10">
             <AnimatePresence mode="wait">
               <Routes>
-                {/* Nyx Mascot Dashboard as the default home page */}
+                {/* Dashboard with Hero (nyxusd.com style) as the default home page */}
                 <Route
                   path="/"
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <DashboardWithHero />
+                    </motion.div>
+                  }
+                />
+                {/* Nyx Mascot Dashboard */}
+                <Route
+                  path="/mascot"
                   element={
                     <motion.div
                       initial="initial"
