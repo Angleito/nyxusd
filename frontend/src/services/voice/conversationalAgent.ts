@@ -444,11 +444,29 @@ Key traits:
 
     try {
       await this.connectWebSocket(agentId);
-      this.currentSession.status = 'connected';
+      
+      // Check if session still exists after WebSocket connection
+      // It could have been cleared by a concurrent cleanup operation
+      if (!this.currentSession) {
+        // Recreate session if it was cleared
+        const sessionId = `convai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        this.currentSession = {
+          agentId,
+          sessionId,
+          status: 'connected',
+          isActive: true,
+          startTime: new Date(),
+        };
+      } else {
+        this.currentSession.status = 'connected';
+      }
+      
       this.emit('conversationStarted', this.currentSession);
       return this.currentSession.sessionId;
     } catch (error) {
-      this.currentSession.status = 'error';
+      if (this.currentSession) {
+        this.currentSession.status = 'error';
+      }
       this.emit('error', { type: 'connection', error });
       throw error;
     }
@@ -606,10 +624,16 @@ Key traits:
   }
 
   private handleWebSocketClose(event: CloseEvent): void {
+    // Store session info before potential cleanup
+    const sessionInfo = this.currentSession ? { ...this.currentSession } : null;
+    
     if (this.currentSession) {
-      this.currentSession.status = event.wasClean ? 'idle' : 'error';
-      this.currentSession.isActive = false;
-      this.currentSession.endTime = new Date();
+      // Only update session if it's not in the middle of connecting
+      if (this.currentSession.status !== 'connecting') {
+        this.currentSession.status = event.wasClean ? 'idle' : 'error';
+        this.currentSession.isActive = false;
+        this.currentSession.endTime = new Date();
+      }
     }
 
     this.emit('websocketClosed', {
@@ -618,7 +642,11 @@ Key traits:
       wasClean: event.wasClean,
     });
 
-    this.cleanup();
+    // Only cleanup if this is not a temporary close during connection setup
+    // Code 1000 is normal closure, 1006 is abnormal closure
+    if (event.code !== 1006 || !this.currentSession || this.currentSession.status !== 'connecting') {
+      this.cleanup();
+    }
   }
 
   private async playAudio(audioData: ArrayBuffer): Promise<void> {
@@ -712,10 +740,21 @@ Key traits:
     this.isPlaying = false;
     
     if (this.ws) {
+      // Remove all event listeners before nulling the WebSocket
+      if (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING) {
+        this.ws.close();
+      }
+      this.ws.onopen = null;
+      this.ws.onclose = null;
+      this.ws.onerror = null;
+      this.ws.onmessage = null;
       this.ws = null;
     }
     
-    this.currentSession = null;
+    // Only clear the session if it's not actively connecting
+    if (this.currentSession && this.currentSession.status !== 'connecting') {
+      this.currentSession = null;
+    }
   }
 
   async reconnect(): Promise<void> {
