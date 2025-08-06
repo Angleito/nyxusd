@@ -24,8 +24,8 @@ interface SwapInterfaceProps {
 }
 
 export const SwapInterface: React.FC<SwapInterfaceProps> = ({
-  initialInputToken = 'AERO',
-  initialOutputToken = 'ETH',
+  initialInputToken = 'ETH',
+  initialOutputToken = 'USDC',
   initialAmount = '',
   sourceChain = 'Base',
   destinationChain = 'Base',
@@ -238,8 +238,36 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
         )}
       </div>
 
-      {/* From Token */}
-      <div className="space-y-2 mb-4">
+      {/* Show wallet connect prompt if not connected */}
+      {!isConnected && (
+        <div className="bg-gray-800/50 rounded-lg p-8 text-center">
+          <div className="mb-4">
+            <AlertCircle className="w-12 h-12 text-purple-400 mx-auto" />
+          </div>
+          <h4 className="text-xl font-semibold text-white mb-2">
+            Connect Your Wallet
+          </h4>
+          <p className="text-gray-400 mb-6">
+            Please connect your wallet to start swapping tokens
+          </p>
+          <button
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-colors"
+            onClick={() => {
+              // Trigger wallet connect - this will be handled by RainbowKit's ConnectButton
+              const connectButton = document.querySelector('[data-testid="rk-connect-button"]') as HTMLButtonElement;
+              if (connectButton) connectButton.click();
+            }}
+          >
+            Connect Wallet
+          </button>
+        </div>
+      )}
+
+      {/* Show swap interface only when connected */}
+      {isConnected && (
+        <>
+          {/* From Token */}
+          <div className="space-y-2 mb-4">
         <label className="text-sm text-gray-400">From</label>
         <div className="flex space-x-2">
           <input
@@ -379,22 +407,18 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
       {/* Action Button */}
       <motion.button
         onClick={handleSwap}
-        disabled={!isConnected || !quoteData || isExecuting || isLoadingQuote}
+        disabled={!quoteData || isExecuting || isLoadingQuote}
         className={`w-full py-3 rounded-lg font-semibold transition-all ${
-          !isConnected
-            ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-            : !quoteData || isLoadingQuote
+          !quoteData || isLoadingQuote
             ? 'bg-purple-800/50 text-purple-300 cursor-not-allowed'
             : isExecuting
             ? 'bg-purple-600/50 text-white cursor-wait'
             : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
         }`}
-        whileHover={isConnected && quoteData && !isExecuting ? { scale: 1.02 } : {}}
-        whileTap={isConnected && quoteData && !isExecuting ? { scale: 0.98 } : {}}
+        whileHover={quoteData && !isExecuting ? { scale: 1.02 } : {}}
+        whileTap={quoteData && !isExecuting ? { scale: 0.98 } : {}}
       >
-        {!isConnected ? (
-          'Connect Wallet'
-        ) : isExecuting ? (
+        {isExecuting ? (
           <span className="flex items-center justify-center space-x-2">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>Executing Swap...</span>
@@ -411,16 +435,18 @@ export const SwapInterface: React.FC<SwapInterfaceProps> = ({
         )}
       </motion.button>
 
-      {/* Info */}
-      {!embedded && (
-        <div className="mt-4 p-3 bg-blue-900/20 border border-blue-800/30 rounded-lg">
-          <div className="flex items-start space-x-2">
-            <Info className="w-5 h-5 text-blue-400 mt-0.5" />
-            <p className="text-xs text-blue-400">
-              Swaps are executed through Odos Protocol on Base chain for optimal routing and best prices.
-            </p>
-          </div>
-        </div>
+          {/* Info */}
+          {!embedded && (
+            <div className="mt-4 p-3 bg-blue-900/20 border border-blue-800/30 rounded-lg">
+              <div className="flex items-start space-x-2">
+                <Info className="w-5 h-5 text-blue-400 mt-0.5" />
+                <p className="text-xs text-blue-400">
+                  Swaps are executed through Odos Protocol on Base chain for optimal routing and best prices.
+                </p>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </motion.div>
   );

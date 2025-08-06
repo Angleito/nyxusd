@@ -64,9 +64,9 @@ export class EnhancedAIService {
     enableCryptoTools: boolean = true
   ): Promise<EnhancedAIResponse> {
     try {
-      // Use different endpoints for production (Vercel) vs local development
+      // Use the proper AI chat endpoint with OpenRouter integration
       const endpoint = this.isProduction 
-        ? `${this.baseUrl}/chat`
+        ? `${this.baseUrl}/ai/chat`
         : `${this.baseUrl}/ai/enhanced/chat`;
       
       const response = await fetch(endpoint, {
@@ -86,7 +86,18 @@ export class EnhancedAIService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      // Handle the API response format: { success: true, data: string }
+      if (data.success && data.data) {
+        return {
+          message: data.data,
+          // Include any additional fields if present
+          ...(data.model && { model: data.model }),
+          ...(data.usage && { usage: data.usage })
+        };
+      }
+      // Fallback for legacy format
+      return data;
     } catch (error) {
       // Only log in development mode
       if (import.meta.env.MODE === 'development') {
@@ -106,10 +117,10 @@ export class EnhancedAIService {
     enableCryptoTools: boolean = true
   ): Promise<void> {
     try {
-      // For production, use the regular endpoint (no streaming support in Vercel functions)
+      // For production, use the AI chat endpoint (no streaming support in Vercel functions)
       // For local, use the streaming endpoint
       const endpoint = this.isProduction
-        ? `${this.baseUrl}/chat`
+        ? `${this.baseUrl}/ai/chat`
         : `${this.baseUrl}/ai/enhanced/chat/stream`;
       
       const response = await fetch(endpoint, {
@@ -132,7 +143,11 @@ export class EnhancedAIService {
       // For production, just get the full response and call onChunk once
       if (this.isProduction) {
         const data = await response.json();
-        if (data.message) {
+        // Handle the API response format: { success: true, data: string }
+        if (data.data) {
+          onChunk(data.data);
+        } else if (data.message) {
+          // Fallback for legacy format
           onChunk(data.message);
         }
         return;

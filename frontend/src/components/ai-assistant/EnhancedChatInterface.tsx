@@ -204,7 +204,7 @@ What would you like to explore today?`,
       } else if (swapIntent.outputToken) {
         contextMessage = `I'll help you get some ${swapIntent.outputToken}${chainContext}. You can adjust the tokens and amount below.`;
       } else {
-        contextMessage = `Here's the swap interface${chainContext}. You can select your tokens and enter the amount.`;
+        contextMessage = `I'll help you swap tokens${chainContext}. Connect your wallet below to get started.`;
       }
       
       // Create swap interface message
