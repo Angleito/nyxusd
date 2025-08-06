@@ -180,6 +180,7 @@ export const ModalTransition: React.FC<ModalTransitionProps> = ({
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
+      return () => {}; // Always return cleanup function
     } else {
       const timer = setTimeout(() => {
         setShouldRender(false);

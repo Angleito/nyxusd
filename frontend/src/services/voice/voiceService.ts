@@ -442,14 +442,21 @@ export class VoiceService extends EventEmitter {
 
   private initializeAudioContext(): void {
     if (typeof window !== 'undefined') {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (AudioContextClass) {
+        this.audioContext = new AudioContextClass();
+      }
     }
   }
 
   private initializeSpeechRecognition(): void {
     if (typeof window !== 'undefined') {
       console.log('🎤 VoiceService: Initializing speech recognition...');
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const windowWithSpeech = window as typeof window & {
+        SpeechRecognition?: new () => ISpeechRecognition;
+        webkitSpeechRecognition?: new () => ISpeechRecognition;
+      };
+      const SpeechRecognition = windowWithSpeech.SpeechRecognition || windowWithSpeech.webkitSpeechRecognition;
       
       if (SpeechRecognition) {
         console.log('🎤 VoiceService: Speech recognition API available');
@@ -523,18 +530,19 @@ export class VoiceService extends EventEmitter {
                 if (this.recognition && this.currentSession?.isActive && this.currentSession.status !== 'error') {
                   try {
                     this.recognition.start();
-                  } catch (e: any) {
+                  } catch (e: unknown) {
                     // If already active or blocked, surface friendly info and stop restart loop
-                    if (e?.name === 'InvalidStateError') {
+                    const error = e instanceof Error ? e : new Error('Unknown error');
+                    if (error.name === 'InvalidStateError') {
                       console.warn('🎤 VoiceService: Recognition already active on onend restart path');
                       return;
                     }
-                    console.error('🎤 VoiceService: Restart recognition failed:', e);
+                    console.error('🎤 VoiceService: Restart recognition failed:', error);
                     if (this.currentSession) {
                       this.currentSession.status = 'error';
                       this.currentSession.isActive = false;
                     }
-                    this.emit('error', e instanceof Error ? e : new Error('Failed to restart speech recognition'));
+                    this.emit('error', error);
                   }
                 }
               }, 150);
@@ -585,19 +593,31 @@ export class VoiceService extends EventEmitter {
       if (!configDataRaw || typeof configDataRaw !== 'object') {
         throw new Error('Invalid voice config response: non-object JSON');
       }
-      const configData: any = configDataRaw;
+
+      interface VoiceConfigResponse {
+        success?: boolean;
+        error?: string;
+        apiStatus?: string;
+        config?: {
+          features?: {
+            conversationalMode?: boolean;
+          };
+        };
+      }
+
+      const configData: VoiceConfigResponse = configDataRaw;
       
       console.log('🎤 VoiceService: Voice config response:', {
-        success: (configData as any)?.success,
-        apiStatus: (configData as any)?.apiStatus,
-        hasFeatures: !!(configData as any)?.config?.features,
-        conversationalMode: (configData as any)?.config?.features?.conversationalMode
+        success: configData.success,
+        apiStatus: configData.apiStatus,
+        hasFeatures: !!configData.config?.features,
+        conversationalMode: configData.config?.features?.conversationalMode
       });
       
       // Guard: verify explicit success before accessing other fields
-      if ((configData as any)?.success !== true) {
-        const msg = typeof (configData as any)?.error === 'string' && (configData as any)?.error.length > 0
-          ? (configData as any).error
+      if (configData.success !== true) {
+        const msg = typeof configData.error === 'string' && configData.error.length > 0
+          ? configData.error
           : 'Unknown error';
         throw new Error(`Voice config error: ${msg}`);
       }
@@ -808,18 +828,20 @@ export class VoiceService extends EventEmitter {
         this.recognition.start();
         console.log('🎤 VoiceService: Speech recognition started successfully');
         this.emit('listeningStarted');
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('🎤 VoiceService: Error starting speech recognition:', error);
         
+        const errorInstance = error instanceof Error ? error : new Error('Unknown error');
+        
         // If recognition is already started, don't treat it as an error
-        if (error.name === 'InvalidStateError' && (error.message?.includes('already started') || error.message?.includes('already active'))) {
+        if (errorInstance.name === 'InvalidStateError' && (errorInstance.message?.includes('already started') || errorInstance.message?.includes('already active'))) {
           console.log('🎤 VoiceService: Recognition already active');
           this.emit('listeningStarted');
           return;
         }
 
         // Surface a friendly error for common cases
-        if (error.name === 'NotAllowedError' || error.name === 'SecurityError') {
+        if (errorInstance.name === 'NotAllowedError' || errorInstance.name === 'SecurityError') {
           const friendly = new Error('Microphone permission is required for voice chat. Please allow access and try again.');
           this.currentSession.status = 'error';
           this.emit('error', friendly);
@@ -827,7 +849,7 @@ export class VoiceService extends EventEmitter {
         }
         
         this.currentSession.status = 'error';
-        throw error;
+        throw errorInstance;
       }
     } else {
       console.error('🎤 VoiceService: Speech recognition not available');
@@ -854,7 +876,7 @@ export class VoiceService extends EventEmitter {
     if (this.recognition) {
       try {
         this.recognition.stop();
-      } catch (error) {
+      } catch {
         // Ignore errors when stopping
       }
     }
@@ -889,7 +911,7 @@ export class VoiceService extends EventEmitter {
 
       // Always prefer server-advertised defaultVoiceId/modelId from /api/voice-config via secureVoiceClient
       // to honor Vercel env (ELEVENLABS_DEFAULT_VOICE_ID, ELEVENLABS_MODEL_ID)
-      const serverCfg = await secureVoiceClient.getConfig().catch(() => null as any);
+      const serverCfg = await secureVoiceClient.getConfig().catch(() => null);
       const advertisedVoiceId =
         (serverCfg && serverCfg.config && typeof serverCfg.config.defaultVoiceId === 'string' && serverCfg.config.defaultVoiceId) || null;
       const advertisedModelId =
@@ -910,7 +932,7 @@ export class VoiceService extends EventEmitter {
         const view = new Uint8Array(audioBuffer);
         const head = Array.from(view.slice(0, 8));
         console.log('🎤 VoiceService: TTS response head bytes', head);
-      } catch (e) {
+      } catch {
         console.warn('🎤 VoiceService: Unable to inspect audio buffer head');
       }
 
@@ -931,6 +953,11 @@ export class VoiceService extends EventEmitter {
       this.handleGenericError(error as Error);
       throw error;
     }
+  }
+
+  // Alias for speakText for backward compatibility
+  async speak(text: string): Promise<void> {
+    return this.speakText(text);
   }
 
   private async connectWebSocket(): Promise<void> {
@@ -977,9 +1004,10 @@ export class VoiceService extends EventEmitter {
 
       this.ws.onmessage = async (event) => {
         // Guard: Parse JSON defensively and validate structure
-        let data: any = null;
+        type WsMessageData = { audio?: string; isFinal?: boolean; is_final?: boolean };
+        let data: WsMessageData | null = null;
         try {
-          data = JSON.parse(event.data);
+          data = JSON.parse(event.data) as WsMessageData;
         } catch (e) {
           console.error('WebSocket message parse error:', e);
           // JSDoc: Guard prevents runtime errors on malformed WS messages; we drop the message
@@ -1118,10 +1146,11 @@ export class VoiceService extends EventEmitter {
       
       source.start();
       console.log('🎤 VoiceService: Playback started');
-    } catch (error: any) {
+    } catch (error: unknown) {
       // decodeAudioData frequently throws when body is JSON or empty buffer
+      const errorInstance = error instanceof Error ? error : new Error('Unknown error');
       console.error('🎤 VoiceService: Error decoding/playing audio', {
-        name: error?.name, message: error?.message
+        name: errorInstance.name, message: errorInstance.message
       });
       void this.processAudioQueue(); // Continue with next chunk
     }
@@ -1306,7 +1335,7 @@ export class VoiceService extends EventEmitter {
       const snippet = await resp.text().catch(() => '').then(t => t.slice(0, 200));
       throw new Error(`STT request failed: ${resp.status} ${resp.statusText} - ${snippet}`);
     }
-    const data = await resp.json().catch(() => ({} as any));
+    const data = await resp.json().catch(() => ({}));
     const text = typeof data?.text === 'string' ? data.text : '';
     if (!text) {
       throw new Error('Empty transcription');

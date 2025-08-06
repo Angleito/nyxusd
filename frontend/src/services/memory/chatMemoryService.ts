@@ -7,7 +7,7 @@ export interface ChatMessage {
   timestamp: Date;
   metadata?: {
     toolsUsed?: string[];
-    cryptoData?: any;
+    cryptoData?: Record<string, unknown>;
     recommendations?: string[];
     tokens?: {
       mentioned?: string[];
@@ -18,6 +18,9 @@ export interface ChatMessage {
       inputToken?: string;
       outputToken?: string;
       amount?: string;
+      sourceChain?: string;
+      destinationChain?: string;
+      isCrossChain?: boolean;
     };
   };
 }
@@ -57,6 +60,13 @@ export interface ConversationMemory {
     lastActivity: Date;
   };
   summary?: string;
+}
+
+export interface ChatHistoryExport {
+  currentSession: ConversationMemory | null;
+  exportDate: string;
+  userProfile?: UserProfile | null;
+  recentSessions: (ConversationMemory | null)[];
 }
 
 class ChatMemoryService {
@@ -222,9 +232,9 @@ class ChatMemoryService {
       const sessionKey = `${this.STORAGE_KEY_PREFIX}${sessionId}`;
       const stored = sessionStorage.getItem(sessionKey);
       if (stored) {
-        const session = JSON.parse(stored);
+        const session = JSON.parse(stored) as ConversationMemory;
         // Convert dates back to Date objects
-        session.messages.forEach((msg: any) => {
+        session.messages.forEach((msg: ChatMessage) => {
           msg.timestamp = new Date(msg.timestamp);
         });
         session.context.lastActivity = new Date(session.context.lastActivity);
@@ -399,24 +409,27 @@ Recent questions: ${userQuestions.join('; ')}`;
 
   public clearSession(): void {
     if (this.currentSession) {
-      const sessionKey = `${this.STORAGE_KEY_PREFIX}${this.currentSession.sessionId}`;
-      sessionStorage.removeItem(sessionKey);
+      // Remove the current session from storage
+      sessionStorage.removeItem(`${this.STORAGE_KEY_PREFIX}${this.currentSession.sessionId}`);
     }
+    // Reset in-memory session and recent sessions list
+    this.currentSession = null;
+    sessionStorage.removeItem(this.SESSION_STORAGE_KEY);
     this.initializeSession();
   }
 
-  public exportChatHistory(walletAddress?: string): any {
-    const data: any = {
+  public exportChatHistory(walletAddress?: string): ChatHistoryExport {
+    const data: ChatHistoryExport = {
       currentSession: this.currentSession,
       exportDate: new Date().toISOString(),
+      userProfile: walletAddress ? this.getUserProfile(walletAddress) : undefined,
+      recentSessions: [],
     };
 
-    if (walletAddress) {
-      data.userProfile = this.getUserProfile(walletAddress);
-    }
-
     const recentSessions = this.getRecentSessions();
-    data.recentSessions = recentSessions.map(id => this.loadSession(id)).filter(Boolean);
+    data.recentSessions = recentSessions
+      .map(id => this.loadSession(id))
+      .filter((session): session is ConversationMemory => Boolean(session));
 
     return data;
   }

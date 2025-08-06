@@ -1,5 +1,15 @@
 /// <reference types="vite/client" />
 
+declare module "*.json" {
+  const value: unknown;
+  export default value;
+}
+
+declare module 'remark-heading-id' {
+  const remarkHeadingId: import('unified').Plugin;
+  export default remarkHeadingId;
+}
+
 interface ImportMetaEnv {
   readonly VITE_OPENROUTER_API_KEY: string
   readonly VITE_OPENROUTER_API_URL: string

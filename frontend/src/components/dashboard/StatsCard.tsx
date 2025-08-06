@@ -12,6 +12,7 @@ export interface StatsCardProps {
   isLoading?: boolean;
   icon?: React.ReactNode;
   className?: string;
+  variant?: string;
 }
 
 export const StatsCard: React.FC<StatsCardProps> = ({
@@ -22,6 +23,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   isLoading = false,
   icon,
   className = "",
+  variant,
 }) => {
   if (isLoading) {
     return (

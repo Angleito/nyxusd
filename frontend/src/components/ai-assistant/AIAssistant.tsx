@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   useAIAssistant,
-  ConversationStep,
 } from "../../providers/AIAssistantProvider";
 import { EnhancedChatInterface as ChatInterface } from "./EnhancedChatInterface";
 import { WalletConnectionStep } from "./WalletConnectionStep";
@@ -12,14 +11,17 @@ import { RecommendationsDisplay } from "./RecommendationsDisplay";
 import { NaturalResponseHandler } from "./NaturalResponseHandler";
 import { StrategyBuilderStep } from "./StrategyBuilderStep";
 
+// Defines the shape of data objects passed to `handleStepComplete`
+interface StepData {
+  connected?: boolean;
+  [key: string]: unknown;
+}
+
 export const AIAssistant: React.FC = () => {
-  const { state, addMessage, setStep, updateUserProfile, setWalletData } =
+  const { state, addMessage, setStep, setWalletData } =
     useAIAssistant();
   const { currentStep, messages } = state;
-  const walletButtonRef = useRef<HTMLButtonElement | null>(null);
-  const questionnaireRef = useRef<{
-    triggerAction?: (value: any) => void;
-  } | null>(null);
+  // Removed unused walletButtonRef to avoid “assigned but never used” warning
   const initialMessageSent = useRef(false);
 
   // Initialize conversation flow - trigger AI service for initial message
@@ -39,8 +41,7 @@ export const AIAssistant: React.FC = () => {
     }
   }, [messages.length, currentStep, setStep, addMessage]);
 
-  // Handle auto actions from natural language processing
-  const handleAutoAction = (action: string, value?: any) => {
+  const handleAutoAction = (action: string, value?: string | number) => {
     if (action === "connect_wallet" && currentStep === "wallet_prompt") {
       // Simulate wallet button click
       const button = document.querySelector(
@@ -95,14 +96,13 @@ export const AIAssistant: React.FC = () => {
             }, 500);
           }
           input.value = Math.floor(currentValue).toString();
-          input.dispatchEvent(new Event("input", { bubbles: true }));
-        }, 50);
+        }, 40); // finish animateValue interval
       }
     }
   };
 
   // Handle conversation flow based on current step
-  const handleStepComplete = (data?: any) => {
+  const handleStepComplete = (data?: StepData) => {
     // Debug logging removed for production
     switch (currentStep) {
       case "wallet_prompt":

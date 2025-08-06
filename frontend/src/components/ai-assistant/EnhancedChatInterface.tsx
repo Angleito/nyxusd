@@ -15,7 +15,7 @@ import { voiceService } from "../../services/voice/voiceService";
 
 interface Message extends MemoryMessage {}
 
-export const EnhancedChatInterface: React.FC = () => {
+export const EnhancedChatInterface: React.FC = (): JSX.Element => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -33,7 +33,7 @@ export const EnhancedChatInterface: React.FC = () => {
   const [voiceTranscript, setVoiceTranscript] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { address, balance, isConnected } = useWallet();
+  const { address, isConnected } = useWallet();
   const [sessionStarted, setSessionStarted] = useState(false);
 
   // Initialize with welcome message and load user profile
@@ -111,26 +111,28 @@ What would you like to explore today?`,
       memoryContext,
       conversationSummary: chatMemoryService.summarizeConversation(),
     };
-  }, [isConnected, address, balance]);
+  }, [isConnected, address]);
 
   // Voice handling callbacks
   const handleVoiceTranscription = useCallback((text: string, isFinal: boolean) => {
     setVoiceTranscript(text);
     if (isFinal && text.trim()) {
       setInputValue(text);
-      // Automatically send the message after final transcription
-      setTimeout(() => {
-        handleSendMessage(text);
-      }, 500);
     }
   }, []);
 
-  const handleVoiceError = useCallback((error: any) => {
+  const handleVoiceError = useCallback((error: Error | { message?: string }) => {
     console.error('Voice error:', error);
+
+    const messageText =
+      typeof error === 'object' && error !== null && 'message' in error
+        ? (error as { message?: string }).message
+        : undefined;
+
     const errorMessage: Message = {
       id: `msg_${Date.now()}_voice_error`,
       role: "system",
-      content: `Voice error: ${error.message || 'Failed to process voice input'}`,
+      content: `Voice error: ${messageText || 'Failed to process voice input'}`,
       timestamp: new Date(),
     };
     setMessages(prev => [...prev, errorMessage]);
@@ -151,7 +153,8 @@ What would you like to explore today?`,
     }
   }, [voiceEnabled]);
 
-  const handleSendMessage = async (messageText?: string) => {
+  // Stable message-sender to satisfy React-hook exhaustive-deps rule
+  const handleSendMessage = useCallback(async (messageText?: string): Promise<void> => {
     const textToSend = messageText || inputValue.trim();
     if (!textToSend || isTyping) return;
 
@@ -244,7 +247,7 @@ What would you like to explore today?`,
       const isCryptoQuery = /price|portfolio|defi|market|trend|btc|eth|crypto|cdp|deposit|yield|compound/i.test(userMessage.content);
 
       // Helper to parse action blocks in both ##ACTION## and ```ACTION formats
-      const parseAction = (text: string): any | null => {
+      const parseAction = (text: string): Record<string, unknown> | null => {
         // Check for ##ACTION## format (single line)
         const singleLineMatch = text.split('\n').find((l) => l.trim().startsWith('##ACTION##'));
         if (singleLineMatch) {
@@ -259,7 +262,7 @@ What would you like to explore today?`,
         // Check for ```ACTION format (code block)
         const codeBlockRegex = /```ACTION\s*([\s\S]*?)\s*```/;
         const codeBlockMatch = text.match(codeBlockRegex);
-        if (codeBlockMatch) {
+        if (codeBlockMatch && codeBlockMatch[1]) {
           try {
             return JSON.parse(codeBlockMatch[1].trim());
           } catch {
@@ -415,8 +418,8 @@ What would you like to explore today?`,
       
       const errorMessage: Message = {
         id: `msg_${Date.now()}_error`,
-        role: "system",
-        content: "I apologize, but I encountered an error processing your request. Please try again.",
+        role: "assistant",
+        content: "I apologize, but I'm having trouble processing your request right now. Please try again.",
         timestamp: new Date(),
       };
       
@@ -426,7 +429,7 @@ What would you like to explore today?`,
       setIsTyping(false);
       inputRef.current?.focus();
     }
-  };
+  }, [inputValue, isTyping, speakResponse, getContext]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -531,15 +534,17 @@ What would you like to explore today?`,
                     // Ensure conversational mode (backend guard exists in voiceService.initialize/enable)
                     await voiceService.enableConversationalMode();
                     const sessionId = await voiceService.startSession({
-                      topic: 'nyxusd',
-                      userContext: { source: 'EnhancedChatInterface' }
-                    } as any);
+                      currentStep: 'chat',
+                      userProfile: { experience: 'intermediate' }
+                    });
                     console.debug('ElevenLabs voice session started:', sessionId);
                     await voiceService.startListening();
                     setIsListeningToVoice(true);
-                  } else {
+                    setVoiceEnabled(true);
                     voiceService.stopListening();
                     await voiceService.endSession();
+                    setIsListeningToVoice(false);
+                    setVoiceEnabled(false);
                     setIsListeningToVoice(false);
                   }
                 } catch (e) {

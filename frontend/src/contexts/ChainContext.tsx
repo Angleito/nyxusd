@@ -34,7 +34,9 @@ interface ChainProviderProps {
 }
 
 export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
-  const [selectedChain, setSelectedChain] = useState<Chain>(chains[0]);
+  const [selectedChain, setSelectedChain] = useState<Chain>(
+    chains[0] || { name: "Default", color: "#000", dotColor: "#000" }
+  );
 
   return (
     <ChainContext.Provider value={{ selectedChain, setSelectedChain }}>

@@ -3,6 +3,7 @@ import { fetchOraclePrices } from "../../services/api";
 
 export interface OraclePricesCardProps {
   className?: string;
+  prices?: any;
 }
 
 interface PriceData {
@@ -16,6 +17,7 @@ interface OraclePricesData {
 
 export const OraclePricesCard: React.FC<OraclePricesCardProps> = ({
   className = "",
+  prices: externalPrices,
 }) => {
   const [prices, setPrices] = useState<OraclePricesData | null>(null);
   const [isLoading, setIsLoading] = useState(true);

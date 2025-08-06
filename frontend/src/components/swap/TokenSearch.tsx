@@ -77,7 +77,7 @@ export const TokenSearch: React.FC<TokenSearchProps> = ({
     if (e.key === 'Escape') {
       setIsOpen(false);
       setSearchQuery('');
-    } else if (e.key === 'Enter' && filteredTokens.length > 0) {
+    } else if (e.key === 'Enter' && filteredTokens.length > 0 && filteredTokens[0]) {
       handleTokenSelect(filteredTokens[0]);
     }
   };

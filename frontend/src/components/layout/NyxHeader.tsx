@@ -85,6 +85,8 @@ export const NyxHeader: React.FC = () => {
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
     }
+    
+    return () => {}; // Always return cleanup function
   }, [isChainDropdownOpen]);
 
   const toggleMobileMenu = () => {

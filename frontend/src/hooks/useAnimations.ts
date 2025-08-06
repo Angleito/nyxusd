@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
 
@@ -165,6 +166,8 @@ export const useScrollAnimation = (config: Partial<AnimationConfig> = {}) => {
     } else if (!inView && !fullConfig.triggerOnce) {
       setIsVisible(false);
     }
+    
+    return () => {}; // Always return cleanup function
   }, [inView, hasAnimated, fullConfig.delay, fullConfig.triggerOnce]);
 
   const animationClasses = useMemo(() => {
@@ -201,7 +204,7 @@ export const useStaggeredAnimation = (
   config: Partial<AnimationConfig> = {},
   staggerConfig: StaggerConfig = { baseDelay: 100, increment: 100 },
 ) => {
-  const fullConfig = { ...defaultConfig, ...config };
+  const fullConfig = useMemo(() => ({ ...defaultConfig, ...config }), [config]);
   const shouldAnimate =
     !fullConfig.respectReducedMotion || !prefersReducedMotion();
 
@@ -242,11 +245,13 @@ export const useStaggeredAnimation = (
     } else if (!inView && !fullConfig.triggerOnce) {
       setVisibleItems(new Array(count).fill(false));
     }
+    
+    return () => {}; // Always return cleanup function
   }, [inView, count, shouldAnimate, staggerConfig, fullConfig.triggerOnce]);
 
   const getItemProps = useCallback(
     (index: number) => {
-      const isVisible = visibleItems[index];
+      const isVisible = visibleItems[index] ?? false;
       const animationClasses = shouldAnimate
         ? getAnimationClasses(fullConfig.type, isVisible)
         : "";
@@ -294,7 +299,7 @@ export const usePerformantAnimation = (
     element.style.willChange = "transform, opacity";
 
     // Use requestAnimationFrame for smooth animations
-    const animate = (_timestamp: number) => {
+    const animate = () => {
       // Animation logic here
       animationFrameRef.current = requestAnimationFrame(animate);
     };
