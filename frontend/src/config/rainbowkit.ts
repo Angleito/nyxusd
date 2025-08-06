@@ -23,7 +23,7 @@ const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ??
 const enableTestnets = import.meta.env.VITE_ENABLE_TESTNETS === 'true';
 
 // Define chains based on environment
-const chains = enableTestnets 
+export const chains = enableTestnets 
   ? [mainnet, base, arbitrum, optimism, sepolia, baseSepolia, arbitrumSepolia, midnightTestnet] as const
   : [mainnet, base, arbitrum, optimism] as const;
 
@@ -102,7 +102,8 @@ export const rainbowkitConnectors = connectorsForWallets(
   ],
   {
     appName: 'NYX USD',
-    ...(hasValidProjectId && { projectId: walletConnectProjectId! }),
+    // Provide a projectId (fallback value is fine when WalletConnect is disabled)
+    projectId: walletConnectProjectId!,
   }
 );
 

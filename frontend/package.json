@@ -53,25 +53,6 @@
     "typescript": "^5.7.2",
     "vite": "^6.0.3",
     "vitest": "^2.1.8"
-  }
-}
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "vitest": {
-    "environment": "jsdom",
-    "setupFiles": "./src/test/setup.ts"
-  }
-}
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "browserslist": {
     "production": [
@@ -88,7 +69,5 @@
   "vitest": {
     "environment": "jsdom",
     "setupFiles": "./src/test/setup.ts"
-  }
-}
   }
 }
