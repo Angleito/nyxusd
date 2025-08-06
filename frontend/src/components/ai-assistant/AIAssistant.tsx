@@ -4,7 +4,7 @@ import {
   useAIAssistant,
   ConversationStep,
 } from "../../providers/AIAssistantProvider";
-import { ChatInterface } from "./ChatInterface";
+import { EnhancedChatInterface as ChatInterface } from "./EnhancedChatInterface";
 import { WalletConnectionStep } from "./WalletConnectionStep";
 import { QuestionnaireStep } from "./QuestionnaireStep";
 import { OccupationExplanationStep } from "./OccupationExplanationStep";
