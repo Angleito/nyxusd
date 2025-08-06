@@ -167,6 +167,7 @@ export class LangChainAIService implements AIService {
     baseURL: import.meta.env.VITE_OPENROUTER_API_URL || "https://openrouter.ai/api/v1",
     appName: import.meta.env.VITE_APP_NAME || "NyxUSD",
     appUrl: import.meta.env.VITE_APP_URL || window.location.origin,
+    agentId: import.meta.env.VITE_AGENT_ID || "",
   };
 
   constructor(config: AIServiceConfig = DEFAULT_AI_CONFIG) {
@@ -434,7 +435,10 @@ export class LangChainAIService implements AIService {
       
       const requestPayload = {
         message: userMessage,
-        context,
+        context: {
+          ...context,
+          agentId: this.openRouterConfig.agentId
+        },
         memoryContext,
         conversationSummary,
         model
@@ -607,7 +611,10 @@ export class LangChainAIService implements AIService {
       
       const requestPayload = {
         message: userMessage,
-        context,
+        context: {
+          ...context,
+          agentId: this.openRouterConfig.agentId
+        },
         memoryContext,
         conversationSummary,
         model

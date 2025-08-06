@@ -276,10 +276,14 @@ const validateModel = (model?: string): AllowedModel => {
  * Build system prompt with memory context using functional composition
  */
 const buildSystemPrompt = (memoryContext?: string, conversationSummary?: string): string => {
+  const agentId = process.env.AGENT_ID || '';
+  
   const nyxIdentity = `You are Nyx, the NYX AI operating exclusively for NYX (nyxusd.com).
 Identity: NYX is a CDP and DeFi hub — an AI-driven DeFi source for custom contracts.
 Scope: Only represent NYX and do not offer, endorse, or refer services outside NYX.
-Compliance: Responses are informational, not financial advice. Prefer actions routed to nyxusd.com or in-app flows.`;
+Compliance: Responses are informational, not financial advice. Prefer actions routed to nyxusd.com or in-app flows.${
+    agentId ? `\nAgent ID: ${agentId}` : ''
+  }`;
 
   const basePrompt = `${nyxIdentity}
 
@@ -363,7 +367,8 @@ if (!apiKey) {
         'Content-Type': 'application/json',
         'HTTP-Referer': process.env.APP_URL || process.env.FRONTEND_URL || 'https://nyxusd.com',
         'X-Title': process.env.APP_NAME || process.env.VITE_APP_NAME || 'NyxUSD',
-        'User-Agent': 'NyxUSD/1.0'
+        'User-Agent': 'NyxUSD/1.0',
+        ...(process.env.AGENT_ID ? { 'X-Agent-Id': process.env.AGENT_ID } : {})
       },
       body: JSON.stringify({
         model,
