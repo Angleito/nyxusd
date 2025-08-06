@@ -201,9 +201,9 @@ export class SecureVoiceClient {
         }
       }
 
-      // Fallback: GET /api/voice-token
+      // Fallback: GET /api/voice-token-simple
       const tokenResp = await fetch(
-        `${this.baseUrl}/api/voice-token${this.sessionId ? `?sessionId=${this.sessionId}` : ''}`,
+        `${this.baseUrl}/api/voice-token-simple${this.sessionId ? `?sessionId=${this.sessionId}` : ''}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },

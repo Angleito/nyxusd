@@ -57,7 +57,7 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
           console.log('🎤 VoiceControls: Initializing voice service...');
           // Initialize voice service: fetch token and apply configuration
           console.log('🎤 VoiceControls: Fetching voice token...');
-          const tokenResponse = await fetch('/api/voice-token', {
+          const tokenResponse = await fetch('/api/voice-token-simple', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           });
