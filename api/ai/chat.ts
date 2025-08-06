@@ -360,14 +360,14 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
   // Also support Vercel env prefixing for edge/runtime by reading process.env directly.
   const envKeyOpenRouter =
     process.env.OPENROUTER_API_KEY ||
-    process.env.OPENROUTER_KEY;
+    process.env.OPENROUTER_KEY ||
+    process.env.OPENROUTER_TOKEN;
   const envKeyOpenAI =
     process.env.OPENAI_API_KEY ||
-    process.env.OPENAI_SECRET_KEY;
+    process.env.OPENAI_SECRET_KEY ||
+    process.env.OPENAI_TOKEN;
   // Allow additional aliases to reduce misconfig risk
   const envKeyAliases = [
-    process.env.OPENAI_TOKEN,
-    process.env.OPENROUTER_TOKEN,
   ].filter(Boolean) as string[];
   const envKey = envKeyOpenRouter || envKeyOpenAI || envKeyAliases[0];
   // Do NOT accept browser-sent Authorization for production to avoid CORS/AUTH reliance.
@@ -668,10 +668,10 @@ async function chatHandler(req: VercelRequest, res: VercelResponse): Promise<voi
     const hasOpenRouter =
       !!process.env.OPENROUTER_API_KEY ||
       !!process.env.OPENROUTER_KEY ||
+      !!process.env.OPENROUTER_TOKEN ||
       !!process.env.OPENAI_API_KEY ||
       !!process.env.OPENAI_SECRET_KEY ||
-      !!process.env.OPENAI_TOKEN ||
-      !!process.env.OPENROUTER_TOKEN;
+      !!process.env.OPENAI_TOKEN;
     if (!hasOpenRouter) missing.push('OPENROUTER_API_KEY');
 
     // JWT secret is used by voice endpoints and potentially sessions; include if required
