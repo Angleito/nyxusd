@@ -376,7 +376,8 @@ const callOpenRouter = (request: ChatRequest, model: AllowedModel): TE.TaskEithe
   const apiKey = (allowHeaderAuth && headerAuth) ? headerAuth : envKey;
 
   if (!apiKey) {
-    return TE.left({ type: 'API_CONFIG_ERROR', message: 'Missing OPENROUTER_API_KEY on server' });
+    console.log('Chat endpoint: Missing OpenRouter/OpenAI API key in environment variables');
+    return TE.left({ type: 'API_CONFIG_ERROR', message: 'AI service not configured. Please set OPENROUTER_API_KEY or OPENAI_API_KEY in your environment variables.' });
   }
 
   const systemPrompt = buildSystemPrompt(request.memoryContext, request.conversationSummary);
@@ -586,10 +587,9 @@ const handleChatError = (res: VercelResponse, error: ChatError): void => {
         success: false,
         error: error.message || 'AI service configuration error'
       };
-      // Surface as 401 to match frontend expectation for "No auth credentials found"
-      // but include header to clarify server misconfiguration.
+      // Use 503 Service Unavailable for missing configuration
       res.setHeader('X-Config-Error', 'AI credentials missing on server');
-      res.status(error.message === 'No auth credentials found' ? 401 : 500).json(configResponse);
+      res.status(503).json(configResponse);
       break;
     }
 

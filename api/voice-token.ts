@@ -29,13 +29,16 @@ export default async function handler(
     // Validate environment configuration
     const envValidation = validateVoiceEnvironment();
     if (!envValidation.isValid) {
+      // Provide helpful error message for missing API keys
+      const missingKeys = envValidation.errors.filter(e => e.includes('missing'));
       const errorResponse: ApiErrorResponse = {
         success: false,
         error: 'Voice service not configured',
-        details: envValidation.errors.join(', '),
+        details: 'ElevenLabs API key is not configured. Please set ELEVENLABS_API_KEY in your environment variables.',
         timestamp: new Date().toISOString(),
       };
-      res.status(500).json(errorResponse);
+      console.log('Voice token endpoint: Missing environment variables:', envValidation.errors);
+      res.status(503).json(errorResponse); // Use 503 Service Unavailable
       return;
     }
     
