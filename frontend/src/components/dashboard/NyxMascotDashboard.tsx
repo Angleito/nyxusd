@@ -156,7 +156,7 @@ export const NyxMascotDashboard: React.FC = () => {
                 Your AI-powered stablecoin protocol with Nyx-chan! 🌙
               </p>
               <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                <Link to="/ai-assistant">
+                <Link to="/chat">
                   <Button 
                     variant="primary" 
                     icon={<Sparkles className="w-5 h-5" />}
@@ -244,7 +244,7 @@ export const NyxMascotDashboard: React.FC = () => {
             <p className="text-xl text-blue-100 mb-6">
               Join thousands of users earning with NYXUSD protocol
             </p>
-            <Link to="/ai-assistant">
+            <Link to="/chat">
               <Button 
                 variant="secondary" 
                 icon={<ArrowRight className="w-5 h-5" />}

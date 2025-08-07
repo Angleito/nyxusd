@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NyxHeader } from "./components/layout/NyxHeader";
@@ -19,12 +19,10 @@ import { ThemeTransition, ThemeBackground } from "./components/theme/ThemeTransi
 import "./styles/nyx-global.css";
 import "./styles/App.css";
 import "./theme/styles/themes.css";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import PoolsSelector from "./components/pools/PoolsSelector";
 
 function App() {
-  const demoModeRef = useRef<{ simulateCommand: (command: string) => void } | null>(null);
-
   useEffect(() => {
     // Generate starfield effect
     const starfield = document.getElementById('app-starfield');
@@ -190,16 +188,7 @@ function App() {
                 <Route
                   path="/ai-assistant"
                   element={
-                    <motion.div
-                      initial="initial"
-                      animate="in"
-                      exit="out"
-                      variants={pageVariants}
-                      transition={pageTransition}
-                      className="container mx-auto px-4 py-8 h-[calc(100vh-80px)]"
-                    >
-                      <StandaloneAIAssistant />
-                    </motion.div>
+                    <Navigate to="/chat" replace />
                   }
                 />
                 {/* Optional: legacy alias to ensure deep links still work */}

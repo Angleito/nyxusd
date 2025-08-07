@@ -149,7 +149,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   Nyx-chan has been watching your bags 👀 • Let's pump those numbers
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <Link to="/ai-assistant">
+                  <Link to="/chat">
                     <Button variant="primary" icon={<UserCircle className="w-5 h-5" />}>
                       Ape In
                     </Button>
@@ -240,7 +240,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     Create CDP
                   </Button>
                 </Link>
-                <Link to="/ai-assistant">
+                <Link to="/chat">
                   <Button variant="secondary" size="lg">
                     AI Assistant
                   </Button>
@@ -300,7 +300,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         Get personalized investment recommendations based on your profile
                       </p>
                     </div>
-                    <Link to="/ai-assistant">
+                    <Link to="/chat">
                       <Button variant="primary" size="lg" icon={<ArrowRight className="w-5 h-5" />} iconPosition="right">
                         Start AI Consultation
                       </Button>

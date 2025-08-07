@@ -154,7 +154,7 @@ export const NyxHeroSection: React.FC = () => {
             transition={{ delay: 0.6 }}
           >
             <Link
-              to="/cdp"
+              to="/chat"
               className="nyx-button nyx-button-glow nyx-button-large"
             >
               <span className="flex items-center gap-2">

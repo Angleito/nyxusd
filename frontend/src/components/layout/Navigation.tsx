@@ -45,7 +45,7 @@ const mainNavItems: NavItem[] = [
   },
   {
     label: "Ape In",
-    href: "/ai-assistant",
+    href: "/chat",
     description: "Chat with Nyx-chan to get started",
   },
   {
