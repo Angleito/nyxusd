@@ -15,10 +15,5 @@
   "exclude": [
     "node_modules",
     "dist"
-  ],
-  "references": [
-    { "path": "../cdp-core" },
-    { "path": "../cdp-adapters" },
-    { "path": "../../libs/fp-utils" }
   ]
 }

@@ -1,15 +1,9 @@
-import { createCDPAdapter, CDPAdapter, BlockchainConfig, CDPResult } from '@nyxusd/cdp-adapters';
+import { createCDPAdapter, CDPAdapter, BlockchainConfig, CDPResult, DepositCollateralParams, WithdrawCollateralParams, MintNYXUSDParams, BurnNYXUSDParams } from '@nyxusd/cdp-adapters';
 import type {
   CDP,
   CDPId,
   CDPCreationParams,
-} from '@nyxusd/cdp-core/src/types';
-import type {
-  DepositCollateralParams,
-  WithdrawCollateralParams,
-  MintNYXUSDParams,
-  BurnNYXUSDParams,
-} from '@nyxusd/cdp-adapters';
+} from '@nyxusd/cdp-core';
 
 /**
  * Unified CDP SDK configuration

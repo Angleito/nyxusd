@@ -5,12 +5,8 @@ export { WelcomeCard } from "./WelcomeCard";
 export { SystemHealthCard } from "./SystemHealthCard";
 export { OraclePricesCard } from "./OraclePricesCard";
 export { WalletDashboardCard } from "./WalletDashboardCard";
-export { default as HeroSection } from "./HeroSection";
+export { Hero } from "./Hero";
 
-// Legacy exports for backward compatibility
-export { Dashboard as ModernDashboard } from "./Dashboard";
-export { Dashboard as DashboardWithHero } from "./Dashboard";
-export { Dashboard as NyxDashboard } from "./Dashboard";
 
 // Types
 export type { DashboardProps } from "./Dashboard";

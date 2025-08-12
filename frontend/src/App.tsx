@@ -3,9 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NyxHeader } from "./components/layout/NyxHeader";
 import { Dashboard } from "./components/dashboard/Dashboard";
-import NyxMascotDashboard from "./components/dashboard/NyxMascotDashboard";
-import DashboardWithHero from "./components/dashboard/DashboardWithHero";
-import HeroSection from "./components/dashboard/HeroSection";
+import { Hero } from "./components/dashboard/Hero";
 import CDPHub from "./components/cdp/CDPHub";
 import { ModernSystemStats } from "./components/stats/ModernSystemStats";
 import { UnifiedAIAssistant, StandaloneAIAssistant } from "./components/ai-assistant/UnifiedAIAssistant";
@@ -102,7 +100,7 @@ function App() {
                       variants={pageVariants}
                       transition={pageTransition}
                     >
-                      <DashboardWithHero />
+                      <Hero variant="nyx" />
                     </motion.div>
                   }
                 />
@@ -117,7 +115,7 @@ function App() {
                       variants={pageVariants}
                       transition={pageTransition}
                     >
-                      <NyxMascotDashboard />
+                      <Hero variant="mascot" />
                     </motion.div>
                   }
                 />
@@ -132,7 +130,7 @@ function App() {
                       variants={pageVariants}
                       transition={pageTransition}
                     >
-                      <HeroSection />
+                      <Hero variant="classic" />
                       <div className="container mx-auto px-4 py-8">
                         <Dashboard variant="modern" />
                       </div>

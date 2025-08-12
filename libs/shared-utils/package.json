@@ -1,0 +1,9 @@
+{
+  "name": "@nyxusd/shared-utils",
+  "version": "1.0.0",
+  "description": "Consolidated utilities to reduce code duplication",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@nyxusd/validators": "*"
+  }
+}

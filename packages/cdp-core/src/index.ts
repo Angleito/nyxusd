@@ -9,6 +9,9 @@
  * @packageDocumentation
  */
 
+// Export all core types
+export * from "./types";
+
 // CDP Creation Functions
 export {
   validateCDPCreation,
