@@ -1,169 +1,194 @@
-# NyxUSD: AI-Driven, Chain-Agnostic, Community-Focused DeFi Hub for All
-## AI-Driven • Chain-Agnostic • Community-Focused
-### Community-Judged Hackathon Submission - August 2025
+# NyxUSD: User-Defined Interest Rate CDP Protocol for Cardano's Cross-Chain Yield Revolution
+## First Liquity V2-Inspired CDP with TEE Oracle & Cross-Chain Yield Optimization
+### Cardano Catalyst Fund 14 Proposal - August 2025
 
-> Our mission: Make financial DeFi products simplified — fully abstracted behind pure natural language. No dashboards, no forms, no complexity. Just tell Nyx what you want, and the protocol handles the rest.
+> Our mission: Bridge Cardano's yield gap by creating the most capital-efficient CDP protocol, enabling ADA holders to mint stablecoins at 125% collateralization and access 5-100%+ yields across EVM chains. AI automation coming post-launch.
 
 ---
 
 ## Executive Summary {#executive-summary}
 
-We are an AI-Driven, Chain-Agnostic, Community-Focused DeFi Hub for all — uniting intelligence, interoperability, and community ownership to make sophisticated decentralized finance accessible to everyone. We believe the future of finance is conversational: financial products should be requested and managed entirely in natural language, with the underlying DeFi complexity abstracted away.
+NyxUSD is a decentralized stablecoin protocol that revolutionizes DeFi yields for Cardano users. By implementing a Liquity V2-inspired CDP system where users set their own interest rates, we enable ADA and CAP3X holders to mint NyxUSD stablecoins at a 125% collateralization ratio. We're building first on Cardano mainnet, then expanding to Apex Fusion's Vector (UTXO L2), and finally deploying yield optimization on Nexus (EVM L2). These stablecoins fuel three risk-stratified pools that deploy capital across EVM chains via Apex Fusion's Reactor Bridge, capturing yields ranging from 5-100%+ APY and converting them back to ADA for Cardano-native users.
 
-DeFi has created unprecedented financial opportunities, yet most potential users remain locked out by complexity. While billions sit in traditional stablecoins earning nothing, sophisticated yield strategies remain the exclusive domain of whales and institutions.
+**Key Innovation:** First user-defined interest rate CDP on Cardano, bridging the yield gap between Cardano and EVM ecosystems.
 
-**NyxUSD changes everything.**
+**Funding Request:** ₳50,000 - This deliberately low request represents only the minimum survival budget. We are personally co-investing significant additional capital where needed to ensure complete delivery. This demonstrates our commitment to building regardless of funding outcome, though Catalyst support would accelerate development and ensure proper security audits.
 
-We've built the first protocol where artificial intelligence doesn't just optimize yields—it creates and deploys custom smart contracts based on plain English requests. Users choose from three risk-calibrated pools or describe their goals to our AI, which then generates, tests, and deploys personalized yield strategies across multiple chains.
+### The Cardano Yield Gap
 
-**Core Innovation Highlights:**
-- **On-Chain Data Intelligence**: Our AI analyzes transaction patterns, liquidity flows, and yield opportunities across Base and Sui
-- **Autonomous Smart Contract Generation**: Protocol where AI writes and deploys custom strategies
-- **Cross-Chain Native**: Seamless operation across multiple blockchains without manual bridging
-- **Natural Language Interface**: Making DeFi as simple as having a conversation
+**Current State:**
+- ADA staking yields only 3-4% APY
+- EVM DeFi offers stablecoin yields of 5-30%+ on established protocols
+- Cardano users lack efficient access to cross-chain yield opportunities
 
-### Revolutionary Innovations
+**Barriers:**
+- No efficient bridge between Cardano and high-yield EVM opportunities
+- Existing Cardano CDPs (Djed, Indigo) have fixed parameters limiting user flexibility
+- Complex multi-step process to access cross-chain yields
+- High collateralization requirements (150-800%) on existing Cardano CDPs
 
-1. **AI Contract Generation**: First protocol where AI creates custom smart contracts from natural language
-2. **Dual Revenue CDP Model**: Earn from both stability fees (5%) AND deployed collateral yields (3-8%)
-3. **True Cross-Chain Native**: Seamless yield optimization across Base and Sui without manual bridging
-4. **Native BTC Access**: Buy and control native Bitcoin from Ethereum via IKA Protocol's 2MPC network on Sui
-5. **Conversational DeFi**: Transform complex strategies into simple conversations
-6. **Self-Improving AI**: Machine learning models that evolve with market conditions
+### Revolutionary Core Features
 
-### Core Innovation
-- **Multiple Risk Tiers**: Safe, Medium, and High-risk yield strategies
-- **AI Strategy Generation**: Fast response times for custom contract creation
-- **Cross-Chain Architecture**: Efficient routing across multiple blockchains
-- **Dual Revenue Model**: Revenue from both stability fees and deployed collateral yields
-- **Custom Portfolio Creation**: One-time fees for AI-generated contracts with performance monitoring
+1. **User-Defined Interest Rates**: First Liquity V2 implementation on Cardano - users set their own borrowing rates (0.5% minimum)
+2. **Capital Efficiency**: 125% minimum collateralization ratio (most efficient on Cardano vs Djed's 400-800%)
+3. **Cross-Chain Yield Access**: Deploy collateral across Base, Sui, and EVM chains for 5-100%+ yields
+4. **TEE Oracle Security**: Custom Trusted Execution Environment oracle with Charli3/Orcfax fallbacks
+5. **Multi-Layer Architecture**: Cardano → Vector → Nexus progression for optimal performance
+6. **Community-First Token Launch**: NYX token via SundaeSwap TasteTest, no VCs or special allocations
+
+### Post-Launch AI Enhancement
+
+After proving the core CDP protocol, we plan to introduce:
+- Natural language interface for CDP management
+- Automated risk assessment and liquidation protection
+- AI-powered yield optimization algorithms
+- Conversational DeFi interface for mainstream adoption
 
 ---
 
 ## Table of Contents
 
-1. [The Problem: DeFi's Complexity Crisis](#the-problem)
-2. [Our Solution: Intelligence Meets Simplicity](#our-solution)
+1. [The Problem: Cardano's Yield Gap](#the-problem)
+2. [Our Solution: User-Defined Interest Rate CDP](#our-solution)
 3. [Technical Architecture](#technical-architecture)
-4. [AI Innovation Deep Dive](#ai-innovation)
-5. [Tokenomics & Revenue Model](#tokenomics)
-6. [Competitive Analysis](#competitive-analysis)
-7. [Security & Risk Management](#security)
-8. [Go-to-Market Strategy](#go-to-market)
-9. [Roadmap & Milestones](#roadmap)
-10. [Team & Governance](#team)
+4. [Tokenomics & Revenue Model](#tokenomics)
+5. [Competitive Analysis](#competitive-analysis)
+6. [Security & Risk Management](#security)
+7. [Development Roadmap](#roadmap)
+8. [Budget Allocation](#budget)
+9. [Post-Launch AI Enhancement](#ai-roadmap)
+10. [Team & Philosophy](#team)
 11. [Conclusion](#conclusion)
 
 ---
 
-## The Problem: DeFi's Complexity Crisis {#the-problem}
+## The Problem: Cardano's Yield Gap {#the-problem}
 
-### The Current State of DeFi
+### The Current State of Cardano DeFi
 
-The decentralized finance revolution promised financial freedom for everyone. Instead, it created a labyrinth that only 5% can navigate:
+Cardano has built the most secure and academically rigorous blockchain platform, yet its DeFi ecosystem suffers from a critical yield gap that locks holders out of lucrative opportunities available on other chains.
 
-#### Complexity Barriers
-- **Protocol Overload**: 500+ protocols across 50+ chains
-- **Technical Prerequisites**: Understanding of:
-  - Smart contract interactions
-  - Gas optimization
-  - Impermanent loss
-  - Liquidation mechanics
-  - Cross-chain bridging
-- **Time Investment**: Average user needs 15+ hours to understand basic yield farming
-- **Capital Inefficiency**: $150B+ in stablecoins earning 0% yield
+#### The Cardano Yield Crisis
 
-#### The Hidden Costs
-| Challenge | Impact | Annual Cost to Users |
-|-----------|--------|---------------------|
-| Failed Transactions | 23% of DeFi transactions fail | $2.3B in wasted gas |
-| Liquidations | 67% don't understand risks | $1.8B in preventable losses |
-| Missed Opportunities | 95% use single protocol | $12B+ in foregone yield |
-| Bridge Hacks | Cross-chain complexity | $2.5B in losses (2022-2024) |
+**Current Limitations:**
+- **ADA Staking**: Only 3-4% APY from native staking
+- **Limited DeFi Options**: Minimal native yield protocols compared to Ethereum/EVM chains
+- **Capital Inefficiency**: Most ADA sits idle in wallets earning minimal returns
+- **Complex Cross-Chain Access**: No seamless bridge to high-yield EVM opportunities
 
-### Why Existing Solutions Fail
+**Market Opportunity:**
+- Cardano TVL of $400M+ actively seeking better yields
+- Growing demand for capital-efficient stablecoin liquidity on Cardano
+- Apex Fusion's Vector launch creates perfect timing for L2 expansion
+- First-mover advantage for Liquity V2 model on Cardano
 
-> We remove the cognitive load: users describe intent in natural language and the system compiles, executes, and manages the appropriate DeFi products end-to-end.
+### Why Existing Cardano CDP Solutions Fall Short
 
-**Traditional Yield Aggregators** (Yearn, Beefy):
-- Still require DeFi knowledge
-- Single-chain limitations
-- No personalization
-- Static strategies
+**Djed Protocol:**
+- 400-800% collateralization requirements (extremely capital inefficient)
+- Fixed parameters limit user flexibility
+- No yield generation on minted stablecoins
+- Complex reserve mechanism
 
-**CDP Protocols** (MakerDAO, Liquity):
-- Complex position management
-- Single revenue stream
-- No yield optimization
-- High liquidation risk
+**Indigo Protocol:**
+- 150% collateralization (better but still not optimal)
+- Fixed borrowing terms
+- Limited to synthetic assets, not true stablecoins
+- 10% liquidation penalty
 
-**AI Trading Bots**:
-- Focus on trading, not yield
-- Require configuration
-- No smart contract generation
-- Limited to predefined strategies
+**Existing Cross-Chain Solutions:**
+- Manual bridging processes with high failure rates
+- Multiple transaction confirmations required
+- High fees for small amounts
+- Security risks from bridge exploits
+- No unified interface for yield optimization
+
+### The Core Problem: Capital Trapped on Cardano
+
+| Asset | Current Yield | EVM DeFi Potential | Opportunity Cost |
+|-------|---------------|-------------------|------------------|
+| ADA Staking | 3-4% APY | 5-30%+ via CDPs/yield farming | 2-27% annually |
+| Idle ADA | 0% | 8-15% stable yields | 8-15% annually |
+| CNTs | 0% | 10-100%+ specialized strategies | 10-100%+ annually |
+
+**Total Opportunity Cost**: Cardano holders are missing out on billions in potential yield due to ecosystem limitations.
 
 ---
 
-## Our Solution: Intelligence Meets Simplicity {#our-solution}
+## Our Solution: User-Defined Interest Rate CDP {#our-solution}
 
-At the core is a Natural Language DeFi Compiler that translates plain-English requests into validated, executable strategies. Users interact with finance conversationally (“Create a conservative income portfolio targeting 8–10% APY and cap max drawdown at 5%”), and the system handles planning, simulation, contract generation, execution, and ongoing management.
+### Solution Architecture
 
-### Three Clicks to Financial Freedom
+NyxUSD solves Cardano's yield gap through a revolutionary three-phase architecture that bridges the most secure blockchain with the highest-yield opportunities:
 
-NyxUSD transforms the entire DeFi experience into three simple choices—or one conversation:
+#### Phase 1: NyxUSD CDP Engine (Cardano Mainnet)
 
-### 🛡️ **Safe Pool** (Conservative Strategy)
+**User-Defined Interest Rate Innovation:**
+- First Liquity V2 implementation on Cardano
+- Users set their own borrowing rates (0.5% minimum to market-determined maximum)
+- 125% minimum collateralization ratio (most capital efficient on Cardano)
+- Accepts ADA and CAP3X (Cardano native Apex token) as collateral
+- 3% liquidation penalty with MEV protection
 
-The Safe Pool prioritizes capital preservation while generating steady returns. Our AI allocates funds across established protocols like Aave and Compound. The system continuously monitors rates and automatically rebalances to capture optimal risk-adjusted returns. With zero leverage and diversification across multiple protocols, this pool maintains high safety standards with minimal liquidation risk.
+**Key Benefits:**
+- **Capital Efficiency**: 3x more efficient than Djed (125% vs 400-800%)
+- **User Control**: Set your own interest rate based on risk tolerance
+- **Revenue Generation**: Protocol earns from both stability fees AND deployed collateral yields
+- **Security**: Built with Plutus/Aiken smart contracts using IOG formal verification
 
-**Perfect for**: Conservative investors, treasuries, long-term holdings
+#### Phase 2: Vector L2 Integration (Apex Fusion)
 
-### ⚡ **Medium Pool** (Balanced Strategy)
+**Enhanced Performance Layer:**
+- Migrate CDP logic to Vector UTXO L2 for faster execution
+- Integrate TxPipe infrastructure (Pallas, Dolos, Oura)
+- Enable rapid liquidation and rebalancing mechanisms
+- Reduce transaction costs while maintaining Cardano security
 
-The Medium Pool balances growth with controlled risk exposure. Our AI employs moderate leverage across established protocols on both Base and Sui chains. The system dynamically adjusts positions based on market conditions, automatically deleveraging during high volatility periods. This pool includes automated liquidation protection to safeguard user funds.
+**Technical Features:**
+- Cross-layer communication between Cardano and Vector
+- Enhanced oracle price feeds via TEE infrastructure
+- Optimized position management interfaces
+- Faster yield optimization execution
 
-**Perfect for**: Balanced growth seekers, medium-term horizons
+#### Phase 3: Nexus Yield Deployment (EVM L2)
 
-### 🚀 **High Risk Pool** (Aggressive Strategy)
+**Three Risk-Stratified Pools:**
 
-The High Risk Pool pursues aggressive yield opportunities across new protocol launches, concentrated liquidity positions, and advanced DeFi strategies. While accepting higher risk, the AI implements mandatory stop-losses to limit downside. The system monitors positions continuously for risk management.
+🛡️ **Safe Pool (5-10% APY)**
+- Strategy: Lending stablecoins on blue-chip protocols
+- Protocols: Aave, Compound, Spark
+- Risk Level: Minimal smart contract risk
+- Target Allocation: 40-50% of TVL
 
-**Perfect for**: Experienced yield farmers, risk-tolerant investors
+⚡ **Medium Pool (10-25% APY)**
+- Strategy: Advanced yield optimization with Pendle
+- Protocols: Pendle (principal/yield splitting), Curve, Balancer
+- Risk Level: Moderate complexity and IL exposure
+- Target Allocation: 30-40% of TVL
 
-### 🤖 **Custom AI Portfolios** (Personalized Strategy)
+🚀 **High Risk Pool (25-100%+ APY)**
+- Strategy: Leveraged strategies and derivatives
+- Protocols: Euler (leveraged lending), Contango (perps), GMX
+- Risk Level: High leverage, complex strategies
+- Target Allocation: 10-20% of TVL
 
-This is where NyxUSD becomes revolutionary. Users simply describe their financial goals in plain English, and our AI creates a complete custom strategy:
+### Cross-Chain Bridge Integration
 
-When a user says "I have $100k, want 20% returns, can handle some risk but need $2k monthly income," our AI designs a personalized portfolio with:
-- 60% allocated to stable yields generating the required monthly income
-- 30% in medium-risk opportunities targeting higher returns
-- 10% in high-risk plays for additional upside
-- Custom smart contracts that automatically rebalance and optimize
+**Apex Fusion Reactor Bridge:**
+- Native, secure cross-chain capital movement
+- Optimized routing between Cardano → Vector → Nexus
+- Batch transactions to minimize fees
+- Automated yield harvesting and compounding
+- Real-time monitoring and risk management
 
-The AI generates and deploys these contracts autonomously, handling all complexity behind the scenes. Users pay a one-time 3% fee for custom contract creation, plus a 10% performance fee on profits generated through AI monitoring and automation.
+### Dual Revenue Model Innovation
 
-**Fee Structure Breakdown:**
-- **Contract Creation Fee (3%)**: One-time fee charged when the AI generates and deploys your custom smart contracts
-- **Performance Fee (10%)**: Ongoing fee on profits generated through continuous AI monitoring and automated strategy adjustments
+Unlike traditional CDPs that only earn from stability fees, NyxUSD generates revenue from two sources:
 
-This dual fee structure ensures alignment—we only succeed when you do. The initial fee covers the sophisticated contract generation, while the performance fee funds ongoing optimization and 24/7 monitoring.
+1. **Stability Fees**: Users pay interest on minted NyxUSD (0.5% minimum)
+2. **Deployment Yields**: Protocol deploys minted stablecoins into yield pools, earning 3-8% additional returns
 
-### The Magic: AI-Generated Smart Contracts
-
-Our AI doesn't just move funds between existing strategies—it actually writes and deploys new smart contracts tailored to each user's needs. When you request "Maximize yield but protect my principal," the AI:
-
-1. Analyzes your requirements and risk tolerance
-2. Designs a custom strategy combining multiple protocols
-3. Generates smart contract code implementing this strategy
-4. Tests the contract in a simulated environment
-5. Deploys it on-chain once verified safe and profitable
-
-The generated contracts might include logic like:
-- Allocating 70% to safe yields when certain conditions are met
-- Moving funds to higher-yield opportunities when rates exceed thresholds
-- Automatically bridging to Sui when yields there surpass Base by 5%
-- Implementing circuit breakers that reduce leverage during market stress
+This creates a revenue multiplier effect where every dollar borrowed strengthens the protocol treasury through compound revenue streams.
 
 ---
 
@@ -171,21 +196,37 @@ The generated contracts might include logic like:
 
 ### System Overview
 
-The NyxUSD architecture consists of four main layers working in harmony:
+The NyxUSD architecture leverages Cardano's advanced infrastructure and expands across the Apex Fusion ecosystem:
 
-**User Interface Layer**: Multiple access points including web application, mobile apps, API endpoints, and voice assistant integration. Users interact through their preferred channel while the system maintains consistent state across all interfaces.
+#### Cardano Foundation Layer
 
-**AI Orchestration Layer**: The brain of the system containing four specialized modules:
-- Strategy Engine: Analyzes market conditions and designs optimal allocation strategies
-- Contract Generator: Transforms strategies into executable smart contract code
-- Risk Manager: Continuously monitors positions and market conditions for threats
-- Learning Module: Improves performance by analyzing historical results
+**Core CDP Smart Contracts:**
+- **NyxUSD Token Contract**: CIP-68 standard implementation for enhanced metadata
+- **CDP Validator**: Plutus/Aiken smart contracts handling user-defined interest rates
+- **Collateral Manager**: ADA and CAP3X collateral handling with automated liquidation
+- **Oracle Interface**: TEE-based price feeds with Charli3/Orcfax fallbacks
 
-**Core Protocol Layer**: The foundational infrastructure managing:
-- CDP Engine: Handles collateralized debt positions and dual revenue generation
-- Yield Allocator: Executes strategies across multiple protocols
-- Bridge Router: Manages cross-chain movements efficiently
-- Treasury Manager: Handles fee collection and distribution
+**Technology Stack:**
+- **Plutus/Aiken**: Smart contract development with formal verification
+- **IOG Tools**: Formal verification for mathematical proof of correctness
+- **TxPipe Infrastructure**: Pallas (Rust primitives), Dolos (indexing), Oura (real-time data)
+- **CIP Standards**: CIP-68 for enhanced token functionality
+
+#### Vector L2 Integration Layer
+
+**Enhanced Performance Components:**
+- **Cross-Layer Bridge**: Seamless Cardano ↔ Vector communication
+- **Optimized CDP Logic**: Faster execution while maintaining security
+- **Real-Time Monitoring**: Enhanced position tracking and risk management
+- **Gas Optimization**: Reduced transaction costs for frequent operations
+
+#### Nexus EVM Deployment Layer
+
+**Yield Optimization Infrastructure:**
+- **Pool Management Contracts**: Automated allocation across risk tiers
+- **Strategy Execution**: Integration with Aave, Compound, Pendle, Euler, Contango
+- **Reactor Bridge Interface**: Secure cross-chain capital deployment
+- **Performance Tracking**: Real-time yield monitoring and reporting
 
 **Multi-Chain Execution Layer**: Deploys capital across Base and Sui chains, utilizing bridge infrastructure for seamless cross-chain operations while optimizing for gas costs and execution speed. Through IKA Protocol's innovative 2MPC network on Sui, users can also buy and control native Bitcoin directly from Ethereum, bringing the world's largest cryptocurrency into our yield optimization ecosystem.
 
@@ -202,68 +243,72 @@ This dual revenue model creates a significant advantage:
 - NyxUSD earns from fees PLUS deployment yields, creating multiple revenue streams
 - Creates a revenue multiplier effect compared to traditional CDP protocols
 
-The system maintains careful collateralization ratios and includes AI-powered monitoring to protect positions from liquidation while maximizing yield generation.
+The system maintains careful collateralization ratios and includes automated monitoring to protect positions from liquidation while maximizing yield generation.
 
-#### 2. AI Yield Allocator
+#### 2. TEE-Based Oracle Infrastructure
 
-Our AI Yield Allocator represents a breakthrough in automated portfolio management. The system continuously scans opportunities across all integrated protocols, evaluating them based on:
+Our revolutionary Trusted Execution Environment (TEE) oracle provides unprecedented security for price feeds:
 
-- Current and historical yields
-- Total value locked and protocol safety
-- Gas costs for execution
-- Correlation with existing positions
-- Market conditions and volatility
+**TEE Oracle Features:**
+- **Intel SGX Implementation**: Hardware-secured price aggregation in tamper-proof environment
+- **Cryptographic Attestation**: Verifiable proof of data integrity and computation correctness
+- **Multi-Source Aggregation**: Combines feeds from Charli3, Orcfax, and external APIs
+- **Circuit Breakers**: Automatic pause for price deviations >10%
+- **Redundant Fallbacks**: Dual backup systems prevent single points of failure
 
-Using machine learning models trained on millions of DeFi transactions, the allocator determines optimal capital distribution for each pool type. It executes these strategies through batched transactions to minimize gas costs, and continuously rebalances based on changing market conditions.
+**Security Benefits:**
+- Price manipulation becomes virtually impossible
+- No reliance on single oracle provider
+- Hardware-level security guarantees
+- Transparent verification process
+- Real-time monitoring and alerting
 
-The allocator adapts its behavior based on the pool type—prioritizing safety for the Safe Pool, balancing risk and reward for the Medium Pool, and aggressively pursuing opportunities in the High Risk Pool.
+#### 3. Cross-Chain Bridge Integration
 
-#### 3. Cross-Chain Bridge Router & Native BTC Integration
+**Apex Fusion Reactor Bridge:**
+The protocol leverages Apex Fusion's proven Reactor Bridge infrastructure for secure cross-chain operations:
 
-Intelligent cross-chain routing is essential for accessing the best yields across Base and Sui. Our hybrid approach combines decentralized bridges with centralized exchange (CEX) infrastructure for optimal efficiency:
+**Key Features:**
+- **Native Security**: Built into Apex Fusion ecosystem with proven track record
+- **Optimized Routing**: Cardano → Vector → Nexus progression minimizes costs
+- **Batch Processing**: Multiple transactions bundled to reduce fees
+- **Automated Monitoring**: Real-time position tracking across all chains
+- **Emergency Safeguards**: Circuit breakers and withdrawal timeouts for large amounts
 
-**Bridging Methods**:
-- **Decentralized Bridges**: For trustless, on-chain transfers
-- **CEX Integration**: Leveraging major exchanges for faster, cheaper cross-chain capital movement
-- **Hybrid Routing**: AI selects between DEX bridges and CEX paths based on:
-  - Transfer size and urgency
-  - Gas costs vs CEX fees
-  - Security requirements
-  - Liquidity availability
+**Bridge Security:**
+- Multi-signature validation across all chains
+- Time-locked withdrawals for amounts >$100K
+- Insurance fund coverage for bridge-related losses
+- Regular security audits and penetration testing
 
-The system evaluates multiple paths considering:
-- Gas costs on source and destination chains
-- Bridge fees and slippage
-- CEX withdrawal/deposit fees
-- Security scores of bridge protocols
-- Historical reliability and uptime
-- Current congestion levels
+#### 4. User-Defined Interest Rate Engine
 
-This hybrid approach aims to reduce cross-chain costs compared to using only decentralized bridges, while maintaining user optionality between trustless and centralized paths.
+The revolutionary feature that distinguishes NyxUSD from all other CDPs on Cardano—users control their own borrowing terms:
 
-**Revolutionary Native BTC Access**: Through our integration with IKA Protocol's 2MPC (Two-Party Multi-Party Computation) network on Sui, Ethereum users can now buy and control native Bitcoin without wrapped tokens or synthetic representations. This breakthrough technology enables:
+**Dynamic Interest Rate Setting:**
+Users choose their own interest rate when minting NyxUSD, balancing cost vs liquidation risk:
+- **Conservative Users**: Set higher rates (2-5%) for lower liquidation priority
+- **Aggressive Users**: Set minimum rates (0.5%) accepting higher liquidation risk
+- **Market Response**: Rates adjust based on supply/demand dynamics
+- **Flexibility**: Users can adjust rates after minting (subject to minimum thresholds)
 
-- Direct native BTC purchases from Ethereum
-- True Bitcoin ownership with private key control
-- No wrapped token risks or centralized custodians
-- Seamless BTC integration into yield strategies
-- Cross-chain BTC collateralization for CDPs
+**Smart Liquidation Prioritization:**
+- Lower interest rate positions get liquidated first during market stress
+- Higher rate payers receive liquidation protection buffer
+- 3% liquidation penalty split between protocol and liquidators
+- MEV protection prevents extractive liquidation behavior
 
-This positions NyxUSD as the first protocol where users can mint stablecoins against native BTC collateral while operating from Ethereum, opening unprecedented opportunities for Bitcoin holders to access DeFi yields without sacrificing custody.
+**Position Management:**
+- Real-time collateralization ratio monitoring
+- Automated warnings before liquidation thresholds
+- Optional auto-adjustment features
+- Integration with Cardano wallet interfaces
 
-#### 4. Smart Contract Factory
-
-The crown jewel of NyxUSD—our AI that generates actual smart contract code. The Contract Factory operates through several sophisticated steps:
-
-**Natural Language Processing**: Advanced NLP models parse user requests to understand financial goals, constraints, and risk tolerance. The system can interpret complex requirements like "protect my principal but maximize upside" or "generate steady income with some growth."
-
-**Strategy Design**: Based on the parsed intent, the AI designs a comprehensive strategy incorporating multiple protocols, risk management rules, and optimization logic. It considers factors like correlation, gas efficiency, and composability.
-
-**Contract Generation**: The AI assembles smart contracts using a library of pre-audited, modular components. It combines these building blocks with custom logic to create contracts that perfectly match user requirements.
-
-**Simulation and Testing**: Before deployment, every generated contract undergoes rigorous testing in a forked mainnet environment. The AI simulates various market conditions to ensure the strategy is both profitable and safe.
-
-**Deployment and Monitoring**: Once validated, contracts are deployed on-chain with the AI continuously monitoring their performance and making adjustments as needed.
+**Benefits Over Fixed-Rate CDPs:**
+- **User Control**: Set borrowing terms based on personal risk tolerance
+- **Capital Efficiency**: Lower rates for users comfortable with higher risk
+- **Market Dynamics**: Natural rate discovery through user preferences
+- **Liquidation Protection**: Premium rate payers get safety benefits
 
 ---
 
@@ -355,57 +400,55 @@ NYX serves as the governance and value accrual token of the NyxUSD ecosystem:
 
 **Revenue Sharing**: NYX stakers earn a portion of protocol revenues, aligning token holder interests with protocol growth and creating sustainable value accrual.
 
-**AI Access**: Premium AI features like advanced analytics, priority execution, and beta strategies are exclusive to NYX holders, creating additional utility demand.
+**Protocol Governance**: NYX holders vote on protocol parameters, risk settings, and treasury allocation decisions.
 
-**Priority Execution**: During high-demand periods, NYX holders receive priority access to new strategies and limited-capacity opportunities.
+**Post-Launch Benefits**: Future AI features and premium analytics will be exclusive to NYX holders.
 
 #### Token Distribution: Community Ownership First
 
 Total Supply: 1,000,000,000 NYX
 
-**Real community ownership, not VC extraction:**
+**Community-First Distribution via SundaeSwap TasteTest:**
 
 **70% to Community & Ecosystem (700M NYX)**
-- 25% Community rewards and airdrops
+- 30% SundaeSwap TasteTest fair launch
 - 20% Liquidity mining for real users
-- 10% JoinPond seed round (community-driven funding)
-- 10% Community grants for builders
+- 10% Early CDP users (retroactive airdrop)
+- 5% Catalyst voters who supported us
 - 5% DAO treasury controlled by token holders
 
 **20% to Dev/Team (200M NYX)**
 - 4-year vesting, no special terms
 - Same unlock schedule as everyone else
-- Performance tied to community satisfaction, not token price
+- Performance tied to protocol success, not token price
 
 **10% for Protocol Operations (100M NYX)**
 - Development funding
-- Community-approved initiatives only
+- Security audits and improvements
 - Emergency reserves
-- NO "strategic investments" (aka VC payoffs)
+- Community-approved initiatives only
 
 **No allocation for:**
 - ❌ Traditional VCs or "strategic investors"
+- ❌ Private sale rounds with special terms
 - ❌ Marketing funds for influencer payments
 - ❌ "Advisor" tokens for fancy names
-- ❌ Pre-sale rounds with special terms
 
-**Note:** JoinPond seed funding is different - it's community-driven funding that supports independent builders, not extractive VC investment. The 10% allocation maintains community ownership principles.
-
-**70% community ownership means the community still owns and controls the protocol.**
+**70% community ownership means real community control over the protocol's future.**
 
 ### Revolutionary Revenue Model
 
 NyxUSD generates revenue from multiple innovative streams:
 
-#### Revenue Streams Breakdown (Concept)
+#### Revenue Streams Breakdown
 
 | Source | Rate | Description |
 |--------|------|-------------|
-| CDP Stability Fees | 5% | Standard borrowing fees on minted stablecoins |
-| CDP Deployment Yields | Variable | Yields generated from deploying minted assets |
-| AI Performance Fees | 10% of profits | Fees from AI monitoring and optimization |
-| Custom Contract Creation | 3% one-time | Fee for AI-generated custom strategies |
-| Premium Features | Subscription | Advanced AI features and analytics |
+| Minting Fee | 0.5% | One-time fee on NyxUSD generation |
+| Interest Rate Floor | 0.5% annual | Minimum interest rate on all positions |
+| Liquidation Penalty | 3% | Fee on liquidated positions |
+| Yield Pool Performance | 10% | Fee on yield pool profits |
+| Bridge Fee Optimization | Variable | Batch transactions to minimize costs |
 
 The dual CDP revenue model is particularly innovative—while users pay standard stability fees, the protocol also earns yields by deploying their minted NyxUSD productively. This creates a compounding effect where every dollar borrowed strengthens the protocol treasury.
 
@@ -449,34 +492,45 @@ Coverage amounts and fund size will be determined based on actual protocol usage
 
 ## Competitive Analysis {#competitive-analysis}
 
-### Feature Comparison Matrix
+### Cardano CDP Comparison Matrix
 
-| Feature | NyxUSD | Yearn | Beefy | Sommelier | MakerDAO |
-|---------|---------|--------|--------|-----------|----------|
-| **AI Strategy Generation** | ✅ Full | ❌ | ❌ | 🟡 Basic | ❌ |
-| **Custom Smart Contracts** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Cross-Chain Native** | ✅ | ❌ | 🟡 Limited | ❌ | ❌ |
-| **CDP Integration** | ✅ | ❌ | ❌ | ❌ | ✅ |
-| **Dual Revenue Model** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **AI Chat Interface** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Educational AI** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Personalized Strategies** | ✅ | ❌ | ❌ | 🟡 | ❌ |
-| **Yield Strategy** | Multiple Tiers | Fixed Vaults | Auto-compound | Managed | No Yield |
-| **User Experience** | Conversational | Manual Selection | Manual Selection | Manual Selection | Complex Setup |
+| Feature | NyxUSD | Djed | Indigo | MakerDAO | Liquity |
+|---------|---------|------|--------|----------|---------|
+| **User-Set Interest Rates** | ✅ Yes | ❌ No | ❌ No | ❌ No | ✅ Yes |
+| **Collateralization Ratio** | 125% | 400-800% | 150% | 150% | 110% |
+| **Cross-Chain Yields** | ✅ Yes | ❌ No | ❌ No | ❌ No | ❌ No |
+| **TEE Oracle** | ✅ Yes | ❌ No | ❌ No | ❌ No | ❌ No |
+| **Multi-Layer Architecture** | ✅ Yes | ❌ No | ❌ No | ❌ No | ❌ No |
+| **Liquidation Penalty** | 3% | Variable | 10% | 13% | 0.5% |
+| **Dual Revenue Model** | ✅ Yes | ❌ No | ❌ No | ❌ No | ❌ No |
+| **Community Token Launch** | ✅ TasteTest | ❌ No | ❌ No | ❌ No | ❌ No |
 
 ### Competitive Advantages Deep Dive
 
-#### Against Traditional Yield Aggregators
+#### Against Djed Protocol
 
-Yearn and Beefy offer vault strategies but require users to understand DeFi concepts and choose appropriate vaults. They operate on single chains with static strategies that don't adapt to individual needs.
+**Capital Efficiency Advantage:**
+- NyxUSD: 125% collateralization vs Djed's 400-800%
+- Users can access 3x more liquidity with the same collateral
+- Djed's overcollateralized reserve mechanism creates unnecessary capital inefficiency
+- Fixed parameters vs user-controlled interest rates
 
-NyxUSD eliminates this complexity through conversational AI that understands user goals and automatically creates personalized strategies. Our cross-chain operation and dynamic adaptation provide superior returns with less user effort.
+#### Against Indigo Protocol
 
-#### Against CDP Protocols
+**True Stablecoin vs Synthetic Assets:**
+- NyxUSD mints true stablecoins for cross-chain deployment
+- Indigo creates synthetic assets with limited utility
+- 10% liquidation penalty vs our 3%
+- No yield generation on minted assets
 
-MakerDAO pioneered CDPs but only generates revenue from stability fees. Users must actively manage positions and receive no yield on their minted DAI.
+#### Against Traditional CDPs (MakerDAO/Liquity)
 
-NyxUSD's dual revenue model generates 2.46x more revenue per dollar of assets under management while the AI handles all position management. Users' minted stablecoins automatically earn yield, creating value instead of sitting idle.
+**Innovation Advantages:**
+- First Liquity V2 implementation on Cardano with user-defined rates
+- Cross-chain yield access vs single-chain limitations
+- TEE oracle security vs traditional oracle dependencies
+- Dual revenue model vs single revenue stream
+- Multi-layer architecture enabling optimal performance
 
 #### Against AI Trading Bots
 
@@ -636,256 +690,251 @@ We partner with protocols and platforms that share our values:
 
 ## Roadmap & Milestones {#roadmap}
 
-### 2025-2026 Development Timeline
+### Development Timeline
 
-#### Q3 2025: Community-Judged Hackathon (Current - August 2025)
-- Build core CDP engine for Base
-- Implement basic three-pool yield system
-- Create AI chat interface prototype
-- Develop smart contract factory proof-of-concept
-- Goal: Demonstrate value to community judges for funding consideration
+#### Phase 1: Cardano Foundation (Months 1-2)
+**Core CDP Development:**
+- Plutus/Aiken smart contract development for NyxUSD token (CIP-68 standard)
+- CDP validator with user-defined interest rate mechanism
+- CAP3X collateral integration and automated liquidation system
+- TEE oracle development using Intel SGX
+- Cardano testnet deployment and community testing
 
-#### Q4 2025: Alpha Launch
-- Deploy contracts to Base testnet
-- Integrate first yield protocols (Aave, Compound)
-- Launch AI contract generation beta
-- Begin security audits
-- Goal: Build with community feedback
+**Deliverables:**
+- NyxUSD token contract on Cardano
+- Working CDP with user-set rates
+- TEE oracle infrastructure
+- Security audit completion
 
-#### Q1 2026: Beta Expansion & Real-World Integration
-- Mainnet deployment on Base
-- Sui chain integration
-- Native BTC via IKA Protocol's 2MPC network
-- Enhanced AI interface beta
-- **Brahma Protocol Integration**: Launch tap-to-pay functionality using CDP positions
-  - Partner with Brahma's Swype Card infrastructure for real-world spending
-  - Enable users to spend against CDP collateral without liquidating positions
-  - Integrate Visa payment rails for access to 100M+ merchants globally
-  - Support Apple Pay and Google Pay for seamless mobile payments
-  - Implement secure payment authorization through AI assistant
-  - Deploy automated risk management for collateral-backed spending
-- Goal: Community adoption and real-world utility
+#### Phase 2: Vector L2 Integration (Month 2-3)
+**Performance Enhancement:**
+- Migrate CDP logic to Vector UTXO L2
+- Integrate TxPipe infrastructure (Pallas, Dolos, Oura)
+- Implement cross-layer communication protocols
+- Optimize gas costs and execution speed
+- Vector testnet deployment
 
-#### Q2 2026: Full Launch
-- Midnight chain integration (following Base and Sui)
-- Cardano chain integration
-- Additional blockchain support (5+ total chains)
-- Mobile application release
-- Advanced AI strategies live
-- Institutional features
-- Goal: Full multi-chain deployment
+**Deliverables:**
+- Enhanced CDP performance on Vector
+- Cross-layer bridge functionality
+- Optimized transaction costs
+- Real-time monitoring systems
 
-### Blockchain Integration Sequence
+#### Phase 3: Nexus Yield Pools (Month 3-4)
+**Cross-Chain Yield Deployment:**
+- Deploy yield optimization contracts on Nexus EVM L2
+- Integrate with Pendle for medium-risk strategies
+- Connect Euler and Contango for high-risk pools
+- Implement Reactor Bridge for cross-chain operations
+- Automated harvest and compound logic
 
-NyxUSD follows a strategic multi-chain expansion roadmap designed to maximize yield opportunities while maintaining security and user experience:
+**Deliverables:**
+- Three risk-stratified yield pools
+- Cross-chain capital deployment
+- Automated yield optimization
+- Full system integration
 
-**Phase 1: Foundation Chains (Q3 2025 - Q1 2026)**
-- **Base Network**: Core deployment and initial yield strategies
-- **Sui Network**: Cross-chain native architecture and enhanced scalability
+#### Post-Launch (Self-Funded - Months 5-6)
+**Community Token Launch:**
+- NYX token contract development
+- SundaeSwap TasteTest preparation and launch
+- Community governance framework deployment
+- Liquidity provision and market making
+- Retroactive airdrops to early CDP users and Catalyst supporters
 
-**Phase 2: Extended Ecosystem (Q2 2026)**
-- **Midnight Protocol**: Privacy-focused DeFi integration, leveraging advanced zero-knowledge capabilities for enhanced user privacy in yield strategies
-- **Cardano Network**: Robust smart contract platform with strong institutional adoption, providing additional yield opportunities through native Cardano DeFi protocols
-
-**Integration Rationale**:
-- Base provides the foundation for our CDP engine and initial user base
-- Sui enables high-performance cross-chain operations and native BTC access
-- Midnight adds privacy-preserving yield strategies for institutional users
-- Cardano expands our reach into academic and institutional DeFi markets
-
-Each new chain integration undergoes rigorous security audits and gradual rollout to ensure user fund safety while expanding yield opportunities.
-
-### Real-World Payment Integration: Brahma Partnership
-
-**Strategic Partnership**: NyxUSD will integrate with Brahma Protocol's proven payment infrastructure to bridge DeFi yields with real-world spending capabilities.
-
-**Technical Architecture**:
-- **Brahma Swype Card Integration**: Leverage Brahma's battle-tested payment infrastructure built on Gnosis Safe (securing $91B+ in assets)
-- **Smart Authorization**: Combine NyxUSD's AI assistant with Brahma's programmable execution policies for seamless payment approval
-- **CDP-Backed Spending**: Users can spend against their collateralized positions without liquidating yield-generating assets
-- **Automated Risk Management**: Smart contract-based collateral monitoring and liquidation protection during spending
-
-**Payment Flow**:
-1. User initiates payment via mobile tap or app interface
-2. NyxUSD AI assistant verifies spending against user-defined policies
-3. Brahma infrastructure automatically borrows USDC against CDP collateral
-4. Payment settles through Visa rails to merchant
-5. System automatically manages loan repayment and collateral ratios
-6. All transactions maintain DeFi position integrity
-
-**Key Benefits**:
-- **Capital Efficiency**: Maintain yield-generating positions while accessing liquidity
-- **Global Reach**: Access to 100M+ Visa merchants worldwide
-- **Security**: Built on proven Gnosis Safe multi-signature infrastructure
-- **Programmable Controls**: Set spending limits, approved merchants, and risk parameters
-- **Multi-Chain Support**: Seamless payments across Base, Sui, and future integrated chains
-
-**Launch Timeline**: Q1 2026 beta with select merchants, expanding to full integration by Q2 2026.
-
-### Long-Term Vision (2026-2028)
-
-**Late 2026 Goals**:
-- Multi-chain protocol deployment
-- Mobile application availability
-- Core integrations established
-- Community governance active
-
-**2027 Vision**:
-- Expanded protocol integrations
-- Regulatory compliance framework
-- Sustainable community growth
-- Enhanced AI capabilities
-
-**2028 Long-term Vision**:
-- Leading community-owned DeFi interface
-- Global payment infrastructure integration
-- Regulatory approvals in key jurisdictions
-- Mature decentralized governance
-
-### Success Framework (Conceptual)
-
-**Growth Indicators:**
-- **User Adoption**: Community growth and engagement
-- **Custom Portfolios**: AI-generated strategy adoption
-- **Transaction Volume**: Daily protocol usage
-- **Payment Integration**: Real-world utility adoption
-- **Merchant Network**: Payment acceptance growth
-- **Protocol Sustainability**: Revenue and treasury health
-
-**Note**: This community-judged hackathon presents a working concept ready for community funding and development. Success metrics will be refined based on community feedback and market validation.
+**Success Metrics:**
+- 100+ active CDP positions within 3 months
+- Zero security incidents during launch period
+- TVL growth demonstrating market validation
+- Community governance activation
+- Sustainable protocol revenue generation
 
 ---
 
-## Philosophy & Community {#team}
+## Budget Allocation {#budget}
 
-### The Builder's Story
+### ₳50,000 Catalyst Fund Request
 
-I'm a Finance Major turned self-taught developer. A pleb like everyone else, watching crypto slowly sink into VC-ran and Wall Street-owned garbage.
+**Why This Low Amount:**
+We are requesting only ₳50,000 as an absolute minimum to ensure professional audits and basic operational needs. We are committed to investing our own capital wherever needed to guarantee complete delivery. This Catalyst grant represents just the critical foundation - we will cover all additional costs ourselves to build the full vision.
 
-I studied finance because I wanted to understand money and markets. What I found was a system designed to extract wealth from regular people and funnel it to the already wealthy. So I taught myself to code, thinking I could build something better.
+| Category | Purpose | Catalyst Request |
+|----------|---------|-----------------|
+| **Security** | Professional audits + formal verification | ₳25,000 |
+| **Development** | Core smart contract development | ₳15,000 |
+| **Infrastructure** | TEE oracle, hosting, essential tools | ₳5,000 |
+| **Operations** | Documentation, testing, deployment | ₳3,000 |
+| **Community** | Bug bounties, beta testing rewards | ₳2,000 |
+| **Total** | **Minimum viable foundation** | **₳50,000** |
 
-Then I discovered something revolutionary: **AI writes better code than I do. And I've fully embraced it.**
+### Our Additional Commitment
+- Personal capital injection wherever needed
+- Full development costs beyond the minimum
+- NYX token launch entirely self-funded
+- Long-term operational sustainability
+- Complete transparency with monthly expense reports
+- Unused funds returned to Catalyst treasury
 
-Why fight the future? Why pretend my human limitations are somehow noble when AI can build more secure, more efficient, more innovative solutions? The old guard wants to gatekeep development behind years of computer science degrees and coding bootcamps. But AI democratizes creation itself.
+### Fund Usage Commitment
+- 100% of Catalyst funds go to security and core development
+- We cover all gaps with personal investment
+- No request for follow-up funding rounds
 
-I remember when crypto was about **freedom**. When it was about giving power back to the people. When a kid in their garage could compete with Goldman Sachs. When "be your own bank" wasn't just a marketing slogan, but a revolution.
+---
 
-Now? We've got protocols that raise $100M before they even write a line of code. VCs dumping on retail while preaching "decentralization." Wall Street suits in $5,000 jackets explaining how they're going to "fix" DeFi. The same system that crashed in 2008 now owns the thing that was supposed to replace it.
+## Post-Launch AI Enhancement {#ai-roadmap}
 
-**This isn't why I got into crypto. And I know you didn't either.**
+### Phase 4: AI Features Integration (Months 6-12)
 
-### Every Man A King
+After proving the core CDP protocol's stability and security, we plan to introduce AI automation features:
 
-Huey Long had it right: **"Every Man A King."** 
+#### Natural Language Interface
+**Development Timeline: Months 6-8**
+- Build conversational interface for CDP management
+- Enable commands like "Mint 1000 NyxUSD at 2% interest rate"
+- Integrate with Cardano wallet interfaces
+- Support voice commands for accessibility
 
-Not every man a subject to some VC fund. Not every man a liquidity provider for some Wall Street trading desk. Not every man a exit liquidity for some influencer's pump and dump.
+#### Automated Risk Management
+**Development Timeline: Months 8-10**
+- AI-powered position monitoring and alerts
+- Automated liquidation protection recommendations
+- Smart rebalancing suggestions based on market conditions
+- Educational AI assistant for DeFi learning
 
-**Every man a king of his own financial destiny.**
+#### Advanced Yield Optimization
+**Development Timeline: Months 10-12**
+- AI algorithms for optimal pool allocation
+- Personalized strategy generation based on user profiles
+- Automated yield harvesting and compounding
+- Portfolio optimization across risk tiers
 
-NyxUSD is built on this principle. No VCs. No institutional investors getting better terms than you. No complex financial instruments designed to extract value from regular people. Just a protocol that works for everyone who uses it.
+### AI Features Vision
 
-When you mint NyxUSD, you're not just another number in some fund's portfolio. You're a sovereign individual using sovereign money in a sovereign way.
+**Our AI Future:**
+- Transform complex CDP management into simple conversations
+- Automate risk assessment and position protection
+- Generate personalized yield strategies
+- Provide educational guidance for DeFi newcomers
+- Optimize cross-chain capital deployment
 
-### Community-First, Always
+**Why Post-Launch:**
+- Focus on core protocol security and stability first
+- Prove value proposition before adding complexity
+- Build user base and gather feedback for AI development
+- Ensure sustainable revenue to fund AI research and development
 
-**The Only Team That Matters Is the Community**
+**Community-Driven Development:**
+- AI features will be developed based on community feedback
+- NYX token holders will vote on AI prioritization
+- Open-source AI components when possible
+- Transparent development roadmap based on protocol success
 
-There's no "core team" here with magical credentials from fancy institutions. There's no advisory board of ex-regulators and Wall Street executives. There's just a developer who believes crypto can still change the world, and a community that refuses to let the suits take it over.
+---
 
-Every line of code is open source. Every decision is transparent. Every improvement comes from the people who actually use the protocol, not some boardroom in Silicon Valley.
+## Team & Philosophy {#team}
 
-The AI doesn't belong to me - it belongs to all of us. And honestly? It's better at this than I am. I'm not threatened by that, I'm liberated by it. Instead of spending months debugging smart contracts, I can focus on what matters: building something that serves real people.
+### The Builder's Commitment
 
-The protocol doesn't serve institutional investors - it serves people who want to earn yield on their assets without getting rekt by some fund manager's bad decisions.
+**Full Transparency:** We are new developers starting our careers in blockchain development. While we have strong technical foundations and are deeply passionate about DeFi, we acknowledge this is our first major protocol deployment.
 
-### Taking Back DeFi
+**Our Background:**
+- Finance major with deep understanding of traditional financial systems
+- Self-taught blockchain development focused on Cardano ecosystem
+- Strong commitment to functional programming and formal verification
+- Passionate about bringing real innovation to DeFi without VC extraction
 
-**This is Our Declaration of Independence from VC-Fi**
+### Risk Mitigation Approach
 
-We're not raising $50M from Andreessen Horowitz to build "the future of finance." We're building it ourselves, with our own hands, for our own communities.
+**To address our newcomer status:**
+- We're actively seeking experienced advisors and developers to join our team
+- All code will be open-source for community review and contribution
+- We're committed to extensive testing and professional security audits
+- We welcome community collaboration and feedback throughout development
+- **Join us:** If you're an experienced developer interested in building with us, please contact us at angel@nyxusd.com
 
-We're not partnering with JPMorgan to bring "institutional adoption." We're proving that regular people can build better financial infrastructure than the institutions.
+### Community-First Philosophy
 
-We're not optimizing for the next bull market exit. We're building something that lasts, something that serves the people who use it instead of the people who fund it.
+**Why We're Different:**
+- Building first, seeking funding second (not the other way around)
+- No VC backing means no pressure to compromise on community values
+- Requesting minimal Catalyst funding to prove commitment and sustainability
+- Complete transparency in development and fund usage
+- Fair token launch via community platforms (SundaeSwap TasteTest)
 
-**Because when everyone is a king, no one is a peasant.**
+**Our Values:**
+- **Innovation**: First Liquity V2 implementation on Cardano
+- **Efficiency**: 125% collateralization vs 400%+ competitors  
+- **Transparency**: Open development process and regular community updates
+- **Community Ownership**: 70% token allocation to community
+- **Security**: Multiple audits and formal verification before mainnet
+- **Sustainability**: Self-funded beyond core development needs
 
-### Governance Structure
+### Our Commitment to Cardano
 
-#### True Decentralization, Not VC-Controlled "Decentralization"
+**Why Cardano First:**
+- Most secure and academically rigorous blockchain platform
+- Formal verification tools ensure mathematical correctness
+- Strong community values aligned with our philosophy
+- Growing DeFi ecosystem ready for capital-efficient solutions
+- TxPipe infrastructure provides cutting-edge development tools
 
-Real decentralization doesn't mean a few VCs control 60% of the tokens and call it "governance." It means the community actually has power.
-
-**Phase 1 (Months 0-6)**: Seed round through JoinPond's community-driven funding mechanism - real people funding real builders, not VCs extracting value. Minimal necessary centralization for security and iteration. No pre-mining for traditional VCs, no "strategic investor" rounds with special terms, no backdoors.
-
-**Phase 2 (Months 6-12)**: Community Snapshot voting on all major decisions. No developer "veto power" - if the community decides, that's what happens.
-
-**Phase 3 (Month 12+)**: Full on-chain DAO governance. The code is the law, and the community writes the law.
-
-#### Community Power
-
-Every NYX holder gets a real voice in:
-- Risk parameters and yield strategies
-- New protocol integrations and chain expansions
-- Fee structures (no "dev tax" nonsense)
-- Treasury allocation (community-first spending)
-- AI safety parameters and constraints
-- Insurance claim approvals and payouts
-
-**No special voting classes. No founder tokens with 10x voting power. One token, one vote. Period.**
-
-### The People's AI
-
-The AI doesn't belong to some corporation or VC fund - it belongs to the community. And here's the thing: **it's legitimately better at managing DeFi protocols than humans are.**
-
-It doesn't get emotional. It doesn't have ego. It doesn't make decisions based on what will pump the token price this quarter. It optimizes for long-term protocol health and user benefit because that's what it was designed to do.
-
-I'm not trying to compete with it - I'm trying to harness it for the community's benefit. The AI holds NYX tokens just like everyone else and votes based on data, not politics. Its reasoning is completely transparent. Its code is open source. Its decisions can be questioned, challenged, and improved by anyone.
-
-**This is the future: humans and AI working together to build better financial infrastructure. Not AI serving Wall Street, but AI serving the people.**
+**Long-Term Vision:**
+- Build the most capital-efficient CDP on Cardano
+- Bridge Cardano to highest-yield opportunities across chains
+- Prove new developers can create institutional-grade protocols
+- Demonstrate community-first development model
+- Launch fair token distribution via established Cardano platforms
 
 ---
 
 ## Conclusion {#conclusion}
 
-### The Future We're Building
+### Bridging Cardano's Yield Gap
 
-NyxUSD isn't just another DeFi protocol—it's the bridge between the complex world of decentralized finance and the simplicity users deserve.
+NyxUSD represents the evolution of CDP protocols on Cardano, combining the capital efficiency of Liquity V2's user-defined rates with the yield opportunities of cross-chain DeFi. By building first on Cardano, then expanding to Vector L2, and finally optimizing yields on Nexus, we're creating a sustainable, secure, and profitable bridge between Cardano's stability and EVM's innovation.
 
-By combining revolutionary AI that creates custom smart contracts, a dual revenue CDP model maximizing capital efficiency, cross-chain native design for unlimited opportunities, and a conversational interface anyone can use, we're creating a future where:
+**Our Vision:**
+- Enable ADA holders to access 5-100%+ yields while maintaining Cardano as their home base
+- Create the most capital-efficient CDP on Cardano (125% vs 400-800% competitors)
+- Prove that new developers can build institutional-grade protocols with community support
+- Launch the first community-first token via SundaeSwap TasteTest
 
-- Your grandmother can earn 20% APY as easily as using email
-- Institutions can deploy billions with confidence
-- Anyone can access strategies previously reserved for quants
-- DeFi becomes as simple as describing what you want
+### Why NyxUSD Will Succeed
 
-### Why NyxUSD Will Win
+1. **Capital Efficiency**: 3x more efficient than Djed with 125% collateralization
+2. **User Control**: First user-defined interest rate CDP on Cardano
+3. **Cross-Chain Yields**: Access to EVM yields without leaving Cardano ecosystem
+4. **TEE Security**: Hardware-secured oracle infrastructure
+5. **Community First**: Fair launch, no VCs, 70% community token allocation
+6. **Proven Architecture**: Building on Apex Fusion's established infrastructure
 
-1. **First Mover Advantage**: No other protocol has AI that creates smart contracts from natural language
-2. **Network Effects**: More users improve AI performance, creating better strategies that attract more users
-3. **Revenue Superiority**: Our dual CDP model generates 2.46x more revenue per dollar than competitors
-4. **Simplicity Moat**: Three clicks versus hours of learning creates an insurmountable user experience advantage
-5. **Cross-Chain Future**: Built for the multi-chain world from day one, not retrofitted
+### The Path Forward
 
-### The Journey Ahead
+We're building this with or without Catalyst funding, but your support would ensure we can do it right - with proper security, audits, and community involvement. As new developers, we're committed to transparency, learning, and building alongside the Cardano community.
 
-We're not just building a protocol—we're building the future of finance. A future where the promise of DeFi finally becomes reality for everyone, not just the technically sophisticated.
+**Our Ask:** Just ₳50,000 - the absolute minimum needed for security audits and core development. We will personally invest whatever additional capital is required to deliver the complete vision and ensure project success.
 
-Our vision is simple yet profound: **"Make my money work as hard as I do"** should be all anyone needs to say to access the world's best financial strategies.
+### Join Us
 
-### Join the Revolution
+**Vote for NyxUSD in Catalyst Fund 14 to:**
+1. **Support new builders** - Help new developers enter the Cardano ecosystem with fresh ideas
+2. **Enable capital-efficient CDPs** - 125% collateralization vs 400%+ on competitors
+3. **Bridge Cardano to EVM yields** - Access 10-100x better yields through proven protocols
+4. **Advance TEE oracle technology** - First CDP with hardware-secured price feeds
+5. **Participate in fair token launch** - NYX token via SundaeSwap TasteTest, no VCs
+6. **Build together** - Join us in creating something revolutionary for Cardano
 
-The DeFi revolution promised financial freedom for everyone. NyxUSD delivers on that promise.
+**Together, we're not just building a CDP – we're building the future of cross-chain DeFi on Cardano with minimal community investment, maximum transparency, and open collaboration.**
 
-**Get Started**:
-- 🌐 Website: [nyxusd.com]
-- 📱 App: [app.nyxusd.com]
-- 🎮 Discord: [discord.gg/nyxusd]
-- 🐦 Twitter: [@nyxusd]
-- 📚 Docs: [docs.nyxusd.com]
-- 💻 GitHub: [github.com/nyxusd]
+**Contact & Resources:**
+- **Email:** angel@nyxusd.com (for partnerships, collaboration, or joining the team)
+- **Demo:** [nyxusd.vercel.app]
+- **GitHub:** [To be created upon funding]
+- **Discord:** [Community ready to launch]
+- **Twitter:** [Updates and announcements]
 
-**Hackathon Demo**: [nyxusd.vercel.app]
+**Final Note:** We're building this with or without Catalyst funding, but your support would ensure we can do it right - with proper security, audits, and community involvement. As new developers, we're committed to transparency, learning, and building alongside the Cardano community. We invite experienced developers to join us in creating the future of cross-chain DeFi on Cardano. Contact us at angel@nyxusd.com if you want to be part of this journey.
 
 ---
 
@@ -893,20 +942,20 @@ The DeFi revolution promised financial freedom for everyone. NyxUSD delivers on 
 
 **Smart Contract Risk**: Despite comprehensive audits and formal verification, smart contracts may contain undiscovered vulnerabilities.
 
-**AI Risk**: Machine learning models may make suboptimal decisions, particularly in unprecedented market conditions.
+**Oracle Risk**: TEE oracle system, while highly secure, may face hardware or software failures affecting price feeds.
 
-**Market Risk**: Cryptocurrency markets are highly volatile and all investment strategies carry risk of loss.
-
-**Regulatory Risk**: The regulatory landscape for DeFi and AI-powered financial services continues to evolve and may impact operations.
+**Market Risk**: Cryptocurrency markets are highly volatile and all CDP strategies carry risk of liquidation.
 
 **Bridge Risk**: Cross-chain operations introduce additional security considerations and potential points of failure.
 
-**Technology Risk**: Dependence on external infrastructure including oracles, RPC nodes, and AI services creates operational dependencies.
+**Technology Risk**: Dependence on external infrastructure including Apex Fusion bridges, TxPipe tools, and oracle services creates operational dependencies.
+
+**Team Experience Risk**: We are new developers building our first major protocol, though we are committed to extensive auditing and community collaboration.
 
 Users should carefully consider these risks and only invest funds they can afford to lose. Past performance does not guarantee future results.
 
 ---
 
-*NyxUSD: Where AI Meets DeFi. Where Complexity Becomes Simplicity.*
+*NyxUSD: Bridging Cardano to Cross-Chain Yields. First User-Defined Interest Rate CDP.*
 
-**Hackathon Submission** | **August 2025** | **Status**: Pre-MVP Demo
+**Cardano Catalyst Fund 14 Proposal** | **August 2025** | **Status**: Community Funding Phase
