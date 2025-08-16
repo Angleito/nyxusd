@@ -1,20 +1,9 @@
 /**
  * NyxUSD Frontend Services
  * 
- * Barrel export for all service modules in the NyxUSD frontend.
- * Includes API clients, business logic, and utility services.
+ * Essential services for deployment
  */
 
-// Core API and service modules
-export * from './api';
+// Core services only
 export * from './chatMemoryService';
-export * from './pdfExportService';
-export * from './poolsService';
-export * from './swapDetectionService';
-export * from './tokenService';
-
-// Feature-specific services
 export * from './ai';
-export * from './defi';
-export * from './strategy';
-export * from './voice';

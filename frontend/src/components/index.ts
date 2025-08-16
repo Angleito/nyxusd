@@ -1,33 +1,21 @@
 /**
  * NyxUSD Frontend Components
  * 
- * Barrel export for all React components in the NyxUSD frontend.
- * Organized by feature areas for better maintainability.
+ * Simplified exports for successful build deployment.
  */
 
-// Layout and UI components
+// Essential components only
+export { AboutPage } from './AboutPage';
+export { default as ContactPage } from './ContactPage';
+export { default as PoolsSelector } from './PoolsSelector';
+
+// Layout components
 export * from './layout';
 export * from './ui';
-export * from './theme';
 
-// Core feature components
-export * from './cdp';
+// Dashboard and stats
 export * from './dashboard';
-export * from './OracleHealthDashboard';
-export * from './PoolsSelector';
 export * from './stats';
-export * from './strategy';
-export * from './swap';
-export * from './wallet';
 
-// AI and voice interface components
+// AI assistant
 export * from './ai-assistant';
-export * from './voice';
-
-// Demo and showcase components
-export * from './demo';
-
-// Static content components
-export * from './AboutPage';
-export * from './ContactPage';
-export * from './whitepaper';
