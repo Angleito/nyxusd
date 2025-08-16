@@ -22,7 +22,7 @@ export const DEMO_SCENARIOS: DemoScenario[] = [
     aiResponses: [
       "Based on your $50k portfolio and preference for low-risk investments, I recommend the Safe Pool with 5-10% APY.",
       "I'll allocate 70% to stable yield protocols like Aave and Compound, 20% to stablecoin liquidity pools, and keep 10% as a safety buffer.",
-      "This strategy targets 8% annual returns while maintaining a 95/100 safety score. Would you like me to create the smart contracts?"
+      "This strategy targets 8% annual returns while maintaining a 95/100 safety score. Would you like me to help you monitor your position?"
     ],
     duration: 30
   },
@@ -76,7 +76,7 @@ export const DEMO_METRICS = {
 };
 
 export const AI_DEMO_RESPONSES = {
-  greeting: "Hi! I'm Nyx, your AI wealth guardian. I can create custom smart contracts from your plain English requests.",
+  greeting: "Hi! I'm Nyx, your AI position manager. I help you monitor and manage your CDP positions safely.",
   
   tokenSearch: "I have access to 155+ tokens on Base network. Try searching for AERO, DEGEN, or HIGHER to see Base ecosystem gems!",
   
@@ -88,7 +88,7 @@ export const AI_DEMO_RESPONSES = {
   
   cdpExplanation: "Unlike MakerDAO, our CDPs generate dual revenue - you earn from stability fees AND your collateral works to generate yield!",
   
-  competitiveAdvantage: "I'm the first AI that actually generates custom smart contracts from conversation. No more manual DeFi management!"
+  competitiveAdvantage: "I'm an AI assistant focused on CDP position management and risk monitoring. No more manual liquidation worries!"
 };
 
 // Demo state management

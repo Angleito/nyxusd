@@ -20,46 +20,46 @@ interface Feature {
 export const KeyFeaturesGrid: React.FC = () => {
   const features: Feature[] = [
     {
-      icon: <FiCpu className="text-3xl" />,
-      title: "AI Contract Generation",
-      description: "First protocol where AI creates custom smart contracts from natural language requests",
+      icon: <FiLayers className="text-3xl" />,
+      title: "Capital Efficiency Leader",
+      description: "125% collateralization ratio vs Djed's 400-800%. Get 3x more liquidity from your ADA while maintaining security.",
       gradient: "from-purple-500 to-pink-500",
-      stats: "3% creation + 10% performance"
+      stats: "3x more efficient"
     },
     {
-      icon: <FiLayers className="text-3xl" />,
-      title: "Dual Revenue CDP Model",
-      description: "Earn from both stability fees (5%) AND deployed collateral yields (3-8%)",
+      icon: <FiCpu className="text-3xl" />,
+      title: "User-Defined Interest Rates",
+      description: "First Liquity V2 implementation on Cardano. Set your own borrowing terms based on risk tolerance.",
       gradient: "from-blue-500 to-purple-500",
-      stats: "2.46x revenue multiplier"
+      stats: "Your rate, your choice"
     },
     {
       icon: <FiGlobe className="text-3xl" />,
-      title: "Cross-Chain Native",
-      description: "Seamless yield optimization across Base and Sui without manual bridging",
+      title: "Three-Phase Architecture",
+      description: "Cardano → Vector L2 → Nexus EVM. Progressive enhancement across the Apex Fusion ecosystem.",
       gradient: "from-green-500 to-blue-500",
-      stats: "40% lower gas costs"
-    },
-    {
-      icon: <FiMessageCircle className="text-3xl" />,
-      title: "Natural Language Interface",
-      description: "Transform complex DeFi strategies into simple conversations with AI",
-      gradient: "from-pink-500 to-orange-500",
-      stats: "3 clicks to yield"
+      stats: "Cross-chain yields"
     },
     {
       icon: <FiLink className="text-3xl" />,
-      title: "CEX/DEX Hybrid Bridging",
-      description: "Intelligent routing between decentralized and centralized exchanges for optimal efficiency",
+      title: "TEE Oracle Security",
+      description: "Intel SGX hardware-secured price feeds with Charli3/Orcfax fallbacks. Price manipulation protection.",
       gradient: "from-cyan-500 to-blue-500",
-      stats: "Best execution paths"
+      stats: "Hardware secured"
     },
     {
       icon: <FiUsers className="text-3xl" />,
-      title: "Community Owned",
-      description: "50% of tokens allocated to community, ensuring true decentralization",
+      title: "Community First Launch",
+      description: "Fair launch via SundaeSwap TasteTest. 70% of NYX tokens go directly to the community.",
       gradient: "from-yellow-500 to-red-500",
-      stats: "500M NYX tokens"
+      stats: "70% community owned"
+    },
+    {
+      icon: <FiMessageCircle className="text-3xl" />,
+      title: "Post-Launch AI Features",
+      description: "Natural language CDP management and AI automation coming in Phase 4 after core protocol launch.",
+      gradient: "from-pink-500 to-orange-500",
+      stats: "Coming in Phase 4"
     }
   ];
 

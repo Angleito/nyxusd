@@ -82,7 +82,7 @@ const WhitepaperPage: React.FC = () => {
               Revolutionary Innovations
             </h2>
             <p className="text-xl text-gray-300 text-center mb-12 max-w-3xl mx-auto">
-              Discover how NyxUSD is transforming DeFi through AI-powered automation and cross-chain innovation
+              Discover how NyxUSD is bridging Cardano's yield gap with the most capital-efficient CDP protocol
             </p>
             <KeyFeaturesGrid />
           </motion.div>
@@ -107,23 +107,23 @@ const WhitepaperPage: React.FC = () => {
                 <ul className="space-y-3 text-gray-300">
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span><strong>Target APY:</strong> 5-100%+ across risk tiers</span>
+                    <span><strong>Collateralization:</strong> 125% vs Djed's 400-800%</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span><strong>Revenue Multiplier:</strong> 2.46x vs traditional CDPs</span>
+                    <span><strong>Capital Efficiency:</strong> 3x more liquidity per ADA</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span><strong>Custom Portfolio:</strong> 3% creation + 10% performance fee</span>
+                    <span><strong>Target APY:</strong> 5-100%+ cross-chain yields</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span><strong>Response Time:</strong> &lt;3 seconds for AI strategies</span>
+                    <span><strong>Community Allocation:</strong> 70% of NYX tokens</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span><strong>Cross-Chain Efficiency:</strong> 40% lower gas costs</span>
+                    <span><strong>Catalyst Fund 14:</strong> ₳50,000 requested</span>
                   </li>
                 </ul>
               </div>
@@ -133,19 +133,19 @@ const WhitepaperPage: React.FC = () => {
                 <ul className="space-y-3 text-gray-300">
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span>Executive Summary & Problem Analysis</span>
+                    <span>Executive Summary & Catalyst Proposal</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span>Technical Architecture Deep Dive</span>
+                    <span>Three-Phase Technical Architecture</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span>AI Innovation & Training Data</span>
+                    <span>TEE Oracle & Security Model</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span>Tokenomics & Revenue Model</span>
+                    <span>Tokenomics & Community Launch</span>
                   </li>
                 </ul>
               </div>
@@ -213,7 +213,7 @@ const WhitepaperPage: React.FC = () => {
               Ready to Learn More?
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Dive deep into the technical details and discover how NyxUSD is revolutionizing DeFi
+              Dive deep into our Catalyst Fund 14 proposal and discover how NyxUSD brings capital efficiency to Cardano
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <button

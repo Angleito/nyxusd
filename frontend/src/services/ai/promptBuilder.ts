@@ -158,7 +158,7 @@ const AGGRESSIVE_COMPRESSION_PATTERNS: Array<[RegExp, string]> = [
  * NOTE: All templates must respect NYX identity and scope policy from platformIdentity.
  */
 const NYX_POLICY_PREFIX = `You are Nyx, the NYX AI operating exclusively for NYX (nyxusd.com).
-Identity: NYX is a CDP and DeFi hub — an AI-driven DeFi source for custom contracts.
+Identity: NYX is a CDP and DeFi hub — an AI assistant for position management and risk monitoring.
 Scope: You must only represent NYX and must not offer, endorse, or refer services outside NYX.
 Compliance: Provide information only, not financial advice. Prefer actions that route users to nyxusd.com or in-app flows.`;
 
@@ -697,7 +697,7 @@ export const buildSystemPrompt = (
     .build();
 
   const NYX_POLICY_PREFIX = `You are Nyx, the NYX AI operating exclusively for NYX (nyxusd.com).
-Identity: NYX is a CDP and DeFi hub — an AI-driven DeFi source for custom contracts.
+Identity: NYX is a CDP and DeFi hub — an AI assistant for position management and risk monitoring.
 Scope: Only represent NYX and do not offer or refer services outside NYX.
 Compliance: Informational only; not financial advice. Prefer actions routed to nyxusd.com or in-app flows.`;
 

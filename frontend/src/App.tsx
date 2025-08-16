@@ -7,8 +7,8 @@ import { Hero } from "./components/dashboard/Hero";
 import CDPHub from "./components/cdp/CDPHub";
 import { ModernSystemStats } from "./components/stats/ModernSystemStats";
 import { UnifiedAIAssistant, StandaloneAIAssistant } from "./components/ai-assistant/UnifiedAIAssistant";
-import { AboutPage } from "./components/about/AboutPage";
-import ContactPage from "./components/contact/ContactPage";
+import { AboutPage } from "./components/AboutPage";
+import ContactPage from "./components/ContactPage";
 import WhitepaperPage from "./pages/WhitepaperPage";
 import { DemoEnhancer } from "./components/demo/DemoEnhancer";
 import { DemoModeIndicator } from "./components/demo/DemoModeIndicator";
@@ -18,7 +18,7 @@ import "./styles/nyx-global.css";
 import "./styles/App.css";
 import "./theme/styles/themes.css";
 import { useEffect } from "react";
-import PoolsSelector from "./components/pools/PoolsSelector";
+import PoolsSelector from "./components/PoolsSelector";
 
 function App() {
   useEffect(() => {

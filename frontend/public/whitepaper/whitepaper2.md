@@ -326,7 +326,7 @@ The NyxAI Brain consists of five specialized models working in concert:
 
 **Risk Assessor**: Analyzes 50+ risk factors in real-time, having learned from thousands of liquidation events. This model prevents 89% of potential liquidations through proactive position management.
 
-**Contract Generator**: Specialized in creating Solidity code, this model can generate safe, gas-efficient smart contracts in under 3 seconds. With training on 100,000+ audited contracts, it maintains a 99.9% safety record.
+**Position Manager**: Specialized in monitoring CDP positions and risk parameters, this model can assess liquidation risks and suggest position adjustments in real-time. With training on millions of historical liquidation events, it provides proactive position management.
 
 **Market Predictor**: Uses advanced time series analysis to forecast market movements 24-72 hours ahead with 72% directional accuracy, enabling proactive strategy adjustments.
 
@@ -339,7 +339,7 @@ Our models are continuously trained on vast on-chain datasets:
 - **Sui Network Integration**: Cross-chain patterns, bridging flows, arbitrage opportunities
 - **DeFi Protocol Analytics**: 10 million+ historical transactions across Aave, Compound, GMX
 - **Risk Pattern Recognition**: 50,000+ liquidation events for predictive modeling
-- **Smart Contract Templates**: 100,000+ audited contracts for safe code generation
+- **Position Analytics**: 100,000+ historical CDP positions for risk assessment and management
 
 This extensive training enables response times under 1 second for most operations while maintaining high accuracy and safety standards.
 
@@ -362,7 +362,7 @@ Users interact with NyxAI through natural conversation. For example, when someon
 
 The AI analyzes the user's timeline, risk tolerance, and goals to design a Conservative Growth Strategy. It might allocate 40% to the Safe Pool for stability, 35% to Medium Pool for growth, 20% to stablecoin liquidity pools for consistent yields, and keep 5% as a cash reserve.
 
-The AI provides detailed projections showing expected portfolio value, inflation-adjusted returns, and success probability. It then offers to create custom contracts that automatically rebalance quarterly, gradually shift to safer allocations as retirement approaches, and generate regular reports on performance.
+The AI provides detailed analysis of CDP position health, collateralization ratios, and liquidation risks. It offers position management recommendations to maintain healthy ratios and avoid liquidation events.
 
 #### 2. Real-Time Market Adaptation
 
@@ -536,7 +536,7 @@ Coverage amounts and fund size will be determined based on actual protocol usage
 
 Existing AI bots focus on trading with predefined strategies requiring technical configuration. They can't create new strategies or adapt to unique user requirements.
 
-NyxUSD's AI actually generates new smart contracts tailored to each user's needs, requiring zero configuration. Users simply describe what they want in plain English.
+NyxUSD's AI provides intelligent position management and risk monitoring, requiring zero configuration. Users can ask about their CDP health and receive clear guidance in plain English.
 
 #### Against VC-Backed "DeFi"
 

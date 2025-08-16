@@ -99,7 +99,7 @@ export const WhitepaperHero: React.FC<WhitepaperHeroProps> = ({ onViewClick }) =
             className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto"
           >
             Making DeFi Simple Through Intelligent Automation. Discover how we're revolutionizing 
-            decentralized finance with AI that creates custom smart contracts from natural language.
+            decentralized finance with AI-powered yield optimization and risk management.
           </motion.p>
 
           {/* CTA Buttons */}

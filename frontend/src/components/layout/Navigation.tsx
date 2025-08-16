@@ -24,44 +24,44 @@ interface NavSection {
 
 const mainNavItems: NavItem[] = [
   {
-    label: "Dashboard",
+    label: "Home",
     href: "/",
-    description: "Overview of your CDPs and system status",
+    description: "Cardano's most capital-efficient CDP protocol",
   },
   {
-    label: "Pools",
-    href: "/pools",
-    description: "Choose Safe, Medium, or High Risk pool",
-  },
-  {
-    label: "My CDPs",
+    label: "Create CDP",
     href: "/cdp",
-    description: "Manage your Collateralized Debt Positions",
+    description: "Mint NyxUSD at 125% collateralization",
+  },
+  {
+    label: "Yield Pools",
+    href: "/pools",
+    description: "Access cross-chain yields via risk-stratified pools",
   },
   {
     label: "System Stats",
     href: "/system",
-    description: "System-wide statistics and health metrics",
+    description: "Protocol health and performance metrics",
   },
   {
-    label: "Ape In",
-    href: "/chat",
-    description: "Chat with Nyx-chan to get started",
-  },
-  {
-    label: "White Paper",
+    label: "Whitepaper",
     href: "/whitepaper",
-    description: "Read our comprehensive technical documentation",
+    description: "Technical documentation and Catalyst proposal",
   },
   {
-    label: "About Us",
+    label: "About",
     href: "/about",
-    description: "Learn more about our platform and team",
+    description: "Our mission to bridge Cardano's yield gap",
   },
   {
     label: "Contact",
     href: "/contact",
-    description: "Get in touch with Angel",
+    description: "Get in touch - angel@nyxusd.com",
+  },
+  {
+    label: "AI Chat",
+    href: "/chat",
+    description: "Post-launch: Conversational CDP management",
   },
 ];
 

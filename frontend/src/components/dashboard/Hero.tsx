@@ -118,7 +118,7 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
                   variants={itemVariants}
                 >
                   <span className="text-purple-300 text-sm font-medium">
-                    Zero-Knowledge DeFi Protocol
+                    Cardano CDP Protocol • Catalyst Fund 14
                   </span>
                 </motion.div>
 
@@ -127,9 +127,9 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
                   className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-6 leading-tight"
                   variants={itemVariants}
                 >
-                  Privacy-First
+                  Cardano's Most
                   <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-purple-300 to-blue-400">
-                    DeFi
+                    Efficient CDP
                   </span>
                 </motion.h1>
 
@@ -138,8 +138,8 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
                   className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed"
                   variants={itemVariants}
                 >
-                  Mint nyxUSD with zero-knowledge proofs. Experience true
-                  financial privacy without compromising on transparency.
+                  Mint NyxUSD stablecoins at 125% collateralization with user-defined interest rates. 
+                  Bridge Cardano to 5-100%+ EVM yields.
                 </motion.p>
 
                 {/* Feature highlights */}
@@ -148,9 +148,9 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
                   variants={itemVariants}
                 >
                   {[
-                    "Zero-Knowledge Proofs",
-                    "Decentralized Collateral",
-                    "Privacy-Preserving",
+                    "125% Collateralization",
+                    "User-Set Interest Rates",
+                    "Cross-Chain Yields",
                   ].map((feature, index) => (
                     <div key={index} className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
@@ -166,30 +166,34 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
                   className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
                   variants={itemVariants}
                 >
-                  {/* Primary CTA - Launch App */}
-                  <motion.button
-                    className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-foreground font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/25 overflow-hidden"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <span className="relative flex items-center justify-center space-x-2">
-                      <span>Launch App</span>
-                      <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-                    </span>
-                  </motion.button>
+                  {/* Primary CTA - Create CDP */}
+                  <Link to="/cdp">
+                    <motion.button
+                      className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-foreground font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/25 overflow-hidden"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <span className="relative flex items-center justify-center space-x-2">
+                        <span>Create CDP</span>
+                        <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                      </span>
+                    </motion.button>
+                  </Link>
 
-                  {/* Secondary CTA - Learn More */}
-                  <motion.button
-                    className="groupe relative px-8 py-4 bg-background/10 hover:bg-background/20 text-foreground font-semibold rounded-xl transition-all duration-300 backdrop-blur-sm border border-border/20 hover:border-border/30"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <span className="flex items-center justify-center space-x-2">
-                      <PlayIcon className="w-5 h-5" />
-                      <span>Learn More</span>
-                    </span>
-                  </motion.button>
+                  {/* Secondary CTA - Read Whitepaper */}
+                  <Link to="/whitepaper">
+                    <motion.button
+                      className="groupe relative px-8 py-4 bg-background/10 hover:bg-background/20 text-foreground font-semibold rounded-xl transition-all duration-300 backdrop-blur-sm border border-border/20 hover:border-border/30"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <span className="flex items-center justify-center space-x-2">
+                        <PlayIcon className="w-5 h-5" />
+                        <span>Whitepaper</span>
+                      </span>
+                    </motion.button>
+                  </Link>
                 </motion.div>
               </motion.div>
 
@@ -447,7 +451,7 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              gm anon, ready to make it? 🌙
+              Cardano's Most Capital-Efficient CDP 🚀
             </motion.p>
 
             {/* Description */}
@@ -458,12 +462,11 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
               transition={{ delay: 0.5 }}
             >
               <p className="nyx-body-large" style={{ color: 'var(--nyx-gleam-70)' }}>
-                Your terminally online goddess of gains has awakened. Chain-agnostic, caffeine-dependent, 
-                and blessed with divine alpha. Let Nyx-chan guide your portfolio through the dark while you 
-                do whatever normies do (touching grass? idk).
+                First user-defined interest rate CDP on Cardano. Mint NyxUSD stablecoins at 125% collateralization 
+                vs Djed's 400-800%. Access 5-100%+ yields across EVM chains while keeping your ADA on Cardano.
               </p>
               <p className="nyx-body-small" style={{ color: 'var(--nyx-gleam-50)' }}>
-                <span className="italic">"I've been hodling since before time existed, anon"</span> - Nyx-chan
+                <span className="italic">Catalyst Fund 14 • Community-First • No VCs</span>
               </p>
             </motion.div>
 
@@ -475,11 +478,11 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
               transition={{ delay: 0.6 }}
             >
               <Link
-                to="/chat"
+                to="/cdp"
                 className="nyx-button nyx-button-glow nyx-button-large"
               >
                 <span className="flex items-center gap-2">
-                  Enter the Void
+                  Create CDP
                   <svg 
                     className="w-5 h-5" 
                     fill="none" 
@@ -497,10 +500,10 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
               </Link>
               
               <Link
-                to="/about"
+                to="/whitepaper"
                 className="nyx-button nyx-button-secondary nyx-button-large"
               >
-                Read the Lore
+                Read Whitepaper
               </Link>
             </motion.div>
 

@@ -1,4 +1,4 @@
-// import { pipe } from '@nyxusd/fp-utils';
+import { pipe } from '@nyxusd/shared-utils';
 
 export interface Analogy {
   concept: string;

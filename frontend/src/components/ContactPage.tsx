@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Card } from '../ui/Card';
+import { Card } from './ui/Card';
 
 interface ContactPageProps {
   className?: string;
@@ -46,7 +46,7 @@ const contactMethods: ContactMethod[] = [
     href: "mailto:angel@nyxusd.com",
     icon: "📧",
     gradient: "from-purple-600 to-pink-600",
-    description: "Direct email for professional inquiries"
+    description: "For partnerships, collaboration, or joining the team"
   },
   {
     label: "GitHub",
@@ -54,7 +54,7 @@ const contactMethods: ContactMethod[] = [
     href: "https://github.com/Angleito",
     icon: "💻",
     gradient: "from-gray-700 to-gray-900",
-    description: "Open source contributions and projects"
+    description: "NyxUSD protocol development and contributions"
   },
   {
     label: "LinkedIn",
@@ -62,7 +62,7 @@ const contactMethods: ContactMethod[] = [
     href: "https://www.linkedin.com/in/angel-ortega-melton-31647a186/",
     icon: "💼",
     gradient: "from-blue-600 to-blue-800",
-    description: "Professional network and experience"
+    description: "Professional network and Cardano ecosystem connections"
   },
   {
     label: "Twitter/X",
@@ -70,7 +70,7 @@ const contactMethods: ContactMethod[] = [
     href: "https://twitter.com/angleito5",
     icon: "🐦",
     gradient: "from-blue-400 to-blue-600",
-    description: "Updates and thoughts on crypto & tech"
+    description: "NyxUSD updates and Cardano DeFi insights"
   },
   {
     label: "Personal Website",
@@ -78,7 +78,7 @@ const contactMethods: ContactMethod[] = [
     href: "https://angelortegamelton.com",
     icon: "🌐",
     gradient: "from-purple-500 to-indigo-600",
-    description: "Portfolio and personal projects"
+    description: "Portfolio and blockchain development journey"
   }
 ];
 
@@ -122,7 +122,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ className }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Let's connect and unite the blockchain ecosystem through chain-agnostic innovation
+            Building Cardano's most capital-efficient CDP protocol. Let's create the future of cross-chain yield together.
           </motion.p>
           
           {/* Decorative element */}

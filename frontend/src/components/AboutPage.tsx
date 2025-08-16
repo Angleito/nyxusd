@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Card } from '../ui/Card';
+import { Card } from './ui/Card';
+import FAQSection from './faq/FAQSection';
 
 interface AboutPageProps {
   className?: string;
@@ -60,8 +61,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Building the chain-agnostic future with personalized investing experiences that adapt 
-            to each user's unique journey across every blockchain ecosystem.
+            Cardano's first user-defined interest rate CDP protocol. Bridging the yield gap 
+            between Cardano's security and EVM's opportunities with capital efficiency.
           </motion.p>
           
           {/* Decorative elements */}
@@ -82,14 +83,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                 Mission Statement
               </h2>
               <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-6">
-                Our mission is to unite the fragmented blockchain landscape by creating a truly chain-agnostic 
-                stablecoin protocol. We're breaking down the walls between chains, allowing liquidity and 
-                technology to flow seamlessly across all ecosystems. Built with AI at its core, NyxUSD adapts to any chain.
+                Our mission is to unlock Cardano's capital efficiency by creating the most advanced CDP protocol 
+                on the blockchain. We bridge Cardano's academic rigor and security with EVM's yield opportunities, 
+                enabling ADA holders to access 5-100%+ yields while maintaining their home base on Cardano.
               </p>
               <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-                As a chain-agnostic protocol, NyxUSD doesn't just bridge chains—it unites them. Our AI learns 
-                your investing style, risk tolerance, and goals to deliver personalized strategies. Every user gets 
-                an adapted experience tailored to their unique financial journey, regardless of which blockchain they prefer.
+                By implementing user-defined interest rates and 125% collateralization, we provide 3x better capital 
+                efficiency than existing Cardano CDPs. Our three-phase architecture (Cardano → Vector → Nexus) creates 
+                a seamless bridge to cross-chain yields, with AI automation planned for post-launch enhancement.
               </p>
             </div>
           </Card>
@@ -105,39 +106,39 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
                 {
-                  title: "Personalized Investing",
-                  description: "AI that learns your unique investing style and adapts strategies to your goals, risk profile, and preferences for truly personalized DeFi.",
-                  icon: "🔒",
+                  title: "Capital Efficiency",
+                  description: "125% collateralization ratio vs Djed's 400-800%. Get 3x more liquidity from your ADA while maintaining security and stability.",
+                  icon: "🚀",
                   gradient: "from-purple-500 to-indigo-500"
                 },
                 {
-                  title: "Adapted User Experiences", 
-                  description: "Every user gets a tailored interface and investment journey. Our AI adapts complexity, recommendations, and strategies to match your expertise level.",
-                  icon: "🌍",
+                  title: "User Control", 
+                  description: "Set your own interest rates based on your risk tolerance. Lower rates for higher risk, premium rates for liquidation protection.",
+                  icon: "⚙️",
                   gradient: "from-blue-500 to-cyan-500"
                 },
                 {
-                  title: "Truly Inclusive",
-                  description: "No geographical restrictions, no minimum requirements, no gatekeepers—financial tools that work for everyone, everywhere.",
-                  icon: "🤝",
+                  title: "Cardano First",
+                  description: "Built specifically for Cardano using Plutus/Aiken contracts with IOG formal verification. Your ADA stays on the most secure blockchain.",
+                  icon: "🛡️",
                   gradient: "from-green-500 to-emerald-500"
                 },
                 {
                   title: "Community Driven",
-                  description: "Decentralized governance puts power in the hands of users, ensuring the protocol evolves to serve its community's needs.",
+                  description: "Fair launch via SundaeSwap TasteTest. No VCs, no special allocations. 70% of NYX tokens go directly to the community.",
                   icon: "👥",
                   gradient: "from-orange-500 to-red-500"
                 },
                 {
-                  title: "Transparent Innovation",
-                  description: "Open-source development and public audits ensure you can verify how your money is protected and managed.",
-                  icon: "🔍",
+                  title: "Cross-Chain Yields",
+                  description: "Access 5-100%+ yields on EVM chains while keeping your ADA collateral secure on Cardano. Best of both worlds.",
+                  icon: "🌍",
                   gradient: "from-yellow-500 to-orange-500"
                 },
                 {
-                  title: "Sustainable Growth",
-                  description: "Long-term economic models designed for stability and growth, not speculation or unsustainable yields.",
-                  icon: "🌱",
+                  title: "TEE Security",
+                  description: "Hardware-secured oracle using Intel SGX with Charli3/Orcfax fallbacks. Price manipulation becomes virtually impossible.",
+                  icon: "🔐",
                   gradient: "from-teal-500 to-green-500"
                 }
               ].map((value, index) => (
@@ -175,24 +176,24 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
               <div className="grid md:grid-cols-2 gap-10">
                 {[
                   {
-                    title: "Chain-Agnostic Architecture",
-                    description: "Built to be truly chain-agnostic, uniting liquidity and technology across all blockchains. One protocol, infinite possibilities, zero boundaries.",
-                    icon: "🌙"
+                    title: "Three-Phase Architecture",
+                    description: "Cardano mainnet for security → Vector L2 for performance → Nexus EVM for yields. Progressive enhancement across the Apex Fusion ecosystem.",
+                    icon: "🏗️"
                   },
                   {
-                    title: "Unified Liquidity Network", 
-                    description: "We don't just bridge liquidity—we unite it. Access the combined liquidity of all chains through our chain-agnostic protocol with AI optimization.",
+                    title: "User-Defined Interest Rates", 
+                    description: "First Liquity V2 implementation on Cardano. Set your own borrowing terms, balance cost vs liquidation risk, natural rate discovery.",
+                    icon: "⚙️"
+                  },
+                  {
+                    title: "TEE Oracle Security",
+                    description: "Intel SGX hardware-secured price feeds with cryptographic attestation. Multi-source aggregation with Charli3/Orcfax fallbacks.",
                     icon: "🔐"
                   },
                   {
-                    title: "Personal Investment AI",
-                    description: "Your personalized DeFi companion that adapts to your investing style, learns your preferences, and provides tailored strategies for your unique financial goals.",
-                    icon: "🧠"
-                  },
-                  {
-                    title: "Universal Access",
-                    description: "No KYC requirements, no geographical restrictions, no minimum deposits—designed to work for anyone with an internet connection.",
-                    icon: "🌐"
+                    title: "Dual Revenue Model",
+                    description: "Earn from both stability fees AND deployed collateral yields. Protocol deploys minted stablecoins into yield strategies for compounding returns.",
+                    icon: "💰"
                   }
                 ].map((tech, index) => (
                   <motion.div
@@ -235,14 +236,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                   Our Team
                 </h3>
                 <p className="text-lg text-gray-300 leading-relaxed">
-                  We're a distributed team of AI researchers, blockchain experts, 
-                  and DeFi pioneers united by the belief that financial freedom 
-                  should be universal, intelligent, and simple to access.
+                  We're building Cardano's most capital-efficient CDP protocol, focused on bridging 
+                  the yield gap between Cardano's security and EVM opportunities while keeping 
+                  your ADA safe on the most academically rigorous blockchain.
                 </p>
                 <p className="text-lg text-gray-300 leading-relaxed">
-                  Our expertise spans cryptography, user experience design, AI research, 
-                  and inclusive technology development—all focused on breaking down the 
-                  barriers that keep people from financial sovereignty.
+                  Our expertise spans Cardano development, TEE security, cross-chain architecture, 
+                  and community-driven governance—all focused on making Cardano DeFi 
+                  accessible and capital efficient for everyone.
                 </p>
                 <p className="text-lg text-gray-300 leading-relaxed mt-4">
                   Learn more about our founder: 
@@ -330,19 +331,26 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                   className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-lg font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-xl hover:shadow-purple-500/25 hover:scale-105"
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.98 }}
+                  onClick={() => window.location.href = '/cdp'}
                 >
-                  Get Started with AI Assistant
+                  Create Your First CDP
                 </motion.button>
                 <motion.button
                   className="px-8 py-4 bg-transparent border-2 border-purple-500 text-purple-300 text-lg font-semibold rounded-xl hover:bg-purple-500/10 transition-all duration-300 hover:scale-105"
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.98 }}
+                  onClick={() => window.location.href = '/whitepaper'}
                 >
-                  Explore Documentation
+                  Read Catalyst Proposal
                 </motion.button>
               </motion.div>
             </motion.div>
           </Card>
+        </motion.section>
+
+        {/* FAQ Section */}
+        <motion.section variants={sectionVariants}>
+          <FAQSection />
         </motion.section>
       </motion.div>
     </div>
