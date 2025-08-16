@@ -9,7 +9,7 @@ import React, {
 import { useAIService } from "../hooks/useAIService";
 import { swapDetectionService } from "../services/swapDetectionService";
 import { transactionService } from "../services/defi/transactionService";
-import { chatMemoryService } from "../services/memory/chatMemoryService";
+import { chatMemoryService } from "../services/chatMemoryService";
 import { useAccount, useChainId } from "wagmi";
 
 export type ConversationStep =

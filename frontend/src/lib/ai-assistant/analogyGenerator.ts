@@ -1,4 +1,6 @@
-import { pipe } from '@nyxusd/shared-utils';
+// Simple pipe implementation
+const pipe = <T>(value: T, ...fns: Array<(arg: T) => any>) => 
+  fns.reduce((acc, fn) => fn(acc), value);
 
 export interface Analogy {
   concept: string;

@@ -5,7 +5,7 @@ import { ChatMessage } from "./ChatMessage";
 import { TypingIndicator } from "./TypingIndicator";
 import { enhancedAIService } from "../../services/ai/enhancedAIService";
 import { useWallet } from "../../hooks/useWallet";
-import { chatMemoryService, ChatMessage as MemoryMessage } from "../../services/memory/chatMemoryService";
+import { chatMemoryService, ChatMessage as MemoryMessage } from "../../services/chatMemoryService";
 import { ConversationStep } from "../../providers/AIAssistantProvider";
 import { swapDetectionService } from "../../services/swapDetectionService";
 import { SwapInterface } from "../swap/SwapInterface";
