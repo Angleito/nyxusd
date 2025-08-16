@@ -1,15 +1,68 @@
 /* NYX Design System - Global Styles */
 
-/* Import all NYX design tokens and components */
-@import '../nyx-design-system/tokens/colors.css';
-@import '../nyx-design-system/tokens/typography.css';
-@import '../nyx-design-system/tokens/spacing.css';
-@import '../nyx-design-system/tokens/effects.css';
-@import '../nyx-design-system/components/buttons.css';
-@import '../nyx-design-system/components/cards.css';
-@import '../nyx-design-system/components/forms.css';
-@import '../nyx-design-system/utilities/animations.css';
-@import '../nyx-design-system/utilities/effects.css';
+/* Define NYX design tokens inline for build compatibility */
+:root {
+  /* NYX Color Palette */
+  --nyx-cosmic-black: #0a0a0a;
+  --nyx-void-90: #1a1a1a;
+  --nyx-void-80: #2a2a2a;
+  --nyx-void-70: #3a3a3a;
+  --nyx-void-60: #4a4a4a;
+  --nyx-void-50: #5a5a5a;
+  --nyx-void-40: #6a6a6a;
+  --nyx-gleam-50: #7a7a7a;
+  --nyx-gleam-60: #8a8a8a;
+  --nyx-gleam-70: #9a9a9a;
+  --nyx-gleam-80: #aaa;
+  --nyx-gleam-90: #bbb;
+  --nyx-gleam-100: #fff;
+  
+  /* NYX Brand Colors */
+  --nyx-electric-purple: #8b5cf6;
+  --nyx-neon-cyan: #06b6d4;
+  --nyx-plasma-pink: #ec4899;
+  --nyx-star-silver: #f8fafc;
+  --nyx-error: #ef4444;
+  --nyx-success: #10b981;
+  --nyx-gold-circuit: #f59e0b;
+  
+  /* NYX Gradients */
+  --nyx-nebula-start: #8b5cf6;
+  --nyx-nebula-mid: #06b6d4;
+  --nyx-nebula-end: #ec4899;
+  
+  /* NYX Typography */
+  --nyx-font-display: 'Inter', system-ui, sans-serif;
+  --nyx-font-body: 'Inter', system-ui, sans-serif;
+  --nyx-weight-normal: 400;
+  --nyx-weight-medium: 500;
+  --nyx-weight-semibold: 600;
+  --nyx-weight-bold: 700;
+  
+  /* NYX Spacing */
+  --nyx-space-xs: 0.25rem;
+  --nyx-space-sm: 0.5rem;
+  --nyx-space-md: 1rem;
+  --nyx-space-lg: 1.5rem;
+  --nyx-space-xl: 2rem;
+  --nyx-space-2xl: 3rem;
+  --nyx-space-galaxy: 4rem;
+  
+  /* NYX Effects */
+  --nyx-transition-fast: 150ms ease;
+  --nyx-transition-normal: 250ms ease;
+  --nyx-transition-slow: 350ms ease;
+  --nyx-blur-sm: 4px;
+  --nyx-blur-md: 8px;
+  --nyx-blur-lg: 16px;
+  --nyx-blur-xl: 24px;
+  
+  /* NYX Layout */
+  --nyx-gap-sm: 0.5rem;
+  --nyx-gap-md: 1rem;
+  --nyx-gap-lg: 1.5rem;
+  --nyx-gap-xl: 2rem;
+}
 
 /* Global styles */
 * {
