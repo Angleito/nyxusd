@@ -353,7 +353,7 @@ const LIFESTYLE_EXAMPLES: Record<Lifestyle, string[]> = {
     "Build a diversified portfolio that can adapt to different market conditions",
   ],
   spontaneous: [
-    'Keep some \"opportunity funds\" for exciting investment prospects',
+    'Keep some "opportunity funds" for exciting investment prospects',
     "Use apps that round up purchases and invest the change automatically",
     "Consider investments that allow you to participate in trends you're passionate about",
   ],

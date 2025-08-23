@@ -62,7 +62,7 @@ const contactMethods: ContactMethod[] = [
     href: "https://www.linkedin.com/in/angel-ortega-melton-31647a186/",
     icon: "💼",
     gradient: "from-blue-600 to-blue-800",
-    description: "Professional network and Cardano ecosystem connections"
+    description: "Professional network and Base ecosystem connections"
   },
   {
     label: "Twitter/X",
@@ -70,7 +70,7 @@ const contactMethods: ContactMethod[] = [
     href: "https://twitter.com/angleito5",
     icon: "🐦",
     gradient: "from-blue-400 to-blue-600",
-    description: "NyxUSD updates and Cardano DeFi insights"
+    description: "NyxUSD updates and Base DeFi insights"
   },
   {
     label: "Personal Website",
@@ -122,7 +122,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ className }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Building Cardano's most capital-efficient CDP protocol. Let's create the future of cross-chain yield together.
+            Building Base Network's most capital-efficient CDP protocol. Let's create the future of AI-powered DeFi together.
           </motion.p>
           
           {/* Decorative element */}
@@ -138,7 +138,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ className }) => {
           className="grid md:grid-cols-2 gap-6 mb-16"
           variants={containerVariants}
         >
-          {contactMethods.map((method, index) => (
+          {contactMethods.map((method) => (
             <motion.div
               key={method.label}
               variants={itemVariants}

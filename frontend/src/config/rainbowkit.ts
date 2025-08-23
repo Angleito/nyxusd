@@ -103,7 +103,7 @@ export const rainbowkitConnectors = connectorsForWallets(
   {
     appName: 'NYX USD',
     // Provide a projectId (fallback value is fine when WalletConnect is disabled)
-    projectId: walletConnectProjectId!,
+    projectId: String(walletConnectProjectId!),
   }
 );
 

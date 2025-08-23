@@ -26,7 +26,7 @@ const mainNavItems: NavItem[] = [
   {
     label: "Home",
     href: "/",
-    description: "Cardano's most capital-efficient CDP protocol",
+    description: "Base Network's most capital-efficient CDP protocol",
   },
   {
     label: "Create CDP",
@@ -46,12 +46,12 @@ const mainNavItems: NavItem[] = [
   {
     label: "Whitepaper",
     href: "/whitepaper",
-    description: "Technical documentation and Catalyst proposal",
+    description: "Technical documentation and project overview",
   },
   {
     label: "About",
     href: "/about",
-    description: "Our mission to bridge Cardano's yield gap",
+    description: "Our mission to revolutionize Base Network DeFi",
   },
   {
     label: "Contact",

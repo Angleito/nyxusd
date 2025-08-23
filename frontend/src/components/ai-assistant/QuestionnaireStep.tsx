@@ -11,11 +11,14 @@ import {
   Search,
 } from "lucide-react";
 import occupationData from "../../data/occupationSuggestions.json";
-import type { OccupationData } from "../../types";
+
+interface QuestionnaireData {
+  [key: string]: string | number | string[] | boolean;
+}
 
 interface QuestionnaireStepProps {
   step: string;
-  onComplete: (data?: any) => void;
+  onComplete: (data?: QuestionnaireData) => void;
 }
 
 export const QuestionnaireStep: React.FC<QuestionnaireStepProps> = ({

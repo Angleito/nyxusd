@@ -82,7 +82,7 @@ const WhitepaperPage: React.FC = () => {
               Revolutionary Innovations
             </h2>
             <p className="text-xl text-gray-300 text-center mb-12 max-w-3xl mx-auto">
-              Discover how NyxUSD is bridging Cardano's yield gap with the most capital-efficient CDP protocol
+              Discover how NyxUSD revolutionizes Base Network DeFi with the most capital-efficient AI-powered CDP protocol
             </p>
             <KeyFeaturesGrid />
           </motion.div>
@@ -123,7 +123,7 @@ const WhitepaperPage: React.FC = () => {
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span><strong>Catalyst Fund 14:</strong> ₳50,000 requested</span>
+                    <span><strong>Community Funding:</strong> No VC backing</span>
                   </li>
                 </ul>
               </div>
@@ -133,7 +133,7 @@ const WhitepaperPage: React.FC = () => {
                 <ul className="space-y-3 text-gray-300">
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
-                    <span>Executive Summary & Catalyst Proposal</span>
+                    <span>Executive Summary & Technical Overview</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-500">•</span>
@@ -213,7 +213,7 @@ const WhitepaperPage: React.FC = () => {
               Ready to Learn More?
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Dive deep into our Catalyst Fund 14 proposal and discover how NyxUSD brings capital efficiency to Cardano
+              Dive deep into our technical architecture and discover how NyxUSD brings revolutionary capital efficiency to Base Network
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <button

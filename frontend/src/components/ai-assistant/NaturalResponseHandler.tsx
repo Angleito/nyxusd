@@ -7,8 +7,16 @@ import {
   generateConfirmationMessage,
 } from "../../lib/ai-assistant/naturalLanguageProcessor";
 
+interface ActionValue {
+  amount?: number;
+  token?: string;
+  address?: string;
+  protocol?: string;
+  [key: string]: unknown;
+}
+
 interface NaturalResponseHandlerProps {
-  onAutoAction?: (action: string, value?: any) => void;
+  onAutoAction?: (action: string, value?: ActionValue) => void;
 }
 
 export const NaturalResponseHandler: React.FC<NaturalResponseHandlerProps> = ({

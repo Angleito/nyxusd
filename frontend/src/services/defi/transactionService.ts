@@ -245,8 +245,8 @@ export class TransactionService {
         args: [
           approval.spender as `0x${string}`,
           BigInt(approval.amount)
-        ]
-      });
+        ],
+      } as any);
 
       const receipt = await waitForTransactionReceipt(wagmiConfig, {
         hash,

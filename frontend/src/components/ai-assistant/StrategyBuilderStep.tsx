@@ -2,15 +2,19 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAIAssistant } from "../../providers/AIAssistantProvider";
 import {
-  StrategyService,
   ProtocolIntegrationService,
-  YieldAggregatorService,
   type ProtocolPosition,
   type StrategyAllocation,
 } from "../../services/strategy";
 
+interface StrategyBuilderData {
+  allocations: StrategyAllocation[];
+  totalAllocation: number;
+  leverageEnabled: boolean;
+}
+
 interface StrategyBuilderStepProps {
-  onComplete?: (data?: any) => void;
+  onComplete?: (data?: StrategyBuilderData) => void;
 }
 
 export const StrategyBuilderStep: React.FC<StrategyBuilderStepProps> = ({
@@ -94,16 +98,17 @@ export const StrategyBuilderStep: React.FC<StrategyBuilderStepProps> = ({
       return;
     }
 
-    // Store strategy in user profile
-    updateUserProfile({
-      // Strategy is stored separately, not as part of UserProfile
-      // This is handled by the context provider
-    } as any);
+    // Strategy is stored separately in the component state
+    // Leverage settings are handled below
 
     if (state.userProfile?.riskTolerance !== "conservative") {
       setShowLeverageOption(true);
     } else {
-      onComplete?.();
+      onComplete?.({
+        allocations,
+        totalAllocation,
+        leverageEnabled: false
+      });
     }
   };
 
@@ -313,8 +318,11 @@ export const StrategyBuilderStep: React.FC<StrategyBuilderStepProps> = ({
           <div className="flex space-x-3">
             <button
               onClick={() => {
-                updateUserProfile({ leverageEnabled: false } as any);
-                onComplete?.();
+                onComplete?.({
+                  allocations,
+                  totalAllocation,
+                  leverageEnabled: false
+                });
               }}
               className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
             >
@@ -322,11 +330,11 @@ export const StrategyBuilderStep: React.FC<StrategyBuilderStepProps> = ({
             </button>
             <button
               onClick={() => {
-                updateUserProfile({
-                  leverageEnabled: true,
-                  leverageMultiplier: 1.5,
-                } as any);
-                onComplete?.();
+                onComplete?.({
+                  allocations,
+                  totalAllocation,
+                  leverageEnabled: true
+                });
               }}
               className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
             >

@@ -4,6 +4,20 @@ import { fetchCDPs } from "../../services/api";
 // import { CDPCard } from './CDPCard'
 // import { CreateCDPWizard } from './CreateCDPWizard'
 
+interface CDP {
+  id: string;
+  collateralAmount: string;
+  debtAmount: string;
+  healthFactor: number;
+  collateralType: string;
+  liquidationPrice: number;
+  interestRate: number;
+}
+
+interface CDPData {
+  cdps: CDP[];
+}
+
 interface QuickStatsCardProps {
   title: string;
   value: string;
@@ -130,7 +144,7 @@ const RiskIndicatorCard: React.FC<RiskIndicatorCardProps> = ({
 const CDPDashboard: React.FC = () => {
   const [showCreateWizard, setShowCreateWizard] = useState(false);
   const [expandedActions, setExpandedActions] = useState(false);
-  const [selectedAsset, setSelectedAsset] = useState<any>(null);
+  const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
 
   const { data: cdpData, isLoading } = useQuery({
     queryKey: ["cdps"],
@@ -138,22 +152,22 @@ const CDPDashboard: React.FC = () => {
   });
 
   // Calculate dashboard metrics
-  const cdps = (cdpData as any)?.cdps || [];
+  const cdps = (cdpData as CDPData)?.cdps || [];
   const totalCDPs = cdps.length;
   const totalCollateralValue = cdps.reduce(
-    (sum: number, cdp: any) => sum + parseInt(cdp.collateralAmount) / 1e18,
+    (sum: number, cdp: CDP) => sum + parseInt(cdp.collateralAmount) / 1e18,
     0,
   );
   const totalDebt = cdps.reduce(
-    (sum: number, cdp: any) => sum + parseInt(cdp.debtAmount) / 1e18,
+    (sum: number, cdp: CDP) => sum + parseInt(cdp.debtAmount) / 1e18,
     0,
   );
   const averageHealthFactor =
     cdps.length > 0
-      ? cdps.reduce((sum: number, cdp: any) => sum + cdp.healthFactor, 0) /
+      ? cdps.reduce((sum: number, cdp: CDP) => sum + cdp.healthFactor, 0) /
         cdps.length
       : 0;
-  const cdpsAtRisk = cdps.filter((cdp: any) => cdp.healthFactor < 1.5).length;
+  const cdpsAtRisk = cdps.filter((cdp: CDP) => cdp.healthFactor < 1.5).length;
   const riskLevel: "low" | "medium" | "high" =
     averageHealthFactor >= 2
       ? "low"
@@ -338,7 +352,7 @@ const CDPDashboard: React.FC = () => {
           </div>
         ) : (
           <div className="grid gap-4">
-            {cdps.map((cdp: any) => (
+            {cdps.map((cdp: CDP) => (
               <div
                 key={cdp.id}
                 className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm"

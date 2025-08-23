@@ -29,14 +29,14 @@ export const KeyFeaturesGrid: React.FC = () => {
     {
       icon: <FiCpu className="text-3xl" />,
       title: "User-Defined Interest Rates",
-      description: "First Liquity V2 implementation on Cardano. Set your own borrowing terms based on risk tolerance.",
+      description: "Revolutionary Liquity V2 implementation on Base Network. Set your own borrowing terms with AI optimization.",
       gradient: "from-blue-500 to-purple-500",
       stats: "Your rate, your choice"
     },
     {
       icon: <FiGlobe className="text-3xl" />,
       title: "Three-Phase Architecture",
-      description: "Cardano → Vector L2 → Nexus EVM. Progressive enhancement across the Apex Fusion ecosystem.",
+      description: "Base Network → AI optimization → Multi-chain expansion. Progressive enhancement with cutting-edge automation.",
       gradient: "from-green-500 to-blue-500",
       stats: "Cross-chain yields"
     },

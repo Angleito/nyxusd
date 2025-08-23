@@ -118,7 +118,7 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
                   variants={itemVariants}
                 >
                   <span className="text-purple-300 text-sm font-medium">
-                    Cardano CDP Protocol • Catalyst Fund 14
+                    Base Network CDP Protocol • AI-Powered DeFi
                   </span>
                 </motion.div>
 
@@ -127,7 +127,7 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
                   className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-6 leading-tight"
                   variants={itemVariants}
                 >
-                  Cardano's Most
+                  Base Network's Most
                   <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-purple-300 to-blue-400">
                     Efficient CDP
                   </span>
@@ -139,7 +139,7 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
                   variants={itemVariants}
                 >
                   Mint NyxUSD stablecoins at 125% collateralization with user-defined interest rates. 
-                  Bridge Cardano to 5-100%+ EVM yields.
+                  Access 5-100%+ DeFi yields on Base network.
                 </motion.p>
 
                 {/* Feature highlights */}
@@ -150,7 +150,7 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
                   {[
                     "125% Collateralization",
                     "User-Set Interest Rates",
-                    "Cross-Chain Yields",
+                    "Base Network Native",
                   ].map((feature, index) => (
                     <div key={index} className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
@@ -237,9 +237,9 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
 
                     {/* Orbiting Collateral Types */}
                     {[
-                      { name: 'NIGHT', angle: 0, color: 'from-purple-500 to-purple-600' },
+                      { name: 'ETH', angle: 0, color: 'from-blue-500 to-blue-600' },
                       { name: 'BTC', angle: 120, color: 'from-orange-500 to-orange-600' },
-                      { name: 'DUST', angle: 240, color: 'from-violet-500 to-violet-600' }
+                      { name: 'USDC', angle: 240, color: 'from-green-500 to-green-600' }
                     ].map((collateral, index) => (
                       <motion.div
                         key={collateral.name}
@@ -451,7 +451,7 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              Cardano's Most Capital-Efficient CDP 🚀
+              Base Network's Most Capital-Efficient CDP 🚀
             </motion.p>
 
             {/* Description */}
@@ -462,11 +462,11 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
               transition={{ delay: 0.5 }}
             >
               <p className="nyx-body-large" style={{ color: 'var(--nyx-gleam-70)' }}>
-                First user-defined interest rate CDP on Cardano. Mint NyxUSD stablecoins at 125% collateralization 
-                vs Djed's 400-800%. Access 5-100%+ yields across EVM chains while keeping your ADA on Cardano.
+                Revolutionary user-defined interest rate CDP protocol on Base. Mint NyxUSD stablecoins at 125% collateralization 
+                with maximum capital efficiency. Access 5-100%+ DeFi yields across Base ecosystem.
               </p>
               <p className="nyx-body-small" style={{ color: 'var(--nyx-gleam-50)' }}>
-                <span className="italic">Catalyst Fund 14 • Community-First • No VCs</span>
+                <span className="italic">AI-Powered • Community-First • No VCs</span>
               </p>
             </motion.div>
 
@@ -478,11 +478,11 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
               transition={{ delay: 0.6 }}
             >
               <Link
-                to="/cdp"
+                to="/chat"
                 className="nyx-button nyx-button-glow nyx-button-large"
               >
                 <span className="flex items-center gap-2">
-                  Create CDP
+                  Speak to Nyx
                   <svg 
                     className="w-5 h-5" 
                     fill="none" 
@@ -503,7 +503,7 @@ export const Hero: React.FC<HeroProps> = ({ variant = "classic", show = true, cl
                 to="/whitepaper"
                 className="nyx-button nyx-button-secondary nyx-button-large"
               >
-                Read Whitepaper
+                Whitepaper
               </Link>
             </motion.div>
 

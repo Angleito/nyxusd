@@ -5,7 +5,7 @@
  * performance metrics, and consensus status
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 interface OracleMetrics {
@@ -53,7 +53,7 @@ export const OracleHealthDashboard: React.FC<OracleHealthDashboardProps> = ({
   className = "",
 }) => {
   const [selectedFeed, setSelectedFeed] = useState<string>('NIGHT/USD')
-  const [refreshInterval, setRefreshInterval] = useState(5000) // 5 seconds
+  const [refreshInterval] = useState(5000) // 5 seconds
 
   // Mock data - in production would fetch from API
   const { data: metrics, isLoading: metricsLoading } = useQuery({

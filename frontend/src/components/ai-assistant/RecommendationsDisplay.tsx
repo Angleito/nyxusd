@@ -43,7 +43,7 @@ const mockRecommendations: Recommendation[] = [
     expectedReturn: "3-8% APY",
     riskLevel: "medium",
     explanation:
-      "NIGHT staking on Midnight Protocol provides privacy-preserving rewards while generating DUST tokens for free transactions. Built on Cardano's proven PoS consensus.",
+      "ETH staking on Base Network provides secure rewards with low gas fees and fast transactions. Built on Ethereum's proven security with L2 efficiency.",
     color: "#8B5CF6",
   },
   {

@@ -81,7 +81,7 @@ export const DEMO_TRANSACTIONS = {
 };
 
 export const isDemoMode = (): boolean => {
-  return process.env.VITE_DEMO_MODE === 'true' || DEMO_CONFIG.enabled;
+  return import.meta.env.VITE_DEMO_MODE === 'true' || DEMO_CONFIG.enabled;
 };
 
 export const getDemoWallet = (index: number = 0): DemoWallet | null => {

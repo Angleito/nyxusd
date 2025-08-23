@@ -108,9 +108,11 @@ export function withVoiceErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
   fallback?: ReactNode
 ): React.ComponentType<P> {
-  return (props: P) => (
+  const WrappedComponent = (props: P) => (
     <VoiceErrorBoundary fallback={fallback}>
       <Component {...props} />
     </VoiceErrorBoundary>
   );
+  WrappedComponent.displayName = `withVoiceErrorBoundary(${Component.displayName || Component.name || 'Component'})`;
+  return WrappedComponent;
 }

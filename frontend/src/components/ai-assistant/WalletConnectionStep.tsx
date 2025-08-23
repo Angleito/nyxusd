@@ -3,10 +3,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Wallet, CheckCircle, AlertCircle } from "lucide-react";
 import { useAccount, useConnect, useBalance } from "wagmi";
 import { formatAddress, formatBalance, getWalletErrorMessage } from "../../lib/wallet";
-import { parseUnits } from "viem";
+
+interface WalletData {
+  address: string;
+  balance?: string;
+  isConnected: boolean;
+}
 
 interface WalletConnectionStepProps {
-  onComplete: (data?: any) => void;
+  onComplete: (data?: WalletData) => void;
 }
 
 export const WalletConnectionStep: React.FC<WalletConnectionStepProps> = ({

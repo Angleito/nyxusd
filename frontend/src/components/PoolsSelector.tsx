@@ -76,7 +76,7 @@ const PoolIcon: React.FC<{ risk: Pool['risk'] }> = ({ risk }) => {
 };
 
 export const PoolsSelector: React.FC<Props> = ({ onSelect }) => {
-  // Mock data for Cardano CDP yield pools
+  // Mock data for Base Network CDP yield pools
   const pools: Pool[] = [
     {
       id: 'safe',
@@ -85,7 +85,7 @@ export const PoolsSelector: React.FC<Props> = ({ onSelect }) => {
       description: 'Stable yields from established DeFi protocols. Focus on liquidity provision and staking rewards with minimal impermanent loss risk.',
       risk: 'safe',
       perfectFor: ['First-time users', 'Capital preservation', 'Steady income'],
-      targetChains: ['Cardano', 'Base', 'Arbitrum']
+      targetChains: ['Base', 'Ethereum', 'Arbitrum']
     },
     {
       id: 'medium',

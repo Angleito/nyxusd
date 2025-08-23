@@ -23,6 +23,7 @@ interface ImportMetaEnv {
   readonly VITE_BASE_RPC_URL: string
   readonly VITE_ARBITRUM_RPC_URL: string
   readonly VITE_OPTIMISM_RPC_URL: string
+  readonly VITE_DEMO_MODE: string
 }
 
 interface ImportMeta {

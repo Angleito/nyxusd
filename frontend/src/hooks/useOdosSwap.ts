@@ -99,9 +99,9 @@ export function useOdosSwap() {
         to: quote.routerAddress as Address,
         data: quote.callData as `0x${string}`,
         value: BigInt(quote.value),
-        account: address,
+        account: walletClient.account,
         chain: walletClient.chain,
-      });
+      } as any);
 
       // Wait for transaction confirmation
       const receipt = await publicClient.waitForTransactionReceipt({

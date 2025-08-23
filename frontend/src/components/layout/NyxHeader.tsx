@@ -16,21 +16,21 @@ interface Chain {
 }
 
 const chains: Chain[] = [
-  { id: "cardano", name: "Cardano", themeId: "midnight", color: "#0033AD", dotColor: "#0033AD" },
-  { id: "vector", name: "Vector L2", themeId: "midnight", color: "#7C3AED", dotColor: "#7C3AED" },
-  { id: "nexus", name: "Nexus EVM", themeId: "base", color: "#0052FF", dotColor: "#0052FF" },
-  { id: "ethereum", name: "Ethereum", themeId: "midnight", color: "#8B5CF6", dotColor: "#8B5CF6" },
   { id: "base", name: "Base", themeId: "base", color: "#0052FF", dotColor: "#0052FF" },
+  { id: "ethereum", name: "Ethereum", themeId: "midnight", color: "#8B5CF6", dotColor: "#8B5CF6" },
+  { id: "arbitrum", name: "Arbitrum", themeId: "midnight", color: "#28A0F0", dotColor: "#28A0F0" },
+  { id: "optimism", name: "Optimism", themeId: "base", color: "#FF0420", dotColor: "#FF0420" },
+  { id: "polygon", name: "Polygon", themeId: "midnight", color: "#7B3F98", dotColor: "#7B3F98" },
 ];
 
 export const NyxHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
  const [isScrolled, setIsScrolled] = useState(false);
- const [selectedChain, setSelectedChain] = useState<Chain>(chains[0] as Chain); // Default to Cardano (index 0)
+ const [selectedChain, setSelectedChain] = useState<Chain>(chains[0] as Chain); // Default to Base (index 0)
  const [isChainDropdownOpen, setIsChainDropdownOpen] = useState(false);
   const { setTheme, currentTheme, transitionState } = useTheme();
 
-  // Set initial theme to midnight (for Cardano) on mount
+  // Set initial theme to base (for Base Network) on mount
   useEffect(() => {
     if (currentTheme.id !== 'midnight') {
       setTheme('midnight');
@@ -151,7 +151,7 @@ export const NyxHeader: React.FC = () => {
                       NyxUSD
                     </h1>
                     <p className="nyx-body-small" style={{ color: 'var(--nyx-gleam-60)', marginTop: '-4px' }}>
-                      Cardano CDP • Catalyst Fund 14
+                      Base Network CDP • AI-Powered DeFi
                     </p>
                   </div>
                 </div>

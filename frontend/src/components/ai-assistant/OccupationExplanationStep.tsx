@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAIAssistant } from "../../providers/AIAssistantProvider";
 import { Briefcase, RefreshCw, ChevronRight, Loader2 } from "lucide-react";
@@ -16,12 +16,7 @@ export const OccupationExplanationStep: React.FC<
   const [showAdjustOptions, setShowAdjustOptions] = useState(false);
   const occupation = state.userProfile.occupation || "professional";
 
-  useEffect(() => {
-    // Generate AI explanation when component mounts
-    generateOccupationExplanation();
-  }, [occupation]);
-
-  const generateOccupationExplanation = async () => {
+  const generateOccupationExplanation = useCallback(async () => {
     setIsGenerating(true);
     
     // Simulate AI generation with a dynamic explanation based on occupation
@@ -31,7 +26,12 @@ export const OccupationExplanationStep: React.FC<
       setExplanation(generatedExplanation);
       setIsGenerating(false);
     }, 1500);
-  };
+  }, [occupation]);
+
+  useEffect(() => {
+    // Generate AI explanation when component mounts
+    generateOccupationExplanation();
+  }, [generateOccupationExplanation]);
 
   const generateDynamicExplanation = (occ: string) => {
     // This function generates a template-based explanation

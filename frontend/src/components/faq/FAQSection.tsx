@@ -15,7 +15,7 @@ const faqData: FAQItem[] = [
   },
   {
     question: "How does the three-phase architecture work?",
-    answer: "Phase 1: Cardano mainnet for security and CDP creation. Phase 2: Vector L2 for performance enhancements. Phase 3: Nexus EVM for cross-chain yield access. Each phase builds progressively on the previous one."
+    answer: "Phase 1: Base Network deployment for security and CDP creation. Phase 2: AI optimization for automated yield strategies. Phase 3: Multi-chain expansion with advanced DeFi integrations. Each phase builds progressively."
   },
   {
     question: "What is the TEE Oracle and why is it important?",
@@ -34,12 +34,12 @@ const faqData: FAQItem[] = [
     answer: "Main risks include liquidation if your collateral falls below 125%, smart contract risks (mitigated by IOG formal verification), and oracle risks (minimized by TEE hardware security). Always manage your collateralization ratio carefully."
   },
   {
-    question: "How much funding is being requested from Catalyst?",
-    answer: "We're requesting ₳50,000 from Catalyst Fund 14. This covers smart contract development, TEE oracle implementation, security audits, and community launch infrastructure."
+    question: "How is the project funded?",
+    answer: "NyxUSD is community-funded with no VC backing. We prioritize security audits, smart contract development, AI optimization, and community-driven governance infrastructure."
   },
   {
     question: "What yields can I expect?",
-    answer: "Cross-chain yields typically range from 5-100%+ APY depending on risk tier. Safe strategies offer 5-10%, medium risk 10-25%, and high risk 25-100%+. Your capital stays secure on Cardano while accessing these opportunities."
+    answer: "Base Network yields typically range from 5-100%+ APY depending on risk tier. Safe strategies offer 5-10%, medium risk 10-25%, and high risk 25-100%+. Your capital stays secure on Base with AI-powered optimization."
   }
 ];
 
@@ -63,7 +63,7 @@ export const FAQSection: React.FC = () => {
           Frequently Asked Questions
         </h2>
         <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-          Everything you need to know about Cardano's most capital-efficient CDP protocol
+          Everything you need to know about Base Network's most capital-efficient CDP protocol
         </p>
       </motion.div>
 

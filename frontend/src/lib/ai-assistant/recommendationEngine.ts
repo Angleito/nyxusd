@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 // Temporary Either type until fp-utils is available
 type Either<E, A> = { isRight: () => boolean; value?: A };
-const Either = {
+const EitherUtils = {
   right: <A>(value: A): Either<any, A> => ({ isRight: () => true, value }),
   left: <E>(error: E): Either<E, any> => ({
     isRight: () => false,
@@ -312,7 +312,7 @@ export const generateRecommendations = (
     const templates = RECOMMENDATION_TEMPLATES[userProfile.riskTolerance];
 
     if (!templates || templates.length === 0) {
-      return Either.left(
+      return EitherUtils.left(
         new Error("No recommendation templates found for risk profile"),
       );
     }
@@ -363,9 +363,9 @@ export const generateRecommendations = (
       (a, b) => b.allocationPercentage - a.allocationPercentage,
     );
 
-    return Either.right(normalizedRecommendations);
+    return EitherUtils.right(normalizedRecommendations);
   } catch (error) {
-    return Either.left(
+    return EitherUtils.left(
       error instanceof Error
         ? error
         : new Error("Failed to generate recommendations"),

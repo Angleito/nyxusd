@@ -61,8 +61,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Cardano's first user-defined interest rate CDP protocol. Bridging the yield gap 
-            between Cardano's security and EVM's opportunities with capital efficiency.
+            Base Network's most advanced user-defined interest rate CDP protocol. Revolutionary capital efficiency 
+            with AI-powered DeFi automation and maximum yield opportunities.
           </motion.p>
           
           {/* Decorative elements */}
@@ -83,14 +83,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                 Mission Statement
               </h2>
               <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-6">
-                Our mission is to unlock Cardano's capital efficiency by creating the most advanced CDP protocol 
-                on the blockchain. We bridge Cardano's academic rigor and security with EVM's yield opportunities, 
-                enabling ADA holders to access 5-100%+ yields while maintaining their home base on Cardano.
+                Our mission is to unlock maximum capital efficiency on Base Network by creating the most advanced CDP protocol 
+                in DeFi. We leverage Base's speed and low costs with cutting-edge yield optimization, 
+                enabling users to access 5-100%+ yields while maintaining complete control over their assets.
               </p>
               <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-                By implementing user-defined interest rates and 125% collateralization, we provide 3x better capital 
-                efficiency than existing Cardano CDPs. Our three-phase architecture (Cardano → Vector → Nexus) creates 
-                a seamless bridge to cross-chain yields, with AI automation planned for post-launch enhancement.
+                By implementing user-defined interest rates and 125% collateralization, we provide maximum capital 
+                efficiency in the Base ecosystem. Our AI-powered architecture creates intelligent yield optimization 
+                with automated risk management and seamless DeFi integration.
               </p>
             </div>
           </Card>
@@ -118,8 +118,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                   gradient: "from-blue-500 to-cyan-500"
                 },
                 {
-                  title: "Cardano First",
-                  description: "Built specifically for Cardano using Plutus/Aiken contracts with IOG formal verification. Your ADA stays on the most secure blockchain.",
+                  title: "Base Native",
+                  description: "Built specifically for Base Network using Solidity smart contracts with comprehensive security audits. Your assets stay on the fastest-growing L2.",
                   icon: "🛡️",
                   gradient: "from-green-500 to-emerald-500"
                 },
@@ -130,8 +130,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                   gradient: "from-orange-500 to-red-500"
                 },
                 {
-                  title: "Cross-Chain Yields",
-                  description: "Access 5-100%+ yields on EVM chains while keeping your ADA collateral secure on Cardano. Best of both worlds.",
+                  title: "AI-Powered Yields",
+                  description: "Access 5-100%+ yields on Base ecosystem with AI-powered optimization and automated risk management. Maximum efficiency.",
                   icon: "🌍",
                   gradient: "from-yellow-500 to-orange-500"
                 },
@@ -177,12 +177,12 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                 {[
                   {
                     title: "Three-Phase Architecture",
-                    description: "Cardano mainnet for security → Vector L2 for performance → Nexus EVM for yields. Progressive enhancement across the Apex Fusion ecosystem.",
+                    description: "Base Network for security and speed → AI optimization for yields → Cross-chain deployment. Progressive enhancement with cutting-edge automation.",
                     icon: "🏗️"
                   },
                   {
                     title: "User-Defined Interest Rates", 
-                    description: "First Liquity V2 implementation on Cardano. Set your own borrowing terms, balance cost vs liquidation risk, natural rate discovery.",
+                    description: "Revolutionary Liquity V2 implementation on Base Network. Set your own borrowing terms with AI-powered risk optimization and natural rate discovery.",
                     icon: "⚙️"
                   },
                   {
@@ -236,13 +236,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                   Our Team
                 </h3>
                 <p className="text-lg text-gray-300 leading-relaxed">
-                  We're building Cardano's most capital-efficient CDP protocol, focused on bridging 
-                  the yield gap between Cardano's security and EVM opportunities while keeping 
-                  your ADA safe on the most academically rigorous blockchain.
+                  We're building Base Network's most capital-efficient CDP protocol, focused on maximizing 
+                  yield opportunities with cutting-edge AI automation while keeping 
+                  your assets secure on the fastest-growing Layer 2 ecosystem.
                 </p>
                 <p className="text-lg text-gray-300 leading-relaxed">
-                  Our expertise spans Cardano development, TEE security, cross-chain architecture, 
-                  and community-driven governance—all focused on making Cardano DeFi 
+                  Our expertise spans Base Network development, AI automation, advanced DeFi protocols, 
+                  and community-driven governance—all focused on making Base DeFi 
                   accessible and capital efficient for everyone.
                 </p>
                 <p className="text-lg text-gray-300 leading-relaxed mt-4">
@@ -341,7 +341,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ className }) => {
                   whileTap={{ scale: 0.98 }}
                   onClick={() => window.location.href = '/whitepaper'}
                 >
-                  Read Catalyst Proposal
+                  Read Whitepaper
                 </motion.button>
               </motion.div>
             </motion.div>
