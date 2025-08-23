@@ -1,0 +1,48 @@
+{
+  "name": "@nyxusd/design-system",
+  "version": "1.0.0",
+  "description": "NyxUSD Design System - Tokens, components, and utilities",
+  "main": "index.css",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.css",
+      "require": "./index.css"
+    },
+    "./tokens": "./styles/tokens/index.css",
+    "./components": "./styles/components/index.css",
+    "./utilities": "./styles/utilities/index.css"
+  },
+  "files": [
+    "styles",
+    "assets",
+    "examples",
+    "index.css",
+    "index.d.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "echo 'Design system build placeholder'",
+    "dev": "echo 'Design system dev placeholder'",
+    "lint": "echo 'Design system lint placeholder'",
+    "type-check": "echo 'Design system type-check placeholder'"
+  },
+  "keywords": [
+    "design-system",
+    "css",
+    "tokens",
+    "components",
+    "ui",
+    "nyx",
+    "midnight-protocol"
+  ],
+  "author": "NYXUSD Team",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.1.6"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

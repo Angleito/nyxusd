@@ -12,6 +12,7 @@ import ContactPage from "./components/ContactPage";
 import WhitepaperPage from "./pages/WhitepaperPage";
 import { DemoEnhancer } from "./components/demo/DemoEnhancer";
 import { DemoModeIndicator } from "./components/demo/DemoModeIndicator";
+import { HackathonBanner } from "./components/ui/HackathonBanner";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ThemeTransition, ThemeBackground } from "./components/theme/ThemeTransition";
 import "./styles/nyx-global.css";
@@ -71,6 +72,9 @@ function App() {
           <div className="stars" id="app-starfield" />
           
           <NyxHeader />
+          
+          {/* Hackathon Warning Banner */}
+          <HackathonBanner />
           
           {/* Global AI Assistant - Available on all pages */}
           <UnifiedAIAssistant position="bottom-right" />

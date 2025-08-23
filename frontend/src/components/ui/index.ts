@@ -8,3 +8,6 @@ export * from "./LoadingStates";
 export * from "./AnimatedCard";
 export * from "./InteractiveInput";
 export * from "./PageTransition";
+
+// Notice and banner components
+export * from "./HackathonBanner";
